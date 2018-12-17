@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * 2018 Alma / Nabla SAS
+ *
+ * THE MIT LICENSE
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+ * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @author    Alma / Nabla SAS <contact@getalma.eu>
+ * @copyright 2018 Alma / Nabla SAS
+ * @license   https://opensource.org/licenses/MIT The MIT License
+ *
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="cart_eligibility" type="Alma\MonthlyPayments\Plugin\Checkout\CustomerData\CartEligibility"/>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="AlmaMonthlyPaymentsGatewayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Alma\MonthlyPayments\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\ConfigurableInfo</argument>
+            <argument name="valueHandlerPool" xsi:type="object">AlmaMonthlyPaymentsGatewayValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">AlmaMonthlyPaymentsGatewayValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">AlmaMonthlyPaymentsGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Configuration reader -->
+    <type name="Alma\MonthlyPayments\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Alma\MonthlyPayments\Model\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </type>
+    <!-- Helper classes -->
+    <type name="Alma\MonthlyPayments\Helpers\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">Alma\MonthlyPayments\Gateway\Config\Config</argument>
+            <argument name="name" xsi:type="string">almaLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Magento\Framework\Logger\Handler\System</item>
+                <item name="debug" xsi:type="object">Magento\Framework\Logger\Handler\Debug</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Alma\MonthlyPayments\Helpers\AlmaClient">
+        <arguments>
+            <argument name="config" xsi:type="object">Alma\MonthlyPayments\Gateway\Config\Config</argument>
+            <argument name="logger" xsi:type="object">Alma\MonthlyPayments\Helpers\Logger</argument>
+        </arguments>
+    </type>
+
+    <!-- Capture command -->
+    <virtualType name="AlmaMonthlyPaymentsGatewayInitializeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">AlmaMonthlyPaymentsGatewayRequestInitializeRequest</argument>
+            <argument name="handler" xsi:type="object">Alma\MonthlyPayments\Gateway\Response\ResponseHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Alma\MonthlyPayments\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">Alma\MonthlyPayments\Gateway\Validator\ResponseValidator</argument>
+            <argument name="client" xsi:type="object">Alma\MonthlyPayments\Gateway\Http\Client\Client</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Initialize Request -->
+    <virtualType name="AlmaMonthlyPaymentsGatewayRequestInitializeRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="payment" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder</item>
+                <item name="customer" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\CustomerDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="AlmaMonthlyPaymentsGatewayCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="initialize" xsi:type="string">AlmaMonthlyPaymentsGatewayInitializeCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="AlmaMonthlyPaymentsGatewayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">AlmaMonthlyPaymentsGatewayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="AlmaMonthlyPaymentsGatewayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Alma\MonthlyPayments\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Validator pool -->
+    <virtualType name="AlmaMonthlyPaymentsGatewayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\CountryValidator</item>
+                <item name="currency" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\CurrencyValidator</item>
+                <item name="availability" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\AvailabilityValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Blocks -->
+    <type name="Alma\MonthlyPayments\Block\Info">
+        <arguments>
+            <argument name="config" xsi:type="object">Alma\MonthlyPayments\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+</config>

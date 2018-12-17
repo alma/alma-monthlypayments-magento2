@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * 2018 Alma / Nabla SAS
+ *
+ * THE MIT LICENSE
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+ * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @author    Alma / Nabla SAS <contact@getalma.eu>
+ * @copyright 2018 Alma / Nabla SAS
+ * @license   https://opensource.org/licenses/MIT The MIT License
+ *
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="alma_monthly_payments" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Alma Monthly Payments</label>
+
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                    <frontend_class>validate-number</frontend_class>
+                </field>
+
+                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable logging info and errors to help debug any issue with the module.</comment>
+                </field>
+
+                <!-- API CONFIGURATION -->
+                <group id="api_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API configuration</label>
+                    <comment><![CDATA[You can find your API keys on <a href="https://dashboard.getalma.eu/security" target="_blank">your Alma dashboard</a>]]></comment>
+                    <attribute type="expanded">1</attribute>
+                    <depends>
+                        <field id="payment/alma_monthly_payments/active">1</field>
+                    </depends>
+
+                    <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Live API key</label>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TestAPIKeyValue</backend_model>
+                        <config_path>payment/alma_monthly_payments/live_api_key</config_path>
+                        <depends>
+                            <field id="payment/alma_monthly_payments/active">1</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="test_api_key" translate="label" type="obscure" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Test API key</label>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TestAPIKeyValue</backend_model>
+                        <config_path>payment/alma_monthly_payments/test_api_key</config_path>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="api_mode" translate="label comment" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>API mode</label>
+                        <comment>Use Test mode until you are ready to take real orders with Alma. In Test mode, only admins can see Alma on cart/checkout pages.</comment>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\APIModes</source_model>
+                        <config_path>payment/alma_monthly_payments/api_mode</config_path>
+                    </field>
+                </group>
+
+                <!-- PAYMENT METHOD CONFIGURATION -->
+                <group id="general_config" translate="label" type="text" sortOrder="20" showInDefault="20" showInWebsite="1" showInStore="1">
+                    <label>Checkout display</label>
+                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                        <comment>This controls the payment method name which the user sees during checkout.</comment>
+                        <config_path>payment/alma_monthly_payments/title</config_path>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Description</label>
+                        <comment>This controls the payment method description which the user sees during checkout.</comment>
+                        <config_path>payment/alma_monthly_payments/description</config_path>
+                    </field>
+                </group>
+
+                <group id="cart_config" translate="label comment" type="text" sortOrder="30" showInDefault="20" showInWebsite="1" showInStore="1">
+                    <label>Cart display</label>
+                    <comment>A message can be displayed in the cart and minicart to indicate the order eligibility for monthly payments</comment>
+
+                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Display cart eligibility message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/alma_monthly_payments/show_eligibility_message</config_path>
+                    </field>
+                    <field id="eligibility_message" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Eligibility message</label>
+                        <config_path>payment/alma_monthly_payments/eligibility_message</config_path>
+                    </field>
+                    <field id="non_eligibility_message" translate="label" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Non-eligibility message</label>
+                        <config_path>payment/alma_monthly_payments/non_eligibility_message</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>
