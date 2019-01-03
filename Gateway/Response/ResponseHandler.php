@@ -61,10 +61,18 @@ class ResponseHandler implements HandlerInterface
         $payment->setAmountAuthorized($order->getTotalDue());
 
         $order->setCanSendNewEmailFlag(false);
-        $order->addCommentToStatusHistory(
-            __('Successfully created Alma Payment. Redirecting customer & awaiting payment return.'),
-            Order::STATE_PENDING_PAYMENT
-        );
+
+        if (is_callable([$order, 'addCommentToStatusHistory'])) {
+            $order->addCommentToStatusHistory(
+                __('Successfully created Alma Payment. Redirecting customer & awaiting payment return.'),
+                Order::STATE_PENDING_PAYMENT
+            );
+        } else {
+            $order->addStatusHistoryComment(
+                __('Successfully created Alma Payment. Redirecting customer & awaiting payment return.'),
+                Order::STATE_PENDING_PAYMENT
+            );
+        }
 
         $stateObject = SubjectReader::readStateObject($handlingSubject);
         $stateObject->setData('status', Order::STATE_PENDING_PAYMENT);

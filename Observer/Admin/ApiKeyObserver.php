@@ -28,6 +28,7 @@ namespace Alma\MonthlyPayments\Observer\Admin;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
@@ -61,9 +62,9 @@ class ApiKeyObserver implements ObserverInterface
 
         $configPath = 'payment/' . ConfigProvider::CODE  . '/fully_configured';
         if ($this->availabilityHelper->canConnectToAlma($modeToTest)) {
-            $this->resourceConfig->saveConfig($configPath, 1);
+            $this->resourceConfig->saveConfig($configPath, 1, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
         } else {
-            $this->resourceConfig->saveConfig($configPath, 0);
+            $this->resourceConfig->saveConfig($configPath, 0, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
         }
     }
 }

@@ -105,7 +105,12 @@ class ReturnAction extends Action
             if (!$payment) {
                 $internalError = __("Cannot get payment information from order %s", $order->getIncrementId());
                 $this->logger->error($internalError->render());
-                $order->addCommentToStatusHistory($internalError);
+
+                if (is_callable([$order, 'addCommentToStatusHistory'])) {
+                    $order->addCommentToStatusHistory($internalError);
+                } else {
+                    $order->addStatusHistoryComment($internalError);
+                }
 
                 throw new LocalizedException($errorMessage);
             }
@@ -119,7 +124,12 @@ class ReturnAction extends Action
                     $e->getMessage()
                 );
                 $this->logger->error($internalError->render());
-                $order->addCommentToStatusHistory($internalError);
+
+                if (is_callable([$order, 'addCommentToStatusHistory'])) {
+                    $order->addCommentToStatusHistory($internalError);
+                } else {
+                    $order->addStatusHistoryComment($internalError);
+                }
 
                 throw new LocalizedException($errorMessage);
             }
@@ -132,7 +142,12 @@ class ReturnAction extends Action
                     $order->getIncrementId()
                 );
                 $this->logger->error($internalError->render());
-                $order->addCommentToStatusHistory($internalError);
+
+                if (is_callable([$order, 'addCommentToStatusHistory'])) {
+                    $order->addCommentToStatusHistory($internalError);
+                } else {
+                    $order->addStatusHistoryComment($internalError);
+                }
 
                 throw new LocalizedException($errorMessage);
             }
@@ -146,7 +161,12 @@ class ReturnAction extends Action
                     $order->getIncrementId()
                 );
                 $this->logger->error($internalError->render());
-                $order->addCommentToStatusHistory($internalError);
+
+                if (is_callable([$order, 'addCommentToStatusHistory'])) {
+                    $order->addCommentToStatusHistory($internalError);
+                } else {
+                    $order->addStatusHistoryComment($internalError);
+                }
 
                 throw new LocalizedException($errorMessage);
             }
@@ -164,9 +184,15 @@ class ReturnAction extends Action
             if ($invoice && !$order->getEmailSent()) {
                 $this->orderSender->send($order);
 
-                $order->addCommentToStatusHistory(
-                    __('You notified customer about invoice %1', $invoice->getIncrementId())
-                )->setIsCustomerNotified(true);
+                if (is_callable([$order, 'addCommentToStatusHistory'])) {
+                    $order->addCommentToStatusHistory(
+                        __('You notified customer about invoice %1', $invoice->getIncrementId())
+                    )->setIsCustomerNotified(true);
+                } else {
+                    $order->addStatusHistoryComment(
+                        __('You notified customer about invoice %1', $invoice->getIncrementId())
+                    )->setIsCustomerNotified(true);
+                }
             }
 
             $this->orderRepository->save($order);
