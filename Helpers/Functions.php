@@ -33,6 +33,6 @@ class Functions {
 
     public static function priceToCents($price)
     {
-        return (int)(floor($price * 100));
+        return (int)(round($price * 100));
     }
 }
