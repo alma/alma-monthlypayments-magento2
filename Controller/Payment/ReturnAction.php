@@ -152,12 +152,12 @@ class ReturnAction extends Action
                 throw new LocalizedException($errorMessage);
             }
 
-            $first_instalment = $almaPayment->payment_plan[0];
-            if ( $almaPayment->state !== Payment::STATE_IN_PROGRESS || $first_instalment->state !== Instalment::STATE_PAID ) {
+            $firstInstalment = $almaPayment->payment_plan[0];
+            if (!in_array($almaPayment->state, [Payment::STATE_IN_PROGRESS, Payment::STATE_PAID]) || $firstInstalment->state !== Instalment::STATE_PAID) {
                 $internalError = __(
                     "Payment state incorrect (%s & %s) for order %s",
                     $almaPayment->state,
-                    $first_instalment->state,
+                    $firstInstalment->state,
                     $order->getIncrementId()
                 );
                 $this->logger->error($internalError->render());
