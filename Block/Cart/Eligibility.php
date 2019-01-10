@@ -61,9 +61,7 @@ class Eligibility extends Template
 
     public function checkEligibility()
     {
-        $eligibilityMessage = $this->config->getEligibilityMessage();
-        $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
-        $this->eligibilityHelper->checkEligibility($eligibilityMessage, $nonEligibilityMessage);
+        $this->eligibilityHelper->checkEligibility();
     }
 
     public function isEligible()

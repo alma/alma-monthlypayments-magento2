@@ -101,6 +101,16 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
         return $this->get('description');
     }
 
+    public function getExcludedProductTypes()
+    {
+        return explode(',', $this->get('excluded_product_types'));
+    }
+
+    public function getExcludedProductsMessage()
+    {
+        return $this->get('excluded_products_message');
+    }
+
     public function isFullyConfigured()
     {
         return !$this->needsAPIKeys() && (bool)(int)$this->get('fully_configured', false);

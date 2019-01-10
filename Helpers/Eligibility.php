@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
 use Alma\API\RequestError;
+use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
 
@@ -54,12 +55,17 @@ class Eligibility
 
     /** @var string */
     private $message;
+    /**
+     * @var Config
+     */
+    private $config;
 
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\Pricing\Helper\Data $pricingHelper,
         Helpers\AlmaClient $almaClient,
-        Helpers\Logger $logger
+        Helpers\Logger $logger,
+        Config $config
     ) {
 
         $this->checkoutSession = $checkoutSession;
@@ -67,15 +73,25 @@ class Eligibility
         $this->logger = $logger;
 
         $this->alma = $almaClient->getDefaultClient();
+        $this->config = $config;
     }
 
     /**
-     * @param $eligibilityMessage string Message to display when Quote is eligible for monthly payments
-     * @param $nonEligibilityMessage string Message to display when Quote is not eligible for monthly payments
      * @return bool
      */
-    public function checkEligibility($eligibilityMessage, $nonEligibilityMessage) {
+    public function checkEligibility() {
+        $eligibilityMessage = $this->config->getEligibilityMessage();
+        $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
+        $excludedProductsMessage = $this->config->getExcludedProductsMessage();
+
         if (!$this->alma) {
+            $this->eligible = false;
+            return false;
+        }
+
+        if (!$this->checkItemsTypes()) {
+            $this->eligible = false;
+            $this->message = $nonEligibilityMessage . '<br>' . $excludedProductsMessage;
             return false;
         }
 
@@ -86,6 +102,7 @@ class Eligibility
             $eligibility = $this->alma->payments->eligibility(AlmaQuote::dataFromQuote($this->checkoutSession->getQuote()));
         } catch (RequestError $e) {
             $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
+            $this->eligible = false;
             $this->message = $nonEligibilityMessage;
             return false;
         }
@@ -118,7 +135,7 @@ class Eligibility
             $this->eligible = true;
         }
 
-        return true;
+        return $this->eligible;
     }
 
     public function isEligible()
@@ -134,5 +151,22 @@ class Eligibility
     private function getFormattedPrice($price)
     {
         return $this->pricingHelper->currency($price, true, false);
+    }
+
+    /**
+     * @return bool
+     */
+    private function checkItemsTypes()
+    {
+        $quote = $this->checkoutSession->getQuote();
+        $excludedProductTypes = $this->config->getExcludedProductTypes();
+
+        foreach ($quote->getAllItems() as $item) {
+            if (in_array($item->getProductType(), $excludedProductTypes)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

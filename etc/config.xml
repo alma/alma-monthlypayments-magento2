@@ -47,6 +47,9 @@
                 <is_gateway>0</is_gateway>
                 <sort_order>1</sort_order>
 
+                <excluded_product_types>virtual,downloadable</excluded_product_types>
+                <excluded_products_message>Virtual and downloadable products aren't eligible</excluded_products_message>
+
                 <live_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <test_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <api_mode>test</api_mode>

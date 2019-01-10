@@ -23,54 +23,54 @@
  *
  */
 
-namespace Alma\MonthlyPayments\Model\Ui;
+namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
-use Magento\Checkout\Model\ConfigProviderInterface;
-use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\UrlInterface;
+use Magento\Catalog\Model\ProductTypeList;
 
-class ConfigProvider implements ConfigProviderInterface
+/**
+ * Config product types source
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
+class ProductTypes implements \Magento\Framework\Option\ArrayInterface
 {
-    const CODE = 'alma_monthly_payments';
     /**
-     * @var CheckoutSession
+     * @var ProductTypeList
      */
-    private $checkoutSession;
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-    /**
-     * @var Config
-     */
-    private $config;
+    private $productTypeList;
 
     /**
-     * ConfigProvider constructor.
-     * @param CheckoutSession $checkoutSession
-     * @param UrlInterface $urlBuilder
-     * @param Config $config
+     * Construct
+     *
+     * @param ProductTypeList $productTypeList
      */
     public function __construct(
-        CheckoutSession $checkoutSession,
-        UrlInterface $urlBuilder,
-        Config $config
+        ProductTypeList $productTypeList
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->urlBuilder = $urlBuilder;
-        $this->config = $config;
+
+        $this->productTypeList = $productTypeList;
     }
 
-    public function getConfig()
+    /**
+     * Return option array
+     *
+     * @param bool $addEmpty
+     * @return array
+     */
+    public function toOptionArray($addEmpty = true)
     {
-        return [
-            'payment' => [
-                self::CODE => [
-                    'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
-                    'title' => $this->config->getPaymentButtonTitle()
-                ]
-            ]
-        ];
+        $types = $this->productTypeList->getProductTypes();
+
+        $options = [];
+
+        if ($addEmpty) {
+            $options[] = ['label' => __('-- Please Select a Type --'), 'value' => ''];
+        }
+
+        foreach ($types as $type) {
+            $options[] = ['label' => $type->getLabel(), 'value' => $type->getName()];
+        }
+
+        return $options;
     }
 }

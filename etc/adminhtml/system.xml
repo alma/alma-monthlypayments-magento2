@@ -47,6 +47,17 @@
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
 
+                <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <can_be_empty>1</can_be_empty>
+                    <label>Excluded product types</label>
+                    <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductTypes</source_model>
+                </field>
+
+                <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Excluded products message</label>
+                    <comment>List/explain which products aren't eligible to monthly payments</comment>
+                </field>
+
                 <!-- API CONFIGURATION -->
                 <group id="api_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API configuration</label>
@@ -58,7 +69,7 @@
 
                     <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Live API key</label>
-                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TestAPIKeyValue</backend_model>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\LiveAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/live_api_key</config_path>
                         <depends>
                             <field id="payment/alma_monthly_payments/active">1</field>
