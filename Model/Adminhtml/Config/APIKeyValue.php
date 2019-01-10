@@ -33,7 +33,7 @@ use Magento\Framework\Exception\LocalizedException;
 class APIKeyValue extends \Magento\Config\Model\Config\Backend\Encrypted
 {
     protected $apiKeyType = null;
-    protected $apiKeyName = null;
+
     /**
      * @var AlmaClient
      */

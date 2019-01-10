@@ -44,7 +44,6 @@ define(
                 this._super();
 
                 var eligibility = cartObservable().eligibility;
-                console.log(eligibility);
                 this.display = ko.observable(eligibility ? eligibility.display : false);
                 this.message = ko.observable(eligibility ? eligibility.message : '');
 

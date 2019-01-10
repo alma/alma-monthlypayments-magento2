@@ -64,7 +64,6 @@ class AlmaClient
             $alma = new Client($apiKey, ['mode' => $mode, 'logger' => $this->logger]);
         } catch (\Exception $e) {
             $this->logger->error("Error creating Alma API client {$e->getMessage()}");
-            var_dump($e);
         }
 
         return $alma;
