@@ -1,3 +1,4 @@
+<?php
 /**
  * 2018 Alma / Nabla SAS
  *
@@ -22,42 +23,42 @@
  *
  */
 
-/*browser:true*/
-/*global define*/
-define(
-    [
-        'uiComponent',
-        'Magento_Checkout/js/model/payment/method-list',
-        'Magento_Checkout/js/model/payment/renderer-list',
-        'mage/storage'
-    ],
-    function (
-        Component,
-        paymentMethods,
-        rendererList,
-        storage,
+namespace Alma\MonthlyPayments\Controller\Payment;
+
+use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Eligibility as EligibilityHelper;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\LocalizedException;
+
+class Eligibility extends Action
+{
+    /**
+     * @var EligibilityHelper
+     */
+    private $eligibilityHelper;
+
+    public function __construct(
+        Context $context,
+        EligibilityHelper $eligibilityHelper
     ) {
-        'use strict';
-
-        function getCode() {
-            return 'alma_monthly_payments';
-        }
-
-        storage.get('alma/payment/eligibility').done(function(response) {
-            if (response.eligible) {
-                rendererList.push({
-                    type: getCode(),
-                    component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
-                });
-
-                paymentMethods.push({
-                    title: window.checkoutConfig.payment[getCode()].title,
-                    method: getCode()
-                });
-            }
-        });
-
-        /** Add view logic here if needed */
-        return Component.extend({});
+        parent::__construct($context);
+        $this->eligibilityHelper = $eligibilityHelper;
     }
-);
+
+    /**
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
+     */
+    public function execute()
+    {
+        $this->eligibilityHelper->checkEligibility();
+
+        /** @var Json $json */
+        $json = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        $json->setData(["eligible" => $this->eligibilityHelper->isEligible()]);
+
+        return $json;
+    }
+}
