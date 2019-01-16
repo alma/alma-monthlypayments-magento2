@@ -26,7 +26,7 @@
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 /**
- * Class PaymentAction
+ * Class APIModes
  */
 class APIModes implements \Magento\Framework\Option\ArrayInterface
 {
