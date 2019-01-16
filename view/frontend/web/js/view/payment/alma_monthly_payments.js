@@ -27,35 +27,20 @@
 define(
     [
         'uiComponent',
-        'Magento_Checkout/js/model/payment/method-list',
-        'Magento_Checkout/js/model/payment/renderer-list',
-        'mage/storage'
+        'Magento_Checkout/js/model/payment/renderer-list'
     ],
     function (
         Component,
-        paymentMethods,
-        rendererList,
-        storage,
+        rendererList
     ) {
         'use strict';
 
-        function getCode() {
-            return 'alma_monthly_payments';
-        }
-
-        storage.get('alma/payment/eligibility').done(function(response) {
-            if (response.eligible) {
-                rendererList.push({
-                    type: getCode(),
-                    component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
-                });
-
-                paymentMethods.push({
-                    title: window.checkoutConfig.payment[getCode()].title,
-                    method: getCode()
-                });
+        rendererList.push(
+            {
+                type: 'alma_monthly_payments',
+                component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
             }
-        });
+        );
 
         /** Add view logic here if needed */
         return Component.extend({});

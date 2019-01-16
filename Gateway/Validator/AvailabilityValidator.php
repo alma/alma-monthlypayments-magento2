@@ -25,7 +25,8 @@
 
 namespace Alma\MonthlyPayments\Gateway\Validator;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Availability;
+use Alma\MonthlyPayments\Helpers\Eligibility;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
@@ -33,16 +34,22 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 class AvailabilityValidator extends AbstractValidator
 {
     /**
-     * @var Config
+     * @var Availability
      */
-    private $config;
+    private $availabilityHelper;
+    /**
+     * @var Eligibility
+     */
+    private $eligibilityHelper;
 
     public function __construct(
         ResultInterfaceFactory $resultFactory,
-        Config $config
+        Availability $availabilityHelper,
+        Eligibility $eligibilityHelper
     ) {
         parent::__construct($resultFactory);
-        $this->config = $config;
+        $this->availabilityHelper = $availabilityHelper;
+        $this->eligibilityHelper = $eligibilityHelper;
     }
 
     /**
@@ -53,12 +60,6 @@ class AvailabilityValidator extends AbstractValidator
      */
     public function validate(array $validationSubject)
     {
-        $isAvailable = true;
-
-        if ($this->config->needsAPIKeys()) {
-            $isAvailable = false;
-        }
-
-        return $this->createResult($isAvailable);
+        return $this->createResult($this->availabilityHelper->isAvailable() && $this->eligibilityHelper->checkEligibility());
     }
 }

@@ -116,9 +116,10 @@
     <virtualType name="AlmaMonthlyPaymentsGatewayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
         <arguments>
             <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\CountryValidator</item>
-                <item name="currency" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\CurrencyValidator</item>
-                <item name="availability" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\AvailabilityValidator</item>
+                <!--<item name="country" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\CountryValidator</item>-->
+                <!--<item name="currency" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\CurrencyValidator</item>-->
+                <!-- Cheating a little here -->
+                <item name="currency" xsi:type="string">Alma\MonthlyPayments\Gateway\Validator\AvailabilityValidator</item>
             </argument>
         </arguments>
     </virtualType>

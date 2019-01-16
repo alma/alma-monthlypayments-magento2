@@ -39,6 +39,6 @@ class CountryValidator extends AbstractValidator
      */
     public function validate(array $validationSubject)
     {
-        return $this->createResult($validationSubject['country'] === 'FR');
+        return $this->createResult(true/*$validationSubject['country'] === 'FR'*/);
     }
 }
