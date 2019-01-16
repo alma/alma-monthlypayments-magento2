@@ -29,7 +29,7 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
-            <alma_monthly_payments>
+            <alma_monthly_payments translate="excluded_products_message title description eligibility_message non_eligibility_message">
                 <model>AlmaMonthlyPaymentsGatewayFacade</model>
 
                 <active>1</active>
