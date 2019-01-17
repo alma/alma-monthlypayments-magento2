@@ -27,10 +27,45 @@
 define(
     [
         'jquery',
-        'Magento_Checkout/js/view/payment/default'
+        'Magento_Checkout/js/view/payment/default',
+        'uiRegistry',
+        'underscore',
     ],
-    function ($, Component) {
+    function ($, Component, registry, _) {
         'use strict';
+
+        // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
+        // payment page to shipping and back and a payment method is removed/inserted. So we reorder them manually.
+        registry.get('checkout.steps.billing-step.payment.payments-list', function(methodsList) {
+            var region = methodsList.regions['payment-methods-items-default'];
+
+            if (!region) {
+                return;
+            }
+
+            function reorderMethods() {
+                var list = region.peek(),
+                    expectedPosition = window.checkoutConfig.payment['alma_monthly_payments'].sortOrder - 1;
+
+                var almaIndex = _.findIndex(list, function(methodComponent) {
+                    return methodComponent.item.method === 'alma_monthly_payments';
+                });
+
+                if (almaIndex >= 0 && almaIndex !== expectedPosition) {
+                    region.valueWillMutate();
+
+                    var component = list[almaIndex];
+                    list.splice(almaIndex, 1);
+                    list.splice(expectedPosition, 0, component);
+
+                    region.valueHasMutated();
+                }
+            }
+
+            region.subscribe(reorderMethods);
+            reorderMethods();
+        });
+
 
         return Component.extend({
             redirectAfterPlaceOrder: false,
