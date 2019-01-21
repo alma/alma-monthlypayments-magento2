@@ -131,7 +131,7 @@ class Ipn extends Action
 
                 $this->logger->error($internalError->render());
 
-                return $json->setData(["retry" => true, "error" => "Cannot fetch Alma payment"])->setHttpResponseCode(500);
+                return $json->setData(["error" => "Cannot fetch Alma payment"])->setHttpResponseCode(500);
             }
 
             // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
@@ -168,16 +168,20 @@ class Ipn extends Action
                 $this->addCommentToOrder($order, $internalError, Order::STATUS_FRAUD);
                 $this->orderManagement->cancel($order->getId());
 
-                // TODO: Ping Alma to set fraud status on payment
+                try {
+                    $this->alma->payments->flagAsPotentialFraud($paymentId, Payment::FRAUD_AMOUNT_MISMATCH);
+                } catch (\Exception $e) {
+                    $this->logger->info("Error flagging payment {$paymentId} as fraudulent");
+                }
 
-                return $json->setData(["retry" => false, "error" => "Amount mismatch"])->setHttpResponseCode(500);
+                return $json->setData(["error" => Payment::FRAUD_AMOUNT_MISMATCH])->setHttpResponseCode(500);
             }
 
             // Check that the Alma API has correctly registered the first installment as paid
             $firstInstalment = $almaPayment->payment_plan[0];
             if (!in_array($almaPayment->state, [Payment::STATE_IN_PROGRESS, Payment::STATE_PAID]) || $firstInstalment->state !== Instalment::STATE_PAID) {
                 $internalError = __(
-                    "Payment state incorrect (%s & %s) for order %s",
+                    "Payment state incorrect (%1 & %2) for order %3",
                     $almaPayment->state,
                     $firstInstalment->state,
                     $order->getIncrementId()
@@ -187,9 +191,13 @@ class Ipn extends Action
                 $this->addCommentToOrder($order, $internalError, Order::STATUS_FRAUD);
                 $this->orderManagement->cancel($order->getId());
 
-                // TODO: Ping Alma to set fraud status on payment
+                try {
+                    $this->alma->payments->flagAsPotentialFraud($paymentId, Payment::FRAUD_STATE_ERROR . ": " . $internalError->render());
+                } catch (\Exception $e) {
+                    $this->logger->info("Error flagging payment {$paymentId} as fraudulent");
+                }
 
-                return $json->setData(["retry" => false, "error" => "State error"])->setHttpResponseCode(500);
+                return $json->setData(["error" => Payment::FRAUD_STATE_ERROR])->setHttpResponseCode(500);
             }
 
             if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
@@ -203,19 +211,19 @@ class Ipn extends Action
                 $this->orderManagement->notify($order->getId());
 
                 $this->orderRepository->save($order);
-                return $json->setData(["retry" => false, "success" => true])->setHttpResponseCode(200);
+                return $json->setData([])->setHttpResponseCode(200);
 
             } elseif ($order->getState() == Order::STATE_CANCELED) {
-                return $json->setData(["retry" => false, "error" => "Order was canceled"])->setHttpResponseCode(500);
+                return $json->setData(["error" => "Order was canceled"])->setHttpResponseCode(500);
             } elseif (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_HOLDED, Order::STATE_PAYMENT_REVIEW])) {
-                return $json->setData(["retry" => false, "info" => "Order already validated"])->setHttpResponseCode(200);
+                return $json->setData(["info" => "Order already validated"])->setHttpResponseCode(200);
             }
         } catch (\Exception $e) {
             $this->logger->critical($e->getMessage());
-            return $json->setData(["retry" => true, "error" => $e->getMessage()])->setHttpResponseCode(500);
+            return $json->setData(["error" => $e->getMessage()])->setHttpResponseCode(500);
         }
 
-        return $json->setData(["retry" => true, "error" => "Order in unexpected state {$order->getState()}"])->setHttpResponseCode(500);
+        return $json->setData(["error" => "Order in unexpected state {$order->getState()}"])->setHttpResponseCode(500);
     }
 
     /**
