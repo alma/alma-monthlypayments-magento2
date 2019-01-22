@@ -58,6 +58,7 @@ class PaymentDataBuilder implements BuilderInterface
             'payment' => [
                 'return_url' => $this->urlBuilder->getUrl('checkout/onepage/success'),
                 'ipn_callback_url' => $this->urlBuilder->getUrl('alma/payment/ipn'),
+                'customer_cancel_url' => $this->urlBuilder->getUrl('checkout/cart'),
                 'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
                 'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
                 'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
