@@ -40,10 +40,10 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Phrase;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment\Processor as PaymentProcessor;
 
 class Ipn extends Action
@@ -73,7 +73,7 @@ class Ipn extends Action
      */
     private $orderSender;
     /**
-     * @var \Magento\Sales\Api\OrderManagementInterface
+     * @var OrderManagementInterface
      */
     private $orderManagement;
     /**
@@ -95,7 +95,7 @@ class Ipn extends Action
         SearchCriteriaBuilder $searchCriteriaBuilder,
         QuoteRepository $quoteRepository,
         OrderSender $orderSender,
-        \Magento\Sales\Api\OrderManagementInterface $orderManagement
+        OrderManagementInterface $orderManagement
     ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
@@ -211,6 +211,11 @@ class Ipn extends Action
                 $this->orderManagement->notify($order->getId());
 
                 $this->orderRepository->save($order);
+
+                $quote = $this->quoteRepository->get($order->getQuoteId());
+                $quote->setIsActive(false);
+                $this->quoteRepository->save($quote);
+
                 return $json->setData([])->setHttpResponseCode(200);
 
             } elseif ($order->getState() == Order::STATE_CANCELED) {
@@ -240,23 +245,5 @@ class Ipn extends Action
         }
 
         return $statusHistoryItem;
-    }
-
-    private function addError($message)
-    {
-        if (method_exists($this->messageManager, 'addErrorMessage') && is_callable([$this->messageManager, 'addErrorMessage'])) {
-            $this->messageManager->addErrorMessage($message);
-        } else {
-            $this->messageManager->addError($message);
-        }
-    }
-
-    private function addException(\Exception $e, $message=null)
-    {
-        if (method_exists($this->messageManager, 'addExceptionMessage') && is_callable([$this->messageManager, 'addExceptionMessage'])) {
-            $this->messageManager->addExceptionMessage($e, $message ?: $e->getMessage());
-        } else {
-            $this->messageManager->addException($e, $message ?: $e->getMessage());
-        }
     }
 }

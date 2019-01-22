@@ -29,6 +29,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Model\QuoteRepository;
 
 class Pay extends Action
 {
@@ -36,13 +37,19 @@ class Pay extends Action
      * @var CheckoutSession
      */
     private $checkoutSession;
+    /**
+     * @var QuoteRepository
+     */
+    private $quoteRepository;
 
     public function __construct(
         Context $context,
-        CheckoutSession $checkoutSession
+        CheckoutSession $checkoutSession,
+        QuoteRepository $quoteRepository
     ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
+        $this->quoteRepository = $quoteRepository;
     }
 
     /**
@@ -65,6 +72,14 @@ class Pay extends Action
         if (empty($url)) {
             throw new LocalizedException(__('Error: no payment URL found in session'));
         }
+
+        // Keep quote active in case the customer comes back to the site without paying
+        $quote = $this->quoteRepository->get($order->getQuoteId());
+        $quote->setIsActive(true);
+        $this->checkoutSession->restoreQuote();
+        $this->quoteRepository->save($quote);
+
+        $this->checkoutSession->setLastQuoteId($quote->getId())->setLastSuccessQuoteId($quote->getId())->setLastOrderId($order->getId())->setLastRealOrderId($order->getIncrementId());
 
         $redirect = $this->resultRedirectFactory->create();
         $redirect->setUrl($url);

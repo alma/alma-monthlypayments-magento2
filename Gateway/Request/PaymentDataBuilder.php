@@ -26,10 +26,12 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Model\Data\Address;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -37,10 +39,20 @@ class PaymentDataBuilder implements BuilderInterface
      * @var UrlInterface
      */
     private $urlBuilder;
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
 
-    public function __construct(UrlInterface $urlBuilder)
+    public function __construct(UrlInterface $urlBuilder, OrderRepositoryInterface $orderRepository, CheckoutSession $checkoutSession)
     {
         $this->urlBuilder = $urlBuilder;
+        $this->orderRepository = $orderRepository;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -53,17 +65,20 @@ class PaymentDataBuilder implements BuilderInterface
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $order = $paymentDO->getOrder();
+        $order_id = $order->getOrderIncrementId();
+        $quote_id = $this->checkoutSession->getQuoteId();
 
         return [
             'payment' => [
-                'return_url' => $this->urlBuilder->getUrl('checkout/onepage/success'),
+                'return_url' => $this->urlBuilder->getUrl('alma/payment/return'),
                 'ipn_callback_url' => $this->urlBuilder->getUrl('alma/payment/ipn'),
                 'customer_cancel_url' => $this->urlBuilder->getUrl('checkout/cart'),
                 'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
                 'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
                 'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
                 'custom_data' => [
-                    'order_id' => $order->getOrderIncrementId(),
+                    'order_id' => $order_id,
+                    'quote_id' => $quote_id
                 ]
             ],
         ];
