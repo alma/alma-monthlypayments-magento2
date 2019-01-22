@@ -233,7 +233,7 @@ class Ipn extends Action
      * @return \Magento\Sales\Api\Data\OrderStatusHistoryInterface
      */
     private function addCommentToOrder($order, $comment, $status=false) {
-        if (is_callable([$order, 'addCommentToStatusHistory'])) {
+        if (method_exists($order, 'addCommentToStatusHistory') && is_callable([$order, 'addCommentToStatusHistory'])) {
             $statusHistoryItem = $order->addCommentToStatusHistory($comment, $status);
         } else {
             $statusHistoryItem = $order->addStatusHistoryComment($comment, $status);
@@ -244,7 +244,7 @@ class Ipn extends Action
 
     private function addError($message)
     {
-        if (is_callable([$this->messageManager, 'addErrorMessage'])) {
+        if (method_exists($this->messageManager, 'addErrorMessage') && is_callable([$this->messageManager, 'addErrorMessage'])) {
             $this->messageManager->addErrorMessage($message);
         } else {
             $this->messageManager->addError($message);
@@ -253,7 +253,7 @@ class Ipn extends Action
 
     private function addException(\Exception $e, $message=null)
     {
-        if (is_callable([$this->messageManager, 'addExceptionMessage'])) {
+        if (method_exists($this->messageManager, 'addExceptionMessage') && is_callable([$this->messageManager, 'addExceptionMessage'])) {
             $this->messageManager->addExceptionMessage($e, $message ?: $e->getMessage());
         } else {
             $this->messageManager->addException($e, $message ?: $e->getMessage());

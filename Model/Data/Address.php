@@ -47,7 +47,7 @@ class Address
 
         foreach ($map as $attribute => $method) {
             $callable = [$address, $method];
-            if (is_callable($callable)) {
+            if (method_exists($address, $method) && is_callable($callable)) {
                 $data[$attribute] = call_user_func_array($callable, []);
             }
         }

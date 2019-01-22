@@ -62,7 +62,7 @@ class ResponseHandler implements HandlerInterface
 
         $order->setCanSendNewEmailFlag(false);
 
-        if (is_callable([$order, 'addCommentToStatusHistory'])) {
+        if (method_exists($order, 'addCommentToStatusHistory') && is_callable([$order, 'addCommentToStatusHistory'])) {
             $order->addCommentToStatusHistory(
                 __('Successfully created Alma Payment. Redirecting customer & awaiting payment return.'),
                 Order::STATE_PENDING_PAYMENT

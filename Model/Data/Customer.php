@@ -69,7 +69,7 @@ class Customer
 
             foreach ($map as $attribute => $method) {
                 $callable = [$address, $method];
-                if (is_callable($callable) && !$customerData[$attribute]) {
+                if (method_exists($address, $method) && is_callable($callable) && !$customerData[$attribute]) {
                     $customerData[$attribute] = call_user_func_array($callable, []);
                 }
             }
