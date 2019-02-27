@@ -25,111 +25,48 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
-use Alma\MonthlyPayments\Helpers\AlmaClient;
-use Magento\Framework\Api\SearchCriteriaBuilder;
+use Alma\MonthlyPayments\Helpers\AlmaPaymentValidationError;
+use Alma\MonthlyPayments\Helpers\PaymentValidation;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Quote\Model\QuoteRepository;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Sales\Model\Order;
 
 class ReturnAction extends Action
 {
     /**
-     * @var CheckoutSession
+     * @var PaymentValidation
      */
-    private $checkoutSession;
-
-    /** @var \Alma\API\Client */
-    private $alma;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var QuoteRepository
-     */
-    private $quoteRepository;
+    private $paymentValidationHelper;
 
     public function __construct(
         Context $context,
-        CheckoutSession $checkoutSession,
-        OrderRepositoryInterface $orderRepository,
-        QuoteRepository $quoteRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        AlmaClient $almaClient
+        PaymentValidation $paymentValidationHelper
     ) {
         parent::__construct($context);
-        $this->checkoutSession = $checkoutSession;
-        $this->alma = $almaClient->getDefaultClient();
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->quoteRepository = $quoteRepository;
+        $this->paymentValidationHelper = $paymentValidationHelper;
     }
 
     /**
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
-     * @throws LocalizedException
      */
     public function execute()
     {
-        $error = false;
-        $quoteId = null;
-        $orderId = null;
-        $orderIncrementId = null;
-
-        $order = $this->checkoutSession->getLastRealOrder();
-        if (!$order) {
-            try {
-                $almaPayment = $this->alma->payments->fetch($this->getRequest()->getParam('pid'));
-            } catch (\Exception $e) {
-                $error = true;
-            }
-
-            if ($almaPayment) {
-                $quoteId = $almaPayment->custom_data["quote_id"];
-                $orderIncrementId = $almaPayment->custom_data["order_id"];
-
-                /** @var Order $order */
-                $searchCriteria = $this->searchCriteriaBuilder->addFilter('increment_id', $orderIncrementId, 'eq')->create();
-                $order = $this->orderRepository->getList($searchCriteria)->getFirstItem();
-                $orderId = $order->getId();
-            } else {
-                $error = true;
-            }
-        } else {
-            $orderId = $order->getId();
-            $orderIncrementId = $order->getIncrementId();
-            $quoteId = $order->getQuoteId();
+        try {
+            $paymentId = $this->getRequest()->getParam('pid');
+            $redirectTo = $this->paymentValidationHelper->validatePayment($paymentId);
+        } catch (AlmaPaymentValidationError $e) {
+            $this->addError($e->getMessage());
+            $redirectTo = $e->getReturnPath();
         }
 
-        $this->checkoutSession->clearHelperData();
-
-        if ($error) {
-            $this->addWarning(__('Your order has been processed correctly but there was an error restoring your user session. You will find your order in your account.'));
-        } else {
-            $quote = $this->quoteRepository->get($quoteId);
-            $quote->setIsActive(false);
-            $this->quoteRepository->save($quote);
-
-            $this->checkoutSession->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId)->setLastOrderId($orderId)->setLastRealOrderId($orderIncrementId);
-        }
-
-        return $this->_redirect('checkout/onepage/success');
+        return $this->_redirect($redirectTo);
     }
 
-    private function addWarning($message)
+    private function addError($message)
     {
-        if (method_exists($this->messageManager, 'addWarningMessage') && is_callable([$this->messageManager, 'addWarningMessage'])) {
-            $this->messageManager->addWarningMessage($message);
+        if (method_exists($this->messageManager, 'addErrorMessage') && is_callable([$this->messageManager, 'addErrorMessage'])) {
+            $this->messageManager->addErrorMessage($message);
         } else {
-            $this->messageManager->addWarning($message);
+            $this->messageManager->addError($message);
         }
     }
 }
