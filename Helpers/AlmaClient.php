@@ -27,6 +27,8 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\API\Client;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Module\ModuleListInterface;
 
 class AlmaClient
 {
@@ -39,12 +41,27 @@ class AlmaClient
      * @var \Alma\MonthlyPayments\Helpers\Logger
      */
     private $logger;
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetadata;
+    /**
+     * @var ModuleListInterface
+     */
+    private $moduleList;
 
-    public function __construct(Config $config, Logger $logger)
+    public function __construct(
+        Config $config,
+        Logger $logger,
+        ProductMetadataInterface $productMetadata,
+        ModuleListInterface $moduleList
+    )
     {
         $this->config = $config;
         $this->alma = null;
         $this->logger = $logger;
+        $this->productMetadata = $productMetadata;
+        $this->moduleList = $moduleList;
     }
 
     public function getDefaultClient()
@@ -62,10 +79,21 @@ class AlmaClient
 
         try {
             $alma = new Client($apiKey, ['mode' => $mode, 'logger' => $this->logger]);
+
+            $edition = $this->productMetadata->getEdition();
+            $version = $this->productMetadata->getVersion();
+            $alma->addUserAgentComponent('Magento', "$version ($edition)");
+            $alma->addUserAgentComponent("Alma for Magento 2", $this->getModuleVersion());
         } catch (\Exception $e) {
             $this->logger->error("Error creating Alma API client {$e->getMessage()}");
         }
 
         return $alma;
+    }
+
+    private function getModuleVersion()
+    {
+        $moduleInfo = $this->moduleList->getOne('Alma_MonthlyPayments');
+        return $moduleInfo['setup_version'];
     }
 }
