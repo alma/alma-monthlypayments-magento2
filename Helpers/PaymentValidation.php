@@ -42,7 +42,7 @@ use Magento\Sales\Model\Order\Payment\Processor as PaymentProcessor;
 class AlmaPaymentValidationError extends \Exception {
     private $returnPath;
 
-    public function __construct($message = "", $returnPath="checkout/onepage/failure", $code = 0, Throwable $previous = null)
+    public function __construct($message = "", $returnPath="checkout/onepage/failure", $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->returnPath = $returnPath;

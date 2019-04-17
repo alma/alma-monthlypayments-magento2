@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.0.2
+------
+
+* Fixes class not found `Throwable` on some PHP versions
+
 v1.0.1
 ------
 
