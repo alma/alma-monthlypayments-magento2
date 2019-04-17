@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.0.3
+------
+
+* Fixes incorrect version requirements in Composer manifest
+
 v1.0.2
 ------
 
