@@ -31,29 +31,29 @@
             <group id="alma_monthly_payments" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Alma Monthly Payments</label>
 
-                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
-                <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
 
-                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
 
-                <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <can_be_empty>1</can_be_empty>
                     <label>Excluded product types</label>
                     <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductTypes</source_model>
                 </field>
 
-                <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Excluded products message</label>
                     <comment>List/explain which products aren't eligible to monthly payments</comment>
                 </field>
@@ -67,7 +67,7 @@
                         <field id="payment/alma_monthly_payments/active">1</field>
                     </depends>
 
-                    <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Live API key</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\LiveAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/live_api_key</config_path>
@@ -76,13 +76,13 @@
                         </depends>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="test_api_key" translate="label" type="obscure" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="test_api_key" translate="label" type="obscure" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Test API key</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TestAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/test_api_key</config_path>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="api_mode" translate="label comment" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="api_mode" translate="label comment" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>API mode</label>
                         <comment>Use Test mode until you are ready to take real orders with Alma. In Test mode, only admins can see Alma on cart/checkout pages.</comment>
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\APIModes</source_model>
@@ -110,7 +110,7 @@
                     <label>Cart display</label>
                     <comment>A message can be displayed in the cart and minicart to indicate the order eligibility for monthly payments</comment>
 
-                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Display cart eligibility message</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/alma_monthly_payments/show_eligibility_message</config_path>

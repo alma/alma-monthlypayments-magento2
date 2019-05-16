@@ -85,7 +85,8 @@ class APIKeyValue extends \Magento\Config\Model\Config\Backend\Encrypted
 
         $genericError = new LocalizedException(__("Error checking {$this->getApiKeyName()}"));
 
-        if (!$this->availabilityHelper->canConnectToAlma($this->apiKeyType, $value)) {
+        // don't try value, if an obscured value was received. This indicates that data was not changed.
+        if (!preg_match('/^\*+$/', $value) && !$this->availabilityHelper->canConnectToAlma($this->apiKeyType, $value)) {
             throw $genericError;
         }
 

@@ -50,8 +50,8 @@
                 <excluded_product_types>virtual,downloadable</excluded_product_types>
                 <excluded_products_message>Virtual and downloadable products aren't eligible</excluded_products_message>
 
-                <live_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <test_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <live_api_key backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\LiveAPIKeyValue" />
+                <test_api_key backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\TestAPIKeyValue" />
                 <api_mode>test</api_mode>
 
                 <title>Monthly Payments with Alma</title>
