@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.0.4
+------
+
+* Fixes obfuscated API keys values being retried as Alma API credentials
+
+
 v1.0.3
 ------
 
