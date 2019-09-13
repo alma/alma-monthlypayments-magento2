@@ -179,15 +179,16 @@ class PaymentValidation
             }
 
             if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
-                // Register successful capture to update order state and generate invoice
-                $this->addCommentToOrder($order, __('First instalment captured successfully'));
                 $order->setCanSendNewEmailFlag(true);
-
-                $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
+                $order->setState(Order::STATE_PROCESSING);
+                $order->setStatus(Order::STATE_PROCESSING);
                 $this->orderRepository->save($order);
 
+                // Register successful capture to update order state and generate invoice
+                $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
                 $this->orderManagement->notify($order->getId());
 
+                $this->addCommentToOrder($order, __('First instalment captured successfully'), Order::STATE_PROCESSING);
                 $this->orderRepository->save($order);
 
                 $quote = $this->quoteRepository->get($order->getQuoteId());

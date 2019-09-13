@@ -45,12 +45,12 @@ class ResponseHandler implements HandlerInterface
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);
+        /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentDO->getPayment();
 
         /** @var Payment $almaPayment */
         $almaPayment = $response['almaPayment'];
 
-        /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment->setTransactionId($almaPayment->id);
         $payment->setAdditionalInformation(self::PAYMENT_URL, $almaPayment->url);
         $payment->setIsTransactionClosed(false);
