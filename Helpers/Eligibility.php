@@ -59,13 +59,18 @@ class Eligibility
      * @var Config
      */
     private $config;
+    /**
+     * @var AlmaQuote
+     */
+    private $quoteData;
 
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\Pricing\Helper\Data $pricingHelper,
         Helpers\AlmaClient $almaClient,
         Helpers\Logger $logger,
-        Config $config
+        Config $config,
+        AlmaQuote $quoteData
     ) {
 
         $this->checkoutSession = $checkoutSession;
@@ -74,6 +79,8 @@ class Eligibility
 
         $this->alma = $almaClient->getDefaultClient();
         $this->config = $config;
+
+        $this->quoteData = $quoteData;
     }
 
     /**
@@ -99,7 +106,7 @@ class Eligibility
         $cartTotal = Helpers\Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         try {
-            $eligibility = $this->alma->payments->eligibility(AlmaQuote::dataFromQuote($this->checkoutSession->getQuote()));
+            $eligibility = $this->alma->payments->eligibility($this->quoteData->dataFromQuote($this->checkoutSession->getQuote()));
         } catch (RequestError $e) {
             $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
             $this->eligible = false;

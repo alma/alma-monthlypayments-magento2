@@ -37,9 +37,15 @@ class CustomerDataBuilder implements BuilderInterface
      */
     private $customerRepository;
 
-    public function __construct(CustomerRepositoryInterface $customerRepository)
+    /**
+     * @var Customer
+     */
+    private $customerData;
+
+    public function __construct(CustomerRepositoryInterface $customerRepository, Customer $customerData)
     {
         $this->customerRepository = $customerRepository;
+        $this->customerData = $customerData;
     }
 
     /**
@@ -62,7 +68,7 @@ class CustomerDataBuilder implements BuilderInterface
         }
 
         return [
-            'customer' => Customer::dataFromCustomer(
+            'customer' => $this->customerData->dataFromCustomer(
                 $customer,
                 [$order->getBillingAddress(), $order->getShippingAddress()]
             ),

@@ -25,17 +25,48 @@
 
 namespace Alma\MonthlyPayments\Model\Data;
 
+use Alma\MonthlyPayments\Helpers\Functions;
+use Magento\Checkout\Model\Session;
 use \Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SortOrder;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 
 class Customer
 {
     /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+    public function __construct(
+        OrderRepositoryInterface $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        Session $checkoutSession
+    )
+    {
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->checkoutSession = $checkoutSession;
+    }
+
+    /**
      * @param CustomerInterface|null $customer
      * @param AddressAdapterInterface[] $addresses
      * @return array
+     * @throws \Magento\Framework\Exception\InputException
      */
-    public static function dataFromCustomer($customer, $addresses)
+    public function dataFromCustomer($customer, $addresses)
     {
         if ($customer) {
             $customerData = [
@@ -45,6 +76,7 @@ class Customer
                 'birth_date' => $customer->getDob(),
                 'addresses' => [],
                 'phone' => null,
+                'metadata' => [],
             ];
         } else {
             $customerData = [
@@ -54,6 +86,7 @@ class Customer
                 'birth_date' => null,
                 'addresses' => [],
                 'phone' => null,
+                'metadata' => [],
             ];
         }
 
@@ -77,6 +110,44 @@ class Customer
 
         foreach ($addresses as $address) {
             $customerData['addresses'][] = Address::dataFromAddress($address);
+        }
+
+        if (!$customerData['email']) {
+            try {
+                $customerData['email'] = $this->checkoutSession->getQuote()->getCustomerEmail();
+            } catch (\Exception $e) {
+                // just ignore
+            }
+        }
+
+        // Find all orders completed by the customer in the past
+        $this->searchCriteriaBuilder
+            ->addFilter('status', Order::STATE_COMPLETE)
+            ->setSortOrders([
+                new SortOrder([SortOrder::FIELD => "created_at", SortOrder::DIRECTION => SortOrder::SORT_DESC])
+            ])
+            ->setPageSize(100);
+
+        if ($customer) {
+            $this->searchCriteriaBuilder->addFilter('customer_id', $customer->getId());
+        } elseif ($customerData['email']) {
+            $this->searchCriteriaBuilder->addFilter('customer_email', $customerData['email']);
+        } else {
+            return $customerData;
+        }
+
+        $customerData['metadata']['past_orders'] = [];
+
+        $criteria = $this->searchCriteriaBuilder->create();
+        $orders = $this->orderRepository->getList($criteria)->getItems();
+
+        foreach ($orders as $order) {
+            $customerData['metadata']['past_orders'][] = [
+                "id" => $order->getEntityId(),
+                "amount" => Functions::priceToCents($order->getTotalPaid()),
+                "date" => strtotime($order->getCreatedAt()),
+                "payment_method" => $order->getPayment()->getMethod()
+            ];
         }
 
         return $customerData;

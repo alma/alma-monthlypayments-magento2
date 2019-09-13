@@ -32,10 +32,20 @@ use Alma\MonthlyPayments\Helpers\Functions;
 class Quote {
 
     /**
+     * @var Customer
+     */
+    private $customerData;
+
+    public function __construct(Customer $customerData)
+    {
+        $this->customerData = $customerData;
+    }
+
+    /**
      * @param MagentoQuote $quote
      * @return array
      */
-    public static function dataFromQuote(MagentoQuote $quote)
+    public function dataFromQuote(MagentoQuote $quote)
     {
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
         $billingAddress = new AddressAdapter($quote->getBillingAddress());
@@ -48,7 +58,7 @@ class Quote {
                 'shipping_address' => Address::dataFromAddress($shippingAddress),
                 'billing_address' => Address::dataFromAddress($billingAddress),
             ],
-            'customer' => Customer::dataFromCustomer($customer, [$billingAddress, $shippingAddress])
+            'customer' => $this->customerData->dataFromCustomer($customer, [$billingAddress, $shippingAddress])
         ];
 
         return $data;
