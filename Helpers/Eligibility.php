@@ -106,7 +106,7 @@ class Eligibility
         $cartTotal = Helpers\Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         try {
-            $eligibility = $this->alma->payments->eligibility($this->quoteData->dataFromQuote($this->checkoutSession->getQuote()));
+            $eligibility = $this->alma->payments->eligibility($this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote()));
         } catch (RequestError $e) {
             $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
             $this->eligible = false;

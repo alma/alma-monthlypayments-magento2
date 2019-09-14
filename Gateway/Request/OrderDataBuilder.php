@@ -1,6 +1,6 @@
 <?php
 /**
- * 2018 Alma / Nabla SAS
+ * 2018-2019 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -17,23 +17,21 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @author    Alma / Nabla SAS <contact@getalma.eu>
- * @copyright 2018 Alma / Nabla SAS
+ * @author    Alma SAS <contact@getalma.eu>
+ * @copyright 2018-2019 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
- *
  */
+
 
 namespace Alma\MonthlyPayments\Gateway\Request;
 
-use Alma\MonthlyPayments\Model\Data\Address;
+use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Alma\MonthlyPayments\Helpers\Functions;
-use Magento\Sales\Api\OrderRepositoryInterface;
 
-class PaymentDataBuilder implements BuilderInterface
+class OrderDataBuilder implements BuilderInterface
 {
     /**
      * @var UrlInterface
@@ -44,10 +42,16 @@ class PaymentDataBuilder implements BuilderInterface
      */
     private $checkoutSession;
 
-    public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession)
+    /**
+     * @var AlmaQuote
+     */
+    private $quoteData;
+
+    public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession, AlmaQuote $quoteData)
     {
         $this->urlBuilder = $urlBuilder;
         $this->checkoutSession = $checkoutSession;
+        $this->quoteData = $quoteData;
     }
 
     /**
@@ -55,25 +59,20 @@ class PaymentDataBuilder implements BuilderInterface
      *
      * @param array $buildSubject
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function build(array $buildSubject)
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $order = $paymentDO->getOrder();
-        $orderId = $order->getOrderIncrementId();
-        $quoteId = $this->checkoutSession->getQuoteId();
+        $quote = $this->checkoutSession->getQuote();
 
         return [
-            'payment' => [
-                'return_url' => $this->urlBuilder->getUrl('alma/payment/return'),
-                'ipn_callback_url' => $this->urlBuilder->getUrl('alma/payment/ipn'),
-                'customer_cancel_url' => $this->urlBuilder->getUrl('checkout/cart'),
-                'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
-                'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
-                'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
-                'custom_data' => [
-                    'order_id' => $orderId,
-                    'quote_id' => $quoteId
+            'order' => [
+                'merchant_reference' => $order->getOrderIncrementId(),
+                'data' => [
+                    'line_items' => $this->quoteData->lineItemsDataFromQuote($quote)
                 ]
             ],
         ];

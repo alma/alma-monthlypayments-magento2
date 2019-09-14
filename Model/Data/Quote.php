@@ -25,9 +25,15 @@
 
 namespace Alma\MonthlyPayments\Model\Data;
 
+use Alma\MonthlyPayments\Helpers\ProductImage;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote as MagentoQuote;
 use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Magento\Quote\Model\Quote\Item;
 
 class Quote {
 
@@ -35,17 +41,32 @@ class Quote {
      * @var Customer
      */
     private $customerData;
+    /**
+     * @var ProductImage
+     */
+    private $productImageHelper;
+    /**
+     * @var CategoryRepositoryInterface
+     */
+    private $categoryRepository;
 
-    public function __construct(Customer $customerData)
+    public function __construct(
+        Customer $customerData,
+        ProductImage $productImageHelper,
+        CategoryRepositoryInterface $categoryRepository
+    )
     {
         $this->customerData = $customerData;
+        $this->productImageHelper = $productImageHelper;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
      * @param MagentoQuote $quote
      * @return array
+     * @throws \Magento\Framework\Exception\InputException
      */
-    public function dataFromQuote(MagentoQuote $quote)
+    public function paymentDataFromQuote(MagentoQuote $quote)
     {
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
         $billingAddress = new AddressAdapter($quote->getBillingAddress());
@@ -62,5 +83,89 @@ class Quote {
         ];
 
         return $data;
+    }
+
+    /**
+     * @param MagentoQuote $quote
+     * @return array
+     */
+    public function lineItemsDataFromQuote(MagentoQuote $quote)
+    {
+        $data = [];
+        $items = $quote->getAllItems();
+
+        /** @var Item $item */
+        foreach ($items as $item) {
+            $product = $item->getProduct();
+
+            $data[] = [
+                'title' => $item->getName(),
+                'category' => $this->getProductCategories($product),
+                'unit_price' => Functions::priceToCents($item->getPrice()),
+                'quantity' => $item->getQty(),
+                'url' => $product->getUrlInStore(),
+                'picture_url' => $this->productImageHelper->getImageUrl($product, 'product_page_image_small', ['width' => 512, 'height' => 512]),
+                'is_virtual' => $item->getIsVirtual(),
+            ];
+        }
+
+        return $data;
+    }
+
+    private function getProductCategories(Product $product)
+    {
+        $paths = [];
+        $categoryIds = $product->getAvailableInCategories();
+
+        // Find each category the product belongs to
+        foreach ($categoryIds as $categoryId) {
+            try {
+                $category = $this->categoryRepository->get($categoryId);
+            } catch (NoSuchEntityException $e) {
+                continue;
+            }
+
+            $components = explode('/', $category->getPath());
+            if (count($components) <= 1) {
+                continue;
+            }
+            $components = array_slice($components, 1);
+
+            // Get the full category path for that category
+            $path = "";
+            foreach ($components as $component) {
+                $path .= "/";
+
+                try {
+                    $cat = $this->categoryRepository->get($component);
+                } catch (NoSuchEntityException $e) {
+                    continue;
+                }
+
+                $path .= $cat->getName();
+            }
+
+            $paths[] = $path;
+        }
+
+        // Only keep leaves
+        $categories = [];
+        foreach ($paths as $path) {
+            $merge = false;
+            foreach ($paths as $otherPath) {
+                if ($path != $otherPath && mb_strpos($otherPath, $path) === 0) {
+                    $merge = true;
+                    break;
+                }
+            }
+
+            if ($merge) {
+                continue;
+            }
+
+            $categories[] = $path;
+        }
+
+        return $categories;
     }
 }
