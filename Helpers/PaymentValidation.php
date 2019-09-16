@@ -181,7 +181,7 @@ class PaymentValidation
             if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
                 $order->setCanSendNewEmailFlag(true);
                 $order->setState(Order::STATE_PROCESSING);
-                $order->setStatus(Order::STATE_PROCESSING);
+                $order->setStatus($order->getConfig()->getStateDefaultStatus(Order::STATE_PROCESSING));
                 $this->orderRepository->save($order);
 
                 // Register successful capture to update order state and generate invoice
