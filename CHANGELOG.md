@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.0.5
+------
+
+* Fixes a bug with order status management on Magento 2.3.2
+* Adds some data collection for risk/fraud prevention
+
 v1.0.4
 ------
 
