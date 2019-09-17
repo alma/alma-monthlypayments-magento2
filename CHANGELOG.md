@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.0.7
+------
+
+* Order status fix in comment creation
+
 v1.0.6
 ------
 
