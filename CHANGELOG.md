@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.0.7
+------
+
+* Order status fix
+
 v1.0.6
 ------
 
