@@ -26,14 +26,13 @@
 namespace Alma\MonthlyPayments\Gateway\Response;
 
 use Alma\API\Entities\Payment;
+use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order;
 
 class ResponseHandler implements HandlerInterface
 {
-    const PAYMENT_URL = 'PAYMENT_URL';
-
     /**
      * Handles transaction id
      *
@@ -52,7 +51,7 @@ class ResponseHandler implements HandlerInterface
         $almaPayment = $response['almaPayment'];
 
         $payment->setTransactionId($almaPayment->id);
-        $payment->setAdditionalInformation(self::PAYMENT_URL, $almaPayment->url);
+        $payment->setAdditionalInformation(Config::ORDER_PAYMENT_URL, $almaPayment->url);
         $payment->setIsTransactionClosed(false);
 
         $order = $payment->getOrder();

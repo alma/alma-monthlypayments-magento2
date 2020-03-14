@@ -26,6 +26,8 @@
 namespace Alma\MonthlyPayments\Gateway\Config;
 
 class Config extends \Magento\Payment\Gateway\Config\Config {
+    const ORDER_PAYMENT_URL = 'PAYMENT_URL';
+
     public function get($field, $default = null, $storeId = null)
     {
         $value = parent::getValue($field, $storeId);

@@ -78,7 +78,7 @@ class AlmaClient
         $alma = null;
 
         try {
-            $alma = new Client($apiKey, ['mode' => $mode, 'logger' => $this->logger]);
+            $alma = new Client($apiKey, ['mode' => $mode, 'logger' => $this->logger, 'api_root' => 'http://alma-api:1337']);
 
             $edition = $this->productMetadata->getEdition();
             $version = $this->productMetadata->getVersion();

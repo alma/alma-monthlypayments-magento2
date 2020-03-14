@@ -26,9 +26,15 @@
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Web API -->
+    <preference for="Alma\MonthlyPayments\Api\PaymentInterface" type="Alma\MonthlyPayments\Model\Api\Payment" />
+    <preference for="Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface" type="Alma\MonthlyPayments\Model\Api\Data\PaymentValidationResult" />
+
+    <!-- Eligibility injection in cart customer data -->
     <type name="Magento\Checkout\CustomerData\Cart">
         <plugin name="cart_eligibility" type="Alma\MonthlyPayments\Plugin\Checkout\CustomerData\CartEligibility"/>
     </type>
+
 
     <!-- Payment Method Facade configuration -->
     <virtualType name="AlmaMonthlyPaymentsGatewayFacade" type="Magento\Payment\Model\Method\Adapter">

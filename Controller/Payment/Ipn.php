@@ -58,7 +58,7 @@ class Ipn extends Action
 
         try {
             $paymentId = $this->getRequest()->getParam('pid');
-            $this->paymentValidationHelper->validatePayment($paymentId);
+            $this->paymentValidationHelper->completeOrderIfValid($paymentId);
         } catch (AlmaPaymentValidationError $e) {
             return $json->setData(["error" => $e->getMessage()])->setHttpResponseCode(500);
         }

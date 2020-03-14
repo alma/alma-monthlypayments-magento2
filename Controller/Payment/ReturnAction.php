@@ -52,7 +52,8 @@ class ReturnAction extends Action
     {
         try {
             $paymentId = $this->getRequest()->getParam('pid');
-            $redirectTo = $this->paymentValidationHelper->validatePayment($paymentId);
+            $this->paymentValidationHelper->completeOrderIfValid($paymentId);
+            $redirectTo = 'checkout/onepage/success';
         } catch (AlmaPaymentValidationError $e) {
             $this->addError($e->getMessage());
             $redirectTo = $e->getReturnPath();

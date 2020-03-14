@@ -46,6 +46,7 @@ class AlmaPaymentValidationError extends \Exception {
     {
         parent::__construct($message, $code, $previous);
         $this->returnPath = $returnPath;
+        $this->message = $message;
     }
 
     public function getReturnPath()
@@ -89,130 +90,187 @@ class PaymentValidation
     }
 
     /**
+     * @param string $paymentId ID of Alma payment to fetch
+     * @return Payment
+     * @throws RequestError
+     */
+    public function getAlmaPayment($paymentId) {
+        try {
+            $almaPayment = $this->alma->payments->fetch($paymentId);
+        } catch (RequestError $e) {
+            $internalError = __(
+                "Error fetching payment information from Alma for payment %s: %s",
+                $paymentId,
+                $e->getMessage()
+            );
+
+            $this->logger->error($internalError->render());
+            throw $e;
+        }
+
+        return $almaPayment;
+    }
+
+    /**
+     * @param Payment
+     * @return Order
+     */
+    public function findOrderForPayment($almaPayment) {
+        // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
+        $orderId = $almaPayment->custom_data['order_id'];
+        $searchCriteria = $this->searchCriteriaBuilder->addFilter('increment_id', $orderId, 'eq')->create();
+
+        return $this->orderRepository->getList($searchCriteria)->getFirstItem();
+    }
+
+    /**
      * @param $paymentId
-     * @return mixed
+     * @param bool $transitionOrder should the order be transitioned to processing state if validation is OK
+     * @return bool `true` if payment is valid
      * @throws AlmaPaymentValidationError
      */
-    public function validatePayment($paymentId)
+    public function completeOrderIfValid($paymentId)
     {
         $errorMessage = __('There was an error when validating your payment. Please try again or contact us if the problem persists.')->render();
 
         try {
+            /** @var Order $order */
+            $order = null;
+            /** @var Payment $almaPayment */
+            $almaPayment = null;
 
             try {
-                $almaPayment = $this->alma->payments->fetch($paymentId);
+                $almaPayment = $this->getAlmaPayment($paymentId);
+                $order = $this->findOrderForPayment($almaPayment);
             } catch (RequestError $e) {
-                $internalError = __(
-                    "Error fetching payment information from Alma for payment %s: %s",
-                    $paymentId,
-                    $e->getMessage()
-                );
-
-                $this->logger->error($internalError->render());
                 throw new AlmaPaymentValidationError($errorMessage);
             }
 
-            // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
-            $orderId = $almaPayment->custom_data['order_id'];
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter('increment_id', $orderId, 'eq')->create();
-
-            /** @var Order $order */
-            $order = $this->orderRepository->getList($searchCriteria)->getFirstItem();
             if (!$order) {
-                $this->logger->error("Error: cannot get order {$orderId} details back");
+                $this->logger->error("Error: cannot get order details back for payment {$paymentId}");
                 throw new AlmaPaymentValidationError($errorMessage);
             }
 
-            $payment = $order->getPayment();
-            if (!$payment) {
-                $internalError = __("Cannot get payment information from order %s", $order->getIncrementId());
-
-                $this->logger->error($internalError->render());
-                $this->addCommentToOrder($order, $internalError);
-
-                throw new AlmaPaymentValidationError($errorMessage);
-            }
-
-            // Check that there's no price mismatch between the order amount and what's been paid
-            if (Functions::priceToCents($order->getGrandTotal()) !== $almaPayment->purchase_amount) {
-                $internalError = __(
-                    "Paid amount (%1) does not match due amount (%2) for order %3",
-                    Functions::priceFromCents($almaPayment->purchase_amount),
-                    $payment->getAmountAuthorized(),
-                    $order->getIncrementId()
-                );
-
-                $this->logger->error($internalError->render());
-                $this->addCommentToOrder($order, $internalError, Order::STATUS_FRAUD);
-                $this->orderManagement->cancel($order->getId());
-
-                try {
-                    $this->alma->payments->flagAsPotentialFraud($paymentId, Payment::FRAUD_AMOUNT_MISMATCH);
-                } catch (\Exception $e) {
-                    $this->logger->info("Error flagging payment {$paymentId} as fraudulent");
-                }
-
-                throw new AlmaPaymentValidationError($errorMessage);
-            }
-
-            // Check that the Alma API has correctly registered the first installment as paid
-            $firstInstalment = $almaPayment->payment_plan[0];
-            if (!in_array($almaPayment->state, [Payment::STATE_IN_PROGRESS, Payment::STATE_PAID]) || $firstInstalment->state !== Instalment::STATE_PAID) {
-                $internalError = __(
-                    "Payment state incorrect (%1 & %2) for order %3",
-                    $almaPayment->state,
-                    $firstInstalment->state,
-                    $order->getIncrementId()
-                );
-
-                $this->logger->error($internalError->render());
-                $this->addCommentToOrder($order, $internalError, Order::STATUS_FRAUD);
-                $this->orderManagement->cancel($order->getId());
-
-                try {
-                    $this->alma->payments->flagAsPotentialFraud($paymentId, Payment::FRAUD_STATE_ERROR . ": " . $internalError->render());
-                } catch (\Exception $e) {
-                    $this->logger->info("Error flagging payment {$paymentId} as fraudulent");
-                }
-
-                throw new AlmaPaymentValidationError($errorMessage);
-            }
-
-            if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
-                $order->setCanSendNewEmailFlag(true);
-                $order->setState(Order::STATE_PROCESSING);
-                $newStatus = $order->getConfig()->getStateDefaultStatus(Order::STATE_PROCESSING);
-                $order->setStatus($newStatus);
-                $this->orderRepository->save($order);
-
-                // Register successful capture to update order state and generate invoice
-                $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
-                $this->orderManagement->notify($order->getId());
-
-                $this->addCommentToOrder($order, __('First instalment captured successfully'), $newStatus);
-                $this->orderRepository->save($order);
-
-                $quote = $this->quoteRepository->get($order->getQuoteId());
-                $quote->setIsActive(false);
-                $this->quoteRepository->save($quote);
-
-                return 'checkout/onepage/success';
-
-            } elseif ($order->getState() == Order::STATE_CANCELED) {
-                throw new AlmaPaymentValidationError(__('Your order has been canceled'), 'checkout/onepage/failure/');
-
-            } elseif (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_HOLDED, Order::STATE_PAYMENT_REVIEW])) {
-                $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-                $this->orderRepository->save($order);
-
-                return 'checkout/onepage/success';
-            }
+            return $this->validateOrderPayment($order, $almaPayment, true);
         } catch (\Exception $e) {
             $this->logger->critical($e->getMessage());
             throw new AlmaPaymentValidationError($errorMessage);
         }
+    }
+
+    /**
+     * @param Order $order
+     * @param Payment $almaPayment
+     * @param bool $transitionOrder
+     * @return bool
+     * @throws AlmaPaymentValidationError
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function validateOrderPayment($order, $almaPayment, $transitionOrder) {
+        $errorMessage = __('There was an error when validating your payment. Please try again or contact us if the problem persists.')->render();
+
+        $payment = $order->getPayment();
+        if (!$payment) {
+            $internalError = __("Cannot get payment information from order %s", $order->getIncrementId());
+
+            $this->logger->error($internalError->render());
+            $this->addCommentToOrder($order, $internalError);
+
+            throw new AlmaPaymentValidationError($errorMessage);
+        }
+
+        // Check that there's no price mismatch between the order amount and what's been paid
+        if (Functions::priceToCents($order->getGrandTotal()) !== $almaPayment->purchase_amount) {
+            $internalError = __(
+                "Paid amount (%1) does not match due amount (%2) for order %3",
+                Functions::priceFromCents($almaPayment->purchase_amount),
+                $payment->getAmountAuthorized(),
+                $order->getIncrementId()
+            );
+
+            $this->logger->error($internalError->render());
+
+            if ($transitionOrder) {
+                $this->addCommentToOrder($order, $internalError, Order::STATUS_FRAUD);
+                $this->orderManagement->cancel($order->getId());
+            }
+
+            try {
+                $this->alma->payments->flagAsPotentialFraud($almaPayment->id, Payment::FRAUD_AMOUNT_MISMATCH);
+            } catch (\Exception $e) {
+                $this->logger->info("Error flagging payment {$almaPayment->id} as fraudulent");
+            }
+
+            throw new AlmaPaymentValidationError($errorMessage);
+        }
+
+        // Check that the Alma API has correctly registered the first installment as paid
+        $firstInstalment = $almaPayment->payment_plan[0];
+        if (!in_array($almaPayment->state, [Payment::STATE_IN_PROGRESS, Payment::STATE_PAID]) || $firstInstalment->state !== Instalment::STATE_PAID) {
+            $internalError = __(
+                "Payment state incorrect (%1 & %2) for order %3",
+                $almaPayment->state,
+                $firstInstalment->state,
+                $order->getIncrementId()
+            );
+
+            $this->logger->error($internalError->render());
+
+            if ($transitionOrder) {
+                $this->addCommentToOrder($order, $internalError, Order::STATUS_FRAUD);
+                $this->orderManagement->cancel($order->getId());
+            }
+
+            try {
+                $this->alma->payments->flagAsPotentialFraud($almaPayment->id, Payment::FRAUD_STATE_ERROR . ": " . $internalError->render());
+            } catch (\Exception $e) {
+                $this->logger->info("Error flagging payment {$almaPayment->id} as fraudulent");
+            }
+
+            throw new AlmaPaymentValidationError($errorMessage);
+        }
+
+        if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
+            if ($transitionOrder) {
+                $this->transitionOrder($order);
+            }
+
+            return true;
+        } elseif ($order->getState() == Order::STATE_CANCELED) {
+            throw new AlmaPaymentValidationError(__('Your order has been canceled'), 'checkout/onepage/failure/');
+
+        } elseif (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_HOLDED, Order::STATE_PAYMENT_REVIEW])) {
+            $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+            $this->orderRepository->save($order);
+
+            return true;
+        }
 
         throw new AlmaPaymentValidationError($errorMessage, 'checkout/cart');
+    }
+
+    /**
+     * @param Order $order
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function transitionOrder($order) {
+        $order->setCanSendNewEmailFlag(true);
+        $order->setState(Order::STATE_PROCESSING);
+        $newStatus = $order->getConfig()->getStateDefaultStatus(Order::STATE_PROCESSING);
+        $order->setStatus($newStatus);
+        $this->orderRepository->save($order);
+
+        // Register successful capture to update order state and generate invoice
+        $payment = $order->getPayment();
+        $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
+        $this->orderManagement->notify($order->getId());
+
+        $this->addCommentToOrder($order, __('First instalment captured successfully'), $newStatus);
+        $this->orderRepository->save($order);
+
+        $quote = $this->quoteRepository->get($order->getQuoteId());
+        $quote->setIsActive(false);
+        $this->quoteRepository->save($quote);
     }
 
     /**
