@@ -27,14 +27,14 @@
     <route url="/V1/alma/payments/:paymentId/validate" method="GET">
         <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="validate"/>
         <resources>
-            <resource ref="anonymous"/>
+            <resource ref="Alma_MonthlyPayments::api"/>
         </resources>
     </route>
 
     <route url="/V1/alma/payments/url" method="GET">
         <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="getPaymentUrl"/>
         <resources>
-            <resource ref="anonymous"/>
+            <resource ref="Alma_MonthlyPayments::api"/>
         </resources>
     </route>
 </routes>
