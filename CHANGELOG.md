@@ -1,6 +1,16 @@
 Changelog
 =========
 
+v1.1.0
+------
+
+* Adds Web API endpoints to get an Alma URL for an order paid with Alma, and to validate such a payment
+  upon customer return. See `etc/webapi.xml` for endpoints URLs and `Model/Api/Payment.php` for 
+  implementation.
+  
+* Adds 3 API Configuration fields to override `return_url`, `ipn_callback_url` and `customer_cancel_url` 
+  in created payments.
+
 v1.0.7
 ------
 
