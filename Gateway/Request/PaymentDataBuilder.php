@@ -25,13 +25,13 @@
 
 namespace Alma\MonthlyPayments\Gateway\Request;
 
+use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Alma\MonthlyPayments\Helpers\Functions;
-use Magento\Sales\Api\OrderRepositoryInterface;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -43,11 +43,16 @@ class PaymentDataBuilder implements BuilderInterface
      * @var CheckoutSession
      */
     private $checkoutSession;
+    /**
+     * @var Config
+     */
+    private $config;
 
-    public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession)
+    public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession, Config $config)
     {
         $this->urlBuilder = $urlBuilder;
         $this->checkoutSession = $checkoutSession;
+        $this->config = $config;
     }
 
     /**
@@ -65,9 +70,9 @@ class PaymentDataBuilder implements BuilderInterface
 
         return [
             'payment' => [
-                'return_url' => $this->urlBuilder->getUrl('alma/payment/return'),
-                'ipn_callback_url' => $this->urlBuilder->getUrl('alma/payment/ipn'),
-                'customer_cancel_url' => $this->urlBuilder->getUrl('checkout/cart'),
+                'return_url' => $this->config->getReturnUrl(),
+                'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
+                'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
                 'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
                 'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
                 'billing_address' => Address::dataFromAddress($order->getBillingAddress()),

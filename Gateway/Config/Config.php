@@ -117,4 +117,19 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
     {
         return !$this->needsAPIKeys() && (bool)(int)$this->get('fully_configured', false);
     }
+
+    public function getReturnUrl()
+    {
+        return $this->get('return_url');
+    }
+
+    public function getIpnCallbackUrl()
+    {
+        return $this->get('ipn_callback_url');
+    }
+
+    public function getCustomerCancelUrl()
+    {
+        return $this->get('customer_cancel_url');
+    }
 }

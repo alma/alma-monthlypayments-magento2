@@ -1,6 +1,6 @@
 <?php
 /**
- * 2018 Alma / Nabla SAS
+ * 2018-2020 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -17,20 +17,13 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @author    Alma / Nabla SAS <contact@getalma.eu>
- * @copyright 2018 Alma / Nabla SAS
+ * @author    Alma SAS <contact@getalma.eu>
+ * @copyright 2018-2020 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
- *
  */
 
-namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
+namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl;
 
-class LiveAPIKeyValue extends APIKeyValue
-{
-    protected $apiKeyType = 'live';
-
-    public function getApiKeyName()
-    {
-        return __('Live API key');
-    }
+class IpnCallbackUrlValue extends ApiUrlValue {
+    protected $urlPath = 'alma/payment/ipn';
 }

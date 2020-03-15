@@ -37,7 +37,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Payment\Processor as PaymentProcessor;
-
+use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 
 class AlmaPaymentValidationError extends \Exception {
     private $returnPath;

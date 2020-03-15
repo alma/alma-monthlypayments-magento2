@@ -23,14 +23,14 @@
  *
  */
 
-namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
+namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
-class TestAPIKeyValue extends APIKeyValue
+class LiveAPIKeyValue extends APIKeyValue
 {
-    protected $apiKeyType = 'test';
+    protected $apiKeyType = 'live';
 
     public function getApiKeyName()
     {
-        return __('Test API key');
+        return __('Live API key');
     }
 }

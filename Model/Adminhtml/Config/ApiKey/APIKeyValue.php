@@ -23,7 +23,7 @@
  *
  */
 
-namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
+namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Availability;
