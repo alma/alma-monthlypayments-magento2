@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.1
+------
+
+* Removes `api_root` override that should not have been committed
+
 v1.1.0
 ------
 
