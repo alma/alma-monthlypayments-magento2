@@ -45,7 +45,7 @@ define(
 
             function reorderMethods() {
                 var list = region.peek(),
-                    expectedPosition = window.checkoutConfig.payment['alma_monthly_payments'].sortOrder - 1;
+                    expectedPosition = Math.min(list.length, window.checkoutConfig.payment['alma_monthly_payments'].sortOrder) - 1;
 
                 var almaIndex = _.findIndex(list, function(methodComponent) {
                     return methodComponent.item.method === 'alma_monthly_payments';
