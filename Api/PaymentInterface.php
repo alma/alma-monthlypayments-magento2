@@ -23,9 +23,6 @@
  */
 
 namespace Alma\MonthlyPayments\Api;
-
-use Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface;
-
 interface PaymentInterface {
 
     /**
@@ -33,7 +30,7 @@ interface PaymentInterface {
      *
      * @api
      * @param string $paymentId The ID of the Alma payment object to validate
-     * @return PaymentValidationResultInterface Whether the order associated to that payment can be validated
+     * @return Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface Whether the order associated to that payment can be validated
      */
     public function validate($paymentId);
 

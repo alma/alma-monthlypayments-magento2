@@ -22,19 +22,19 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  * -->
 
-<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../app/code/Magento/Webapi/etc/webapi.xsd">
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
 
-    <route url="/V1/alma/payments/:paymentId/validate" method="GET">
+    <route url="/V1/alma/payments/validate/:paymentId" method="GET">
         <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="validate"/>
         <resources>
-            <resource ref="Alma_MonthlyPayments::api"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
     <route url="/V1/alma/payments/url" method="GET">
         <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="getPaymentUrl"/>
         <resources>
-            <resource ref="Alma_MonthlyPayments::api"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 </routes>
