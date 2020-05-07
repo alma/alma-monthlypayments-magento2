@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.2
+------
+
+* Makes sure there is a CheckoutSession with an active quote when using the REST API
+
 v1.1.1
 ------
 
