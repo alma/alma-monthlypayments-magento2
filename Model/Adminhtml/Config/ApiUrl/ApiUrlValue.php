@@ -32,7 +32,6 @@ use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
-use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -40,10 +39,6 @@ class ApiUrlValue extends Value implements ProcessorInterface
 {
     protected $urlPath = null;
 
-    /**
-     * @var Url
-     */
-    private $urlBuilder;
     /**
      * @var StoreManagerInterface
      */
@@ -54,14 +49,12 @@ class ApiUrlValue extends Value implements ProcessorInterface
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        Url $urlBuilder,
         StoreManagerInterface $storeManager,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
-        $this->urlBuilder = $urlBuilder;
         $this->storeManager = $storeManager;
     }
 
@@ -72,7 +65,10 @@ class ApiUrlValue extends Value implements ProcessorInterface
     public function processValue($value)
     {
         if (empty($value)) {
-            $value = $this->storeManager->getStore()->getUrl($this->urlPath, ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]);
+            $value = $this->storeManager->getStore()->getUrl(
+                $this->urlPath,
+                ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
+            );
         }
 
         return $value;
