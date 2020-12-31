@@ -51,13 +51,13 @@
 
                 <!-- API CONFIGURATION -->
                 <group id="api_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\ApiFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
 
                     <label>API configuration</label>
                     <comment><![CDATA[You can find your API keys on <a href="https://dashboard.getalma.eu/security" target="_blank">your Alma dashboard</a>]]></comment>
-                    <attribute type="expanded">1</attribute>
 
                     <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Live API key</label>

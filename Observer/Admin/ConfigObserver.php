@@ -25,15 +25,15 @@
 
 namespace Alma\MonthlyPayments\Observer\Admin;
 
+use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
+use Magento\Framework\App\Cache\Type\Config as CacheTypeConfig;
+use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Message\Manager as MessageManager;
-use Magento\Framework\Message\MessageInterface;
-use Psr\Log\LoggerInterface;
 
 class ConfigObserver implements ObserverInterface
 {
@@ -46,24 +46,24 @@ class ConfigObserver implements ObserverInterface
      */
     private $availabilityHelper;
     /**
-     * @var MessageManager
+     * @var Config
      */
-    private $messageManager;
+    private $config;
     /**
-     * @var LoggerInterface
+     * @var TypeListInterface
      */
-    private $logger;
+    private $cacheTypeList;
 
     public function __construct(
+        Config $config,
         ResourceConfig $resourceConfig,
         Availability $availabilityHelper,
-        MessageManager $messageManager,
-        LoggerInterface $logger
+        TypeListInterface $cacheTypeList
     ) {
         $this->resourceConfig = $resourceConfig;
         $this->availabilityHelper = $availabilityHelper;
-        $this->messageManager = $messageManager;
-        $this->logger = $logger;
+        $this->config = $config;
+        $this->cacheTypeList = $cacheTypeList;
     }
 
     public function execute(Observer $observer)
@@ -71,6 +71,10 @@ class ConfigObserver implements ObserverInterface
         // Update the fully_configured flag depending on whether we can correctly connect to Alma with provided API keys
         $configPath = 'payment/' . ConfigProvider::CODE  . '/fully_configured';
         $fully_configured = (int) $this->availabilityHelper->canConnectToAlma();
-        $this->resourceConfig->saveConfig($configPath, $fully_configured, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+
+        if ($this->config->isFullyConfigured() !== $fully_configured) {
+            $this->resourceConfig->saveConfig($configPath, $fully_configured, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+            $this->cacheTypeList->cleanType(CacheTypeConfig::TYPE_IDENTIFIER);
+        }
     }
 }
