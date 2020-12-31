@@ -29,7 +29,7 @@
     <system>
         <section id="payment">
             <group id="alma_monthly_payments" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer simple Buy Now Pay Later payments to your customers.<br/>Some marketing blurb should come here and explain how<br/>wonderful Alma is!</div>]]></comment>
+                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer installments payments with Alma and instantly boost your sales.<br>Increase average order value by 60% and your sales by 20%.<br>With no subscription fees and no commitment, it’s risk free: you are paid upfront while your customers pay later.</div>]]></comment>
                 <fieldset_css>complex alma-section</fieldset_css>
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
 
