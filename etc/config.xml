@@ -32,7 +32,7 @@
             <alma_monthly_payments translate="excluded_products_message title description eligibility_message non_eligibility_message">
                 <model>AlmaMonthlyPaymentsGatewayFacade</model>
 
-                <active>1</active>
+                <active>0</active>
                 <debug>0</debug>
 
                 <order_status>processing</order_status>
