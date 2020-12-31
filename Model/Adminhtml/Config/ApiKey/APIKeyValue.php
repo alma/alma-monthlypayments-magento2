@@ -27,10 +27,20 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Availability;
-use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Framework\Exception\LocalizedException;
+use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
+use Magento\Config\Model\Config\Backend\Encrypted;
+use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Message\Manager as MessageManager;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
+use Psr\Log\LoggerInterface;
 
-class APIKeyValue extends \Magento\Config\Model\Config\Backend\Encrypted
+class APIKeyValue extends Encrypted
 {
     protected $apiKeyType = null;
 
@@ -38,33 +48,61 @@ class APIKeyValue extends \Magento\Config\Model\Config\Backend\Encrypted
      * @var AlmaClient
      */
     private $almaClient;
-    /**
-     * @var Logger
-     */
-    private $logger;
+
     /**
      * @var Availability
      */
     private $availabilityHelper;
+    /**
+     * @var ResourceConfig
+     */
+    private $resourceConfig;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
+     * @var MessageManager
+     */
+    private $messageManager;
+    /**
+     * @var false
+     */
+    protected $hasError;
 
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        Context $context,
+        Registry $registry,
+        ScopeConfigInterface $config,
+        TypeListInterface $cacheTypeList,
+        EncryptorInterface $encryptor,
         AlmaClient $almaClient,
-        Logger $logger,
         Availability $availabilityHelper,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ResourceConfig $resourceConfig,
+        MessageManager $messageManager,
+        LoggerInterface $logger,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        parent::__construct($context, $registry, $config, $cacheTypeList, $encryptor, $resource, $resourceCollection,
-            $data);
+        parent::__construct(
+            $context,
+            $registry,
+            $config,
+            $cacheTypeList,
+            $encryptor,
+            $resource,
+            $resourceCollection,
+            $data
+        );
+
         $this->almaClient = $almaClient;
-        $this->logger = $logger;
         $this->availabilityHelper = $availabilityHelper;
+        $this->resourceConfig = $resourceConfig;
+        $this->logger = $logger;
+        $this->messageManager = $messageManager;
+
+        $this->hasError = false;
     }
 
     public function getApiKeyName()
@@ -72,31 +110,39 @@ class APIKeyValue extends \Magento\Config\Model\Config\Backend\Encrypted
         return __('API key');
     }
 
-    /**
-     * @throws LocalizedException
-     */
     public function beforeSave()
     {
+        if (!$this->hasDataChanges()) {
+            return;
+        }
+
+        // Force fully_configured to 0 – it will be switched to 1 by the ConfigObserver if both API keys are correct
+        $configPath = 'payment/' . ConfigProvider::CODE  . '/fully_configured';
+        $this->resourceConfig->saveConfig($configPath, 0, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+
         $value = (string)$this->getValue();
 
         if (empty($value)) {
-            throw new LocalizedException(__('API key is required'));
+            // If we throw a ValidatorException (or any Exception), the whole DB transaction will be rolled back and
+            // our change to fully_configured above won't be saved, which is a problem; so we use the Message Manager
+            // and prevent save using `_dataSaveAllowed`.
+            $this->_dataSaveAllowed = false;
+            $this->messageManager->addErrorMessage(__('API key is required'));
+            return;
         }
-
-        $genericError = new LocalizedException(__("Error checking {$this->getApiKeyName()}"));
 
         // don't try value, if an obscured value was received. This indicates that data was not changed.
         if (!preg_match('/^\*+$/', $value) && !$this->availabilityHelper->canConnectToAlma($this->apiKeyType, $value)) {
-            throw $genericError;
+            $this->_dataSaveAllowed = false;
+            $this->messageManager->addErrorMessage(
+                sprintf(
+                    __("Error checking %s - other configuration has been saved"),
+                    __($this->getApiKeyName())
+                )
+            );
+            return;
         }
 
         parent::beforeSave();
-    }
-
-    public function afterSave()
-    {
-        $result = parent::afterSave();
-        $this->_eventManager->dispatch('alma_saved_api_key', ['mode' => $this->apiKeyType]);
-        return $result;
     }
 }

@@ -20,5 +20,11 @@
         "psr-4": {
             "Alma\\MonthlyPayments\\": ""
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ]
 }
