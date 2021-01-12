@@ -28,10 +28,11 @@ define(
     [
         'jquery',
         'Magento_Checkout/js/view/payment/default',
+        'Magento_Checkout/js/model/full-screen-loader',
         'uiRegistry',
         'underscore',
     ],
-    function ($, Component, registry, _) {
+    function ($, Component, fullScreenLoader, registry, _) {
         'use strict';
 
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
@@ -81,6 +82,8 @@ define(
             },
 
             afterPlaceOrder: function () {
+                fullScreenLoader.startLoader();
+
                 // Get payment page URL from checkoutConfig and redirect
                 $.mage.redirect(window.checkoutConfig.payment[this.getCode()].redirectTo);
             }
