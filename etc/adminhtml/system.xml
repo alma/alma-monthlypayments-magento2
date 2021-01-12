@@ -49,8 +49,78 @@
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
 
+                <!-- PAYMENT METHOD CONFIGURATION -->
+                <group id="general_config" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\SecondaryFieldset</frontend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+
+                    <label>Checkout display</label>
+                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                        <comment>This controls the payment method name which the user sees during checkout.</comment>
+                        <config_path>payment/alma_monthly_payments/title</config_path>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Description</label>
+                        <comment>This controls the payment method description which the user sees during checkout.</comment>
+                        <config_path>payment/alma_monthly_payments/description</config_path>
+                    </field>
+                </group>
+
+                <!-- CART DISPLAY CONFIGURATION -->
+                <group id="cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\SecondaryFieldset</frontend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+
+                    <label>Cart display</label>
+                    <comment>A message can be displayed in the cart and minicart to indicate the order eligibility for monthly payments</comment>
+
+                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display cart eligibility message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/alma_monthly_payments/show_eligibility_message</config_path>
+                    </field>
+                    <field id="eligibility_message" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Eligibility message</label>
+                        <config_path>payment/alma_monthly_payments/eligibility_message</config_path>
+                    </field>
+                    <field id="non_eligibility_message" translate="label" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Non-eligibility message</label>
+                        <config_path>payment/alma_monthly_payments/non_eligibility_message</config_path>
+                    </field>
+                </group>
+
+                <!-- EXCLUDED PRODUCTS CONFIGURATION -->
+                <group id="excluded_products_config" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\SecondaryFieldset</frontend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+
+                    <label>Products exclusions</label>
+                    <comment><![CDATA[<p>Some products (gift cards, license keys, software, weapons, ...) cannot be sold with Alma, <a href="https://getalma.eu/legal/terms/payment" target="_blank">as per our terms</a> (see Exclusions paragraph).</p><p>If you are selling such products on your shop, you need to configure Alma so that it is not enabled when customers view or shop them.</p>]]></comment>
+
+                    <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <can_be_empty>1</can_be_empty>
+                        <label>Excluded product types</label>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductTypes</source_model>
+                        <config_path>payment/alma_monthly_payments/excluded_product_types</config_path>
+                    </field>
+
+                    <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Excluded products message</label>
+                        <comment>List/explain which products aren't eligible to monthly payments</comment>
+                        <config_path>payment/alma_monthly_payments/excluded_products_message</config_path>
+                    </field>
+                </group>
+
                 <!-- API CONFIGURATION -->
-                <group id="api_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\ApiFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
@@ -94,73 +164,6 @@
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl</backend_model>
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>customer_cancel_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/customer_cancel_url</config_path>
-                    </field>
-                </group>
-
-                <!-- PAYMENT METHOD CONFIGURATION -->
-                <group id="general_config" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-
-                    <label>Checkout display</label>
-                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Title</label>
-                        <comment>This controls the payment method name which the user sees during checkout.</comment>
-                        <config_path>payment/alma_monthly_payments/title</config_path>
-                        <validate>required-entry</validate>
-                    </field>
-                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Description</label>
-                        <comment>This controls the payment method description which the user sees during checkout.</comment>
-                        <config_path>payment/alma_monthly_payments/description</config_path>
-                    </field>
-                </group>
-
-                <!-- CART DISPLAY CONFIGURATION -->
-                <group id="cart_config" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-
-                    <label>Cart display</label>
-                    <comment>A message can be displayed in the cart and minicart to indicate the order eligibility for monthly payments</comment>
-
-                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Display cart eligibility message</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/alma_monthly_payments/show_eligibility_message</config_path>
-                    </field>
-                    <field id="eligibility_message" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Eligibility message</label>
-                        <config_path>payment/alma_monthly_payments/eligibility_message</config_path>
-                    </field>
-                    <field id="non_eligibility_message" translate="label" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Non-eligibility message</label>
-                        <config_path>payment/alma_monthly_payments/non_eligibility_message</config_path>
-                    </field>
-                </group>
-
-                <!-- EXCLUDED PRODUCTS CONFIGURATION -->
-                <group id="excluded_products_config" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-
-                    <label>Products exclusions</label>
-                    <comment><![CDATA[<p>Some products (gift cards, license keys, software, weapons, ...) cannot be sold with Alma, <a href="https://getalma.eu/legal/terms/payment" target="_blank">as per our terms</a> (see Exclusions paragraph).</p><p>If you are selling such products on your shop, you need to configure Alma so that it is not enabled when customers view or shop them.</p>]]></comment>
-
-                    <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <can_be_empty>1</can_be_empty>
-                        <label>Excluded product types</label>
-                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductTypes</source_model>
-                        <config_path>payment/alma_monthly_payments/excluded_product_types</config_path>
-                    </field>
-
-                    <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Excluded products message</label>
-                        <comment>List/explain which products aren't eligible to monthly payments</comment>
-                        <config_path>payment/alma_monthly_payments/excluded_products_message</config_path>
                     </field>
                 </group>
             </group>
