@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Model\Data\Address;
+use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -64,12 +65,17 @@ class PaymentDataBuilder implements BuilderInterface
     public function build(array $buildSubject)
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
+        $payment = $paymentDO->getPayment();
+
         $order = $paymentDO->getOrder();
         $orderId = $order->getOrderIncrementId();
         $quoteId = $this->checkoutSession->getQuoteId();
 
+        $installmentsCount = (int) $payment->getAdditionalInformation(PaymentDataAssignObserver::INSTALLMENTS_COUNT);
+
         return [
             'payment' => [
+                'installments_count' => $installmentsCount,
                 'return_url' => $this->config->getReturnUrl(),
                 'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
                 'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
