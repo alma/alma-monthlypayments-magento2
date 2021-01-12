@@ -25,20 +25,37 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Logger\Monolog;
+use Monolog\Handler\StreamHandler;
+
 use Alma\MonthlyPayments\Gateway\Config\Config;
 
 class Logger extends Monolog {
     /** @var Config */
     private $config;
 
-    public function __construct(Config $config, $name, $handlers = [], $processors = [])
+    /**
+     * @var DirectoryList
+     */
+    private $directoryList;
+
+    public function __construct(Config $config, DirectoryList $directoryList, string $name, $handlers = [], $processors = [])
     {
         $this->config = $config;
+        $this->directoryList = $directoryList;
+
+        try {
+            $handlers[] = new StreamHandler($directoryList->getPath('log') . '/alma.log', self::INFO);
+        } catch (FileSystemException $e) {
+        } catch (\Exception $e) {
+        }
+
         parent::__construct($name, $handlers, $processors);
     }
 
-    public function addRecord($level, $message, array $context = [])
+    public function addRecord($level, $message, array $context = []): bool
     {
         if (!$this->config->canLog()) {
             return true;
