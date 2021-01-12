@@ -47,7 +47,7 @@
     <!-- Payment Method Facade configuration -->
     <virtualType name="AlmaMonthlyPaymentsGatewayFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
-            <argument name="code" xsi:type="const">Alma\MonthlyPayments\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="code" xsi:type="const">Alma\MonthlyPayments\Gateway\Config\Config::CODE</argument>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\ConfigurableInfo</argument>
             <argument name="valueHandlerPool" xsi:type="object">AlmaMonthlyPaymentsGatewayValueHandlerPool</argument>
@@ -59,7 +59,7 @@
     <!-- Configuration reader -->
     <type name="Alma\MonthlyPayments\Gateway\Config\Config">
         <arguments>
-            <argument name="methodCode" xsi:type="const">Alma\MonthlyPayments\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="methodCode" xsi:type="const">Alma\MonthlyPayments\Gateway\Config\Config::CODE</argument>
         </arguments>
     </type>
     <!-- Helper classes -->

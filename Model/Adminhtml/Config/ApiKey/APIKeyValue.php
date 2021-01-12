@@ -25,9 +25,9 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
+use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Availability;
-use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -69,6 +69,10 @@ class APIKeyValue extends Encrypted
      * @var false
      */
     protected $hasError;
+    /**
+     * @var Config
+     */
+    private $almaConfig;
 
     public function __construct(
         Context $context,
@@ -80,7 +84,7 @@ class APIKeyValue extends Encrypted
         Availability $availabilityHelper,
         ResourceConfig $resourceConfig,
         MessageManager $messageManager,
-        LoggerInterface $logger,
+        Config $almaConfig,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -99,7 +103,7 @@ class APIKeyValue extends Encrypted
         $this->almaClient = $almaClient;
         $this->availabilityHelper = $availabilityHelper;
         $this->resourceConfig = $resourceConfig;
-        $this->logger = $logger;
+        $this->almaConfig = $almaConfig;
         $this->messageManager = $messageManager;
 
         $this->hasError = false;
@@ -117,7 +121,7 @@ class APIKeyValue extends Encrypted
         }
 
         // Force fully_configured to 0 – it will be switched to 1 by the ConfigObserver if both API keys are correct
-        $configPath = 'payment/' . ConfigProvider::CODE  . '/fully_configured';
+        $configPath = $this->almaConfig->getFieldPath(Config::CONFIG_FULLY_CONFIGURED);
         $this->resourceConfig->saveConfig($configPath, 0, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
 
         $value = (string)$this->getValue();

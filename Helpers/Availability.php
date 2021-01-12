@@ -25,6 +25,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\Entities\Merchant;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Store\Model\StoreManagerInterface;
@@ -87,7 +88,13 @@ class Availability
         return $this->config->isFullyConfigured();
     }
 
-    public function canConnectToAlma($mode = null, $apiKey = null)
+    /**
+     * @param string | null $mode
+     * @param string | null $apiKey
+     * @param Merchant $merchant
+     * @return bool
+     */
+    public function canConnectToAlma($mode = null, $apiKey = null, &$merchant = false): bool
     {
         if ($mode) {
             $modes = [$mode];
@@ -121,7 +128,7 @@ class Availability
             }
 
             try {
-                $alma->merchants->me();
+                $merchant = $alma->merchants->me();
             } catch (RequestError $e) {
                 if ($e->response && $e->response->responseCode === 401) {
                     return false;

@@ -32,7 +32,6 @@ use Magento\Framework\UrlInterface;
 
 class ConfigProvider implements ConfigProviderInterface
 {
-    const CODE = 'alma_monthly_payments';
     /**
      * @var CheckoutSession
      */
@@ -69,7 +68,7 @@ class ConfigProvider implements ConfigProviderInterface
                 self::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => $this->config->getPaymentButtonTitle(),
-                    'sortOrder' => $this->config->get('sort_order'),
+                    'sortOrder' => $this->config->getSortOrder(),
                 ]
             ]
         ];

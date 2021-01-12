@@ -25,9 +25,9 @@
 
 namespace Alma\MonthlyPayments\Observer\Admin;
 
+use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Availability;
-use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\App\Cache\Type\Config as CacheTypeConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -66,14 +66,23 @@ class ConfigObserver implements ObserverInterface
         $this->cacheTypeList = $cacheTypeList;
     }
 
+    // Update the fully_configured flag depending on whether we can correctly connect to Alma with provided API keys
+    // Get the merchant's ID at the same time, as it might be needed for frontend-initiated API calls
     public function execute(Observer $observer)
     {
-        // Update the fully_configured flag depending on whether we can correctly connect to Alma with provided API keys
-        $configPath = 'payment/' . ConfigProvider::CODE  . '/fully_configured';
-        $fully_configured = (int) $this->availabilityHelper->canConnectToAlma();
+        /** @var Merchant $merchant */
+        $merchant = null;
+        $fully_configured = (int) $this->availabilityHelper->canConnectToAlma(null, null, $merchant);
+
+        if ($fully_configured && $merchant) {
+            $configPath = $this->config->getFieldPath(Config::CONFIG_MERCHANT_ID);
+            $this->resourceConfig->saveConfig($configPath, $merchant->id, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
+        }
 
         if ($this->config->isFullyConfigured() !== $fully_configured) {
-            $this->resourceConfig->saveConfig($configPath, $fully_configured, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+            $configPath = $this->config->getFieldPath(Config::CONFIG_FULLY_CONFIGURED);
+            $this->resourceConfig->saveConfig($configPath, $fully_configured, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
+
             $this->cacheTypeList->cleanType(CacheTypeConfig::TYPE_IDENTIFIER);
         }
     }
