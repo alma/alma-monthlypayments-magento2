@@ -65,7 +65,7 @@ class ConfigProvider implements ConfigProviderInterface
     {
         return [
             'payment' => [
-                self::CODE => [
+                Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => $this->config->getPaymentButtonTitle(),
                     'sortOrder' => $this->config->getSortOrder(),

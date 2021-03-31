@@ -25,9 +25,8 @@
 
 namespace Alma\MonthlyPayments\Gateway\Config;
 
+use Alma\API\Client;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use const Alma\API\LIVE_MODE;
-use const Alma\API\TEST_MODE;
 
 class Config extends \Magento\Payment\Gateway\Config\Config {
     const CODE = 'alma_monthly_payments';
@@ -47,7 +46,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
     const CONFIG_EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
     const CONFIG_EXCLUDED_PRODUCTS_MESSAGE = 'excluded_products_message';
     const CONFIG_FULLY_CONFIGURED = 'fully_configured';
-    const CONFIG_RETURN_URL = 'fully_configured';
+    const CONFIG_RETURN_URL = 'return_url';
     const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
     const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
     const CONFIG_MERCHANT_ID = 'merchant_id';
@@ -114,14 +113,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
 
     public function getActiveMode()
     {
-        return $this->get(self::CONFIG_API_MODE, TEST_MODE);
+        return $this->get(self::CONFIG_API_MODE, Client::LIVE_MODE);
     }
 
     public function getActiveAPIKey() {
         $mode = $this->getActiveMode();
 
         switch ($mode) {
-            case LIVE_MODE:
+            case Client::LIVE_MODE:
                 $apiKeyType = self::CONFIG_LIVE_API_KEY;
                 break;
             default:
