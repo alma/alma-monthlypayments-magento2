@@ -22,23 +22,22 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-namespace Alma\MonthlyPayments\Block\System\Config\Form;
+namespace Alma\MonthlyPayments\Block\Adminhtml\Form;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Fieldset;
-use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\Js;
 
 /**
- * Class SecondaryFieldset
+ * Class ApiFieldset
  * @package Alma\MonthlyPayments\Block\System\Config\Form
  *
- * Will only render if the API has been correctly configured.
+ * Changes default collapsed state depending on whether the API has already been configured.
  *
  */
-class SecondaryFieldset extends Fieldset {
+class ApiFieldset extends Fieldset {
     /**
      * @var Config
      */
@@ -55,12 +54,31 @@ class SecondaryFieldset extends Fieldset {
         $this->config = $config;
     }
 
-    public function render(AbstractElement $element): string
+    /**
+     * Must return `true` for the group to be expanded by default – go figure.
+     *
+     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @return bool
+     */
+    protected function _isCollapseState($element): bool
     {
+        return !$this->config->isFullyConfigured();
+    }
+
+    /**
+     * When the API hasn't been configured yet, add information about other configuration settings being available only
+     * after proper API configuration.
+     *
+     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @return string
+     */
+    protected function _getHeaderCommentHtml($element): string
+    {
+        $comment = $element->getComment();
         if (!$this->config->isFullyConfigured()) {
-            return "";
+            $comment .= '<br>' . __("Other configuration settings will be made available after you provide valid API keys.");
         }
 
-        return parent::render($element);
+        return $comment ? '<div class="comment">' . $comment . '</div>' : '';
     }
 }

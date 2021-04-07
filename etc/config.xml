@@ -33,6 +33,7 @@
                 <model>AlmaMonthlyPaymentsGatewayFacade</model>
 
                 <active>0</active>
+                <sort_order>1</sort_order>
                 <debug>0</debug>
 
                 <order_status>processing</order_status>
@@ -45,7 +46,6 @@
                 <can_refund>0</can_refund>
                 <can_use_checkout>1</can_use_checkout>
                 <is_gateway>0</is_gateway>
-                <sort_order>1</sort_order>
 
                 <excluded_product_types>virtual,downloadable</excluded_product_types>
                 <excluded_products_message>Virtual and downloadable products aren't eligible</excluded_products_message>

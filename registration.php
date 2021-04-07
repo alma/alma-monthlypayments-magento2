@@ -25,4 +25,4 @@
 
 use Magento\Framework\Component\ComponentRegistrar;
 
-ComponentRegistrar::register(ComponentRegistrar::MODULE, 'Alma_MonthlyPayments', __DIR__);
+ComponentRegistrar::register(ComponentRegistrar::MODULE, 'Alma_MonthlyPayments', isset($file) ? dirname($file) : __DIR__);

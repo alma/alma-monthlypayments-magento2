@@ -4,23 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5e01c3d80801d16d0df45a3a7ecfb92d",
+    "content-hash": "2129344b702819abe43f7070226d97b5",
     "packages": [
         {
             "name": "alma/alma-php-client",
-            "version": "v1.0.13",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alma/alma-php-client.git",
-                "reference": "e0439011226d695f252904e5c6123e52a38a1a9d"
+                "reference": "942cdbf74400afa1c8701c60aa3150fcafef04cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alma/alma-php-client/zipball/e0439011226d695f252904e5c6123e52a38a1a9d",
-                "reference": "e0439011226d695f252904e5c6123e52a38a1a9d",
+                "url": "https://api.github.com/repos/alma/alma-php-client/zipball/942cdbf74400afa1c8701c60aa3150fcafef04cb",
+                "reference": "942cdbf74400afa1c8701c60aa3150fcafef04cb",
                 "shasum": ""
             },
             "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
                 "psr/log": "^1.1"
             },
             "require-dev": {
@@ -50,11 +52,7 @@
                 }
             ],
             "description": "PHP API client for the Alma payments API",
-            "support": {
-                "issues": "https://github.com/alma/alma-php-client/issues",
-                "source": "https://github.com/alma/alma-php-client/tree/v1.0.13"
-            },
-            "time": "2020-12-06T14:37:34+00:00"
+            "time": "2021-03-13T10:43:39+00:00"
         },
         {
             "name": "colinmollenhour/credis",
@@ -5911,5 +5909,5 @@
         "php": ">=5.5"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "1.1.0"
 }

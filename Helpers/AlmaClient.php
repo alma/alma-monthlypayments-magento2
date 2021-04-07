@@ -64,7 +64,7 @@ class AlmaClient
         $this->moduleList = $moduleList;
     }
 
-    public function getDefaultClient()
+    public function getDefaultClient(): Client
     {
         if ($this->alma === null) {
             $this->alma = $this->createInstance($this->config->getActiveAPIKey(), $this->config->getActiveMode());

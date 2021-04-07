@@ -51,12 +51,12 @@
 
                 <!-- PAYMENT METHOD CONFIGURATION -->
                 <group id="general_config" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\SecondaryFieldset</frontend_model>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
 
-                    <label>Checkout display</label>
+                    <label>Payment method configuration</label>
                     <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Title</label>
                         <comment>This controls the payment method name which the user sees during checkout.</comment>
@@ -68,11 +68,17 @@
                         <comment>This controls the payment method description which the user sees during checkout.</comment>
                         <config_path>payment/alma_monthly_payments/description</config_path>
                     </field>
+                    <field id="payment_plans" translate="label" sortOrder="23" showInDefault="23" showInWebsite="1" showInStore="1">
+                        <label>Payment plans</label>
+                        <config_path>payment/alma_monthly_payments/payment_plans</config_path>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\PaymentPlans</backend_model>
+                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\Plans</frontend_model>
+                    </field>
                 </group>
 
                 <!-- CART DISPLAY CONFIGURATION -->
                 <group id="cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\SecondaryFieldset</frontend_model>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -97,7 +103,7 @@
 
                 <!-- EXCLUDED PRODUCTS CONFIGURATION -->
                 <group id="excluded_products_config" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\SecondaryFieldset</frontend_model>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -121,7 +127,7 @@
 
                 <!-- API CONFIGURATION -->
                 <group id="api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\System\Config\Form\ApiFieldset</frontend_model>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\ApiFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>

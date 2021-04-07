@@ -1,0 +1,238 @@
+<?php
+/** @var \Alma\MonthlyPayments\Block\Adminhtml\Form\Field\Plans $block */
+$blockId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
+$htmlId = $block->escapeHtmlAttr($blockId);
+$jsId = $block->escapeJs($blockId);
+?>
+
+<div id="paymentPlans<?= $htmlId ?>"
+     data-bind="component: { name: 'alma-plan-details', params: { jsonConfig: '<?= $block->escapeHtmlAttr($block->getPlansJson()) ?>' } }">
+</div>
+
+<script type="text/html" id="planDetailsTemplate<?= $htmlId ?>">
+    <input type="hidden" name="<?= $block->escapeHtmlAttr($block->getElement()->getName()) ?>"
+           id="plansConfig<?= $htmlId ?>"
+           data-bind="value: jsonConfig">
+
+    <select class="select admin__control-select"
+            id="planSelect<?= $htmlId ?>"
+            data-bind="options: allowedPlans, optionsText: 'label', optionsValue: 'key', value: selectedPlan">
+    </select>
+
+    <div id="planDetails<?= $htmlId ?>">
+        <!-- ko if: !currentPlan().deferredMonths && !currentPlan().deferredDays -->
+        <p data-bind="html: i18n('installmentsBounds', currentPlan())"></p>
+        <!-- /ko -->
+
+        <!-- ko if: currentPlan().deferredMonths || currentPlan().deferredDays -->
+        <p data-bind="html: i18n('payLaterBounds', currentPlan())"></p>
+        <!-- /ko -->
+
+        <p><?= __('Fees applied to each transaction for this plan:') ?></p>
+
+        <ul>
+            <li>
+                <b><?= __('You pay:') ?></b>
+                <!-- ko if: currentPlan().merchantFees.variable > 0 -->
+                <span data-bind="html: i18n('variableFees', currentPlan().merchantFees)"></span>
+                <!-- ko if: currentPlan().merchantFees.fixed > 0 -->
+                +
+                <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: currentPlan().merchantFees.fixed > 0 -->
+                <span data-bind="html: i18n('fixedFees', currentPlan().merchantFees)"></span>
+                <!-- /ko -->
+            </li>
+            <li>
+                <b><?= __('Customers pay:') ?></b>
+                <!-- ko if: currentPlan().customerFees.variable == 0 && currentPlan().customerFees.fixed == 0 -->
+                <?= __('no fees') ?>
+                <!-- /ko -->
+
+                <!-- ko if: currentPlan().customerFees.variable > 0 -->
+                <span data-bind="html: i18n('variableFees', currentPlan().customerFees)"></span>
+                <!-- ko if: currentPlan().customerFees.fixed > 0 -->
+                +
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: currentPlan().customerFees.fixed > 0 -->
+                <span data-bind="html: i18n('fixedFees', currentPlan().customerFees)"></span>
+                <!-- /ko -->
+            </li>
+        </ul>
+
+        <div id="planDetailsFields<?= $htmlId ?>">
+            <p class="field<?= $htmlId ?>">
+                <label for="<?= $htmlId ?>_active"><?= __('Enabled') ?></label>
+                <select id="<?= $htmlId ?>_active"
+                        class="select admin__control-select"
+                        data-bind="value: enabled">
+                    <option value="1"><?= __('Yes') ?></option>
+                    <option value="0"><?= __('No') ?></option>
+                </select>
+            </p>
+
+            <p class="field<?= $htmlId ?>">
+                <label for="<?= $htmlId ?>_min-amount"><?= __('Minimum amount (€)') ?></label>
+                <input id="<?= $htmlId ?>_min-amount"
+                       type="text"
+                       class="validate-number input-text admin__control-text"
+                       data-bind="value: minAmount">
+                <span class="note">
+                    <?= __('Minimum purchase amount for which this payment plan will be enabled') ?>
+                </span>
+            </p>
+
+            <p class="field<?= $htmlId ?>">
+                <label for="<?= $htmlId ?>_max-amount"><?= __('Maximum amount (€)') ?></label>
+                <input id="<?= $htmlId ?>_max-amount"
+                       type="text"
+                       class="validate-number input-text admin__control-text"
+                       data-bind="value: maxAmount">
+                <span class="note">
+                    <?= __('Maximum purchase amount for which this payment plan will be enabled') ?>
+                </span>
+            </p>
+        </div>
+    </div>
+</script>
+
+<style type="text/css">
+    #planDetails<?= $htmlId ?> {
+        padding: 2rem 0;
+    }
+
+    #planDetails<?= $htmlId ?> ul {
+        padding-left: 2rem;
+    }
+
+    #planDetails<?= $htmlId ?> b, #planDetails<?= $htmlId ?> label {
+        color: #303030;
+        font-weight: 600;
+    }
+
+    #planDetailsFields<?= $htmlId ?> .field<?= $htmlId ?> {
+        margin-bottom: 1rem;
+    }
+</style>
+
+<script>
+    require(
+        ['ko', 'mage/template', 'Magento_Catalog/js/price-utils', 'prototype'],
+        function (ko, template, priceUtils) {
+            const strings = {
+                payLaterLabel: template("<?= $block->escapeJs(__('Pay later - <%= deferredType %>+<%= deferredDuration %>')) ?>"),
+                installmentsLabel: template("<?= $block->escapeJs(__('Pay in <%= installmentsCount %> installments')) ?>"),
+                installmentsBounds: template("<?= $block->escapeJs(__('You can offer <%= installmentsCount %>-installment payments for amounts between <b><%= almaPriceFromCents(minAllowedAmount) %>€</b> and <b><%= almaPriceFromCents(maxAllowedAmount) %>€</b>.')) ?>"),
+                payLaterBounds: template("<?= $block->escapeJs(__('You can offer Pay Later payments at <%= deferredType %>+<%= deferredDuration %> for amounts between <b><%= almaPriceFromCents(minAllowedAmount) %>€</b> and <b><%= almaPriceFromCents(maxAllowedAmount) %>€</b>.')) ?>"),
+                variableFees: template("<?= $block->escapeJs(__('<%= almaPriceFromCents(variable) %>%')) ?>"),
+                fixedFees: template("<?= $block->escapeJs(__('<%= almaPriceFromCents(fixed) %>€')) ?>"),
+            }
+
+            window.almaPriceFromCents = function (cents) {
+                return priceUtils.formatPrice(cents / 100).replace(/[,.]00/, '');
+            }
+
+            window.almaPriceToCents = function (price) {
+                return Math.round(Number(price) * 100);
+            }
+
+            ko.components.register('alma-plan-details', {
+                viewModel: function PlanDetails(params) {
+                    this.plansConfig = JSON.parse(params.jsonConfig);
+                    this.jsonConfig = ko.observable(params.jsonConfig);
+
+                    this.i18n = (function (phrase, ctx) {
+                        if (!strings.hasOwnProperty(phrase)) {
+                            return phrase;
+                        }
+
+                        return strings[phrase](ctx);
+                    }).bind(this);
+
+                    // Present only allowed plans
+                    this.allowedPlans = Object.keys(this.plansConfig).filter(function (key) {
+                        return this.plansConfig[key].allowed;
+                    }, this).map(function (key) {
+                        const plan = this.plansConfig[key];
+                        const item = {key: key, plan: plan};
+
+                        if (plan.deferredMonths > 0 || plan.deferredDays) {
+                            item.label = this.i18n('payLaterLabel', plan);
+                        } else {
+                            item.label = this.i18n('installmentsLabel', plan)
+                        }
+
+                        return item;
+                    }, this);
+
+                    this.selectedPlan = ko.observable();
+                    this.currentPlan = ko.computed({
+                        owner: this,
+                        read: function () {
+                            return this.plansConfig[this.selectedPlan()];
+                        },
+
+                        write: function(value) {
+                            this.plansConfig[this.selectedPlan()] = value;
+                            this.jsonConfig(JSON.stringify(this.plansConfig));
+                        }
+                    });
+
+                    this.enabled = ko.computed({
+                        owner: this,
+                        read: function () {
+                            return this.currentPlan() ? this.currentPlan().enabled : false;
+                        },
+
+                        write: function (value) {
+                            let currentPlan = this.currentPlan();
+                            if (!currentPlan) {
+                                return;
+                            }
+
+                            currentPlan.enabled = Boolean(Number(value));
+                            this.currentPlan(currentPlan);
+                        }
+                    });
+
+                    this.minAmount = ko.computed({
+                        owner: this,
+                        read: function () {
+                            return almaPriceFromCents(this.currentPlan() ? this.currentPlan().minAmount : 0);
+                        },
+
+                        write: function (value) {
+                            let currentPlan = this.currentPlan();
+                            if (!currentPlan) {
+                                return;
+                            }
+
+                            currentPlan.minAmount = almaPriceToCents(value);
+                            this.currentPlan(currentPlan);
+                        }
+                    });
+
+                    this.maxAmount = ko.computed({
+                        owner: this,
+                        read: function () {
+                            return almaPriceFromCents(this.currentPlan() ? this.currentPlan().maxAmount : 0);
+                        },
+
+                        write: function (value) {
+                            let currentPlan = this.currentPlan();
+                            if (!currentPlan) {
+                                return;
+                            }
+
+                            currentPlan.maxAmount = almaPriceToCents(value);
+                            this.currentPlan(currentPlan);
+                        }
+                    });
+                },
+
+                template: document.getElementById('planDetailsTemplate<?= $jsId ?>').innerHTML
+            });
+        });
+</script>
