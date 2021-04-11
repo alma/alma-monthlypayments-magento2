@@ -32,10 +32,19 @@ class PaymentPlansConfig
     private $data;
     private $serializer;
 
-    public function __construct(array $data)
+    /**
+     * PaymentPlansConfig constructor.
+     * @param array|string $data
+     */
+    public function __construct($data)
     {
-        $this->data = $data;
         $this->serializer = new Json();
+
+        if (is_string($data)) {
+            $data = $this->serializer->unserialize($data);
+        }
+
+        $this->data = $data;
     }
 
     public function updatePlanDefaults(string $planKey, array $defaultConfig)

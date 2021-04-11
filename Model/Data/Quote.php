@@ -63,10 +63,11 @@ class Quote {
 
     /**
      * @param MagentoQuote $quote
+     * @param int|array $installmentsCounts
      * @return array
      * @throws \Magento\Framework\Exception\InputException
      */
-    public function paymentDataFromQuote(MagentoQuote $quote)
+    public function paymentDataFromQuote(MagentoQuote $quote, $installmentsCounts = 3): array
     {
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
         $billingAddress = new AddressAdapter($quote->getBillingAddress());
@@ -76,6 +77,7 @@ class Quote {
         $data = [
             'payment' => [
                 'purchase_amount' => Functions::priceToCents((float)$quote->getGrandTotal()),
+                'installments_count' => $installmentsCounts,
                 'shipping_address' => Address::dataFromAddress($shippingAddress),
                 'billing_address' => Address::dataFromAddress($billingAddress),
             ],

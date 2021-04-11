@@ -26,6 +26,8 @@
 namespace Alma\MonthlyPayments\Gateway\Config;
 
 use Alma\API\Client;
+use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlanConfig;
+use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlansConfig;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class Config extends \Magento\Payment\Gateway\Config\Config {
@@ -50,6 +52,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
     const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
     const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
     const CONFIG_MERCHANT_ID = 'merchant_id';
+    const CONFIG_PAYMENT_PLANS = 'payment_plans';
 
     private $pathPattern;
     private $methodCode;
@@ -203,5 +206,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
     public function getMerchantId()
     {
         return $this->get(self::CONFIG_MERCHANT_ID);
+    }
+
+    /**
+     * @return PaymentPlanConfig[]
+     */
+    public function getPaymentPlansConfig(): array
+    {
+        $plansConfig = new PaymentPlansConfig($this->get(self::CONFIG_PAYMENT_PLANS));
+        return $plansConfig->getPlans();
     }
 }

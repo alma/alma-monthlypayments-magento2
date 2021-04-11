@@ -52,7 +52,7 @@ class CartEligibility
      * @param Helpers\Eligibility $eligibilityHelper
      * @param Config $config
      * @param Helpers\Logger $logger
-
+     * @param Helpers\Availability $availabilityHelper
      */
     public function __construct(
         Helpers\Eligibility $eligibilityHelper,

@@ -30,15 +30,20 @@ use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Pricing\Helper\Data;
 
 class Eligibility
 {
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var Session
      */
     private $checkoutSession;
     /**
-     * @var \Magento\Framework\Pricing\Helper\Data
+     * @var Data
      */
     private $pricingHelper;
     /**
@@ -65,8 +70,8 @@ class Eligibility
     private $quoteData;
 
     public function __construct(
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
+        Session $checkoutSession,
+        Data $pricingHelper,
         Helpers\AlmaClient $almaClient,
         Helpers\Logger $logger,
         Config $config,
@@ -85,8 +90,13 @@ class Eligibility
 
     /**
      * @return bool
+     *
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function checkEligibility() {
+    public function checkEligibility()
+    {
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
@@ -103,10 +113,32 @@ class Eligibility
         }
 
         $this->message = $eligibilityMessage;
-        $cartTotal = Helpers\Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
+        $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
+
+        // Get activated plans and build a list of installments count that should be tested for eligibility
+        $plansConfig = $this->config->getPaymentPlansConfig();
+        $installmentsCounts = [];
+        foreach ($plansConfig as $planConfig) {
+            if (
+                !$planConfig->isAllowed() ||
+                !$planConfig->isEnabled() ||
+                $cartTotal < $planConfig->minimumAmount() ||
+                $cartTotal > $planConfig->maximumAmount()
+            ) {
+                continue;
+            }
+
+            $installmentsCounts[] = $planConfig->installmentsCount();
+        }
+
+        // TODO: pass $installmentsCounts to paymentDataFromQuote (or use Payment Data Builder?)
+        // TODO: collect max of max and min of min above for easier comparison below if nothing is eligible
+        // TODO: $eligibililty -> $eligibilities => process multiple results as any eligible == eligible, otherwise not
 
         try {
-            $eligibility = $this->alma->payments->eligibility($this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote()));
+            $eligibilities = $this->alma->payments->eligibility(
+                $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts), true
+            );
         } catch (RequestError $e) {
             $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
             $this->eligible = false;
@@ -114,7 +146,15 @@ class Eligibility
             return false;
         }
 
-        if (!$eligibility->isEligible) {
+        $anyEligible = false;
+        foreach ($eligibilities as $eligibility) {
+            if ($eligibility->isEligible()) {
+                $anyEligible = true;
+                break;
+            }
+        }
+
+        if (!$anyEligible) {
             $this->eligible = false;
             $this->message = $nonEligibilityMessage;
 
@@ -137,23 +177,11 @@ class Eligibility
         return $this->eligible;
     }
 
-    public function isEligible()
-    {
-        return $this->eligible;
-    }
-
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    private function getFormattedPrice($price)
-    {
-        return $this->pricingHelper->currency($price, true, false);
-    }
-
     /**
      * @return bool
+     *
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     private function checkItemsTypes()
     {
@@ -167,5 +195,20 @@ class Eligibility
         }
 
         return true;
+    }
+
+    private function getFormattedPrice($price)
+    {
+        return $this->pricingHelper->currency($price, true, false);
+    }
+
+    public function isEligible()
+    {
+        return $this->eligible;
+    }
+
+    public function getMessage()
+    {
+        return $this->message;
     }
 }
