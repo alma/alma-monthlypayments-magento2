@@ -26,6 +26,7 @@
 namespace Alma\MonthlyPayments\Model\Ui;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Eligibility;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\UrlInterface;
@@ -44,21 +45,21 @@ class ConfigProvider implements ConfigProviderInterface
      * @var Config
      */
     private $config;
-
     /**
-     * ConfigProvider constructor.
-     * @param CheckoutSession $checkoutSession
-     * @param UrlInterface $urlBuilder
-     * @param Config $config
+     * @var Eligibility
      */
+    private $eligibilityHelper;
+
     public function __construct(
         CheckoutSession $checkoutSession,
         UrlInterface $urlBuilder,
-        Config $config
+        Config $config,
+        Eligibility $eligibilityHelper
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
+        $this->eligibilityHelper = $eligibilityHelper;
     }
 
     public function getConfig()
@@ -69,6 +70,9 @@ class ConfigProvider implements ConfigProviderInterface
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => $this->config->getPaymentButtonTitle(),
                     'sortOrder' => $this->config->getSortOrder(),
+                    'paymentPlans' => array_map(function ($c) {
+                        return $c->toArray();
+                    }, $this->eligibilityHelper->getEligiblePlans())
                 ]
             ]
         ];

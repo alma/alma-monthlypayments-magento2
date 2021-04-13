@@ -26,9 +26,12 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
+use Alma\API\Endpoints\Results\Eligibility as AlmaEligibility;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Helpers;
+use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\InputException;
@@ -89,6 +92,78 @@ class Eligibility
     }
 
     /**
+     * @return PaymentPlanEligibility[]
+     *
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @throws RequestError
+     */
+    public function getPlansEligibility(): array
+    {
+        if (!$this->alma || !$this->checkItemsTypes()) {
+            return [];
+        }
+
+        $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
+
+        // Get enabled plans and build a list of installments counts that should be tested for eligibility
+        $enabledPlans = $this->config->getPaymentPlansConfig()->getEnabledPlans();
+        $installmentsCounts = [];
+        $queriedPlans = [];
+        $plansEligibility = [];
+        foreach ($enabledPlans as $planKey => $planConfig) {
+            if (
+                $cartTotal < $planConfig->minimumAmount() ||
+                $cartTotal > $planConfig->maximumAmount()
+            ) {
+                // If cart total is out of this plan's configured bounds, we know it's not eligible right away
+                $eligibility = new AlmaEligibility(
+                    [
+                        'installments_count' => $planConfig->installmentsCount(),
+                        'eligible' => false,
+                        'constraints' => [
+                            'purchase_amount' => [
+                                'minimum' => $planConfig->minimumAmount(),
+                                'maximum' => $planConfig->maximumAmount(),
+                            ],
+                        ],
+                        'reasons' => [
+                            'purchase_amount' => 'invalid_value'
+                        ]
+                    ]
+                );
+
+                $plansEligibility[] = new PaymentPlanEligibility($planConfig, $eligibility);
+            } else {
+                // Query eligibility for the plan's installments count & keep track of which plans are queried
+                $installmentsCounts[] = $planConfig->installmentsCount();
+                $queriedPlans[] = $planKey;
+
+                // Insert plan key into the "final" result array so that we can replace it with its actual eligibility
+                // result after the API call is made
+                $plansEligibility[] = $planKey;
+            }
+        }
+
+        $eligibilities = $this->alma->payments->eligibility(
+            $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts),
+            true
+        );
+
+        $queriedEligibilities = [];
+        foreach (array_values($eligibilities) as $idx => $eligibility) {
+            $key = $queriedPlans[$idx];
+            $planConfig = $enabledPlans[$key];
+            $queriedEligibilities[$key] = new PaymentPlanEligibility($planConfig, $eligibility);
+        }
+
+        return array_map(function ($planOrKey) use ($queriedEligibilities) {
+            return is_string($planOrKey) ? $queriedEligibilities[$planOrKey] : $planOrKey;
+        }, $plansEligibility);
+    }
+
+    /**
      * @return bool
      *
      * @throws InputException
@@ -101,80 +176,81 @@ class Eligibility
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
 
-        if (!$this->alma) {
-            $this->eligible = false;
-            return false;
-        }
-
         if (!$this->checkItemsTypes()) {
             $this->eligible = false;
             $this->message = $nonEligibilityMessage . '<br>' . $excludedProductsMessage;
+
+            return false;
+        }
+
+        try {
+            $plansEligibility = $this->getPlansEligibility();
+        } catch (\Exception $e) {
+            $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
+            $this->eligible = false;
+            $this->message = $nonEligibilityMessage;
+
             return false;
         }
 
         $this->message = $eligibilityMessage;
-        $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
-
-        // Get activated plans and build a list of installments count that should be tested for eligibility
-        $plansConfig = $this->config->getPaymentPlansConfig();
-        $installmentsCounts = [];
-        foreach ($plansConfig as $planConfig) {
-            if (
-                !$planConfig->isAllowed() ||
-                !$planConfig->isEnabled() ||
-                $cartTotal < $planConfig->minimumAmount() ||
-                $cartTotal > $planConfig->maximumAmount()
-            ) {
-                continue;
-            }
-
-            $installmentsCounts[] = $planConfig->installmentsCount();
-        }
-
-        // TODO: pass $installmentsCounts to paymentDataFromQuote (or use Payment Data Builder?)
-        // TODO: collect max of max and min of min above for easier comparison below if nothing is eligible
-        // TODO: $eligibililty -> $eligibilities => process multiple results as any eligible == eligible, otherwise not
-
-        try {
-            $eligibilities = $this->alma->payments->eligibility(
-                $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts), true
-            );
-        } catch (RequestError $e) {
-            $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage;
-            return false;
-        }
-
         $anyEligible = false;
-        foreach ($eligibilities as $eligibility) {
+        $minAmount = PHP_INT_MAX;
+        $maxAmount = PHP_INT_MIN;
+        foreach ($plansEligibility as $planEligibility) {
+            $eligibility = $planEligibility->getEligibility();
+
             if ($eligibility->isEligible()) {
                 $anyEligible = true;
+
                 break;
+            }
+
+            $reasons = $eligibility->getReasons();
+            if (key_exists('purchase_amount', $reasons) && $reasons['purchase_amount'] == 'invalid_value') {
+                $minAmount = min($minAmount, $eligibility->getConstraints()['purchase_amount']['minimum']);
+                $maxAmount = max($maxAmount, $eligibility->getConstraints()['purchase_amount']['maximum']);
+            } else {
+                $minAmount = min($minAmount, $planEligibility->getPlanConfig()->minimumAmount());
+                $maxAmount = max($maxAmount, $planEligibility->getPlanConfig()->maximumAmount());
             }
         }
 
         if (!$anyEligible) {
+            $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
             $this->eligible = false;
             $this->message = $nonEligibilityMessage;
 
-            $minAmount = $eligibility->constraints["purchase_amount"]["minimum"];
-            $maxAmount = $eligibility->constraints["purchase_amount"]["maximum"];
-
-            if ($cartTotal < $minAmount || $cartTotal > $maxAmount) {
-                if ($cartTotal > $maxAmount) {
-                    $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
-                    $this->message .= '<br>' . sprintf(__('(Maximum amount: %s)'), $price);
-                } else {
-                    $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($minAmount));
-                    $this->message .= '<br>' . sprintf(__('(Minimum amount: %s)'), $price);
-                }
+            if ($cartTotal > $maxAmount) {
+                $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
+                $this->message .= '<br>' . sprintf(__('(Maximum amount: %s)'), $price);
+            } elseif ($cartTotal < $minAmount) {
+                $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($minAmount));
+                $this->message .= '<br>' . sprintf(__('(Minimum amount: %s)'), $price);
             }
         } else {
             $this->eligible = true;
         }
 
         return $this->eligible;
+    }
+
+    /**
+     * @return PaymentPlanConfig[]
+     */
+    public function getEligiblePlans(): array
+    {
+        try {
+            $eligiblePlans = array_filter($this->getPlansEligibility(), function ($planEligibility) {
+                return $planEligibility->getEligibility()->isEligible();
+            });
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        return array_map(function ($planEligibility) {
+            return $planEligibility->getPlanConfig();
+        }, $eligiblePlans);
     }
 
     /**

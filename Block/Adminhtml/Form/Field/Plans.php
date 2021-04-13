@@ -24,8 +24,8 @@
 
 namespace Alma\MonthlyPayments\Block\Adminhtml\Form\Field;
 
-use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlanConfig;
-use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlansConfig;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Serialize\Serializer\Json;
 
@@ -60,6 +60,7 @@ class Plans extends Field
             return $plan->isDeferred() || $plan->installmentsCount() > 1;
         });
 
+        // TODO: plan sorting should be done at a higher level
         uksort($plans, function ($k1, $k2) use ($plans) {
             /** @var PaymentPlanConfig $p1 */
             $p1 = $plans[$k1];

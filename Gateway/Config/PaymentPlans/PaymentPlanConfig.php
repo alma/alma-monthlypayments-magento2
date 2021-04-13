@@ -22,7 +22,9 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-namespace Alma\MonthlyPayments\Model\Data\PaymentPlans;
+namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
+
+use Alma\API\Entities\FeePlan;
 
 class PaymentPlanConfig
 {
@@ -44,6 +46,25 @@ class PaymentPlanConfig
         ];
     }
 
+    public static function keyForFeePlan(FeePlan $plan): string
+    {
+        return self::key(
+            $plan->kind,
+            intval($plan->installments_count),
+            intval($plan->deferred_days),
+            intval($plan->deferred_months)
+        );
+    }
+
+    private static function key(
+        string $planKind,
+        int $installmentsCount,
+        int $deferredDays,
+        int $deferredMonths
+    ): string {
+        return implode(':', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
+    }
+
     /**
      * @var array
      */
@@ -57,6 +78,16 @@ class PaymentPlanConfig
     public function toArray(): array
     {
         return $this->data;
+    }
+
+    public function planKey(): string
+    {
+        return self::key($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
+    }
+
+    public function kind(): string
+    {
+        return $this->data['kind'];
     }
 
     public function isAllowed(): bool
@@ -86,12 +117,12 @@ class PaymentPlanConfig
 
     public function deferredDays(): int
     {
-        return $this->data['deferredDays'];
+        return intval($this->data['deferredDays']);
     }
 
     public function deferredMonths(): int
     {
-        return $this->data['deferredMonths'];
+        return intval($this->data['deferredMonths']);
     }
 
     /**
@@ -115,6 +146,11 @@ class PaymentPlanConfig
         return $this->data['minAmount'];
     }
 
+    public function setMinimumAmount(int $amount)
+    {
+        $this->data['minAmount'] = $amount;
+    }
+
     public function minimumAllowedAmount(): int
     {
         return $this->data['minAllowedAmount'];
@@ -123,6 +159,11 @@ class PaymentPlanConfig
     public function maximumAmount(): int
     {
         return $this->data['maxAmount'];
+    }
+
+    public function setMaximumAmount(int $amount)
+    {
+        $this->data['maxAmount'] = $amount;
     }
 
     public function maximumAllowedAmount(): int

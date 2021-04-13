@@ -26,11 +26,11 @@
 namespace Alma\MonthlyPayments\Gateway\Config;
 
 use Alma\API\Client;
-use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlanConfig;
-use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlansConfig;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
-class Config extends \Magento\Payment\Gateway\Config\Config {
+class Config extends \Magento\Payment\Gateway\Config\Config
+{
     const CODE = 'alma_monthly_payments';
 
     const ORDER_PAYMENT_URL = 'PAYMENT_URL';
@@ -106,7 +106,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
 
     public function getSortOrder(): int
     {
-        return (int) $this->get(self::CONFIG_SORT_ORDER);
+        return (int)$this->get(self::CONFIG_SORT_ORDER);
     }
 
     public function canLog(): bool
@@ -119,7 +119,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
         return $this->get(self::CONFIG_API_MODE, Client::LIVE_MODE);
     }
 
-    public function getActiveAPIKey() {
+    public function getActiveAPIKey()
+    {
         $mode = $this->getActiveMode();
 
         switch ($mode) {
@@ -209,11 +210,10 @@ class Config extends \Magento\Payment\Gateway\Config\Config {
     }
 
     /**
-     * @return PaymentPlanConfig[]
+     * @return PaymentPlansConfig
      */
-    public function getPaymentPlansConfig(): array
+    public function getPaymentPlansConfig(): PaymentPlansConfig
     {
-        $plansConfig = new PaymentPlansConfig($this->get(self::CONFIG_PAYMENT_PLANS));
-        return $plansConfig->getPlans();
+        return new PaymentPlansConfig($this->get(self::CONFIG_PAYMENT_PLANS));
     }
 }

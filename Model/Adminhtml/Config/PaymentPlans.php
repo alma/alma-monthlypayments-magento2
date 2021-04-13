@@ -28,9 +28,9 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 use Alma\API\Entities\FeePlan;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
-use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlanConfig;
-use Alma\MonthlyPayments\Model\Data\PaymentPlans\PaymentPlansConfig;
 use Magento\Config\Model\Config\Backend\Serialized;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -96,16 +96,11 @@ class PaymentPlans extends Serialized
         $this->serializer = $serializer ?: new Json();
     }
 
-    private function keyForPlan(FeePlan $plan): string
-    {
-        return implode(':',
-            [$plan->kind, $plan->installments_count, intval($plan->deferred_days), intval($plan->deferred_months)]
-        );
-    }
-
     private function defaultConfigForPlan(FeePlan $plan): array
     {
         return [
+            'kind' => $plan->kind,
+
             'installmentsCount' => $plan->installments_count,
 
             'deferredDays' => intval($plan->deferred_days),
@@ -154,7 +149,7 @@ class PaymentPlans extends Serialized
         }
 
         foreach ($feePlans as $plan) {
-            $key = $this->keyForPlan($plan);
+            $key = PaymentPlanConfig::keyForFeePlan($plan);
             $plansConfig->setPlanAllowed($key, $plan->allowed);
             $plansConfig->updatePlanDefaults($key, $this->defaultConfigForPlan($plan));
         }

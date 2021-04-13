@@ -22,7 +22,7 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-namespace Alma\MonthlyPayments\Model\Data\PaymentPlans;
+namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
 use Magento\Framework\Serialize\Serializer\Json;
 
@@ -62,11 +62,24 @@ class PaymentPlansConfig
         $this->data[$planKey]['allowed'] = $allowed;
     }
 
+    /**
+     * @return PaymentPlanConfig[]
+     */
     public function getPlans(): array
     {
         return array_map(function ($planData) {
             return new PaymentPlanConfig($planData);
         }, $this->data);
+    }
+
+    /**
+     * @return PaymentPlanConfig[]
+     */
+    public function getEnabledPlans(): array
+    {
+        return array_filter($this->getPlans(), function ($planConfig) {
+            return $planConfig->isAllowed() && $planConfig->isEnabled();
+        });
     }
 
     public function toJson(): string
