@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<!--
- * 2018-2020 Alma SAS
+<?php
+/**
+ * 2018-2021 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -18,30 +18,44 @@
  * IN THE SOFTWARE.
  *
  * @author    Alma SAS <contact@getalma.eu>
- * @copyright 2018-2020 Alma SAS
+ * @copyright 2018-2021 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
- * -->
+ */
 
-<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+namespace Alma\MonthlyPayments\Model\Api;
 
-    <route url="/V1/alma/payments/validate/:paymentId" method="GET">
-        <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="validate"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
-    </route>
+use Alma\MonthlyPayments\Api\Data\EligiblePlansResultInterfaceFactory;
+use Alma\MonthlyPayments\Api\EligibilityInterface;
+use Alma\MonthlyPayments\Helpers\Eligibility as EligibilityHelper;
 
-    <route url="/V1/alma/payments/url" method="GET">
-        <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="getPaymentUrl"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
-    </route>
+class Eligibility implements EligibilityInterface
+{
 
-    <route url="/V1/alma/payments/eligibility/eligible-plans" method="GET">
-        <service class="Alma\MonthlyPayments\Api\EligibilityInterface" method="getEligiblePlans"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
-    </route>
-</routes>
+    /**
+     * @var EligibilityHelper
+     */
+    private $eligibilityHelper;
+    /**
+     * @var EligiblePlansResultInterfaceFactory
+     */
+    private $eligiblePlansResultFactory;
+
+    public function __construct(EligibilityHelper $eligibilityHelper, EligiblePlansResultInterfaceFactory $eligiblePlansResultFactory)
+    {
+
+        $this->eligibilityHelper = $eligibilityHelper;
+        $this->eligiblePlansResultFactory = $eligiblePlansResultFactory;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEligiblePlans()
+    {
+        $eligiblePlans = $this->eligibilityHelper->getEligiblePlans();
+
+        return array_map(function ($planEligibility) {
+            return $this->eligiblePlansResultFactory->create(["data" => ["planEligibility" => $planEligibility]]);
+        }, $eligiblePlans);
+    }
+}

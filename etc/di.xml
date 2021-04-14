@@ -30,6 +30,10 @@
     <preference for="Alma\MonthlyPayments\Api\PaymentInterface" type="Alma\MonthlyPayments\Model\Api\Payment" />
     <preference for="Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface" type="Alma\MonthlyPayments\Model\Api\Data\PaymentValidationResult" />
 
+    <preference for="Alma\MonthlyPayments\Api\EligibilityInterface" type="Alma\MonthlyPayments\Model\Api\Eligibility" />
+    <preference for="Alma\MonthlyPayments\Api\Data\EligiblePlansResultInterface" type="Alma\MonthlyPayments\Model\Api\Data\EligiblePlansResult" />
+    <preference for="Alma\MonthlyPayments\Api\Data\InstallmentInterface" type="Alma\MonthlyPayments\Model\Api\Data\Installment" />
+
     <!-- Eligibility injection in cart customer data -->
     <type name="Magento\Checkout\CustomerData\Cart">
         <plugin name="cart_eligibility" type="Alma\MonthlyPayments\Plugin\Checkout\CustomerData\CartEligibility"/>

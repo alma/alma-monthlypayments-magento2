@@ -128,8 +128,15 @@ class PaymentPlanConfig
         return $this->deferredDays() > 0 || $this->deferredMonths() > 0;
     }
 
-    public function deferredType(): string
+    /**
+     * @return string|null
+     */
+    public function deferredType()
     {
+        if (!$this->isDeferred()) {
+            return null;
+        }
+
         return $this->deferredMonths() > 0 ? 'M' : 'D';
     }
 

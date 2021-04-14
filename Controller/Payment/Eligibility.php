@@ -25,13 +25,11 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Eligibility as EligibilityHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Exception\LocalizedException;
 
 class Eligibility extends Action
 {
