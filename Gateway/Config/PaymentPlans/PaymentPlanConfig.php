@@ -208,4 +208,17 @@ class PaymentPlanConfig
     {
         return $this->data['customerFees']['fixed'];
     }
+
+    /**
+     * @return string|null
+     */
+    public function logoFileName()
+    {
+        // TODO: there's gotta be a better way
+        if (!$this->isDeferred() && in_array($this->installmentsCount(), [2, 3, 4])) {
+            return 'p' . $this->installmentsCount() . 'x_logo.svg';
+        }
+
+        return null;
+    }
 }

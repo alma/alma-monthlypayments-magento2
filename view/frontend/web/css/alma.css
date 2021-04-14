@@ -7,6 +7,11 @@
     margin-right: 10px;
 }
 
+.alma.payment-method .alma-plan-logo {
+    height: 25px;
+    vertical-align: bottom;
+}
+
 .alma.payment-method ul.alma-installments {
     padding: 0;
     margin-bottom: 2rem;
