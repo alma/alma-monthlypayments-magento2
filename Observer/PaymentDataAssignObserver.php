@@ -30,13 +30,13 @@ use Magento\Quote\Api\Data\PaymentInterface;
 
 class PaymentDataAssignObserver extends AbstractDataAssignObserver
 {
-    const INSTALLMENTS_COUNT = 'installments_count';
+    const SELECTED_PLAN = 'selectedPlan';
 
     /**
      * @var array
      */
     protected $additionalInformationList = [
-        self::INSTALLMENTS_COUNT
+        self::SELECTED_PLAN
     ];
 
     /**

@@ -85,6 +85,24 @@ class PaymentPlanConfig
         return self::key($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
     }
 
+    public function getPaymentData(): array
+    {
+        if (!$this->isAllowed() || !$this->isEnabled()) {
+            return [];
+        }
+
+        $data = [
+            'installments_count' => $this->installmentsCount(),
+        ];
+
+        if ($this->isDeferred()) {
+            $data['deferred_days'] = $this->deferredDays();
+            $data['deferred_months'] = $this->deferredMonths();
+        }
+
+        return $data;
+    }
+
     public function kind(): string
     {
         return $this->data['kind'];

@@ -26,13 +26,13 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Alma\MonthlyPayments\Helpers\Functions;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -71,22 +71,25 @@ class PaymentDataBuilder implements BuilderInterface
         $orderId = $order->getOrderIncrementId();
         $quoteId = $this->checkoutSession->getQuoteId();
 
-        $installmentsCount = (int) $payment->getAdditionalInformation(PaymentDataAssignObserver::INSTALLMENTS_COUNT);
+        $planKey = $payment->getAdditionalInformation(PaymentDataAssignObserver::SELECTED_PLAN);
+        $planConfig = $this->config->getPaymentPlansConfig()->getPlans()[$planKey];
 
         return [
-            'payment' => [
-                'installments_count' => $installmentsCount,
-                'return_url' => $this->config->getReturnUrl(),
-                'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
-                'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
-                'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
-                'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
-                'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
-                'custom_data' => [
-                    'order_id' => $orderId,
-                    'quote_id' => $quoteId
+            'payment' => array_merge(
+                $planConfig->getPaymentData(),
+                [
+                    'return_url' => $this->config->getReturnUrl(),
+                    'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
+                    'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
+                    'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
+                    'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
+                    'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
+                    'custom_data' => [
+                        'order_id' => $orderId,
+                        'quote_id' => $quoteId
+                    ]
                 ]
-            ],
+            ),
         ];
     }
 }
