@@ -24,20 +24,32 @@
 
 namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
+use Alma\API\Entities\FeePlan;
+use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Magento\Framework\Serialize\Serializer\Json;
 
-class PaymentPlansConfig
+class PaymentPlansConfig implements PaymentPlansConfigInterface
 {
     /** @var array */
     private $data;
     private $serializer;
+    private $almaClient;
+    /**
+     * @var PaymentPlanConfigInterfaceFactory
+     */
+    private $planConfigFactory;
 
     /**
      * PaymentPlansConfig constructor.
+     *
+     * @param AlmaClient $almaClient
      * @param array|string $data
      */
-    public function __construct($data)
-    {
+    public function __construct(
+        AlmaClient $almaClient,
+        PaymentPlanConfigInterfaceFactory $planConfigFactory,
+        array $data = []
+    ) {
         $this->serializer = new Json();
 
         if (is_string($data)) {
@@ -45,14 +57,39 @@ class PaymentPlansConfig
         }
 
         $this->data = $data;
+        $this->almaClient = $almaClient;
+        $this->planConfigFactory = $planConfigFactory;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function updateFromApi()
+    {
+        $alma = $this->almaClient->getDefaultClient();
+
+        // TODO: Request deferred plans when support for Pay Later is added
+        $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", false);
+
+        foreach ($feePlans as $plan) {
+            $key = PaymentPlanConfig::keyForFeePlan($plan);
+            $this->setPlanAllowed($key, $plan->allowed);
+            $this->updatePlanDefaults($key, PaymentPlanConfig::defaultConfigForFeePlan($plan));
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function updatePlanDefaults(string $planKey, array $defaultConfig)
     {
         $currentConfig = key_exists($planKey, $this->data) ? $this->data[$planKey] : [];
         $this->data[$planKey] = array_merge($defaultConfig, $currentConfig);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setPlanAllowed(string $planKey, bool $allowed)
     {
         if (!key_exists($planKey, $this->data)) {
@@ -63,17 +100,17 @@ class PaymentPlansConfig
     }
 
     /**
-     * @return PaymentPlanConfig[]
+     * @inheritDoc
      */
     public function getPlans(): array
     {
         return array_map(function ($planData) {
-            return new PaymentPlanConfig($planData);
+            return $this->planConfigFactory->create(["data" => $planData]);
         }, $this->data);
     }
 
     /**
-     * @return PaymentPlanConfig[]
+     * @inheritDoc
      */
     public function getEnabledPlans(): array
     {
@@ -82,6 +119,9 @@ class PaymentPlansConfig
         });
     }
 
+    /**
+     * @inheritDoc
+     */
     public function toJson(): string
     {
         return $this->serializer->serialize($this->data);

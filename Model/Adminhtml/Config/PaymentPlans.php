@@ -25,12 +25,10 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
-use Alma\API\Entities\FeePlan;
-use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
-use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Magento\Config\Model\Config\Backend\Serialized;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -45,10 +43,6 @@ class PaymentPlans extends Serialized
 {
     protected $apiKeyType = null;
 
-    /**
-     * @var AlmaClient
-     */
-    private $almaClient;
     /**
      * @var MessageManager
      */
@@ -65,14 +59,18 @@ class PaymentPlans extends Serialized
      * @var Json
      */
     protected $serializer;
+    /**
+     * @var PaymentPlansConfigInterfaceFactory
+     */
+    private $plansConfigFactory;
 
     public function __construct(
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        AlmaClient $almaClient,
         MessageManager $messageManager,
+        PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         Config $almaConfig,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
@@ -90,39 +88,10 @@ class PaymentPlans extends Serialized
             $serializer
         );
 
-        $this->almaClient = $almaClient;
         $this->almaConfig = $almaConfig;
         $this->messageManager = $messageManager;
         $this->serializer = $serializer ?: new Json();
-    }
-
-    private function defaultConfigForPlan(FeePlan $plan): array
-    {
-        return [
-            'kind' => $plan->kind,
-
-            'installmentsCount' => $plan->installments_count,
-
-            'deferredDays' => intval($plan->deferred_days),
-            'deferredMonths' => intval($plan->deferred_months),
-
-            'enabled' => $plan->installments_count === 3,
-
-            'minAllowedAmount' => $plan->min_purchase_amount,
-            'minAmount' => $plan->min_purchase_amount,
-
-            'maxAllowedAmount' => $plan->max_purchase_amount,
-            'maxAmount' => $plan->max_purchase_amount,
-
-            'merchantFees' => [
-                'variable' => $plan->merchant_fee_variable,
-                'fixed' => $plan->merchant_fee_fixed
-            ],
-            'customerFees' => [
-                'variable' => $plan->customer_fee_variable,
-                'fixed' => $plan->customer_fee_fixed
-            ]
-        ];
+        $this->plansConfigFactory = $plansConfigFactory;
     }
 
     protected function _afterLoad()
@@ -134,24 +103,16 @@ class PaymentPlans extends Serialized
             $value = [];
         }
 
-        $plansConfig = new PaymentPlansConfig($value);
+        $plansConfig = $this->plansConfigFactory->create(["data" => $value]);
 
-        $alma = $this->almaClient->getDefaultClient();
         try {
-            // TODO: Request deferred plans when support for Pay Later is added
-            $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", false);
-        } catch (RequestError $e) {
+            $plansConfig->updateFromApi();
+        } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(
                 __("Error fetching Alma payment plans - displayed information might not be accurate")
             );
 
             return;
-        }
-
-        foreach ($feePlans as $plan) {
-            $key = PaymentPlanConfig::keyForFeePlan($plan);
-            $plansConfig->setPlanAllowed($key, $plan->allowed);
-            $plansConfig->updatePlanDefaults($key, $this->defaultConfigForPlan($plan));
         }
 
         $this->setValue($plansConfig);
@@ -172,6 +133,7 @@ class PaymentPlans extends Serialized
             }
         }
 
+        // Parent class will serialize the value as JSON again in its beforeSave implementation
         $this->setValue($value);
 
         return parent::beforeSave();

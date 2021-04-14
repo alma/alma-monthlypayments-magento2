@@ -26,7 +26,9 @@
 namespace Alma\MonthlyPayments\Gateway\Config;
 
 use Alma\API\Client;
-use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
+use Alma\API\RequestError;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
@@ -56,9 +58,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     private $pathPattern;
     private $methodCode;
+    private $plansConfigFactory;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
+        PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         $methodCode = null,
         $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
@@ -66,6 +70,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
+        $this->plansConfigFactory = $plansConfigFactory;
     }
 
     /**
@@ -209,11 +214,22 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $this->get(self::CONFIG_MERCHANT_ID);
     }
 
-    /**
-     * @return PaymentPlansConfig
-     */
-    public function getPaymentPlansConfig(): PaymentPlansConfig
+    public function getPaymentPlansConfig(): PaymentPlansConfigInterface
     {
-        return new PaymentPlansConfig($this->get(self::CONFIG_PAYMENT_PLANS));
+        $data = $this->get(self::CONFIG_PAYMENT_PLANS, []);
+
+        /** @var PaymentPlansConfigInterface $plansConfig */
+        $plansConfig = $this->plansConfigFactory->create(["data" => $data]);
+
+        if (empty($data)) {
+            // No plans config data has ever been saved – fetch what we need
+            try {
+                $plansConfig->updateFromApi();
+            } catch (RequestError $e) {
+                // TODO: log error (circumvent circular dependency between Logger & Config)
+            }
+        }
+
+        return $plansConfig;
     }
 }

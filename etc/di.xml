@@ -61,6 +61,9 @@
     </virtualType>
 
     <!-- Configuration reader -->
+    <preference for="Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface" type="Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig"/>
+    <preference for="Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface" type="Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig"/>
+
     <type name="Alma\MonthlyPayments\Gateway\Config\Config">
         <arguments>
             <argument name="methodCode" xsi:type="const">Alma\MonthlyPayments\Gateway\Config\Config::CODE</argument>

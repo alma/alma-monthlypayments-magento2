@@ -26,7 +26,7 @@ namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
 use Alma\API\Entities\FeePlan;
 
-class PaymentPlanConfig
+class PaymentPlanConfig implements PaymentPlanConfigInterface
 {
     const TRANSIENT_KEY_MIN_ALLOWED_AMOUNT = 'minAllowedAmount';
     const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
@@ -56,6 +56,35 @@ class PaymentPlanConfig
         );
     }
 
+    public static function defaultConfigForFeePlan(FeePlan $plan): array
+    {
+        return [
+            'kind' => $plan->kind,
+
+            'installmentsCount' => $plan->installments_count,
+
+            'deferredDays' => intval($plan->deferred_days),
+            'deferredMonths' => intval($plan->deferred_months),
+
+            'enabled' => $plan->installments_count === 3,
+
+            'minAllowedAmount' => $plan->min_purchase_amount,
+            'minAmount' => $plan->min_purchase_amount,
+
+            'maxAllowedAmount' => $plan->max_purchase_amount,
+            'maxAmount' => $plan->max_purchase_amount,
+
+            'merchantFees' => [
+                'variable' => $plan->merchant_fee_variable,
+                'fixed' => $plan->merchant_fee_fixed
+            ],
+            'customerFees' => [
+                'variable' => $plan->customer_fee_variable,
+                'fixed' => $plan->customer_fee_fixed
+            ]
+        ];
+    }
+
     private static function key(
         string $planKind,
         int $installmentsCount,
@@ -70,7 +99,7 @@ class PaymentPlanConfig
      */
     private $data;
 
-    public function __construct(array $data)
+    public function __construct(array $data = [])
     {
         $this->data = $data;
     }
@@ -151,12 +180,9 @@ class PaymentPlanConfig
     }
 
     /**
-     * Returns deferred duration in days – approximate value (invariably using 30 days for 1 month) but it's OK as it's
-     * mainly being used for sorting purposes.
-     *
-     * @return int
+     * @inheritDoc
      */
-    public function deferredDurationInDays()
+    public function deferredDurationInDays(): int
     {
         return $this->deferredMonths() * 30 + $this->deferredDays();
     }
