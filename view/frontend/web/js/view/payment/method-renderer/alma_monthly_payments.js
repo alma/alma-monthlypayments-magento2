@@ -26,13 +26,17 @@
 /*global define*/
 define(
     [
+        'ko',
         'jquery',
+        'underscore',
+        'moment',
+        'mage/translate',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/model/full-screen-loader',
+        'Magento_Catalog/js/price-utils',
         'uiRegistry',
-        'underscore',
     ],
-    function ($, Component, fullScreenLoader, registry, _) {
+    function (ko, $, _, moment, $t, Component, fullScreenLoader, priceUtils, registry) {
         'use strict';
 
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
@@ -77,15 +81,70 @@ define(
                 template: 'Alma_MonthlyPayments/payment/form',
             },
 
-            getCode: function() {
-                return 'alma_monthly_payments';
+            initialize: function() {
+                this._super();
+
+                this.config = window.checkoutConfig.payment[this.item.method];
+                this.paymentPlans = this.config.paymentPlans;
+                this.selectedPlanKey = ko.observable(this.defaultPlan().key);
+
+                this.selectedPlan = ko.computed(function () {
+                    var key = this.selectedPlanKey();
+
+                    return this.paymentPlans.find(function (plan) {
+                        return plan.key === key;
+                    }) || {};
+                }, this);
+
+                return this;
+            },
+
+            defaultPlan: function() {
+                return this.paymentPlans.reduce(function (plan, result) {
+                    if (plan.installmentsCount === 3 || plan.installmentsCount > result.installmentsCount) {
+                        return plan;
+                    }
+
+                    return result;
+                }, this.paymentPlans[0]);
+            },
+
+            getSinglePlanTitle: function(plan) {
+                return $t('Pay in %1 installments').replace('%1', plan.installmentsCount);
+            },
+
+            getPlanLabel: function(plan) {
+                return $t('%1 installments').replace('%1', plan.installmentsCount);
+            },
+
+            formattedDate: function(ts) {
+                return (new Date(ts * 1000)).toLocaleDateString(this.config.locale);
+            },
+
+            formattedPrice: function(cents) {
+                return priceUtils.formatPrice(cents / 100, window.checkoutConfig.priceFormat);
+            },
+
+            getFeesMention: function(customerFee) {
+                return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
+            },
+
+            getData: function() {
+                return $.extend(
+                    this._super(),
+                    {
+                        additional_data: {
+                            selectedPlan: this.selectedPlanKey()
+                        }
+                    }
+                );
             },
 
             afterPlaceOrder: function () {
                 fullScreenLoader.startLoader();
 
                 // Get payment page URL from checkoutConfig and redirect
-                $.mage.redirect(window.checkoutConfig.payment[this.getCode()].redirectTo);
+                $.mage.redirect(this.config.redirectTo);
             }
         });
     }

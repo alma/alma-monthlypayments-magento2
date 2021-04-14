@@ -24,7 +24,7 @@
  */
 -->
 
-<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+<div class="alma payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
     <div class="payment-method-title field choice">
         <input type="radio"
                name="payment[alma_monthly_payments]"
@@ -39,6 +39,42 @@
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
+
+        <p class="alma-plan-choices">
+            <!-- ko if: paymentPlans.length === 1 -->
+                <span data-bind="text: getSinglePlanTitle(paymentPlans[0])"></span>
+            <!-- /ko -->
+            <!-- ko ifnot: paymentPlans.length === 1 -->
+                <!-- ko foreach: paymentPlans -->
+                <label data-bind="attr: { for: 'alma-select-plan-' + key }">
+                    <input type="radio" name="alma-selected-plan" data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.selectedPlanKey">
+                    <span data-bind="text: $parent.getPlanLabel($data)"></span>
+                </label>
+                <!-- /ko -->
+            <!-- /ko -->
+        </p>
+
+        <ul class="alma-installments">
+            <!-- ko foreach: selectedPlan().installments -->
+            <li>
+                <!-- ko if: $index() === 0 -->
+                    <span class="alma-installment--due-date" data-bind="i18n: 'Today'"></span>
+                <!-- /ko -->
+                <!-- ko if: $index() > 0 -->
+                    <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                <!-- /ko -->
+                <span class="alma-installment--amount-column">
+                    <span class="alma-installment--amount" data-bind="text: $parent.formattedPrice(purchase_amount + customer_fee)"></span>
+                    <!-- ko if: customer_fee > 0 -->
+                        <span class="alma-installment--fee">
+                            <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>
+                        </span>
+                    <!-- /ko -->
+                </span>
+            </li>
+            <!-- /ko -->
+        </ul>
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->

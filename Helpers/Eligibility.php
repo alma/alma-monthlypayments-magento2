@@ -29,7 +29,6 @@ use Alma\API\Client;
 use Alma\API\Endpoints\Results\Eligibility as AlmaEligibility;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
@@ -236,21 +235,17 @@ class Eligibility
     }
 
     /**
-     * @return PaymentPlanConfig[]
+     * @return PaymentPlanEligibility[]
      */
     public function getEligiblePlans(): array
     {
         try {
-            $eligiblePlans = array_filter($this->getPlansEligibility(), function ($planEligibility) {
+            return array_filter($this->getPlansEligibility(), function ($planEligibility) {
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
             return [];
         }
-
-        return array_map(function ($planEligibility) {
-            return $planEligibility->getPlanConfig();
-        }, $eligiblePlans);
     }
 
     /**

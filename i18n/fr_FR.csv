@@ -57,4 +57,8 @@
 "<p>Some products (gift cards, license keys, software, weapons, ...) cannot be sold with Alma, <a href=""https://getalma.eu/legal/terms/payment"" target=""_blank"">as per our terms</a> (see Exclusions paragraph).</p><p>If you are selling such products on your shop, you need to configure Alma so that it is not enabled when customers view or shop them.</p>", "<p>Certains produits (cartes cadeau, clés de licence, logiciels, armes, ...) ne peuvent pas être vendus avec Alma, comme indiqué <a href=""https://getalma.eu/legal/terms/payment"" target=""_blank"">dans nos CGV</a> (voir le paragraphe Exclusions).</p><p>Si vous vendez de tels produits, vous devez configurer le module Alma pour qu'il soit désactivé lorsque vos clients les consultent ou les achètent.</p>"
 "Products exclusions", "Exclusions de produits"
 "Other configuration settings will be made available after you provide valid API keys.", "Les autres options de configuration seront disponibles une fois les clefs d'API correctement configurées."
-"<i>no fees</i>", "<i>aucun frais</i>"
+"<i>no fees</i>", "<i>aucun frais</i>",
+"Today", "Aujourd'hui"
+"Pay in %1 installments", "Payer en %1 fois"
+"%1 installments", "En %1 fois"
+"Including fees: %1", "Dont frais : %1"

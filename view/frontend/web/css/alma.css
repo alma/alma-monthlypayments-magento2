@@ -1,3 +1,41 @@
 .alma-cart-eligibility img {
     height: 25px;
 }
+
+.alma.payment-method .alma-plan-choices label {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.alma.payment-method ul.alma-installments {
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.alma.payment-method ul.alma-installments li {
+    list-style-type: none;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid silver;
+}
+
+.alma.payment-method ul.alma-installments li:last-child {
+    border-bottom: none;
+}
+
+.alma.payment-method .alma-installment--amount-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.alma.payment-method .alma-installment--amount {
+    font-weight: bolder;
+}
+
+.alma.payment-method .alma-installment--fee {
+    font-weight: lighter;
+    font-size: smaller;
+}

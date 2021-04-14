@@ -29,6 +29,7 @@ use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Eligibility;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
 
 class ConfigProvider implements ConfigProviderInterface
@@ -49,17 +50,23 @@ class ConfigProvider implements ConfigProviderInterface
      * @var Eligibility
      */
     private $eligibilityHelper;
+    /**
+     * @var ResolverInterface
+     */
+    private $localeResolver;
 
     public function __construct(
         CheckoutSession $checkoutSession,
         UrlInterface $urlBuilder,
         Config $config,
-        Eligibility $eligibilityHelper
+        Eligibility $eligibilityHelper,
+        ResolverInterface $localeResolver
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
         $this->eligibilityHelper = $eligibilityHelper;
+        $this->localeResolver = $localeResolver;
     }
 
     public function getConfig()
@@ -70,8 +77,15 @@ class ConfigProvider implements ConfigProviderInterface
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => $this->config->getPaymentButtonTitle(),
                     'sortOrder' => $this->config->getSortOrder(),
-                    'paymentPlans' => array_map(function ($c) {
-                        return $c->toArray();
+                    'locale' => str_replace('_', '-', $this->localeResolver->getLocale()),
+                    'paymentPlans' => array_map(function ($pe) {
+                        $planConfig = $pe->getPlanConfig();
+
+                        $plan = $planConfig->toArray();
+                        $plan['key'] = $planConfig->planKey();
+                        $plan['installments'] = $pe->getEligibility()->getPaymentPlan();
+
+                        return $plan;
                     }, $this->eligibilityHelper->getEligiblePlans())
                 ]
             ]

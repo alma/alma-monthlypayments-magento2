@@ -35,12 +35,16 @@ define(
     ) {
         'use strict';
 
-        rendererList.push(
-            {
-                type: 'alma_monthly_payments',
-                component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
-            }
-        );
+
+        var methodCode = 'alma_monthly_payments';
+        if (window.checkoutConfig.payment[methodCode].paymentPlans.length > 0) {
+            rendererList.push(
+                {
+                    type: methodCode,
+                    component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
+                }
+            );
+        }
 
         /** Add view logic here if needed */
         return Component.extend({});
