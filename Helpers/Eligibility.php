@@ -145,10 +145,14 @@ class Eligibility
             }
         }
 
-        $eligibilities = $this->alma->payments->eligibility(
-            $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts),
-            true
-        );
+        $eligibilities = [];
+
+        if (!empty($installmentsCounts)) {
+            $eligibilities = $this->alma->payments->eligibility(
+                $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts),
+                true
+            );
+        }
 
         $queriedEligibilities = [];
         foreach (array_values($eligibilities) as $idx => $eligibility) {
