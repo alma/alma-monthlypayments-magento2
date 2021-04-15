@@ -43,12 +43,13 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
      * PaymentPlansConfig constructor.
      *
      * @param AlmaClient $almaClient
+     * @param PaymentPlanConfigInterfaceFactory $planConfigFactory
      * @param array|string $data
      */
     public function __construct(
         AlmaClient $almaClient,
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
-        array $data = []
+        $data = []
     ) {
         $this->serializer = new Json();
 
@@ -67,6 +68,9 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     public function updateFromApi()
     {
         $alma = $this->almaClient->getDefaultClient();
+        if (!$alma) {
+            return;
+        }
 
         // TODO: Request deferred plans when support for Pay Later is added
         $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", false);
