@@ -1,6 +1,17 @@
 Changelog
 =========
 
+v1.2.0
+------
+
+* Improves admin configuration UI
+* Updates Alma logo
+* Fixes bug preventing Alma from being activated after saving its configuration for the first time
+* Fixes Alma disappearing from payment methods when sort order is higher than number of methods
+* Displays fullscreen loader while redirecting to Alma's payment page from checkout
+* Adds support for multiple payment plans, each configurable with specific purchase amount bounds
+* Adds Web API endpoint to check eligibility for the activated payment plans
+
 v1.1.2
 ------
 

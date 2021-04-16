@@ -11,7 +11,7 @@
         "alma/alma-php-client": "~1.0"
     },
     "type": "magento2-module",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "license": [
         "MIT"
     ],
