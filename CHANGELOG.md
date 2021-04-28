@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.2.1
+------
+
+* Fixes module's registration dir path, which in some situations prevented the payment plans admin config form to
+  display correctly 
+
 v1.2.0
 ------
 
