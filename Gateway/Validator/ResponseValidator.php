@@ -43,7 +43,6 @@ class ResponseValidator extends AbstractValidator
     public function validate(array $validationSubject)
     {
         $response = SubjectReader::readResponse($validationSubject);
-
         if ($response['resultCode'] == Client::FAILURE) {
             return $this->createResult(
                 false,
@@ -52,7 +51,6 @@ class ResponseValidator extends AbstractValidator
                 ]
             );
         }
-
         return $this->createResult(true);
     }
 }

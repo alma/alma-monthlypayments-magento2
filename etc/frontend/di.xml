@@ -25,12 +25,14 @@
  */
 -->
 
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
                 <item name="alma_monthly_payments_config_provider"
-                      xsi:type="object">Alma\MonthlyPayments\Model\Ui\ConfigProvider</item>
+                      xsi:type="object">Alma\MonthlyPayments\Model\Ui\ConfigProvider
+                </item>
             </argument>
         </arguments>
     </type>

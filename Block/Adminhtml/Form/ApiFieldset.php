@@ -37,19 +37,29 @@ use Magento\Framework\View\Helper\Js;
  * Changes default collapsed state depending on whether the API has already been configured.
  *
  */
-class ApiFieldset extends Fieldset {
+class ApiFieldset extends Fieldset
+{
     /**
      * @var Config
      */
     private $config;
 
+    /**
+     * ApiFieldset constructor.
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param Config $config
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Session $authSession,
         Js $jsHelper,
         Config $config,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $authSession, $jsHelper, $data);
         $this->config = $config;
     }

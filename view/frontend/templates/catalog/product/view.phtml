@@ -1,0 +1,135 @@
+<?php
+/**
+ * 2018 Alma / Nabla SAS
+ *
+ * THE MIT LICENSE
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+ * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @author    Alma / Nabla SAS <contact@getalma.eu>
+ * @copyright 2018 Alma / Nabla SAS
+ * @license   https://opensource.org/licenses/MIT The MIT License
+ *
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * @see \Alma\MonthlyPayments\Block\Catalog\Product\View
+ */
+/** @var $block \Alma\MonthlyPayments\Block\Catalog\Product\View */
+/** @var $escaper \Magento\Framework\Escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+<?php if ($block->isActive() && $block->getPlans()): ?>
+    <div id="payment-plans"></div>
+    <?php
+    $scriptString = <<<script
+require.config({
+    paths: {
+        'widgets/Alma': 'https://cdn.jsdelivr.net/npm/@alma/widgets@1.x/dist/alma-widgets.umd'
+    }
+});
+
+require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Alma, $, priceUtils) {
+    ;(function() {
+
+        function initWidget(merchantId, apiMode, containerId, purchaseAmount, plans) {
+            var widgets = Alma.Widgets.initialize(merchantId, apiMode);
+            widgets.add(Alma.Widgets.PaymentPlans, {
+                container: '#' + containerId,
+                purchaseAmount: purchaseAmount,
+                plans: plans
+            });
+            widgets.render();
+        }
+
+        function getAlmaPrice() {
+            if({$block->getAlmaIsDynamicQtyPrice()}){
+                var priceContainer = $('#product-price-{$block->getProductId()} .price');
+                if(priceContainer != undefined)
+                {
+                    var priceHtml = priceContainer.html();
+                    if(priceHtml != undefined)
+                    {
+                        var price = priceHtml.replace(/[^\d]/g,"");
+                        var qty = $('#qty').val();
+                        if( !qty.match(/^\d+$/) || !( qty > 0 ))
+                        {
+                            qty = 1;
+                        }
+                        return price*qty;
+                    }
+                }
+                return false;
+            }else{
+                return '{$block->getPrice()}';
+            }
+        }
+
+        function updateWidget() {
+            var almaPrice = getAlmaPrice();
+            if(almaPrice !== false && almaPrice > 0){
+                initWidget(
+                    '{$block->getAlmaMerchantId()}',
+                    Alma.ApiMode.{$block->getAlmaApiMode()},
+                    'payment-plans',
+                    almaPrice,
+                    {$block->getPlans()}
+                );
+            }
+        }
+
+        var targetNode = document.getElementById('product-price-{$block->getProductId()}');
+
+        if({$block->isCustomWidgetPosition()}){
+            if($('{$block->getAlmaWidgetContainer()}') != undefined){
+                if({$block->getAlmaIsPrepend()}){
+                    $('{$block->getAlmaWidgetContainer()}').prepend($('#payment-plans'));
+                }else{
+                    $('{$block->getAlmaWidgetContainer()}').append($('#payment-plans'));
+                }
+            }else{
+                console.log('Css container "{$block->getAlmaWidgetContainer()}" not found');
+            }
+        }
+
+        var callback = function(mutationsList) {
+            for(var mutation of mutationsList) {
+                if (mutation.type == 'childList')
+                {
+                    updateWidget();
+                }
+            }
+        };
+        if(targetNode != undefined)
+        {
+            var observer = new MutationObserver(callback);
+            // https://developer.mozilla.org/fr/docs/Web/API/MutationObserver#MutationObserverInit
+            observer.observe(targetNode, { childList: true });
+            $('#qty').change(function() {
+                updateWidget();
+            });
+        }else{
+            updateWidget();
+        }
+    })()
+});
+script;
+    ?>
+    <?= /* @noEscape */
+    $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php endif; ?>

@@ -32,7 +32,8 @@ use Monolog\Handler\StreamHandler;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 
-class Logger extends Monolog {
+class Logger extends Monolog
+{
     /** @var Config */
     private $config;
 
@@ -41,6 +42,14 @@ class Logger extends Monolog {
      */
     private $directoryList;
 
+    /**
+     * Logger constructor.
+     * @param Config $config
+     * @param DirectoryList $directoryList
+     * @param string $name
+     * @param array $handlers
+     * @param array $processors
+     */
     public function __construct(Config $config, DirectoryList $directoryList, string $name, $handlers = [], $processors = [])
     {
         $this->config = $config;
@@ -55,6 +64,12 @@ class Logger extends Monolog {
         parent::__construct($name, $handlers, $processors);
     }
 
+    /**
+     * @param int $level
+     * @param string $message
+     * @param array $context
+     * @return bool
+     */
     public function addRecord($level, $message, array $context = []): bool
     {
         if (!$this->config->canLog()) {

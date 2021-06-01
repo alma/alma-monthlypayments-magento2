@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="https://cdn.jsdelivr.net/npm/@alma/widgets@1.x/dist/alma-widgets.min.css" src_type="url"
+             rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <referenceContainer name="product.info.main">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.after.title.alma.widget"
+                   as="alma_widget_product_after_title"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   before="-"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.main">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.after.addlinks.alma.widget"
+                   as="alma_widget_product_after_addlinks"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   after="-"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.price">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.before.price.alma.widget"
+                   as="alma_widget_product_before_price"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   before="-"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.type">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.before.stock.alma.widget"
+                   as="alma_widget_product_before_stock"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   before="-"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.type">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.after.stock.alma.widget"
+                   as="alma_widget_product_after_stock"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   after="-"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.price">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.after.info.alma.widget"
+                   as="alma_widget_product_after_info"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   after="-"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.main">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.before.addtocart.alma.widget"
+                   as="alma_widget_product_before_addtocart"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   before="product.info"/>
+        </referenceContainer>
+        <referenceContainer name="product.info.main">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.after.addtocart.alma.widget"
+                   as="alma_widget_product_after_addtocart"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   after="product.info"/>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Alma\MonthlyPayments\Block\Catalog\Product\View"
+                   name="catalog.product.view.custom.alma.widget"
+                   as="alma_widget_product_custom_position"
+                   template="Alma_MonthlyPayments::catalog/product/view.phtml"
+                   after="-"/>
+        </referenceContainer>
+    </body>
+</page>

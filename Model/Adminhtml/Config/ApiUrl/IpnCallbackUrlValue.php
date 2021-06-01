@@ -24,6 +24,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl;
 
-class IpnCallbackUrlValue extends ApiUrlValue {
+class IpnCallbackUrlValue extends ApiUrlValue
+{
     protected $urlPath = 'alma/payment/ipn';
 }

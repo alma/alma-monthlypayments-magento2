@@ -35,7 +35,6 @@ define(
     ) {
         'use strict';
 
-
         var methodCode = 'alma_monthly_payments';
         if (window.checkoutConfig.payment[methodCode].paymentPlans.length > 0) {
             rendererList.push(

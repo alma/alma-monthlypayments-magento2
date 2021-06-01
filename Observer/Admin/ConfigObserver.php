@@ -59,7 +59,8 @@ class ConfigObserver implements ObserverInterface
         ResourceConfig $resourceConfig,
         Availability $availabilityHelper,
         TypeListInterface $cacheTypeList
-    ) {
+    )
+    {
         $this->resourceConfig = $resourceConfig;
         $this->availabilityHelper = $availabilityHelper;
         $this->config = $config;
@@ -72,7 +73,7 @@ class ConfigObserver implements ObserverInterface
     {
         /** @var Merchant $merchant */
         $merchant = null;
-        $fully_configured = (int) $this->availabilityHelper->canConnectToAlma(null, null, $merchant);
+        $fully_configured = (int)$this->availabilityHelper->canConnectToAlma(null, null, $merchant);
 
         if ($fully_configured && $merchant) {
             $configPath = $this->config->getFieldPath(Config::CONFIG_MERCHANT_ID);

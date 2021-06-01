@@ -38,16 +38,25 @@ class Eligibility extends Action
      */
     private $eligibilityHelper;
 
+    /**
+     * Eligibility constructor.
+     * @param Context $context
+     * @param EligibilityHelper $eligibilityHelper
+     */
     public function __construct(
         Context $context,
         EligibilityHelper $eligibilityHelper
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->eligibilityHelper = $eligibilityHelper;
     }
 
     /**
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute()
     {

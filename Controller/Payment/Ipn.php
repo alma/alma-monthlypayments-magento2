@@ -40,10 +40,16 @@ class Ipn extends Action
      */
     private $paymentValidationHelper;
 
+    /**
+     * Ipn constructor.
+     * @param Context $context
+     * @param PaymentValidation $paymentValidationHelper
+     */
     public function __construct(
         Context $context,
         PaymentValidation $paymentValidationHelper
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->paymentValidationHelper = $paymentValidationHelper;
     }

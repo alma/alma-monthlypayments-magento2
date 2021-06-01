@@ -35,8 +35,8 @@ use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Quote\Model\Quote\Item;
 
-class Quote {
-
+class Quote
+{
     /**
      * @var Customer
      */
@@ -50,6 +50,12 @@ class Quote {
      */
     private $categoryRepository;
 
+    /**
+     * Quote constructor.
+     * @param Customer $customerData
+     * @param ProductImage $productImageHelper
+     * @param CategoryRepositoryInterface $categoryRepository
+     */
     public function __construct(
         Customer $customerData,
         ProductImage $productImageHelper,
@@ -114,6 +120,10 @@ class Quote {
         return $data;
     }
 
+    /**
+     * @param Product $product
+     * @return array
+     */
     private function getProductCategories(Product $product)
     {
         $paths = [];

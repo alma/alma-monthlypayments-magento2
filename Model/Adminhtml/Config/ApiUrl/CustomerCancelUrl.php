@@ -24,6 +24,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl;
 
-class CustomerCancelUrl extends ApiUrlValue {
+class CustomerCancelUrl extends ApiUrlValue
+{
     protected $urlPath = 'checkout/cart';
 }

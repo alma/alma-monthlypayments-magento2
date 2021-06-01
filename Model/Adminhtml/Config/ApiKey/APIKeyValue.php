@@ -53,27 +53,48 @@ class APIKeyValue extends Encrypted
      * @var Availability
      */
     private $availabilityHelper;
+
     /**
      * @var ResourceConfig
      */
     private $resourceConfig;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var MessageManager
      */
     private $messageManager;
+
     /**
      * @var false
      */
     protected $hasError;
+
     /**
      * @var Config
      */
     private $almaConfig;
 
+    /**
+     * APIKeyValue constructor.
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param EncryptorInterface $encryptor
+     * @param AlmaClient $almaClient
+     * @param Availability $availabilityHelper
+     * @param ResourceConfig $resourceConfig
+     * @param MessageManager $messageManager
+     * @param Config $almaConfig
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -88,7 +109,8 @@ class APIKeyValue extends Encrypted
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct(
             $context,
             $registry,
@@ -109,6 +131,9 @@ class APIKeyValue extends Encrypted
         $this->hasError = false;
     }
 
+    /**
+     * @return \Magento\Framework\Phrase
+     */
     public function getApiKeyName()
     {
         return __('API key');

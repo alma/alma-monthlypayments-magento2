@@ -25,7 +25,8 @@
  */
 -->
 
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.root">
             <arguments>
@@ -47,9 +48,11 @@
                                                                         Alma_MonthlyPayments/js/view/payment/alma_monthly_payments
                                                                     </item>
                                                                     <item name="methods" xsi:type="array">
-                                                                        <item name="alma_monthly_payments" xsi:type="array">
+                                                                        <item name="alma_monthly_payments"
+                                                                              xsi:type="array">
                                                                             <item name="isBillingAddressRequired"
-                                                                                  xsi:type="boolean">true</item>
+                                                                                  xsi:type="boolean">true
+                                                                            </item>
                                                                         </item>
                                                                     </item>
                                                                 </item>

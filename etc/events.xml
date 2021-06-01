@@ -21,8 +21,10 @@
  * @copyright 2018-2021 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
  * -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="payment_method_assign_data_alma_monthly_payments">
-        <observer name="alma_monthly_payments_gateway_data_assign" instance="Alma\MonthlyPayments\Observer\PaymentDataAssignObserver" />
+        <observer name="alma_monthly_payments_gateway_data_assign"
+                  instance="Alma\MonthlyPayments\Observer\PaymentDataAssignObserver"/>
     </event>
 </config>

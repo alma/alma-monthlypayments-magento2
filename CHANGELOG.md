@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.3.0
+------
+
+* Adds of Alma badge feature on product pages
+* Standardization of code
+
 v1.2.1
 ------
 

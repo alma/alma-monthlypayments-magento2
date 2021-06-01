@@ -174,7 +174,7 @@ $jsId = $block->escapeJs($blockId);
                             return this.plansConfig[this.selectedPlan()];
                         },
 
-                        write: function(value) {
+                        write: function (value) {
                             this.plansConfig[this.selectedPlan()] = value;
                             this.jsonConfig(JSON.stringify(this.plansConfig));
                         }

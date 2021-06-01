@@ -49,18 +49,30 @@ class Availability
      */
     private $logger;
 
+    /**
+     * Availability constructor.
+     * @param Config $config
+     * @param StoreManagerInterface $storeManager
+     * @param AlmaClient $almaClient
+     * @param Logger $logger
+     */
     public function __construct(
         Config $config,
         StoreManagerInterface $storeManager,
         AlmaClient $almaClient,
         Logger $logger
-    ) {
+    )
+    {
         $this->config = $config;
         $this->storeManager = $storeManager;
         $this->almaClient = $almaClient;
         $this->logger = $logger;
     }
 
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function isAvailable()
     {
         $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
@@ -68,21 +80,32 @@ class Availability
 
         return $this->isFullyConfigured() &&
             $this->isAvailableForCurrency($currencyCode) /*&&
-            $this->isAvailableForCountry($countryCode)*/;
+            $this->isAvailableForCountry($countryCode)*/ ;
     }
 
+    /**
+     * @param $currencyCode
+     * @return bool
+     */
     public function isAvailableForCurrency($currencyCode)
     {
         // We only support Euros at the moment
         return $currencyCode === 'EUR';
     }
 
+    /**
+     * @param $countryCode
+     * @return bool
+     */
     public function isAvailableForCountry($countryCode)
     {
         // We only support France at the moment
         return $countryCode === 'FR';
     }
 
+    /**
+     * @return bool
+     */
     public function isFullyConfigured()
     {
         return $this->config->isFullyConfigured();

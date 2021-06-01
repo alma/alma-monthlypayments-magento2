@@ -29,6 +29,9 @@ class LiveAPIKeyValue extends APIKeyValue
 {
     protected $apiKeyType = 'live';
 
+    /**
+     * @return \Magento\Framework\Phrase
+     */
     public function getApiKeyName()
     {
         return __('Live API key');

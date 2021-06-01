@@ -42,22 +42,25 @@
 
         <p class="alma-plan-choices">
             <!-- ko if: paymentPlans.length === 1 -->
-                <!-- ko if: paymentPlans[0].logo -->
-                    <img class="alma-plan-logo" data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + paymentPlans[0].logo), alt: paymentPlans[0].logo }">
-                <!-- /ko -->
+            <!-- ko if: paymentPlans[0].logo -->
+            <img class="alma-plan-logo"
+                 data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + paymentPlans[0].logo), alt: paymentPlans[0].logo }">
+            <!-- /ko -->
 
-                <span data-bind="text: getSinglePlanTitle(paymentPlans[0])"></span>
+            <span data-bind="text: getSinglePlanTitle(paymentPlans[0])"></span>
             <!-- /ko -->
             <!-- ko ifnot: paymentPlans.length === 1 -->
-                <!-- ko foreach: paymentPlans -->
-                <label data-bind="attr: { for: 'alma-select-plan-' + key }">
-                    <input type="radio" name="alma-selected-plan" data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.selectedPlanKey">
-                    <!-- ko if: logo -->
-                        <img class="alma-plan-logo" data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + logo), alt: logo }">
-                    <!-- /ko -->
-                    <span data-bind="text: $parent.getPlanLabel($data)"></span>
-                </label>
+            <!-- ko foreach: paymentPlans -->
+            <label data-bind="attr: { for: 'alma-select-plan-' + key }">
+                <input type="radio" name="alma-selected-plan"
+                       data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.selectedPlanKey">
+                <!-- ko if: logo -->
+                <img class="alma-plan-logo"
+                     data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + logo), alt: logo }">
                 <!-- /ko -->
+                <span data-bind="text: $parent.getPlanLabel($data)"></span>
+            </label>
+            <!-- /ko -->
             <!-- /ko -->
         </p>
 
@@ -65,13 +68,14 @@
             <!-- ko foreach: selectedPlan().installments -->
             <li>
                 <!-- ko if: $index() === 0 -->
-                    <span class="alma-installment--due-date" data-bind="i18n: 'Today'"></span>
+                <span class="alma-installment--due-date" data-bind="i18n: 'Today'"></span>
                 <!-- /ko -->
                 <!-- ko if: $index() > 0 -->
-                    <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
                 <!-- /ko -->
                 <span class="alma-installment--amount-column">
-                    <span class="alma-installment--amount" data-bind="text: $parent.formattedPrice(purchase_amount + customer_fee)"></span>
+                    <span class="alma-installment--amount"
+                          data-bind="text: $parent.formattedPrice(purchase_amount + customer_fee)"></span>
                     <!-- ko if: customer_fee > 0 -->
                         <span class="alma-installment--fee">
                             <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>

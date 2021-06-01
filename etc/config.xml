@@ -26,10 +26,11 @@
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
-            <alma_monthly_payments translate="excluded_products_message title description eligibility_message non_eligibility_message">
+            <alma_monthly_payments
+                translate="excluded_products_message title description eligibility_message non_eligibility_message widget_position widget_container_id">
                 <model>AlmaMonthlyPaymentsGatewayFacade</model>
 
                 <active>0</active>
@@ -50,13 +51,15 @@
                 <excluded_product_types>virtual,downloadable</excluded_product_types>
                 <excluded_products_message>Virtual and downloadable products aren't eligible</excluded_products_message>
 
-                <live_api_key backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\LiveAPIKeyValue" />
-                <test_api_key backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\TestAPIKeyValue" />
+                <live_api_key backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\LiveAPIKeyValue"/>
+                <test_api_key backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\TestAPIKeyValue"/>
                 <api_mode>test</api_mode>
 
                 <return_url backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\ReturnUrlValue"/>
-                <ipn_callback_url backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\IpnCallbackUrlValue"/>
-                <customer_cancel_url backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl"/>
+                <ipn_callback_url
+                    backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\IpnCallbackUrlValue"/>
+                <customer_cancel_url
+                    backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl"/>
 
                 <title>Monthly Payments with Alma</title>
                 <description>Pay in 3 monthly payments with your credit card.</description>
@@ -64,6 +67,11 @@
                 <show_eligibility_message>1</show_eligibility_message>
                 <eligibility_message>Eligible for monthly payments</eligibility_message>
                 <non_eligibility_message>Not eligible for monthly payments</non_eligibility_message>
+
+                <widget_active>1</widget_active>
+                <widget_price_per_qty>1</widget_price_per_qty>
+                <widget_position>catalog.product.view.before.addtocart.alma.widget</widget_position>
+                <widget_container_css_selector>#maincontent</widget_container_css_selector>
             </alma_monthly_payments>
         </payment>
     </default>

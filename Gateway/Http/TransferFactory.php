@@ -48,7 +48,8 @@ class TransferFactory implements TransferFactoryInterface
     public function __construct(
         TransferBuilder $transferBuilder,
         Config $config
-    ) {
+    )
+    {
         $this->transferBuilder = $transferBuilder;
         $this->config = $config;
     }

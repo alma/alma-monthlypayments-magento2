@@ -32,7 +32,13 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
 {
     /** @var array */
     private $data;
+    /**
+     * @var Json
+     */
     private $serializer;
+    /**
+     * @var AlmaClient
+     */
     private $almaClient;
     /**
      * @var PaymentPlanConfigInterfaceFactory
@@ -50,7 +56,8 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
         AlmaClient $almaClient,
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
         $data = []
-    ) {
+    )
+    {
         $this->serializer = new Json();
 
         if (is_string($data)) {

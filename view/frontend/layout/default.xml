@@ -25,9 +25,10 @@
  */
 -->
 
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <css src="Alma_MonthlyPayments/css/alma.css" />
+        <css src="Alma_MonthlyPayments/css/alma.css"/>
     </head>
     <body>
         <referenceBlock name="minicart">
@@ -39,9 +40,13 @@
                                 <item name="extra_info" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <item name="alma.eligibility" xsi:type="array">
-                                            <item name="component" xsi:type="string">Alma_MonthlyPayments/js/view/checkout/minicart/eligibility</item>
+                                            <item name="component"
+                                                  xsi:type="string">Alma_MonthlyPayments/js/view/checkout/minicart/eligibility
+                                            </item>
                                             <item name="config" xsi:type="array">
-                                                <item name="template" xsi:type="string">Alma_MonthlyPayments/checkout/minicart/eligibility</item>
+                                                <item name="template"
+                                                      xsi:type="string">Alma_MonthlyPayments/checkout/minicart/eligibility
+                                                </item>
                                             </item>
                                         </item>
                                     </item>

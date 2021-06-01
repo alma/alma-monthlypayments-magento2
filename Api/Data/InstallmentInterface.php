@@ -9,24 +9,24 @@ interface InstallmentInterface
     /**
      * Returns a UNIX timestamp indicating the date this installment is due
      *
-     *  @api
-     *  @return int
+     * @return int
+     * @api
      */
     public function getDueDate();
 
     /**
      *  Returns the amount of fees to be paid for by the customer
      *
-     *  @api
-     *  @return int
+     * @return int
+     * @api
      */
     public function getCustomerFee();
 
     /**
      *  Returns the principal amount to be paid for this installment
      *
-     *  @api
-     *  @return int
+     * @return int
+     * @api
      */
     public function getPurchaseAmount();
 }

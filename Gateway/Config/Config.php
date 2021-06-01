@@ -60,12 +60,20 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     private $methodCode;
     private $plansConfigFactory;
 
+    /**
+     * Config constructor.
+     * @param ScopeConfigInterface $scopeConfig
+     * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
+     * @param null $methodCode
+     * @param string $pathPattern
+     */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         $methodCode = null,
         $pathPattern = self::DEFAULT_PATH_PATTERN
-    ) {
+    )
+    {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
 
         $this->methodCode = $methodCode;
@@ -98,6 +106,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return sprintf($this->pathPattern, $this->methodCode, $field);
     }
 
+    /**
+     * @param $field
+     * @param null $default
+     * @param null $storeId
+     * @return mixed|null
+     */
     public function get($field, $default = null, $storeId = null)
     {
         $value = parent::getValue($field, $storeId);
@@ -109,21 +123,33 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $value;
     }
 
+    /**
+     * @return int
+     */
     public function getSortOrder(): int
     {
         return (int)$this->get(self::CONFIG_SORT_ORDER);
     }
 
+    /**
+     * @return bool
+     */
     public function canLog(): bool
     {
         return (bool)(int)$this->get(self::CONFIG_DEBUG, false);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getActiveMode()
     {
         return $this->get(self::CONFIG_API_MODE, Client::LIVE_MODE);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getActiveAPIKey()
     {
         $mode = $this->getActiveMode();
@@ -139,81 +165,129 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $this->get($apiKeyType);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getLiveKey()
     {
         return $this->get(self::CONFIG_LIVE_API_KEY, '');
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getTestKey()
     {
         return $this->get(self::CONFIG_TEST_API_KEY, '');
     }
 
+    /**
+     * @return bool
+     */
     public function needsAPIKeys(): bool
     {
         return empty(trim($this->getLiveKey())) || empty(trim($this->getTestKey()));
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getEligibilityMessage()
     {
         return $this->get(self::CONFIG_ELIGIBILITY_MESSAGE);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getNonEligibilityMessage()
     {
         return $this->get(self::CONFIG_NON_ELIGIBILITY_MESSAGE);
     }
 
+    /**
+     * @return bool
+     */
     public function showEligibilityMessage(): bool
     {
         return (bool)(int)$this->get(self::CONFIG_SHOW_ELIGIBILITY_MESSAGE);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getPaymentButtonTitle()
     {
         return $this->get(self::CONFIG_TITLE);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getPaymentButtonDescription()
     {
         return $this->get(self::CONFIG_DESCRIPTION);
     }
 
+    /**
+     * @return false|string[]
+     */
     public function getExcludedProductTypes()
     {
         return explode(',', $this->get(self::CONFIG_EXCLUDED_PRODUCT_TYPES));
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getExcludedProductsMessage()
     {
         return $this->get(self::CONFIG_EXCLUDED_PRODUCTS_MESSAGE);
     }
 
+    /**
+     * @return bool
+     */
     public function isFullyConfigured(): bool
     {
         return !$this->needsAPIKeys() && (bool)(int)$this->get(self::CONFIG_FULLY_CONFIGURED, false);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getReturnUrl()
     {
         return $this->get(self::CONFIG_RETURN_URL);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getIpnCallbackUrl()
     {
         return $this->get(self::CONFIG_IPN_CALLBACK_URL);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getCustomerCancelUrl()
     {
         return $this->get(self::CONFIG_CUSTOMER_CANCEL_URL);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getMerchantId()
     {
         return $this->get(self::CONFIG_MERCHANT_ID);
     }
 
+    /**
+     * @return PaymentPlansConfigInterface
+     */
     public function getPaymentPlansConfig(): PaymentPlansConfigInterface
     {
         $data = $this->get(self::CONFIG_PAYMENT_PLANS, []);

@@ -41,7 +41,7 @@ class Client implements ClientInterface
      */
     private $logger;
 
-    /** @var \Alma\API\Client|null  */
+    /** @var \Alma\API\Client|null */
     private $alma;
 
     /**
@@ -51,7 +51,8 @@ class Client implements ClientInterface
     public function __construct(
         Logger $logger,
         AlmaClient $almaClient
-    ) {
+    )
+    {
         $this->logger = $logger;
         $this->alma = $almaClient->getDefaultClient();
     }

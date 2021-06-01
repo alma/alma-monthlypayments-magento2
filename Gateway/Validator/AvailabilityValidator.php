@@ -42,11 +42,18 @@ class AvailabilityValidator extends AbstractValidator
      */
     private $eligibilityHelper;
 
+    /**
+     * AvailabilityValidator constructor.
+     * @param ResultInterfaceFactory $resultFactory
+     * @param Availability $availabilityHelper
+     * @param Eligibility $eligibilityHelper
+     */
     public function __construct(
         ResultInterfaceFactory $resultFactory,
         Availability $availabilityHelper,
         Eligibility $eligibilityHelper
-    ) {
+    )
+    {
         parent::__construct($resultFactory);
         $this->availabilityHelper = $availabilityHelper;
         $this->eligibilityHelper = $eligibilityHelper;

@@ -59,7 +59,8 @@ class CartEligibility
         Config $config,
         Helpers\Logger $logger,
         Helpers\Availability $availabilityHelper
-    ) {
+    )
+    {
         $this->eligibilityHelper = $eligibilityHelper;
         $this->config = $config;
         $this->logger = $logger;
@@ -85,14 +86,18 @@ class CartEligibility
 
         $result['eligibility'] = [
             'eligible' => $this->eligibilityHelper->isEligible(),
-            'message'  => $this->eligibilityHelper->getMessage(),
-            'display'  => $this->config->showEligibilityMessage() && $this->shouldDisplay(),
+            'message' => $this->eligibilityHelper->getMessage(),
+            'display' => $this->config->showEligibilityMessage() && $this->shouldDisplay(),
         ];
 
         return $result;
     }
 
-    private function shouldDisplay() {
+    /**
+     * @return bool
+     */
+    private function shouldDisplay()
+    {
         return $this->availabilityHelper->isAvailable();
     }
 }

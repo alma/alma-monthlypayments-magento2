@@ -37,10 +37,16 @@ class ReturnAction extends Action
      */
     private $paymentValidationHelper;
 
+    /**
+     * ReturnAction constructor.
+     * @param Context $context
+     * @param PaymentValidation $paymentValidationHelper
+     */
     public function __construct(
         Context $context,
         PaymentValidation $paymentValidationHelper
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->paymentValidationHelper = $paymentValidationHelper;
     }
