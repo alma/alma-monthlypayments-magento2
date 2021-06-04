@@ -55,7 +55,7 @@ class Plans extends Field
     }
 
     /**
-     * @return \Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface[]|array
+     * @return array
      */
     private function getPlans()
     {

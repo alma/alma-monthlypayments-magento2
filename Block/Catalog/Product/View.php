@@ -36,11 +36,6 @@ use Magento\Framework\Registry;
 class View extends Template
 {
     /**
-     * @var Helpers\Eligibility
-     */
-    private $eligibilityHelper;
-
-    /**
      * @var Config
      */
     private $config;
@@ -60,32 +55,94 @@ class View extends Template
      */
     private $plans = array();
 
+    private const ALMA_API_MODE = 'payment/alma_monthly_payments/api_mode';
+    private const ALMA_MERCHANT_ID = 'payment/alma_monthly_payments/merchant_id';
     private const WIDGET_POSITION = 'payment/alma_monthly_payments/widget_position';
-
+    private const WIDGET_ACTIVE = 'payment/alma_monthly_payments/widget_active';
+    private const WIDGET_CONTAINER = 'payment/alma_monthly_payments/widget_container_css_selector';
+    private const WIDGET_PRICE_PER_QTY = 'payment/alma_monthly_payments/widget_price_per_qty';
     private const EXCLUDED_PRODUCT_TYPES = 'payment/alma_monthly_payments/excluded_product_types';
+    private const WIDGET_CONTAINER_PREPEND = 'payment/alma_monthly_payments/widget_container_prepend';
 
+    /**
+     * @var string
+     */
     public $widgetContainer;
 
     /**
      * View constructor.
      * @param Context $context
-     * @param Helpers\Eligibility $eligibilityHelper
      * @param Registry $registry
      * @param Config $config
      * @param array $data
+     * @throws LocalizedException
      */
     public function __construct(
         Context $context,
-        Helpers\Eligibility $eligibilityHelper,
         Registry $registry,
         Config $config,
         array $data = []
     )
     {
         parent::__construct($context, $data);
-        $this->eligibilityHelper = $eligibilityHelper;
         $this->config = $config;
         $this->registry = $registry;
+        $this->_initProduct();
+        $this->_initPlans();
+    }
+
+    /**
+     * @return void
+     * @throws LocalizedException
+     */
+    private function _initProduct()
+    {
+        $this->product = $this->registry->registry('product');
+        if (!$this->product->getId()) {
+            throw new LocalizedException(__('Failed to initialize product'));
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function _initPlans()
+    {
+        foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
+            $this->plans[] = array(
+                'installmentsCount' => $planConfig->installmentsCount(),
+                'minAmount' => $planConfig->minimumAmount(),
+                'maxAmount' => $planConfig->maximumAmount()
+            );
+        }
+    }
+
+    /**
+     * Get config value.
+     *
+     * @param string $path
+     * @return mixed
+     */
+    private function getConfig($path)
+    {
+        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+
+    /**
+     * @return bool
+     * @throws LocalizedException
+     */
+    private function isExcluded()
+    {
+        return in_array($this->getProductType(), $this->getExcludedProductType(), true);
+    }
+
+    /**
+     * @return string[]|false
+     */
+    private function getExcludedProductType()
+    {
+        return explode(',', $this->getConfig(SELF::EXCLUDED_PRODUCT_TYPES));
     }
 
     /**
@@ -97,57 +154,11 @@ class View extends Template
         && !$this->isExcluded() ? parent::_toHtml() : '');
     }
 
-    public function isExcluded()
-    {
-        return in_array($this->getProductType(), $this->getExcludedProductType(), true);
-    }
-
     /**
-     * Get config value.
-     *
-     * @param string $path
-     * @return string|null
+     * @return string
      */
-    public function getConfig($path)
-    {
-        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @return false|string
-     */
-    public function getPlans()
-    {
-        if (empty($this->plans)) {
-            foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-                $this->plans[] = array(
-                    'installmentsCount' => $planConfig->installmentsCount(),
-                    'minAmount' => $planConfig->minimumAmount(),
-                    'maxAmount' => $planConfig->maximumAmount()
-                );
-            }
-        }
-        return (!empty($this->plans) ? json_encode($this->plans) : false);
-    }
-
-    public function getExcludedProductType()
-    {
-        return explode(',', $this->getConfig(SELF::EXCLUDED_PRODUCT_TYPES));
-    }
-
-    /**
-     * @return Product|mixed|null
-     * @throws LocalizedException
-     */
-    private function getProduct()
-    {
-        if (is_null($this->product)) {
-            $this->product = $this->registry->registry('product');
-            if (!$this->product->getId()) {
-                throw new LocalizedException(__('Failed to initialize product'));
-            }
-        }
-        return $this->product;
+    public function getJsonPlans(){
+        return (!empty($this->plans) ? json_encode($this->plans) : '');
     }
 
     /**
@@ -156,7 +167,7 @@ class View extends Template
      */
     public function getProductId()
     {
-        return $this->getProduct()->getId();
+        return $this->product->getId();
     }
 
     /**
@@ -165,7 +176,7 @@ class View extends Template
      */
     public function getProductName()
     {
-        return $this->getProduct()->getName();
+        return $this->product->getName();
     }
 
     /**
@@ -174,34 +185,34 @@ class View extends Template
      */
     public function getProductType()
     {
-        return $this->getProduct()->getTypeId();
+        return $this->product->getTypeId();
     }
 
     /**
-     * @return float|int
+     * @return int
      * @throws LocalizedException
      */
     public function getPrice()
     {
-        return $this->getProduct()->getFinalPrice() * 100;
+        return $this->product->getFinalPrice() * 100;
     }
 
     /**
-     * @return string|null
+     * @return bool
      */
     public function isActive()
     {
-        return $this->getConfig('payment/alma_monthly_payments/widget_active');
+        return $this->getConfig(SELF::WIDGET_ACTIVE);
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getAlmaWidgetContainer()
     {
         if (!$this->widgetContainer) {
             $this->widgetContainer =
-                $this->getConfig('payment/alma_monthly_payments/widget_container_jquery_selector');
+                $this->getConfig(SELF::WIDGET_CONTAINER);
         }
         return $this->widgetContainer;
     }
@@ -211,39 +222,39 @@ class View extends Template
      */
     public function getAlmaApiMode()
     {
-        return strtoupper($this->getConfig('payment/alma_monthly_payments/api_mode'));
+        return strtoupper($this->getConfig(SELF::ALMA_API_MODE));
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getAlmaMerchantId()
     {
-        return $this->getConfig('payment/alma_monthly_payments/merchant_id');
+        return $this->getConfig(SELF::ALMA_MERCHANT_ID);
     }
 
     /**
-     * @return string
+     * @return string used by javascript in view.phtml
      */
     public function getAlmaIsDynamicQtyPrice()
     {
-        return ($this->getConfig('payment/alma_monthly_payments/widget_price_per_qty') ? 'true' : 'false');
+        return ($this->getConfig(SELF::WIDGET_PRICE_PER_QTY) ? 'true' : 'false');
     }
 
     /**
-     * @return string
+     * @return string used by javascript in view.phtml
      */
     public function getAlmaIsPrepend()
     {
-        return ($this->getConfig('payment/alma_monthly_payments/widget_container_prepend') ? 'true' : 'false');
+        return ($this->getConfig(SELF::WIDGET_CONTAINER_PREPEND) ? 'true' : 'false');
     }
 
     /**
-     * @return string
+     * @return string used by javascript in view.phtml
      */
     public function isCustomWidgetPosition()
     {
-        return ($this->getConfig('payment/alma_monthly_payments/widget_position') ==
+        return ($this->getConfig(SELF::WIDGET_POSITION) ==
         'catalog.product.view.custom.alma.widget' ? 'true' : 'false');
     }
 }

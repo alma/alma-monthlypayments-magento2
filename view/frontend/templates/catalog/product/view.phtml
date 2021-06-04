@@ -34,7 +34,7 @@
 /** @var $escaper \Magento\Framework\Escaper */
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 ?>
-<?php if ($block->isActive() && $block->getPlans()): ?>
+<?php if ($block->isActive() && $block->getJsonPlans()): ?>
     <div id="payment-plans"></div>
     <?php
     $scriptString = <<<script
@@ -88,7 +88,7 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                     Alma.ApiMode.{$block->getAlmaApiMode()},
                     'payment-plans',
                     almaPrice,
-                    {$block->getPlans()}
+                    {$block->getJsonPlans()}
                 );
             }
         }
