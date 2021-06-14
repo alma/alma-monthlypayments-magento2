@@ -115,7 +115,7 @@
                 </group>
 
                 <!-- PRODUCT PAGE DISPLAY CONFIGURATION -->
-                <group id="product_config" translate="label comment" type="text" sortOrder="15" showInDefault="1"
+                <group id="product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -132,12 +132,12 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/alma_monthly_payments/widget_active</config_path>
                     </field>
-                    <field id="widget_price_per_qty" translate="label" type="select" sortOrder="20" showInDefault="1"
+                    <field id="widget_price_use_qty" translate="label" type="select" sortOrder="20" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                         <label>Update with qty</label>
                         <comment>Dynamicaly updates the badge's price when product quantity is changed.</comment>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/alma_monthly_payments/widget_price_per_qty</config_path>
+                        <config_path>payment/alma_monthly_payments/widget_price_use_qty</config_path>
                     </field>
                     <field id="widget_position" translate="label" type="select" sortOrder="30" showInDefault="1"
                            showInWebsite="1">
@@ -147,7 +147,7 @@
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductWidgetPositions</source_model>
                         <attribute type="shared">1</attribute>
                     </field>
-                    <field id="widget_container_id" translate="label" type="text" sortOrder="40" showInDefault="1"
+                    <field id="widget_container_css_selector" translate="label" type="text" sortOrder="40" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                         <label>HTML container</label>
                         <comment>CSS selector for the custom badge container. (ex: #maincontent or .field.qty)</comment>

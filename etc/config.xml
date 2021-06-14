@@ -30,7 +30,7 @@
     <default>
         <payment>
             <alma_monthly_payments
-                translate="excluded_products_message title description eligibility_message non_eligibility_message widget_position widget_container_id">
+                translate="excluded_products_message title description eligibility_message non_eligibility_message widget_position widget_container_css_selector">
                 <model>AlmaMonthlyPaymentsGatewayFacade</model>
 
                 <active>0</active>
@@ -69,7 +69,7 @@
                 <non_eligibility_message>Not eligible for monthly payments</non_eligibility_message>
 
                 <widget_active>1</widget_active>
-                <widget_price_per_qty>1</widget_price_per_qty>
+                <widget_price_use_qty>1</widget_price_use_qty>
                 <widget_position>catalog.product.view.before.addtocart.alma.widget</widget_position>
                 <widget_container_css_selector>#maincontent</widget_container_css_selector>
             </alma_monthly_payments>

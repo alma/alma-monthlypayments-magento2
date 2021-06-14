@@ -56,6 +56,18 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const CONFIG_MERCHANT_ID = 'merchant_id';
     const CONFIG_PAYMENT_PLANS = 'payment_plans';
 
+    private const ALMA_API_MODE = 'api_mode';
+    private const ALMA_MERCHANT_ID = 'merchant_id';
+    private const WIDGET_POSITION = 'widget_position';
+    private const WIDGET_ACTIVE = 'widget_active';
+    private const WIDGET_CONTAINER = 'widget_container_css_selector';
+    private const WIDGET_PRICE_USE_QTY = 'widget_price_use_qty';
+    private const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
+    private const WIDGET_CONTAINER_PREPEND = 'widget_container_prepend';
+
+    private const CUSTOM_WIDGET_POSITION = 'catalog.product.view.custom.alma.widget';
+    private $widgetContainer;
+
     private $pathPattern;
     private $methodCode;
     private $plansConfigFactory;
@@ -305,5 +317,58 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         }
 
         return $plansConfig;
+    }
+
+    /**
+     * @return bool
+     */
+    public function showProductWidget()
+    {
+        return $this->get(self::WIDGET_ACTIVE);
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidgetContainerSelector()
+    {
+        if (!$this->widgetContainer) {
+            $this->widgetContainer =
+                $this->get(self::WIDGET_CONTAINER);
+        }
+        return $this->widgetContainer;
+    }
+
+    /**
+     * @return string used by javascript in view.phtml
+     */
+    public function useQuantityForWidgetPrice()
+    {
+        return ($this->get(self::WIDGET_PRICE_USE_QTY) ? 'true' : 'false');
+    }
+
+    /**
+     * @return string used by javascript in view.phtml
+     */
+    public function prependWidgetInContainer()
+    {
+        return ($this->get(self::WIDGET_CONTAINER_PREPEND) ? 'true' : 'false');
+    }
+
+    /**
+     * @return string used by javascript in view.phtml
+     */
+    public function isCustomWidgetPosition()
+    {
+        return ($this->getWidgetPosition() ==
+        SELF::CUSTOM_WIDGET_POSITION ? 'true' : 'false');
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidgetPosition()
+    {
+        return $this->get(SELF::WIDGET_POSITION);
     }
 }

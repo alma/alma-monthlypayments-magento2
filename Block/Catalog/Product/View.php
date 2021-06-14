@@ -32,6 +32,7 @@ use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
+use Alma\MonthlyPayments\Helpers\Functions;
 
 class View extends Template
 {
@@ -46,6 +47,11 @@ class View extends Template
     private $registry;
 
     /**
+     * @var Functions
+     */
+    private $functions;
+
+    /**
      * @var Product
      */
     private $product;
@@ -55,25 +61,12 @@ class View extends Template
      */
     private $plans = array();
 
-    private const ALMA_API_MODE = 'payment/alma_monthly_payments/api_mode';
-    private const ALMA_MERCHANT_ID = 'payment/alma_monthly_payments/merchant_id';
-    private const WIDGET_POSITION = 'payment/alma_monthly_payments/widget_position';
-    private const WIDGET_ACTIVE = 'payment/alma_monthly_payments/widget_active';
-    private const WIDGET_CONTAINER = 'payment/alma_monthly_payments/widget_container_css_selector';
-    private const WIDGET_PRICE_PER_QTY = 'payment/alma_monthly_payments/widget_price_per_qty';
-    private const EXCLUDED_PRODUCT_TYPES = 'payment/alma_monthly_payments/excluded_product_types';
-    private const WIDGET_CONTAINER_PREPEND = 'payment/alma_monthly_payments/widget_container_prepend';
-
-    /**
-     * @var string
-     */
-    public $widgetContainer;
-
     /**
      * View constructor.
      * @param Context $context
      * @param Registry $registry
      * @param Config $config
+     * @param Functions $functions
      * @param array $data
      * @throws LocalizedException
      */
@@ -81,21 +74,23 @@ class View extends Template
         Context $context,
         Registry $registry,
         Config $config,
+        Functions $functions,
         array $data = []
     )
     {
         parent::__construct($context, $data);
         $this->config = $config;
         $this->registry = $registry;
-        $this->_initProduct();
-        $this->_initPlans();
+        $this->functions = $functions;
+        $this->getProduct();
+        $this->getPlans();
     }
 
     /**
      * @return void
      * @throws LocalizedException
      */
-    private function _initProduct()
+    private function getProduct()
     {
         $this->product = $this->registry->registry('product');
         if (!$this->product->getId()) {
@@ -106,7 +101,7 @@ class View extends Template
     /**
      * @return void
      */
-    private function _initPlans()
+    private function getPlans()
     {
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
             $this->plans[] = array(
@@ -118,31 +113,28 @@ class View extends Template
     }
 
     /**
-     * Get config value.
-     *
-     * @param string $path
-     * @return mixed
-     */
-    private function getConfig($path)
-    {
-        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
      * @return bool
      * @throws LocalizedException
      */
     private function isExcluded()
     {
-        return in_array($this->getProductType(), $this->getExcludedProductType(), true);
+        return in_array($this->getProductType(), $this->config->getExcludedProductTypes(), true);
     }
 
     /**
-     * @return string[]|false
+     * @return Config
      */
-    private function getExcludedProductType()
+    public function getConfig()
     {
-        return explode(',', $this->getConfig(SELF::EXCLUDED_PRODUCT_TYPES));
+        return $this->config;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActiveMode()
+    {
+        return strtoupper($this->config->getActiveMode());
     }
 
     /**
@@ -150,14 +142,15 @@ class View extends Template
      */
     public function _toHtml()
     {
-        return ($this->getNameInLayout() == $this->getConfig(SELF::WIDGET_POSITION)
+        return ($this->getNameInLayout() == $this->config->getWidgetPosition()
         && !$this->isExcluded() ? parent::_toHtml() : '');
     }
 
     /**
      * @return string
      */
-    public function getJsonPlans(){
+    public function getJsonPlans()
+    {
         return (!empty($this->plans) ? json_encode($this->plans) : '');
     }
 
@@ -194,67 +187,6 @@ class View extends Template
      */
     public function getPrice()
     {
-        return $this->product->getFinalPrice() * 100;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        return $this->getConfig(SELF::WIDGET_ACTIVE);
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlmaWidgetContainer()
-    {
-        if (!$this->widgetContainer) {
-            $this->widgetContainer =
-                $this->getConfig(SELF::WIDGET_CONTAINER);
-        }
-        return $this->widgetContainer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlmaApiMode()
-    {
-        return strtoupper($this->getConfig(SELF::ALMA_API_MODE));
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlmaMerchantId()
-    {
-        return $this->getConfig(SELF::ALMA_MERCHANT_ID);
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function getAlmaIsDynamicQtyPrice()
-    {
-        return ($this->getConfig(SELF::WIDGET_PRICE_PER_QTY) ? 'true' : 'false');
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function getAlmaIsPrepend()
-    {
-        return ($this->getConfig(SELF::WIDGET_CONTAINER_PREPEND) ? 'true' : 'false');
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function isCustomWidgetPosition()
-    {
-        return ($this->getConfig(SELF::WIDGET_POSITION) ==
-        'catalog.product.view.custom.alma.widget' ? 'true' : 'false');
+        return $this->functions->priceToCents($this->product->getFinalPrice());
     }
 }

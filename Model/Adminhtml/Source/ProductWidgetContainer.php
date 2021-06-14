@@ -26,7 +26,7 @@
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 /**
- * Class APIModes
+ * Class ProductWidgetContainer
  */
 class ProductWidgetContainer implements \Magento\Framework\Option\ArrayInterface
 {

@@ -26,14 +26,14 @@
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 /**
- * Class APIModes
+ * Class ProductWidgetPositions
  */
 class ProductWidgetPositions implements \Magento\Framework\Option\ArrayInterface
 {
     const POS_AFTER_TITLE = 'catalog.product.view.after.title.alma.widget';
     const POS_BEFORE_PRICE = 'catalog.product.view.before.price.alma.widget';
     const POS_BEFORE_STOCK = 'catalog.product.view.before.stock.alma.widget';
-    const POS_AFTER_PRICE = 'catalog.product.view.after.stock.alma.widget';
+    const POS_AFTER_STOCK = 'catalog.product.view.after.stock.alma.widget';
     const POS_AFTER_INFO = 'catalog.product.view.after.info.alma.widget';
     const POS_BEFORE_ADDTOCART = 'catalog.product.view.before.addtocart.alma.widget';
     const POS_AFTER_ADDTOCART = 'catalog.product.view.after.addtocart.alma.widget';
@@ -49,8 +49,8 @@ class ProductWidgetPositions implements \Magento\Framework\Option\ArrayInterface
             ['value' => SELF::POS_AFTER_TITLE, 'label' => __('After Product Title')],
             ['value' => SELF::POS_BEFORE_PRICE, 'label' => __('Before Product Price')],
             ['value' => SELF::POS_BEFORE_STOCK, 'label' => __('Before Product Stock')],
-            ['value' => SELF::POS_AFTER_PRICE, 'label' => __('After Product Stock')],
-            ['value' => SELF::POS_AFTER_INFO, 'label' => __('After Product Informations')],
+            ['value' => SELF::POS_AFTER_STOCK, 'label' => __('After Product Stock')],
+            ['value' => SELF::POS_AFTER_INFO, 'label' => __('After Product Information')],
             ['value' => SELF::POS_BEFORE_ADDTOCART, 'label' => __('Before Product AddToCart Button')],
             ['value' => SELF::POS_AFTER_ADDTOCART, 'label' => __('After Product AddToCart Button')],
             ['value' => SELF::POS_AFTER_ADDLINKS, 'label' => __('After AddTo links')],

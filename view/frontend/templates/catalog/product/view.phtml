@@ -33,8 +33,12 @@
 /** @var $block \Alma\MonthlyPayments\Block\Catalog\Product\View */
 /** @var $escaper \Magento\Framework\Escaper */
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+/** @var \Magento\Csp\Api\InlineUtilInterface $csp */
 ?>
-<?php if ($block->isActive() && $block->getJsonPlans()): ?>
+<?php
+$config = $block->getConfig();
+
+if ($config->showProductWidget() && $block->getJsonPlans()): ?>
     <div id="payment-plans"></div>
     <?php
     $scriptString = <<<script
@@ -58,7 +62,7 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
         }
 
         function getAlmaPrice() {
-            if({$block->getAlmaIsDynamicQtyPrice()}){
+            if({$config->useQuantityForWidgetPrice()}){
                 var priceContainer = $('#product-price-{$block->getProductId()} .price');
                 if(priceContainer != undefined)
                 {
@@ -84,8 +88,8 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
             var almaPrice = getAlmaPrice();
             if(almaPrice !== false && almaPrice > 0){
                 initWidget(
-                    '{$block->getAlmaMerchantId()}',
-                    Alma.ApiMode.{$block->getAlmaApiMode()},
+                    '{$config->getMerchantId()}',
+                    Alma.ApiMode.{$block->getActiveMode()},
                     'payment-plans',
                     almaPrice,
                     {$block->getJsonPlans()}
@@ -95,15 +99,15 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
 
         var targetNode = document.getElementById('product-price-{$block->getProductId()}');
 
-        if({$block->isCustomWidgetPosition()}){
-            if($('{$block->getAlmaWidgetContainer()}') != undefined){
-                if({$block->getAlmaIsPrepend()}){
-                    $('{$block->getAlmaWidgetContainer()}').prepend($('#payment-plans'));
+        if({$config->isCustomWidgetPosition()}){
+            if($('{$config->getWidgetContainerSelector()}') != undefined){
+                if({$config->prependWidgetInContainer()}){
+                    $('{$config->getWidgetContainerSelector()}').prepend($('#payment-plans'));
                 }else{
-                    $('{$block->getAlmaWidgetContainer()}').append($('#payment-plans'));
+                    $('{$config->getWidgetContainerSelector()}').append($('#payment-plans'));
                 }
             }else{
-                console.log('Css container "{$block->getAlmaWidgetContainer()}" not found');
+                console.error('Css container "{$config->getWidgetContainerSelector()}" not found');
             }
         }
 
@@ -129,7 +133,10 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
     })()
 });
 script;
-    ?>
-    <?= /* @noEscape */
-    $secureRenderer->renderTag('script', [], $scriptString, false) ?>
-<?php endif; ?>
+
+    if (isset($secureRenderer)) :
+        echo $secureRenderer->renderTag('script', [], $scriptString, false);
+    else:
+        echo $csp->render('script', ['type' => 'text/javascript'], $scriptString);
+    endif;
+endif; ?>
