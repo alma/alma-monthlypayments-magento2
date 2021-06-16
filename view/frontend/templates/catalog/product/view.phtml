@@ -61,27 +61,43 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
             widgets.render();
         }
 
+        function formatPrice(priceHtml)
+        {
+            var price = priceHtml.replace(/[^\d]/g,"");
+            var qty = $('#qty').val();
+            if( !qty.match(/^\d+$/) || !( qty > 0 ))
+            {
+                qty = 1;
+            }
+            return price*qty;
+        }
+
+        function getPriceFromContainer(priceContainer)
+        {
+            if(priceContainer != undefined)
+            {
+                var priceHtml = priceContainer.html();
+                if(priceHtml != undefined)
+                {
+                    return formatPrice(priceHtml);
+                }
+            }
+            return false;
+        }
+
         function getAlmaPrice() {
             if({$config->useQuantityForWidgetPrice()}){
                 var priceContainer = $('#product-price-{$block->getProductId()} .price');
-                if(priceContainer != undefined)
-                {
-                    var priceHtml = priceContainer.html();
-                    if(priceHtml != undefined)
-                    {
-                        var price = priceHtml.replace(/[^\d]/g,"");
-                        var qty = $('#qty').val();
-                        if( !qty.match(/^\d+$/) || !( qty > 0 ))
-                        {
-                            qty = 1;
-                        }
-                        return price*qty;
-                    }
-                }
-                return false;
-            }else{
-                return '{$block->getPrice()}';
+                var price = getPriceFromContainer(priceContainer);
+                if(price > 0){ return price; }
+
+                priceContainer = $('#price-including-tax-product-price-{$block->getProductId()} .price');
+                price = getPriceFromContainer(priceContainer);
+                if(price > 0){ return price; }
+
+                console.error('Price container not found, fallback to price without qty installments')
             }
+            return '{$block->getPrice()}';
         }
 
         function updateWidget() {
@@ -119,6 +135,9 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                 }
             }
         };
+        if(targetNode == undefined) {
+            targetNode = document.getElementById('price-including-tax-product-price-{$block->getProductId()}');
+        }
         if(targetNode != undefined)
         {
             var observer = new MutationObserver(callback);
