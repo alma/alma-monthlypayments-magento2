@@ -65,19 +65,19 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
         {
             var price = priceHtml.replace(/[^\d]/g,"");
             var qty = $('#qty').val();
-            if( !qty.match(/^\d+$/) || !( qty > 0 ))
+            if(!qty.match(/^\d+$/) || !(qty > 0))
             {
                 qty = 1;
             }
-            return price*qty;
+            return price * qty;
         }
 
         function getPriceFromContainer(priceContainer)
         {
-            if(priceContainer != undefined)
+            if(priceContainer !== undefined)
             {
                 var priceHtml = priceContainer.html();
-                if(priceHtml != undefined)
+                if(priceHtml !== undefined)
                 {
                     return formatPrice(priceHtml);
                 }
@@ -135,10 +135,10 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                 }
             }
         };
-        if(targetNode == undefined) {
+        if(targetNode === undefined) {
             targetNode = document.getElementById('price-including-tax-product-price-{$block->getProductId()}');
         }
-        if(targetNode != undefined)
+        if(targetNode !== undefined)
         {
             var observer = new MutationObserver(callback);
             // https://developer.mozilla.org/fr/docs/Web/API/MutationObserver#MutationObserverInit
