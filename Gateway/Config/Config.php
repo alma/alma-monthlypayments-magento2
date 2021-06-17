@@ -56,17 +56,17 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const CONFIG_MERCHANT_ID = 'merchant_id';
     const CONFIG_PAYMENT_PLANS = 'payment_plans';
 
-    private const ALMA_IS_ACTIVE = 'active';
-    private const ALMA_API_MODE = 'api_mode';
-    private const ALMA_MERCHANT_ID = 'merchant_id';
-    private const WIDGET_POSITION = 'widget_position';
-    private const WIDGET_ACTIVE = 'widget_active';
-    private const WIDGET_CONTAINER = 'widget_container_css_selector';
-    private const WIDGET_PRICE_USE_QTY = 'widget_price_use_qty';
-    private const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
-    private const WIDGET_CONTAINER_PREPEND = 'widget_container_prepend';
+    const ALMA_IS_ACTIVE = 'active';
+    const ALMA_API_MODE = 'api_mode';
+    const ALMA_MERCHANT_ID = 'merchant_id';
+    const WIDGET_POSITION = 'widget_position';
+    const WIDGET_ACTIVE = 'widget_active';
+    const WIDGET_CONTAINER = 'widget_container_css_selector';
+    const WIDGET_PRICE_USE_QTY = 'widget_price_use_qty';
+    const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
+    const WIDGET_CONTAINER_PREPEND = 'widget_container_prepend';
 
-    private const CUSTOM_WIDGET_POSITION = 'catalog.product.view.custom.alma.widget';
+    const CUSTOM_WIDGET_POSITION = 'catalog.product.view.custom.alma.widget';
     private $widgetContainer;
 
     private $pathPattern;
