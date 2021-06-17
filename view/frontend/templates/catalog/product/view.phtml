@@ -74,10 +74,10 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
 
         function getPriceFromContainer(priceContainer)
         {
-            if(priceContainer !== undefined)
+            if(priceContainer !== undefined && priceContainer !== null)
             {
                 var priceHtml = priceContainer.html();
-                if(priceHtml !== undefined)
+                if(priceHtml !== undefined && priceHtml !== null)
                 {
                     return formatPrice(priceHtml);
                 }
@@ -85,7 +85,7 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
             return false;
         }
 
-        function getAlmaPrice() {
+        function getPrice() {
             if({$config->useQuantityForWidgetPrice()}){
                 var priceContainer = $('#product-price-{$block->getProductId()} .price');
                 var price = getPriceFromContainer(priceContainer);
@@ -101,19 +101,17 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
         }
 
         function updateWidget() {
-            var almaPrice = getAlmaPrice();
-            if(almaPrice !== false && almaPrice > 0){
+            var price = getPrice();
+            if(price !== false && price > 0){
                 initWidget(
                     '{$config->getMerchantId()}',
                     Alma.ApiMode.{$block->getActiveMode()},
                     'payment-plans',
-                    almaPrice,
+                    price,
                     {$block->getJsonPlans()}
                 );
             }
         }
-
-        var targetNode = document.getElementById('product-price-{$block->getProductId()}');
 
         if({$config->isCustomWidgetPosition()}){
             if($('{$config->getWidgetContainerSelector()}') != undefined){
@@ -135,10 +133,14 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                 }
             }
         };
-        if(targetNode === undefined) {
+
+        var targetNode = document.getElementById('product-price-{$block->getProductId()}');
+        if(targetNode === null || targetNode === undefined)
+        {
             targetNode = document.getElementById('price-including-tax-product-price-{$block->getProductId()}');
+        }else{
         }
-        if(targetNode !== undefined)
+        if(targetNode !== undefined && targetNode !== null)
         {
             var observer = new MutationObserver(callback);
             // https://developer.mozilla.org/fr/docs/Web/API/MutationObserver#MutationObserverInit
