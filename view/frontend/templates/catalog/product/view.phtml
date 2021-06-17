@@ -157,7 +157,9 @@ script;
 
     if (isset($secureRenderer)) :
         echo $secureRenderer->renderTag('script', [], $scriptString, false);
-    else:
+    elseif (isset($csp)):
         echo $csp->render('script', ['type' => 'text/javascript'], $scriptString);
+    else:
+        echo '<script>'.$scriptString.'</script>';
     endif;
 endif; ?>
