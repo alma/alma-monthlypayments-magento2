@@ -87,7 +87,7 @@ class CartEligibility
         $result['eligibility'] = [
             'eligible' => $this->eligibilityHelper->isEligible(),
             'message' => $this->eligibilityHelper->getMessage(),
-            'display' => $this->config->showEligibilityMessage() && $this->shouldDisplay(),
+            'display' => ($this->config->showEligibilityMessage() && $this->shouldDisplay()),
         ];
 
         return $result;

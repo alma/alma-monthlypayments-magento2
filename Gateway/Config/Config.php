@@ -56,6 +56,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const CONFIG_MERCHANT_ID = 'merchant_id';
     const CONFIG_PAYMENT_PLANS = 'payment_plans';
 
+    private const ALMA_IS_ACTIVE = 'active';
     private const ALMA_API_MODE = 'api_mode';
     private const ALMA_MERCHANT_ID = 'merchant_id';
     private const WIDGET_POSITION = 'widget_position';
@@ -133,6 +134,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         }
 
         return $value;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIsActive(): bool
+    {
+        return (bool)(int)$this->get(self::ALMA_IS_ACTIVE);
     }
 
     /**
@@ -222,7 +231,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function showEligibilityMessage(): bool
     {
-        return (bool)(int)$this->get(self::CONFIG_SHOW_ELIGIBILITY_MESSAGE);
+        return ((bool)(int)$this->get(self::CONFIG_SHOW_ELIGIBILITY_MESSAGE) && $this->getIsActive());
     }
 
     /**
@@ -324,7 +333,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function showProductWidget()
     {
-        return $this->get(self::WIDGET_ACTIVE);
+        return ((bool)(int)$this->get(self::WIDGET_ACTIVE) && $this->getIsActive());
     }
 
     /**
@@ -344,7 +353,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function useQuantityForWidgetPrice()
     {
-        return ($this->get(self::WIDGET_PRICE_USE_QTY) ? 'true' : 'false');
+        return ((bool)(int)$this->get(self::WIDGET_PRICE_USE_QTY) ? 'true' : 'false');
     }
 
     /**
@@ -352,7 +361,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function prependWidgetInContainer()
     {
-        return ($this->get(self::WIDGET_CONTAINER_PREPEND) == 0 ? 'true' : 'false');
+        return ((bool)(int)$this->get(self::WIDGET_CONTAINER_PREPEND) == 0 ? 'true' : 'false');
     }
 
     /**
