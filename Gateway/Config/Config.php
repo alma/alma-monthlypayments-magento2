@@ -352,7 +352,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function prependWidgetInContainer()
     {
-        return ($this->get(self::WIDGET_CONTAINER_PREPEND) ? 'true' : 'false');
+        return ($this->get(self::WIDGET_CONTAINER_PREPEND) == 0 ? 'true' : 'false');
     }
 
     /**
