@@ -36,7 +36,8 @@ use Magento\Framework\Exception\NotFoundException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 
-class Payment implements PaymentInterface {
+class Payment implements PaymentInterface
+{
     /**
      * @var OrderRepositoryInterface
      */
@@ -65,9 +66,9 @@ class Payment implements PaymentInterface {
 
     /**
      * @inheritDoc
-     * @throws RequestError
-     * @throws NoSuchEntityException
      * @return PaymentValidationResultInterface
+     * @throws NoSuchEntityException
+     * @throws RequestError
      */
     public function validate($paymentId)
     {

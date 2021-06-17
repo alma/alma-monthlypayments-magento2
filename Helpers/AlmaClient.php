@@ -50,6 +50,13 @@ class AlmaClient
      */
     private $moduleList;
 
+    /**
+     * AlmaClient constructor.
+     * @param Config $config
+     * @param Logger $logger
+     * @param ProductMetadataInterface $productMetadata
+     * @param ModuleListInterface $moduleList
+     */
     public function __construct(
         Config $config,
         Logger $logger,
@@ -76,6 +83,11 @@ class AlmaClient
         return $this->alma;
     }
 
+    /**
+     * @param $apiKey
+     * @param $mode
+     * @return Client|null
+     */
     public function createInstance($apiKey, $mode)
     {
         $alma = null;
@@ -94,6 +106,9 @@ class AlmaClient
         return $alma;
     }
 
+    /**
+     * @return mixed
+     */
     private function getModuleVersion()
     {
         $moduleInfo = $this->moduleList->getOne('Alma_MonthlyPayments');

@@ -43,13 +43,22 @@ class Eligibility extends Template
      */
     private $availabilityHelper;
 
+    /**
+     * Eligibility constructor.
+     * @param Template\Context $context
+     * @param Config $config
+     * @param Helpers\Eligibility $eligibilityHelper
+     * @param Helpers\Availability $availabilityHelper
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         Config $config,
         Helpers\Eligibility $eligibilityHelper,
         Helpers\Availability $availabilityHelper,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $data);
 
         $this->config = $config;
@@ -79,7 +88,8 @@ class Eligibility extends Template
         return $this->eligibilityHelper->getMessage();
     }
 
-    public function shouldDisplay() {
+    public function shouldDisplay()
+    {
         return $this->availabilityHelper->isAvailable();
     }
 }

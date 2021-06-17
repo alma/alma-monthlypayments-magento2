@@ -38,6 +38,11 @@ class PaymentPlanEligibility
      */
     private $eligibility;
 
+    /**
+     * PaymentPlanEligibility constructor.
+     * @param PaymentPlanConfig $planConfig
+     * @param Eligibility $eligibility
+     */
     public function __construct(PaymentPlanConfig $planConfig, Eligibility $eligibility)
     {
         $this->planConfig = $planConfig;

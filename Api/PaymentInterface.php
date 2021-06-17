@@ -23,23 +23,24 @@
  */
 
 namespace Alma\MonthlyPayments\Api;
-interface PaymentInterface {
+interface PaymentInterface
+{
 
     /**
      * Validate an Alma payment
      *
-     * @api
      * @param string $paymentId The ID of the Alma payment object to validate
      * @return Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface Whether the order associated to that payment can be validated
+     * @api
      */
     public function validate($paymentId);
 
     /**
      * Get the Alma payment page URL for the given Order ID
      *
-     * @api
      * @param int $orderId The Magento Order ID to retrieve the Alma payment page URL for
      * @return string The URL of the Alma payment page for that order
+     * @api
      */
     public function getPaymentUrl($orderId);
 }

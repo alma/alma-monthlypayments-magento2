@@ -55,13 +55,22 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $localeResolver;
 
+    /**
+     * ConfigProvider constructor.
+     * @param CheckoutSession $checkoutSession
+     * @param UrlInterface $urlBuilder
+     * @param Config $config
+     * @param Eligibility $eligibilityHelper
+     * @param ResolverInterface $localeResolver
+     */
     public function __construct(
         CheckoutSession $checkoutSession,
         UrlInterface $urlBuilder,
         Config $config,
         Eligibility $eligibilityHelper,
         ResolverInterface $localeResolver
-    ) {
+    )
+    {
         $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
@@ -69,6 +78,9 @@ class ConfigProvider implements ConfigProviderInterface
         $this->localeResolver = $localeResolver;
     }
 
+    /**
+     * @return \array[][]
+     */
     public function getConfig()
     {
         return [

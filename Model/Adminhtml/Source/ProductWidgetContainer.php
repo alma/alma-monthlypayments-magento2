@@ -1,3 +1,4 @@
+<?php
 /**
  * 2018 Alma / Nabla SAS
  *
@@ -22,41 +23,21 @@
  *
  */
 
-/*browser:true*/
-/*global define*/
-define(
-    [
-        'uiComponent',
-        'ko',
-        'Magento_Customer/js/customer-data',
-    ],
-    function (
-        Component,
-        ko,
-        customerData,
-    ) {
-        'use strict';
+namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
-        var cartObservable = customerData.get('cart');
-
-        return Component.extend({
-            initialize: function () {
-                this._super();
-
-                var eligibility = cartObservable().eligibility;
-                this.display = ko.observable(eligibility ? eligibility.display : false);
-                this.message = ko.observable(eligibility ? eligibility.message : '');
-
-                cartObservable.subscribe((function (newCart) {
-                    var eligibility = newCart.eligibility;
-                    this.display(eligibility ? eligibility.display : false);
-                    this.message(eligibility ? eligibility.message : '');
-                }).bind(this));
-            },
-
-            getImageUrl: function (path) {
-                return window.require.toUrl(path);
-            },
-        });
+/**
+ * Class ProductWidgetContainer
+ */
+class ProductWidgetContainer implements \Magento\Framework\Option\ArrayInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function toOptionArray()
+    {
+        return [
+            ['value' => 0, 'label' => __('Begin')],
+            ['value' => 1, 'label' => __('End')]
+        ];
     }
-);
+}

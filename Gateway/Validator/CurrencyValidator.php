@@ -30,7 +30,6 @@ use Magento\Payment\Gateway\Validator\ResultInterface;
 
 class CurrencyValidator extends AbstractValidator
 {
-
     /**
      * Performs domain-related validation for business object
      *

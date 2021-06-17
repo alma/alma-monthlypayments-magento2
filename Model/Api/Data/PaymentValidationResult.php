@@ -26,7 +26,8 @@ namespace Alma\MonthlyPayments\Model\Api\Data;
 
 use Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface;
 
-class PaymentValidationResult implements PaymentValidationResultInterface {
+class PaymentValidationResult implements PaymentValidationResultInterface
+{
     private $valid;
     private $reason;
     private $orderRef;
@@ -34,6 +35,9 @@ class PaymentValidationResult implements PaymentValidationResultInterface {
     private $orderDate;
     private $purchaseAmount;
 
+    /**
+     * PaymentValidationResult constructor.
+     */
     public function __construct()
     {
         $this->valid = false;

@@ -36,6 +36,10 @@ class Plans extends Field
      */
     protected $_template = 'Alma_MonthlyPayments::form/field/plans.phtml';
 
+    /**
+     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @return string
+     */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $this->setElement($element);
@@ -43,7 +47,7 @@ class Plans extends Field
     }
 
     /**
-     * @return PaymentPlansConfig
+     * @return mixed
      */
     public function getValue()
     {
@@ -89,14 +93,14 @@ class Plans extends Field
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     public function getPlansJson()
     {
         $serializer = new Json();
         return $serializer->serialize(
             array_map(
-                // Map each plan config to its data array and add useful information for rendering
+            // Map each plan config to its data array and add useful information for rendering
                 function ($plan) {
                     $data = $plan->toArray();
 

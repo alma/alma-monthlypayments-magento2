@@ -71,6 +71,15 @@ class Eligibility
      */
     private $quoteData;
 
+    /**
+     * Eligibility constructor.
+     * @param Session $checkoutSession
+     * @param Data $pricingHelper
+     * @param AlmaClient $almaClient
+     * @param Logger $logger
+     * @param Config $config
+     * @param AlmaQuote $quoteData
+     */
     public function __construct(
         Session $checkoutSession,
         Data $pricingHelper,
@@ -78,15 +87,13 @@ class Eligibility
         Helpers\Logger $logger,
         Config $config,
         AlmaQuote $quoteData
-    ) {
-
+    )
+    {
         $this->checkoutSession = $checkoutSession;
         $this->pricingHelper = $pricingHelper;
         $this->logger = $logger;
-
         $this->alma = $almaClient->getDefaultClient();
         $this->config = $config;
-
         $this->quoteData = $quoteData;
     }
 
@@ -272,16 +279,26 @@ class Eligibility
         return true;
     }
 
+    /**
+     * @param $price
+     * @return float|string
+     */
     private function getFormattedPrice($price)
     {
         return $this->pricingHelper->currency($price, true, false);
     }
 
+    /**
+     * @return bool
+     */
     public function isEligible()
     {
         return $this->eligible;
     }
 
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         return $this->message;

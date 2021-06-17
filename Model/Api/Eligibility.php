@@ -40,6 +40,11 @@ class Eligibility implements EligibilityInterface
      */
     private $eligiblePlansResultFactory;
 
+    /**
+     * Eligibility constructor.
+     * @param EligibilityHelper $eligibilityHelper
+     * @param EligiblePlansResultInterfaceFactory $eligiblePlansResultFactory
+     */
     public function __construct(EligibilityHelper $eligibilityHelper, EligiblePlansResultInterfaceFactory $eligiblePlansResultFactory)
     {
 

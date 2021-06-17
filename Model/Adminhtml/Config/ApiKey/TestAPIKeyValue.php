@@ -29,6 +29,9 @@ class TestAPIKeyValue extends APIKeyValue
 {
     protected $apiKeyType = 'test';
 
+    /**
+     * @return \Magento\Framework\Phrase
+     */
     public function getApiKeyName()
     {
         return __('Test API key');

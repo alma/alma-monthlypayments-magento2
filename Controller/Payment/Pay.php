@@ -42,11 +42,18 @@ class Pay extends Action
      */
     private $quoteRepository;
 
+    /**
+     * Pay constructor.
+     * @param Context $context
+     * @param CheckoutSession $checkoutSession
+     * @param QuoteRepository $quoteRepository
+     */
     public function __construct(
         Context $context,
         CheckoutSession $checkoutSession,
         QuoteRepository $quoteRepository
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
         $this->quoteRepository = $quoteRepository;

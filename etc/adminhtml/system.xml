@@ -25,50 +25,59 @@
  */
 -->
 
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="alma_monthly_payments" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="alma_monthly_payments" translate="label comment" type="text" sortOrder="1" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
                 <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer installments payments with Alma and instantly boost your sales.<br>Increase average order value by 60% and your sales by 20%.<br>With no subscription fees and no commitment, it’s risk free: you are paid upfront while your customers pay later.</div>]]></comment>
                 <fieldset_css>complex alma-section</fieldset_css>
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
 
-                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
-                <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
 
-                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
 
                 <!-- PAYMENT METHOD CONFIGURATION -->
-                <group id="general_config" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="general_config" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
 
                     <label>Payment method configuration</label>
-                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Title</label>
                         <comment>This controls the payment method name which the user sees during checkout.</comment>
                         <config_path>payment/alma_monthly_payments/title</config_path>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Description</label>
                         <comment>This controls the payment method description which the user sees during checkout.</comment>
                         <config_path>payment/alma_monthly_payments/description</config_path>
                     </field>
-                    <field id="payment_plans" translate="label" sortOrder="23" showInDefault="23" showInWebsite="1" showInStore="1">
+                    <field id="payment_plans" translate="label" sortOrder="23" showInDefault="23" showInWebsite="1"
+                           showInStore="1">
                         <label>Payment plans</label>
                         <config_path>payment/alma_monthly_payments/payment_plans</config_path>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\PaymentPlans</backend_model>
@@ -77,7 +86,8 @@
                 </group>
 
                 <!-- CART DISPLAY CONFIGURATION -->
-                <group id="cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
@@ -86,23 +96,80 @@
                     <label>Cart display</label>
                     <comment>A message can be displayed in the cart and minicart to indicate the order eligibility for monthly payments</comment>
 
-                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="show_eligibility_message" translate="label comment" type="select" sortOrder="31"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Display cart eligibility message</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/alma_monthly_payments/show_eligibility_message</config_path>
                     </field>
-                    <field id="eligibility_message" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="eligibility_message" translate="label" type="text" sortOrder="32" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Eligibility message</label>
                         <config_path>payment/alma_monthly_payments/eligibility_message</config_path>
                     </field>
-                    <field id="non_eligibility_message" translate="label" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="non_eligibility_message" translate="label" type="text" sortOrder="33" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Non-eligibility message</label>
                         <config_path>payment/alma_monthly_payments/non_eligibility_message</config_path>
                     </field>
                 </group>
 
+                <!-- PRODUCT PAGE DISPLAY CONFIGURATION -->
+                <group id="product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+
+                    <label>Product page display</label>
+                    <comment>A badge can be displayed on product pages to indicate eligible payments plans</comment>
+
+                    <field id="widget_active" translate="label" type="select" sortOrder="10" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <comment>Activate Alma badge on product pages.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/alma_monthly_payments/widget_active</config_path>
+                    </field>
+                    <field id="widget_price_use_qty" translate="label" type="select" sortOrder="20" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                        <label>Update with qty</label>
+                        <comment>Dynamicaly updates the badge's price when product quantity is changed.</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/alma_monthly_payments/widget_price_use_qty</config_path>
+                    </field>
+                    <field id="widget_position" translate="label" type="select" sortOrder="30" showInDefault="1"
+                           showInWebsite="1">
+                        <label>Badge position</label>
+                        <comment>Indicates where the badge should appear in product pages.</comment>
+                        <config_path>payment/alma_monthly_payments/widget_position</config_path>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductWidgetPositions</source_model>
+                        <attribute type="shared">1</attribute>
+                    </field>
+                    <field id="widget_container_css_selector" translate="label" type="text" sortOrder="40" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                        <label>HTML container</label>
+                        <comment>CSS selector for the custom badge container. (ex: #maincontent or .field.qty)</comment>
+                        <config_path>payment/alma_monthly_payments/widget_container_css_selector</config_path>
+                        <depends>
+                            <field id="widget_position">catalog.product.view.custom.alma.widget</field>
+                        </depends>
+                    </field>
+                    <field id="widget_container_prepend" translate="label" type="select" sortOrder="50"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Position in the HTML container</label>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductWidgetContainer</source_model>
+                        <config_path>payment/alma_monthly_payments/widget_container_prepend</config_path>
+                        <depends>
+                            <field id="widget_position">catalog.product.view.custom.alma.widget</field>
+                        </depends>
+                    </field>
+                </group>
+
                 <!-- EXCLUDED PRODUCTS CONFIGURATION -->
-                <group id="excluded_products_config" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="excluded_products_config" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
@@ -111,14 +178,16 @@
                     <label>Products exclusions</label>
                     <comment><![CDATA[<p>Some products (gift cards, license keys, software, weapons, ...) cannot be sold with Alma, <a href="https://getalma.eu/legal/terms/payment" target="_blank">as per our terms</a> (see Exclusions paragraph).</p><p>If you are selling such products on your shop, you need to configure Alma so that it is not enabled when customers view or shop them.</p>]]></comment>
 
-                    <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="excluded_product_types" translate="label comment" type="multiselect" sortOrder="4"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
                         <can_be_empty>1</can_be_empty>
                         <label>Excluded product types</label>
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\ProductTypes</source_model>
                         <config_path>payment/alma_monthly_payments/excluded_product_types</config_path>
                     </field>
 
-                    <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="excluded_products_message" translate="label comment" type="text" sortOrder="5"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Excluded products message</label>
                         <comment>List/explain which products aren't eligible to monthly payments</comment>
                         <config_path>payment/alma_monthly_payments/excluded_products_message</config_path>
@@ -126,7 +195,8 @@
                 </group>
 
                 <!-- API CONFIGURATION -->
-                <group id="api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\ApiFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
@@ -135,37 +205,43 @@
                     <label>API configuration</label>
                     <comment><![CDATA[You can find your API keys on <a href="https://dashboard.getalma.eu/security" target="_blank">your Alma dashboard</a>]]></comment>
 
-                    <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="live_api_key" translate="label" type="obscure" sortOrder="11" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Live API key</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\LiveAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/live_api_key</config_path>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="test_api_key" translate="label" type="obscure" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="test_api_key" translate="label" type="obscure" sortOrder="12" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Test API key</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\TestAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/test_api_key</config_path>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="api_mode" translate="label comment" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="api_mode" translate="label comment" type="select" sortOrder="13" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>API mode</label>
                         <comment>Use Test mode until you are ready to take real orders with Alma. In Test mode, only admins can see Alma on cart/checkout pages.</comment>
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\APIModes</source_model>
                         <config_path>payment/alma_monthly_payments/api_mode</config_path>
                     </field>
-                    <field id="return_url" translate="label comment" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="return_url" translate="label comment" type="text" sortOrder="14" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>Customer Return URL</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\ReturnUrlValue</backend_model>
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>return_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/return_url</config_path>
                     </field>
-                    <field id="ipn_callback_url" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="ipn_callback_url" translate="label comment" type="text" sortOrder="15" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
                         <label>IPN Callback URL</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\IpnCallbackUrlValue</backend_model>
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>ipn_callback_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/ipn_callback_url</config_path>
                     </field>
-                    <field id="customer_cancel_url" translate="label comment" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="customer_cancel_url" translate="label comment" type="text" sortOrder="16"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Customer Cancel URL</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl</backend_model>
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>customer_cancel_url</code> value of created payments]]></comment>

@@ -8,26 +8,61 @@ use Alma\API\Entities\FeePlan;
 
 interface PaymentPlanConfigInterface
 {
+    /**
+     * @return array
+     */
     public static function transientKeys(): array;
 
+    /**
+     * @param FeePlan $plan
+     * @return string
+     */
     public static function keyForFeePlan(FeePlan $plan): string;
 
+    /**
+     * @param FeePlan $plan
+     * @return array
+     */
     public static function defaultConfigForFeePlan(FeePlan $plan): array;
 
+    /**
+     * @return array
+     */
     public function toArray(): array;
 
+    /**
+     * @return string
+     */
     public function planKey(): string;
 
+    /**
+     * @return array
+     */
     public function getPaymentData(): array;
 
+    /**
+     * @return string
+     */
     public function kind(): string;
 
+    /**
+     * @return bool
+     */
     public function isAllowed(): bool;
 
+    /**
+     * @return bool
+     */
     public function isEnabled(): bool;
 
+    /**
+     * @return int
+     */
     public function installmentsCount(): int;
 
+    /**
+     * @return bool
+     */
     public function isDeferred(): bool;
 
     /**
@@ -35,8 +70,14 @@ interface PaymentPlanConfigInterface
      */
     public function deferredType();
 
+    /**
+     * @return int
+     */
     public function deferredDays(): int;
 
+    /**
+     * @return int
+     */
     public function deferredMonths(): int;
 
     /**
@@ -45,26 +86,61 @@ interface PaymentPlanConfigInterface
      */
     public function deferredDurationInDays(): int;
 
+    /**
+     * @return int
+     */
     public function deferredDuration(): int;
 
+    /**
+     * @return int
+     */
     public function minimumAmount(): int;
 
+    /**
+     * @param int $amount
+     * @return mixed
+     */
     public function setMinimumAmount(int $amount);
 
+    /**
+     * @return int
+     */
     public function minimumAllowedAmount(): int;
 
+    /**
+     * @return int
+     */
     public function maximumAmount(): int;
 
+    /**
+     * @param int $amount
+     * @return mixed
+     */
     public function setMaximumAmount(int $amount);
 
+    /**
+     * @return int
+     */
     public function maximumAllowedAmount(): int;
 
+    /**
+     * @return int
+     */
     public function variableMerchantFees(): int;
 
+    /**
+     * @return int
+     */
     public function fixedMerchantFees(): int;
 
+    /**
+     * @return int
+     */
     public function variableCustomerFees(): int;
 
+    /**
+     * @return int
+     */
     public function fixedCustomerFees(): int;
 
     /**

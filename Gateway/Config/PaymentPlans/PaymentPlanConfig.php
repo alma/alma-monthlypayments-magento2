@@ -34,6 +34,20 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
 
     /**
+     * @var array
+     */
+    private $data;
+
+    /**
+     * PaymentPlanConfig constructor.
+     * @param array $data
+     */
+    public function __construct(array $data = [])
+    {
+        $this->data = $data;
+    }
+
+    /**
      * @return string[]
      */
     public static function transientKeys(): array
@@ -46,6 +60,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function keyForFeePlan(FeePlan $plan): string
     {
         return self::key(
@@ -56,6 +73,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function defaultConfigForFeePlan(FeePlan $plan): array
     {
         return [
@@ -85,35 +105,42 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         ];
     }
 
+    /**
+     * @param string $planKind
+     * @param int $installmentsCount
+     * @param int $deferredDays
+     * @param int $deferredMonths
+     * @return string
+     */
     private static function key(
         string $planKind,
         int $installmentsCount,
         int $deferredDays,
         int $deferredMonths
-    ): string {
+    ): string
+    {
         return implode(':', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
     }
 
     /**
-     * @var array
+     * @inheritDoc
      */
-    private $data;
-
-    public function __construct(array $data = [])
-    {
-        $this->data = $data;
-    }
-
     public function toArray(): array
     {
         return $this->data;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function planKey(): string
     {
         return self::key($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getPaymentData(): array
     {
         if (!$this->isAllowed() || !$this->isEnabled()) {
@@ -132,26 +159,41 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         return $data;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function kind(): string
     {
         return $this->data['kind'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isAllowed(): bool
     {
         return $this->data['allowed'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isEnabled(): bool
     {
         return $this->data['enabled'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function installmentsCount(): int
     {
         return $this->data['installmentsCount'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isDeferred(): bool
     {
         return $this->deferredDays() > 0 || $this->deferredMonths() > 0;
@@ -169,11 +211,17 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         return $this->deferredMonths() > 0 ? 'M' : 'D';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function deferredDays(): int
     {
         return intval($this->data['deferredDays']);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function deferredMonths(): int
     {
         return intval($this->data['deferredMonths']);
@@ -187,56 +235,89 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         return $this->deferredMonths() * 30 + $this->deferredDays();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function deferredDuration(): int
     {
         return $this->deferredMonths() ?: $this->deferredDays();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function minimumAmount(): int
     {
         return $this->data['minAmount'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setMinimumAmount(int $amount)
     {
         $this->data['minAmount'] = $amount;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function minimumAllowedAmount(): int
     {
         return $this->data['minAllowedAmount'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function maximumAmount(): int
     {
         return $this->data['maxAmount'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setMaximumAmount(int $amount)
     {
         $this->data['maxAmount'] = $amount;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function maximumAllowedAmount(): int
     {
         return $this->data['maxAllowedAmount'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function variableMerchantFees(): int
     {
         return $this->data['merchantFees']['variable'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function fixedMerchantFees(): int
     {
         return $this->data['merchantFees']['fixed'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function variableCustomerFees(): int
     {
         return $this->data['customerFees']['variable'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function fixedCustomerFees(): int
     {
         return $this->data['customerFees']['fixed'];

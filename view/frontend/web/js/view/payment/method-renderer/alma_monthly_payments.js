@@ -41,7 +41,7 @@ define(
 
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
         // payment page to shipping and back and a payment method is removed/inserted. So we reorder them manually.
-        registry.get('checkout.steps.billing-step.payment.payments-list', function(methodsList) {
+        registry.get('checkout.steps.billing-step.payment.payments-list', function (methodsList) {
             var region = methodsList.regions['payment-methods-items-default'];
 
             if (!region) {
@@ -55,7 +55,7 @@ define(
                         window.checkoutConfig.payment['alma_monthly_payments'].sortOrder
                     ) - 1;
 
-                var almaIndex = _.findIndex(list, function(methodComponent) {
+                var almaIndex = _.findIndex(list, function (methodComponent) {
                     return methodComponent.item.method === 'alma_monthly_payments';
                 });
 
@@ -81,7 +81,7 @@ define(
                 template: 'Alma_MonthlyPayments/payment/form',
             },
 
-            initialize: function() {
+            initialize: function () {
                 this._super();
 
                 this.config = window.checkoutConfig.payment[this.item.method];
@@ -99,7 +99,7 @@ define(
                 return this;
             },
 
-            defaultPlan: function() {
+            defaultPlan: function () {
                 return this.paymentPlans.reduce(function (plan, result) {
                     if (plan.installmentsCount === 3 || plan.installmentsCount > result.installmentsCount) {
                         return plan;
@@ -109,27 +109,27 @@ define(
                 }, this.paymentPlans[0]);
             },
 
-            getSinglePlanTitle: function(plan) {
+            getSinglePlanTitle: function (plan) {
                 return $t('Pay in %1 installments').replace('%1', plan.installmentsCount);
             },
 
-            getPlanLabel: function(plan) {
+            getPlanLabel: function (plan) {
                 return $t('%1 installments').replace('%1', plan.installmentsCount);
             },
 
-            formattedDate: function(ts) {
+            formattedDate: function (ts) {
                 return (new Date(ts * 1000)).toLocaleDateString(this.config.locale);
             },
 
-            formattedPrice: function(cents) {
+            formattedPrice: function (cents) {
                 return priceUtils.formatPrice(cents / 100, window.checkoutConfig.priceFormat);
             },
 
-            getFeesMention: function(customerFee) {
+            getFeesMention: function (customerFee) {
                 return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
             },
 
-            getData: function() {
+            getData: function () {
                 return $.extend(
                     this._super(),
                     {

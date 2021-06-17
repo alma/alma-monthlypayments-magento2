@@ -39,16 +39,27 @@ use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Payment\Processor as PaymentProcessor;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 
-class AlmaPaymentValidationError extends \Exception {
+class AlmaPaymentValidationError extends \Exception
+{
     private $returnPath;
 
-    public function __construct($message = "", $returnPath="checkout/onepage/failure", $code = 0, \Throwable $previous = null)
+    /**
+     * AlmaPaymentValidationError constructor.
+     * @param string $message
+     * @param string $returnPath
+     * @param int $code
+     * @param \Throwable|null $previous
+     */
+    public function __construct($message = "", $returnPath = "checkout/onepage/failure", $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->returnPath = $returnPath;
         $this->message = $message;
     }
 
+    /**
+     * @return string
+     */
     public function getReturnPath()
     {
         return $this->returnPath;
@@ -67,6 +78,18 @@ class PaymentValidation
     private $orderManagement;
     private $quoteRepository;
 
+    /**
+     * PaymentValidation constructor.
+     * @param Logger $logger
+     * @param CheckoutSession $checkoutSession
+     * @param AlmaClient $almaClient
+     * @param PaymentProcessor $paymentProcessor
+     * @param OrderRepositoryInterface $orderRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param QuoteRepository $quoteRepository
+     * @param OrderSender $orderSender
+     * @param OrderManagementInterface $orderManagement
+     */
     public function __construct(
         Logger $logger,
         CheckoutSession $checkoutSession,
@@ -77,7 +100,8 @@ class PaymentValidation
         QuoteRepository $quoteRepository,
         OrderSender $orderSender,
         OrderManagementInterface $orderManagement
-    ) {
+    )
+    {
         $this->checkoutSession = $checkoutSession;
         $this->alma = $almaClient->getDefaultClient();
         $this->paymentProcessor = $paymentProcessor;
@@ -94,7 +118,8 @@ class PaymentValidation
      * @return Payment
      * @throws RequestError
      */
-    public function getAlmaPayment($paymentId) {
+    public function getAlmaPayment($paymentId)
+    {
         try {
             $almaPayment = $this->alma->payments->fetch($paymentId);
         } catch (RequestError $e) {
@@ -115,7 +140,8 @@ class PaymentValidation
      * @param Payment
      * @return Order
      */
-    public function findOrderForPayment($almaPayment) {
+    public function findOrderForPayment($almaPayment)
+    {
         // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
         $orderId = $almaPayment->custom_data['order_id'];
         $searchCriteria = $this->searchCriteriaBuilder->addFilter('increment_id', $orderId, 'eq')->create();
@@ -166,7 +192,8 @@ class PaymentValidation
      * @throws AlmaPaymentValidationError
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function validateOrderPayment($order, $almaPayment, $transitionOrder) {
+    public function validateOrderPayment($order, $almaPayment, $transitionOrder)
+    {
         $errorMessage = __('There was an error when validating your payment. Please try again or contact us if the problem persists.')->render();
 
         $payment = $order->getPayment();
@@ -253,7 +280,8 @@ class PaymentValidation
      * @param Order $order
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function transitionOrder($order) {
+    public function transitionOrder($order)
+    {
         $order->setCanSendNewEmailFlag(true);
         $order->setState(Order::STATE_PROCESSING);
         $newStatus = $order->getConfig()->getStateDefaultStatus(Order::STATE_PROCESSING);
@@ -279,7 +307,8 @@ class PaymentValidation
      * @param bool $status
      * @return \Magento\Sales\Api\Data\OrderStatusHistoryInterface
      */
-    private function addCommentToOrder($order, $comment, $status=false) {
+    private function addCommentToOrder($order, $comment, $status = false)
+    {
         if (method_exists($order, 'addCommentToStatusHistory') && is_callable([$order, 'addCommentToStatusHistory'])) {
             $statusHistoryItem = $order->addCommentToStatusHistory($comment, $status);
         } else {

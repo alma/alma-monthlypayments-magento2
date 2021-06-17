@@ -49,6 +49,12 @@ class Customer
      */
     private $checkoutSession;
 
+    /**
+     * Customer constructor.
+     * @param OrderRepositoryInterface $orderRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param Session $checkoutSession
+     */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,

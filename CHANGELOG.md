@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.3.0
+------
+
+* Adds an Alma badge with eligibility/payment plans information on product pages
+* Standardization of code
+
 v1.2.1
 ------
 

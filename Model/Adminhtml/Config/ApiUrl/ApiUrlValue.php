@@ -44,6 +44,17 @@ class ApiUrlValue extends Value implements ProcessorInterface
      */
     private $storeManager;
 
+    /**
+     * ApiUrlValue constructor.
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param StoreManagerInterface $storeManager
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -53,7 +64,8 @@ class ApiUrlValue extends Value implements ProcessorInterface
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->storeManager = $storeManager;
     }

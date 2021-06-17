@@ -76,7 +76,8 @@ class PaymentPlans extends Serialized
         AbstractDb $resourceCollection = null,
         array $data = [],
         Json $serializer = null
-    ) {
+    )
+    {
         parent::__construct(
             $context,
             $registry,

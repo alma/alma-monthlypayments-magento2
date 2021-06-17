@@ -38,23 +38,37 @@ use Magento\Framework\View\Helper\Js;
  * Will only render if the API has been correctly configured.
  *
  */
-class SecondaryFieldset extends Fieldset {
+class SecondaryFieldset extends Fieldset
+{
     /**
      * @var Config
      */
     private $config;
 
+    /**
+     * SecondaryFieldset constructor.
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param Config $config
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Session $authSession,
         Js $jsHelper,
         Config $config,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct($context, $authSession, $jsHelper, $data);
         $this->config = $config;
     }
 
+    /**
+     * @param AbstractElement $element
+     * @return string
+     */
     public function render(AbstractElement $element): string
     {
         if (!$this->config->isFullyConfigured()) {

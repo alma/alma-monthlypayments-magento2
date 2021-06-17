@@ -24,106 +24,107 @@
 
 namespace Alma\MonthlyPayments\Api\Data;
 
-interface PaymentValidationResultInterface {
+interface PaymentValidationResultInterface
+{
     /**
      * Return whether the considered payment is valid
      *
-     * @api
      * @return bool
+     * @api
      */
     public function getValid();
 
     /**
      * Return the reason for not being valid
      *
-     * @api
      * @return string|null
+     * @api
      */
     public function getReason();
 
     /**
      * Return the order reference for the validated payment (null if invalid)
      *
-     * @api
      * @return string|null
+     * @api
      */
     public function getOrderRef();
 
     /**
      * Return the order id for the validated payment (null if invalid)
      *
-     * @api
      * @return int|null
+     * @api
      */
     public function getOrderId();
 
     /**
      * Return the order date as a UNIX timestamp for the validated payment (null if invalid)
      *
-     * @api
      * @return int|null
+     * @api
      */
     public function getOrderDate();
 
     /**
      * Return the order amount (in cents) for the validated payment (null if invalid)
      *
-     * @api
      * @return int|null
+     * @api
      */
     public function getPurchaseAmount();
 
     /**
      * Set whether the considered payment is valid
      *
-     * @api
      * @param bool $value
      * @return null
+     * @api
      */
     public function setValid($value);
 
     /**
      * Set the reason for not being valid
      *
-     * @api
      * @param string $value
      * @return null
+     * @api
      */
     public function setReason($value);
 
     /**
      * Set the order reference for the validated payment (null if invalid)
      *
-     * @api
      * @param string $value
      * @return null
+     * @api
      */
     public function setOrderRef($value);
 
     /**
      * Set the order id for the validated payment (null if invalid)
      *
-     * @api
      * @param int $value
      * @return null
+     * @api
      */
     public function setOrderId($value);
 
     /**
      * Set the order date as a UNIX timestamp for the validated payment (null if invalid)
      *
-     * @api
      * @param int $value
      * @return null
+     * @api
      */
     public function setOrderDate($value);
 
     /**
      * Set the order amount (in cents) for the validated payment (null if invalid)
      *
-     * @api
      * @param $value
      * @return null
+     * @api
      */
     public function setPurchaseAmount($value);
 }

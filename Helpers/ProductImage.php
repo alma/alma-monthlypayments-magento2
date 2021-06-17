@@ -46,11 +46,18 @@ class ProductImage
      */
     private $imageFactory;
 
+    /**
+     * ProductImage constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Emulation $appEmulation
+     * @param ImageFactory $imageFactory
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Emulation $appEmulation,
         ImageFactory $imageFactory
-    ) {
+    )
+    {
         $this->storeManager = $storeManager;
         $this->appEmulation = $appEmulation;
         $this->imageFactory = $imageFactory;
@@ -69,13 +76,9 @@ class ProductImage
         } catch (NoSuchEntityException $e) {
             return null;
         }
-
         $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
-
         $imageUrl = $this->imageFactory->create()->init($product, $imageType, $attributes)->getUrl();
-
         $this->appEmulation->stopEnvironmentEmulation();
-
         return $imageUrl;
     }
 

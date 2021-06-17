@@ -42,6 +42,11 @@ class CustomerDataBuilder implements BuilderInterface
      */
     private $customerData;
 
+    /**
+     * CustomerDataBuilder constructor.
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param Customer $customerData
+     */
     public function __construct(CustomerRepositoryInterface $customerRepository, Customer $customerData)
     {
         $this->customerRepository = $customerRepository;

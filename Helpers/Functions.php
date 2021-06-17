@@ -25,12 +25,21 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-class Functions {
+class Functions
+{
+    /**
+     * @param $amount
+     * @return float
+     */
     public static function priceFromCents($amount)
     {
         return (float)($amount / 100);
     }
 
+    /**
+     * @param $price
+     * @return int
+     */
     public static function priceToCents($price)
     {
         return (int)(round($price * 100));

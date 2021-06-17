@@ -21,6 +21,11 @@ class EligiblePlansResult implements EligiblePlansResultInterface
     /** @var PaymentPlanConfig */
     private $planConfig;
 
+    /**
+     * EligiblePlansResult constructor.
+     * @param InstallmentInterfaceFactory $installmentFactory
+     * @param array $data
+     */
     public function __construct(InstallmentInterfaceFactory $installmentFactory, array $data = [])
     {
         $this->eligibility = $data['planEligibility']->getEligibility();

@@ -24,76 +24,77 @@
 
 namespace Alma\MonthlyPayments\Api\Data;
 
-interface EligiblePlansResultInterface {
+interface EligiblePlansResultInterface
+{
     /**
      * Return the plan's ID key
      *
-     * @api
      * @return string
+     * @api
      */
     public function getKey();
 
     /**
      * Return the number of installments for this plan
      *
-     * @api
      * @return int
+     * @api
      */
     public function getInstallmentsCount();
 
     /**
      * Return whether the plan is a Pay Later / deferred plan
      *
-     * @api
      * @return bool
+     * @api
      */
     public function isDeferred();
 
     /**
      * Return the deferred plan "type": 'D' for days- and 'M' for months-deferred
      *
-     * @api
      * @return string|null
+     * @api
      */
     public function getDeferredType();
 
     /**
      * Return the number of days a payment is deferred in case of a Pay Later plan
      *
-     * @api
      * @return int
+     * @api
      */
     public function getDeferredDays();
 
     /**
      * Return the number of months a payment is deferred in case of a Pay Later plan
      *
-     * @api
      * @return int
+     * @api
      */
     public function getDeferredMonths();
 
     /**
      * Return the minimum amount this plan is enabled for
      *
-     * @api
      * @return int
+     * @api
      */
     public function getMinimumAmount();
 
     /**
      * Return the maximum amount this plan is enabled for
      *
-     * @api
      * @return int
+     * @api
      */
     public function getMaximumAmount();
 
     /**
      * Return the plan's ID key
      *
-     * @api
      * @return Alma\MonthlyPayments\Api\Data\InstallmentInterface[]
+     * @api
      */
     public function getInstallments();
 }

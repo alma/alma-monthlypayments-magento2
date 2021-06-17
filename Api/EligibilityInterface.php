@@ -24,13 +24,14 @@
 
 namespace Alma\MonthlyPayments\Api;
 
-interface EligibilityInterface {
+interface EligibilityInterface
+{
 
     /**
      * Get all enabled payment plans that are eligible for the current cart
      *
-     * @api
      * @return Alma\MonthlyPayments\Api\Data\EligiblePlansResultInterface[] Eligible plans information
+     * @api
      */
     public function getEligiblePlans();
 }

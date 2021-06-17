@@ -24,6 +24,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl;
 
-class ReturnUrlValue extends ApiUrlValue {
+class ReturnUrlValue extends ApiUrlValue
+{
     protected $urlPath = 'alma/payment/return';
 }

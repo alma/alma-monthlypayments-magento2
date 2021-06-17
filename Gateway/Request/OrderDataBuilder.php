@@ -47,6 +47,12 @@ class OrderDataBuilder implements BuilderInterface
      */
     private $quoteData;
 
+    /**
+     * OrderDataBuilder constructor.
+     * @param UrlInterface $urlBuilder
+     * @param CheckoutSession $checkoutSession
+     * @param AlmaQuote $quoteData
+     */
     public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession, AlmaQuote $quoteData)
     {
         $this->urlBuilder = $urlBuilder;

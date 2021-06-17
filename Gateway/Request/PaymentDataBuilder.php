@@ -49,6 +49,12 @@ class PaymentDataBuilder implements BuilderInterface
      */
     private $config;
 
+    /**
+     * PaymentDataBuilder constructor.
+     * @param UrlInterface $urlBuilder
+     * @param CheckoutSession $checkoutSession
+     * @param Config $config
+     */
     public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession, Config $config)
     {
         $this->urlBuilder = $urlBuilder;

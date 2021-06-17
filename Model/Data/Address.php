@@ -29,6 +29,10 @@ use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 
 class Address
 {
+    /**
+     * @param AddressAdapterInterface $address
+     * @return array
+     */
     public static function dataFromAddress(AddressAdapterInterface $address)
     {
         $data = [];
