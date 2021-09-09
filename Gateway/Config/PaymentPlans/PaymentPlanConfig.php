@@ -329,7 +329,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     public function logoFileName()
     {
         // TODO: there's gotta be a better way
-        if (!$this->isDeferred() && in_array($this->installmentsCount(), [2, 3, 4])) {
+        if (!$this->isDeferred() && in_array($this->installmentsCount(), [2, 3, 4, 10])) {
             return 'p' . $this->installmentsCount() . 'x_logo.svg';
         }
 
