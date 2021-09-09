@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.3.1
+------
+
+* Add Alma 10x payment plan feature
+
 v1.3.0
 ------
 
