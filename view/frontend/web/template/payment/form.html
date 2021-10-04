@@ -88,7 +88,7 @@
                           data-bind="text: cartTotal()"></span><br />
                     <span data-bind="i18n: 'Credit cost : '"></span><span data-bind="text: customerTotalCostAmount(selectedPlan().eligibility.customerTotalCostAmount)"></span><br />
                     <!-- ko if: isAnnualInterestRate(selectedPlan().eligibility.annualInterestRate) -->
-                    <span data-bind="i18n: 'Fixed TAEG : '"></span><span data-bind="text: selectedPlan().eligibility.annualInterestRate"></span><br />
+                    <span data-bind="i18n: 'Annual interest rate : '"></span><span data-bind="text: selectedPlan().eligibility.annualInterestRate"></span><br />
                     <!-- /ko -->
                     <b><span data-bind="i18n: 'Total : '"></span><span data-bind="text: totalPaid(selectedPlan().eligibility.customerTotalCostAmount)"></span></b><br />
                 </span>
