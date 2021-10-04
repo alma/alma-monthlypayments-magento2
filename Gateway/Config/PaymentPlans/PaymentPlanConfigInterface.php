@@ -147,4 +147,9 @@ interface PaymentPlanConfigInterface
      * @return string|null
      */
     public function logoFileName();
+
+    /**
+     * @return int
+     */
+    public function customerLendingRate(): int;
 }

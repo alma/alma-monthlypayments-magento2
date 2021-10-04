@@ -4,7 +4,8 @@
 
 .alma.payment-method .alma-plan-choices label {
     cursor: pointer;
-    margin-right: 10px;
+    width: 24%;
+    display: inline-block;
 }
 
 .alma.payment-method .alma-plan-logo {

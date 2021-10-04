@@ -94,6 +94,8 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
             'maxAllowedAmount' => $plan->max_purchase_amount,
             'maxAmount' => $plan->max_purchase_amount,
 
+            'customerLendingRate' => $plan->customer_lending_rate,
+
             'merchantFees' => [
                 'variable' => $plan->merchant_fee_variable,
                 'fixed' => $plan->merchant_fee_fixed
@@ -329,10 +331,23 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     public function logoFileName()
     {
         // TODO: there's gotta be a better way
-        if (!$this->isDeferred() && in_array($this->installmentsCount(), [2, 3, 4, 10])) {
+        if (!$this->isDeferred() && in_array($this->installmentsCount(), [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])) {
             return 'p' . $this->installmentsCount() . 'x_logo.svg';
         }
-
+        if($this->isDeferred() && $this->deferredType() === 'D' && $this->installmentsCount() === 1){
+            return $this->deferredDays() . 'j_logo.svg';
+        }
+        if($this->isDeferred() && $this->deferredType() === 'M' && $this->installmentsCount() === 1){
+            return $this->deferredMonths() . 'm_logo.svg';
+        }
         return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function customerLendingRate(): int
+    {
+        return $this->data['customerLendingRate'];
     }
 }

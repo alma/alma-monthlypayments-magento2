@@ -104,11 +104,13 @@ class View extends Template
     private function getPlans()
     {
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-            $this->plans[] = array(
-                'installmentsCount' => $planConfig->installmentsCount(),
-                'minAmount' => $planConfig->minimumAmount(),
-                'maxAmount' => $planConfig->maximumAmount()
-            );
+            if( in_array($planConfig->installmentsCount(), array(2,3,4,10,12)) ){
+                $this->plans[] = array(
+                    'installmentsCount' => $planConfig->installmentsCount(),
+                    'minAmount' => $planConfig->minimumAmount(),
+                    'maxAmount' => $planConfig->maximumAmount()
+                );
+            }
         }
     }
 

@@ -97,7 +97,7 @@ class ConfigProvider implements ConfigProviderInterface
                         $plan['key'] = $planConfig->planKey();
                         $plan['logo'] = $planConfig->logoFileName();
                         $plan['installments'] = $pe->getEligibility()->getPaymentPlan();
-
+                        $plan['eligibility'] = $pe->getEligibility();
                         return $plan;
                     }, $this->eligibilityHelper->getEligiblePlans())
                 ]

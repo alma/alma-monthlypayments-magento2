@@ -79,8 +79,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
             return;
         }
 
-        // TODO: Request deferred plans when support for Pay Later is added
-        $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", false);
+        $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
 
         foreach ($feePlans as $plan) {
             $key = PaymentPlanConfig::keyForFeePlan($plan);

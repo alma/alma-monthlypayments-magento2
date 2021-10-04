@@ -61,8 +61,8 @@
                 <customer_cancel_url
                     backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl"/>
 
-                <title>Monthly Payments with Alma</title>
-                <description>Pay in 3 monthly payments with your credit card.</description>
+                <title>Alma monthly and deferred payments</title>
+                <description>Pay in deferred or multiple monthly payments with your credit card.</description>
 
                 <show_eligibility_message>1</show_eligibility_message>
                 <eligibility_message>Eligible for monthly payments</eligibility_message>
