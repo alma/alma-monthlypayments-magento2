@@ -60,6 +60,16 @@ $jsId = $block->escapeJs($blockId);
                 <span data-bind="html: i18n('fixedFees', currentPlan().customerFees)"></span>
                 <!-- /ko -->
             </li>
+            <li>
+                <b><?= __('Customers lending rate:') ?></b>
+                <!-- ko if: currentPlan().customerLendingRate == 0 -->
+                <?= __('no fees') ?>
+                <!-- /ko -->
+
+                <!-- ko if: currentPlan().customerLendingRate > 0 -->
+                <span data-bind="text: (currentPlan().customerLendingRate)/100+'%'"></span>
+                <!-- /ko -->
+            </li>
         </ul>
 
         <div id="planDetailsFields<?= $htmlId ?>">

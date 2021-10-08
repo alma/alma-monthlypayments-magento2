@@ -32,6 +32,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
     const TRANSIENT_KEY_MERCHANT_FEES = 'merchantFees';
     const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
+    const ALLOWED_MONTHLY_PLANS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     /**
      * @var array
@@ -330,8 +331,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function logoFileName()
     {
-        // TODO: there's gotta be a better way
-        if (!$this->isDeferred() && in_array($this->installmentsCount(), [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])) {
+        if (!$this->isDeferred() && in_array($this->installmentsCount(), self::ALLOWED_MONTHLY_PLANS)) {
             return 'p' . $this->installmentsCount() . 'x_logo.svg';
         }
         if($this->isDeferred() && $this->deferredType() === 'D' && $this->installmentsCount() === 1){

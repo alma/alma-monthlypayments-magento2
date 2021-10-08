@@ -104,7 +104,7 @@ class View extends Template
     private function getPlans()
     {
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-            if( in_array($planConfig->installmentsCount(), array(2,3,4,10,12)) ){
+            if( $this->isEnabledBadge($planConfig->installmentsCount()) ){
                 $this->plans[] = array(
                     'installmentsCount' => $planConfig->installmentsCount(),
                     'minAmount' => $planConfig->minimumAmount(),
@@ -112,6 +112,15 @@ class View extends Template
                 );
             }
         }
+    }
+
+    /**
+     * @param int
+     * @return bool
+     */
+    private function isEnabledBadge($installments_count)
+    {
+        return in_array($installments_count, array(2,3,4,10,12));
     }
 
     /**

@@ -131,7 +131,7 @@ define(
                 return priceUtils.formatPrice(cost / 100, window.checkoutConfig.priceFormat);
             },
 
-            isAnnualInterestRate: function (rate) {
+            hasAnnualInterestRate: function (rate) {
                 return ( rate!=null && rate > 0 ? true : false );
             },
 

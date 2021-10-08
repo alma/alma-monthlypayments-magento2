@@ -185,10 +185,11 @@ class Eligibility
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     *
+     * TODO : Do not check Eligibility when cart is empty
      */
     public function checkEligibility()
     {
-        // TODO : Do not check Eligibility when cart is empty
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();

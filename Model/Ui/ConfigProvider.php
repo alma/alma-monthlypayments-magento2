@@ -96,8 +96,11 @@ class ConfigProvider implements ConfigProviderInterface
                         $plan = $planConfig->toArray();
                         $plan['key'] = $planConfig->planKey();
                         $plan['logo'] = $planConfig->logoFileName();
-                        $plan['installments'] = $pe->getEligibility()->getPaymentPlan();
+                        $plan['paymentPlan'] = $pe->getEligibility()->getPaymentPlan();
+
+                        // TODO : we need to take only customerTotalCostAmount and annualInterestRate
                         $plan['eligibility'] = $pe->getEligibility();
+
                         return $plan;
                     }, $this->eligibilityHelper->getEligiblePlans())
                 ]
