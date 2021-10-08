@@ -143,7 +143,13 @@ class Eligibility
                 $plansEligibility[] = new PaymentPlanEligibility($planConfig, $eligibility);
             } else {
                 // Query eligibility for the plan's installments count & keep track of which plans are queried
-                $installmentsCounts[] = $planConfig->installmentsCount();
+                $installmentsCounts[] = [
+                    'purchase_amount' => $cartTotal,
+                    'installments_count' => $planConfig->installmentsCount(),
+                    'deferred_days' => $planConfig->deferredDays(),
+                    'deferred_month' => $planConfig->deferredMonths(),
+                    'cart_total' => $cartTotal
+                ];
                 $queriedPlans[] = $planKey;
 
                 // Insert plan key into the "final" result array so that we can replace it with its actual eligibility
@@ -179,6 +185,8 @@ class Eligibility
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     *
+     * TODO : Do not check Eligibility when cart is empty
      */
     public function checkEligibility()
     {

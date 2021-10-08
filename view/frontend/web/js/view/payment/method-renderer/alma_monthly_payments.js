@@ -87,7 +87,6 @@ define(
                 this.config = window.checkoutConfig.payment[this.item.method];
                 this.paymentPlans = this.config.paymentPlans;
                 this.selectedPlanKey = ko.observable(this.defaultPlan().key);
-
                 this.selectedPlan = ko.computed(function () {
                     var key = this.selectedPlanKey();
 
@@ -95,7 +94,6 @@ define(
                         return plan.key === key;
                     }) || {};
                 }, this);
-
                 return this;
             },
 
@@ -123,6 +121,22 @@ define(
 
             formattedPrice: function (cents) {
                 return priceUtils.formatPrice(cents / 100, window.checkoutConfig.priceFormat);
+            },
+
+            cartTotal: function () {
+                return priceUtils.formatPrice(window.checkoutConfig.quoteData.grand_total, window.checkoutConfig.priceFormat);
+            },
+
+            customerTotalCostAmount: function (cost) {
+                return priceUtils.formatPrice(cost / 100, window.checkoutConfig.priceFormat);
+            },
+
+            hasAnnualInterestRate: function (rate) {
+                return ( rate!=null && rate > 0 ? true : false );
+            },
+
+            totalPaid: function (cost) {
+                return priceUtils.formatPrice(parseInt(window.checkoutConfig.quoteData.grand_total) + (cost/100), window.checkoutConfig.priceFormat);
             },
 
             getFeesMention: function (customerFee) {

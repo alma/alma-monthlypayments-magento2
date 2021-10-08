@@ -42,6 +42,14 @@ class Installment implements InstallmentInterface
     /**
      * @inheritDoc
      */
+    public function getCustomerInterest()
+    {
+        return $this->installmentData['customer_interest'];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getPurchaseAmount()
     {
         return $this->installmentData['purchase_amount'];

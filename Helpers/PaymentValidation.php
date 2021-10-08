@@ -293,6 +293,7 @@ class PaymentValidation
         $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
         $this->orderManagement->notify($order->getId());
 
+        // TODO : Paylater / PnX
         $this->addCommentToOrder($order, __('First instalment captured successfully'), $newStatus);
         $this->orderRepository->save($order);
 
