@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.4.0
+------
+
+* Add Alma Paylater feature
+* Add Alma Pnx payment plan from 5x to 12x
+
 v1.3.1
 ------
 

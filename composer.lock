@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "314a308d317d63fe2a7c76352ae6cead",
+    "content-hash": "ad5b98db0d8a0c42e28cc54da3bf52aa",
     "packages": [
         {
             "name": "alma/alma-php-client",
