@@ -26,14 +26,18 @@
 namespace Alma\MonthlyPayments\Model\Data;
 
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
+use Magento\Sales\Model\Order;
 
 class Address
 {
     /**
-     * @param AddressAdapterInterface $address
+     * @param null|AddressAdapterInterface|Order $address
      * @return array
+     * @see \Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder
+     * @see \PayPal\Braintree\Gateway\Data\Order\OrderAdapter::getShippingAddress which return Magento\Sales\Model\Order
+     * and do not implement \Magento\Payment\Gateway\Data\AddressAdapterInterface
      */
-    public static function dataFromAddress(AddressAdapterInterface $address)
+    public static function dataFromAddress($address): array
     {
         $data = [];
         $map = [
