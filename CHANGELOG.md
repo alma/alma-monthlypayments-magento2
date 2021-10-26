@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.4.1
+------
+
+* Incremental compatibility Fix on invalid payment into Session for Magento 2.4.2-p1 and later
+
 v1.4.0
 ------
 
