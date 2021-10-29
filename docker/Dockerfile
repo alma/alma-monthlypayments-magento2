@@ -9,6 +9,8 @@ ENV MAGENTO_VERSION 2.4.2
 ENV INSTALL_DIR /var/www/html
 ENV COMPOSER_HOME /var/www/.composer/
 
+ENV SAMPLE_DATA_COMPOSER_HOME /var/www/html/var/composer_home/
+
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer #&& composer self-update 1.10.19
 
@@ -41,6 +43,7 @@ RUN chsh -s /bin/bash www-data
 RUN chown -R www-data:www-data /var/www
 
 RUN su www-data -c "composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $INSTALL_DIR $MAGENTO_VERSION"
+COPY ./auth.json $SAMPLE_DATA_COMPOSER_HOME
 
 RUN cd $INSTALL_DIR \
     && find . -type d -exec chmod 770 {} \; \

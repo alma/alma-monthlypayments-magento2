@@ -9,6 +9,7 @@ services:
       - elastic
     volumes:
       - ./:/var/www/html/app/code/Alma/MonthlyPayments/
+      - /var/www/html/app/code/Alma/MonthlyPayments/vendor
       - ./docker/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini
 #      -  ../alma-monthlypayments-magento2:/var/www/html/vendor/alma/alma-monthlypayments-magento2
 #      - alma-vendors:/var/www/html/vendor/alma/alma-monthlypayments-magento2/vendor
@@ -24,7 +25,7 @@ services:
       - http.cors.allow-credentials=true
       - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       - http.cors.allow-origin=/http?:\/\/(localhost|local.magento)(:[0-9]+)?/
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
     ulimits:
       memlock:
         soft: -1

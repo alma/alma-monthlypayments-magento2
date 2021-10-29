@@ -14,10 +14,10 @@ docker-compose exec web /usr/local/bin/install-magento
 docker-compose exec web /usr/local/bin/fix-permissions
 docker-compose exec web /usr/local/bin/install-sampledata
 
-# build mangento env
-php bin/magento cache:clean
-php bin/magento setup:upgrade
-php bin/magento setup:di:compile # compile dependence injections
+# build mangento env as www-data user (todo: move this instructions under /usr/local/bin/script like 3 previous ones)
+bin/magento cache:clean
+bin/magento setup:upgrade
+bin/magento setup:di:compile # compile dependence injections
 if [[ x$ENV == 'xdev' ]] ; then
     php bin/magento deploy:mode:set developer # refresh compiled code on update
 else
