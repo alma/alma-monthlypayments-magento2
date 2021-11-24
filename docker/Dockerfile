@@ -14,6 +14,7 @@ ENV SAMPLE_DATA_COMPOSER_HOME /var/www/html/var/composer_home/
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer #&& composer self-update 1.10.19
 
+# Maybe useless (TODO: remove this COPY command)
 COPY ./auth.json $COMPOSER_HOME
 
 RUN requirements="libpng++-dev libzip-dev libmcrypt-dev libmcrypt4 libcurl3-dev libfreetype6 libjpeg-turbo8 libjpeg-turbo8-dev libfreetype6-dev libicu-dev libxslt1-dev unzip" \
@@ -43,6 +44,8 @@ RUN chsh -s /bin/bash www-data
 RUN chown -R www-data:www-data /var/www
 
 RUN su www-data -c "composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $INSTALL_DIR $MAGENTO_VERSION"
+
+# retrieve this auth.json from 1password vault or build it with your own magento developer credentials
 COPY ./auth.json $SAMPLE_DATA_COMPOSER_HOME
 
 RUN cd $INSTALL_DIR \
