@@ -66,7 +66,7 @@ class Client implements ClientInterface
     public function placeRequest(TransferInterface $transferObject)
     {
         try {
-            $payment = $this->alma->payments->createPayment($transferObject->getBody());
+            $payment = $this->alma->payments->create($transferObject->getBody());
         } catch (RequestError $e) {
             $this->logger->error("Error creating payment: {$e->getMessage()}");
 
