@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
+set -Eeo pipefail
+source /var/www/env
 
 su www-data <<EOSU
+set -Eeo pipefail
+
+echo "Installing Magento with 'MAGENTO_URL=$MAGENTO_URL' & 'MAGENTO_BACKEND_FRONTNAME=$MAGENTO_BACKEND_FRONTNAME'"
+[[ -n "$MAGENTO_URL" ]] && [[ -n "$MAGENTO_BACKEND_FRONTNAME" ]]
+
+echo "Requiring alma-php-client"
+composer require alma/alma-php-client
+
 /var/www/html/bin/magento setup:install \
     --base-url=$MAGENTO_URL \
     --backend-frontname=$MAGENTO_BACKEND_FRONTNAME \
@@ -18,8 +28,10 @@ su www-data <<EOSU
     --admin-lastname=$MAGENTO_ADMIN_LASTNAME \
     --admin-email=$MAGENTO_ADMIN_EMAIL \
     --admin-user=$MAGENTO_ADMIN_USERNAME \
-    --admin-password=$MAGENTO_ADMIN_PASSWORD \
-    --search-engine=elasticsearch7 \
-    --elasticsearch-enable-auth=0 \
-    --elasticsearch-host=elastic
+    --admin-password=$MAGENTO_ADMIN_PASSWORD
+    # --search-engine=elasticsearch7 \
+    # --elasticsearch-enable-auth=0 \
+    # --elasticsearch-host=elastic
+
+#/var/www/html/bin/magento setup:upgrade
 EOSU

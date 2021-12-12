@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+set -Eeo pipefail
+echo "Installing Magento Fixtures"
 
 su www-data <<EOSU
+set -Eeo pipefail
 
 /var/www/html/bin/magento sampledata:deploy
 

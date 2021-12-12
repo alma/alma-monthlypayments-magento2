@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-find . -type f -exec chmod 644 {} \;
-find . -type d -exec chmod 755 {} \;
-find var pub/static pub/media app/etc generated/ -type f -exec chmod g+w {} \;
-find var pub/static pub/media app/etc generated/ -type d -exec chmod g+ws {} \;
-chown -R www-data:www-data .
-chmod u+x bin/magento

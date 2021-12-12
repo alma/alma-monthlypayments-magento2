@@ -2,78 +2,64 @@ FROM quay.io/alexcheng1982/apache2-php7:7.3.12
 
 LABEL maintainer="alexcheng1982@gmail.com"
 LABEL php_version="7.3.12"
-LABEL magento_version="2.3.6"
+LABEL magento_version=2.3.6
 LABEL description="Magento 2.3.6 with PHP 7.3.12"
 
-ENV MAGENTO_VERSION 2.4.2
-ENV INSTALL_DIR /var/www/html
-ENV COMPOSER_HOME /var/www/.composer/
+ENV MAGENTO_INSTALL_DIR=/var/www/html
 
-ENV SAMPLE_DATA_COMPOSER_HOME /var/www/html/var/composer_home/
-
+#COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer #&& composer self-update 1.10.19
+    && mv composer.phar /usr/local/bin/composer \
+    && composer self-update 1.10.19
+    # Composer 1 required for following dependencies =>
+    # TODO: describe `composer create-project` from magento repo broken with composer v2 here
 
-# Maybe useless (TODO: remove this COPY command)
+# Retrieve this auth.json from 1password vault or build it with your own magento developer credentials
+# Usefull into composer create-project context
+ENV COMPOSER_HOME /var/www/.composer/
 COPY ./auth.json $COMPOSER_HOME
 
-RUN requirements="libpng++-dev libzip-dev libmcrypt-dev libmcrypt4 libcurl3-dev libfreetype6 libjpeg-turbo8 libjpeg-turbo8-dev libfreetype6-dev libicu-dev libxslt1-dev unzip" \
-    && apt-get update \
-    && apt-get install -y $requirements \
-    && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd \
-    && docker-php-ext-install mbstring \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install intl \
-    && docker-php-ext-install xsl \
-    && docker-php-ext-install soap \
-    && docker-php-ext-install sockets \
-    && docker-php-ext-install bcmath
-
-#RUN yes '' | pecl install xdebug
-
-RUN yes '' | pecl install mcrypt-1.0.3 \
-    && echo 'extension=mcrypt.so' > /usr/local/etc/php/conf.d/mcrypt.ini
-
-COPY ./memory-limit.ini /usr/local/etc/php/conf.d/memory-limit.ini
+COPY ./custom-php.ini /usr/local/etc/php/conf.d/zz-custom-php.ini
 
 RUN chsh -s /bin/bash www-data
 
 RUN chown -R www-data:www-data /var/www
 
-RUN su www-data -c "composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $INSTALL_DIR $MAGENTO_VERSION"
-
-# retrieve this auth.json from 1password vault or build it with your own magento developer credentials
+# Usefull for mage-fixtures launched into the container
+ENV SAMPLE_DATA_COMPOSER_HOME /var/www/html/var/composer_home/
 COPY ./auth.json $SAMPLE_DATA_COMPOSER_HOME
 
-RUN cd $INSTALL_DIR \
-    && find . -type d -exec chmod 770 {} \; \
-    && find . -type f -exec chmod 660 {} \; \
-    && chmod u+x bin/magento
+COPY ./env                   /var/www/
+COPY ./docker-entrypoint.sh  /usr/local/bin
+COPY ./mage-php-requirements /usr/local/bin/mage-php-requirements
+COPY ./mage-init             /usr/local/bin/mage-init
+COPY ./mage-install          /usr/local/bin/mage-install
+COPY ./mage-fixtures         /usr/local/bin/mage-fixtures
+COPY ./mage-fix-perms        /usr/local/bin/mage-fix-perms
+COPY ./mage-configure        /usr/local/bin/mage-configure
 
-COPY ./install-magento /usr/local/bin/install-magento
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/mage-php-requirements
+RUN chmod +x /usr/local/bin/mage-init
+RUN chmod +x /usr/local/bin/mage-install
+RUN chmod +x /usr/local/bin/mage-fix-perms
+RUN chmod +x /usr/local/bin/mage-fixtures
+RUN chmod +x /usr/local/bin/mage-configure
 
-RUN chmod +x /usr/local/bin/install-magento
-
-COPY ./install-sampledata /usr/local/bin/install-sampledata
-
-RUN chmod +x /usr/local/bin/install-sampledata
-
-COPY ./fix-permissions /usr/local/bin/fix-permissions
-
-RUN chmod +x /usr/local/bin/fix-permissions
+RUN /usr/local/bin/mage-php-requirements
+RUN /usr/local/bin/mage-init
 
 RUN a2enmod rewrite
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-WORKDIR $INSTALL_DIR
+WORKDIR $MAGENTO_INSTALL_DIR
 
 # Add cron job
-#ADD crontab /etc/cron.d/magento2-cron
-#RUN chmod 0644 /etc/cron.d/magento2-cron \
+ADD crontab /etc/cron.d/magento2-cron
+RUN chmod 0644 /etc/cron.d/magento2-cron
 #    && crontab -u www-data /etc/cron.d/magento2-cron
 
-VOLUME $INSTALL_DIR
+VOLUME $MAGENTO_INSTALL_DIR
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
