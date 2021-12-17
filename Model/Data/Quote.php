@@ -25,14 +25,15 @@
 
 namespace Alma\MonthlyPayments\Model\Data;
 
+use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\ProductImage;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Quote\Model\Quote as MagentoQuote;
+use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
-use Alma\MonthlyPayments\Helpers\Functions;
+use Magento\Quote\Model\Quote as MagentoQuote;
 use Magento\Quote\Model\Quote\Item;
 
 class Quote
@@ -49,43 +50,62 @@ class Quote
      * @var CategoryRepositoryInterface
      */
     private $categoryRepository;
+    /**
+     * @var Resolver
+     */
+    private $locale;
 
     /**
      * Quote constructor.
-     * @param Customer $customerData
-     * @param ProductImage $productImageHelper
+     *
+     * @param Customer                    $customerData
+     * @param ProductImage                $productImageHelper
      * @param CategoryRepositoryInterface $categoryRepository
-     */
+     * @param Resolver                    $locale ;
+ */
     public function __construct(
         Customer $customerData,
         ProductImage $productImageHelper,
-        CategoryRepositoryInterface $categoryRepository
+        CategoryRepositoryInterface $categoryRepository,
+        Resolver $locale
     )
     {
-        $this->customerData = $customerData;
+        $this->customerData       = $customerData;
         $this->productImageHelper = $productImageHelper;
         $this->categoryRepository = $categoryRepository;
+        $this->locale             = $locale;
     }
 
     /**
      * @param MagentoQuote $quote
-     * @param int|array $installmentsCounts
+     * @param array        $installmentsQuery
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\InputException
+     * @throws InputException
      */
-    public function paymentDataFromQuote(MagentoQuote $quote, $installmentsQuery): array
+    public function eligibilityDataFromQuote(MagentoQuote $quote, array $installmentsQuery): array
     {
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
-        $billingAddress = new AddressAdapter($quote->getBillingAddress());
+        $billingAddress  = new AddressAdapter($quote->getBillingAddress());
+        $billingCountry  = $billingAddress->getCountryId();
+        $shippingCountry = $shippingAddress->getCountryId();
 
         $customer = $quote->getCustomer();
 
         $data = [
-            'online' => 'online',
-            'purchase_amount' => Functions::priceToCents((float)$quote->getGrandTotal()),
-            'queries' => $installmentsQuery,
-            'customer' => $this->customerData->dataFromCustomer($customer, [$billingAddress, $shippingAddress])
+            'online'          => 'online',
+            'purchase_amount' => Functions::priceToCents((float) $quote->getGrandTotal()),
+            'locale'          => $this->locale->getLocale(),
+            'queries'         => $installmentsQuery,
+            'customer'        => $this->customerData->dataFromCustomer($customer, [$billingAddress, $shippingAddress]),
         ];
+        if ($billingCountry) {
+            $data['billing_address'] = ['country' => $billingCountry];
+        }
+        if ($shippingCountry) {
+            $data['shipping_address'] = ['country' => $shippingCountry];
+        }
+
         return $data;
     }
 

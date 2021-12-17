@@ -115,7 +115,7 @@ class Eligibility
 
         // Get enabled plans and build a list of installments counts that should be tested for eligibility
         $enabledPlans = $this->config->getPaymentPlansConfig()->getEnabledPlans();
-        $installmentsCounts = [];
+        $installmentsQuery = [];
         $queriedPlans = [];
         $plansEligibility = [];
         foreach ($enabledPlans as $planKey => $planConfig) {
@@ -143,7 +143,7 @@ class Eligibility
                 $plansEligibility[] = new PaymentPlanEligibility($planConfig, $eligibility);
             } else {
                 // Query eligibility for the plan's installments count & keep track of which plans are queried
-                $installmentsCounts[] = [
+                $installmentsQuery[] = [
                     'purchase_amount' => $cartTotal,
                     'installments_count' => $planConfig->installmentsCount(),
                     'deferred_days' => $planConfig->deferredDays(),
@@ -160,9 +160,13 @@ class Eligibility
 
         $eligibilities = [];
 
-        if (!empty($installmentsCounts)) {
+        if (!empty($installmentsQuery)) {
+            $data = $this->quoteData->eligibilityDataFromQuote(
+                $this->checkoutSession->getQuote(),
+                $installmentsQuery
+            );
             $eligibilities = $this->alma->payments->eligibility(
-                $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts),
+                $data,
                 true
             );
         }
