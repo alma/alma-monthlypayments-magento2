@@ -31,8 +31,9 @@ use Alma\MonthlyPayments\Helpers;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Registry;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Catalog\Helper\Data;
 
 class View extends Template
 {
@@ -40,11 +41,6 @@ class View extends Template
      * @var Config
      */
     private $config;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
 
     /**
      * @var Functions
@@ -64,24 +60,28 @@ class View extends Template
     /**
      * View constructor.
      * @param Context $context
-     * @param Registry $registry
      * @param Config $config
      * @param Functions $functions
      * @param array $data
+     * @param Data $dataHelper
+     * @param Logger $logger
      * @throws LocalizedException
      */
     public function __construct(
         Context $context,
-        Registry $registry,
+        array $data = [],
         Config $config,
         Functions $functions,
-        array $data = []
+        Data $dataHelper,
+        Logger $logger
     )
     {
         parent::__construct($context, $data);
         $this->config = $config;
-        $this->registry = $registry;
         $this->functions = $functions;
+        $this->dataHelper = $dataHelper;
+        $this->logger = $logger;
+
         $this->getProduct();
         $this->getPlans();
     }
@@ -92,9 +92,11 @@ class View extends Template
      */
     private function getProduct()
     {
-        $this->product = $this->registry->registry('product');
-        if (!$this->product->getId()) {
-            throw new LocalizedException(__('Failed to initialize product'));
+        if(is_null($this->product)){
+            $this->product = $this->dataHelper->getProduct();
+            if (!$this->product->getId()) {
+                throw new LocalizedException(__('Failed to initialize product'));
+            }
         }
     }
 
