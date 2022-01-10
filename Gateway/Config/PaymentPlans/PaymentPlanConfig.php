@@ -126,6 +126,23 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     }
 
     /**
+     * @param string $planKind
+     * @param int $installmentsCount
+     * @param int $deferredDays
+     * @param int $deferredMonths
+     * @return string
+     */
+    private static function almaKey(
+        string $planKind,
+        int $installmentsCount,
+        int $deferredDays,
+        int $deferredMonths
+    ): string
+    {
+        return implode('_', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
+    }
+
+    /**
      * @inheritDoc
      */
     public function toArray(): array
@@ -139,6 +156,14 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     public function planKey(): string
     {
         return self::key($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function almaPlanKey(): string
+    {
+        return self::almaKey($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
     }
 
     /**

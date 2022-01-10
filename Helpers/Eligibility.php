@@ -26,9 +26,9 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
-use Alma\API\Endpoints\Results\Eligibility as AlmaEligibility;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
@@ -98,6 +98,23 @@ class Eligibility
     }
 
     /**
+     * @param PaymentPlanConfigInterface[] $plansConfig
+     * @param string                       $planKey
+     *
+     * @return null|PaymentPlanConfigInterface
+     */
+    private function getPlanConfigFromKey(array $plansConfig, string $planKey): ?PaymentPlanConfigInterface
+    {
+        foreach ($plansConfig as $planConfig) {
+            if ($planConfig->planKey() === $planKey) {
+                return $planConfig;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return PaymentPlanEligibility[]
      *
      * @throws InputException
@@ -114,73 +131,69 @@ class Eligibility
         $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         // Get enabled plans and build a list of installments counts that should be tested for eligibility
-        $enabledPlans = $this->config->getPaymentPlansConfig()->getEnabledPlans();
+        $enabledPlans      = $this->config->getPaymentPlansConfig()->getEnabledPlans();
         $installmentsQuery = [];
-        $queriedPlans = [];
-        $plansEligibility = [];
+        $availablePlans    = [];
         foreach ($enabledPlans as $planKey => $planConfig) {
             if (
-                $cartTotal < $planConfig->minimumAmount() ||
-                $cartTotal > $planConfig->maximumAmount()
+                $cartTotal >= $planConfig->minimumAmount() &&
+                $cartTotal <= $planConfig->maximumAmount()
             ) {
-                // If cart total is out of this plan's configured bounds, we know it's not eligible right away
-                $eligibility = new AlmaEligibility(
-                    [
-                        'installments_count' => $planConfig->installmentsCount(),
-                        'eligible' => false,
-                        'constraints' => [
-                            'purchase_amount' => [
-                                'minimum' => $planConfig->minimumAmount(),
-                                'maximum' => $planConfig->maximumAmount(),
-                            ],
-                        ],
-                        'reasons' => [
-                            'purchase_amount' => 'invalid_value'
-                        ]
-                    ]
-                );
-
-                $plansEligibility[] = new PaymentPlanEligibility($planConfig, $eligibility);
-            } else {
                 // Query eligibility for the plan's installments count & keep track of which plans are queried
                 $installmentsQuery[] = [
                     'purchase_amount' => $cartTotal,
                     'installments_count' => $planConfig->installmentsCount(),
                     'deferred_days' => $planConfig->deferredDays(),
                     'deferred_month' => $planConfig->deferredMonths(),
-                    'cart_total' => $cartTotal
+                    'cart_total' => $cartTotal,
                 ];
-                $queriedPlans[] = $planKey;
-
-                // Insert plan key into the "final" result array so that we can replace it with its actual eligibility
-                // result after the API call is made
-                $plansEligibility[] = $planKey;
+                $availablePlans[] = $planKey;
             }
         }
 
-        $eligibilities = [];
-
-        if (!empty($installmentsQuery)) {
-            $data = $this->quoteData->eligibilityDataFromQuote(
+        if (empty($installmentsQuery)) {
+            return [];
+        }
+        $eligibilities = $this->alma->payments->eligibility(
+            $this->quoteData->eligibilityDataFromQuote(
                 $this->checkoutSession->getQuote(),
                 $installmentsQuery
-            );
-            $eligibilities = $this->alma->payments->eligibility(
-                $data,
-                true
-            );
+            ),
+            true
+        );
+        if (!is_array($eligibilities) && $eligibilities instanceof \Alma\API\Endpoints\Results\Eligibility) {
+            $eligibilities = [$eligibilities->getPlanKey() => $eligibilities];
         }
-
-        $queriedEligibilities = [];
-        foreach (array_values($eligibilities) as $idx => $eligibility) {
-            $key = $queriedPlans[$idx];
-            $planConfig = $enabledPlans[$key];
-            $queriedEligibilities[$key] = new PaymentPlanEligibility($planConfig, $eligibility);
+        $plansEligibility = [];
+        foreach ($availablePlans as $planKey) {
+            $planConfig  = $this->getPlanConfigFromKey($enabledPlans, $planKey);
+            if (!$planConfig) {
+                continue;
+            }
+            if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
+                continue;
+            }
+            $eligibility = $eligibilities[$planConfig->almaPlanKey()];
+            $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
         }
+        // TODO check solutions bellow to update AJAX payment methods on country update:
+        // * https://magento.stackexchange.com/questions/160479/magento-2-how-to-refresh-payment-method-on-some-condition
+        // * https://magento.stackexchange.com/questions/175806/magento2-how-to-trigger-onchange-event-on-country-region-in-shipping-address
+        return array_values($plansEligibility); //TODO:check why there is cache in eligibilities from Alma if we change country in shipping checkout UI
 
-        return array_map(function ($planOrKey) use ($queriedEligibilities) {
-            return is_string($planOrKey) ? $queriedEligibilities[$planOrKey] : $planOrKey;
-        }, $plansEligibility);
+        $this->logger->info("getPlansEligibility: plansEligibility keys before array_map", array_keys($plansEligibility));
+        $arrayMap = array_map(function ($planKey) use ($plansEligibility) {
+            if (is_string($planKey) && isset($plansEligibility[$planKey])) {
+                $this->logger->info("getPlansEligibility: map plan returned", [$planKey]);
+
+                return $plansEligibility[$planKey];
+            }
+            $this->logger->info("getPlansEligibility: plan skipped because not found into queried eligibilities", [$planKey]);
+            return $this->mockUneligiblePlanConfig();
+        }, $availablePlans);
+        $this->logger->info("getPlansEligibility: return", $arrayMap);
+
+        return $arrayMap;
     }
 
     /**
@@ -267,6 +280,7 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage(), $e->getTrace());
             return [];
         }
     }
