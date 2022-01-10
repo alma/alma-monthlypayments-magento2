@@ -69,11 +69,11 @@ class View extends Template
      */
     public function __construct(
         Context $context,
-        array $data = [],
         Config $config,
         Functions $functions,
         Data $dataHelper,
-        Logger $logger
+        Logger $logger,
+        array $data = []
     )
     {
         parent::__construct($context, $data);
@@ -82,7 +82,7 @@ class View extends Template
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
 
-        $this->getProduct();
+        $this->initProduct();
         $this->getPlans();
     }
 
@@ -90,14 +90,14 @@ class View extends Template
      * @return void
      * @throws LocalizedException
      */
-    private function getProduct()
+    private function initProduct()
     {
+        $this->product = $this->dataHelper->getProduct();
         if(is_null($this->product)){
-            $this->product = $this->dataHelper->getProduct();
-            if (!$this->product->getId()) {
-                throw new LocalizedException(__('Failed to initialize product'));
-            }
-        }
+            $errorMessage  = __('Failed to initialize product');
+            $this->logger->error($errorMessage,[]);
+            throw new LocalizedException($errorMessage);
+        }   
     }
 
     /**
