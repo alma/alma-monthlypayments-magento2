@@ -31,6 +31,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -68,7 +69,8 @@ class ConfigProvider implements ConfigProviderInterface
         UrlInterface $urlBuilder,
         Config $config,
         Eligibility $eligibilityHelper,
-        ResolverInterface $localeResolver
+        ResolverInterface $localeResolver,
+        Logger $logger
     )
     {
         $this->checkoutSession = $checkoutSession;
@@ -76,6 +78,7 @@ class ConfigProvider implements ConfigProviderInterface
         $this->config = $config;
         $this->eligibilityHelper = $eligibilityHelper;
         $this->localeResolver = $localeResolver;
+        $this->logger = $logger;
     }
 
     /**
@@ -83,11 +86,12 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        return [
+        $config = [
             'payment' => [
                 Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => $this->config->getPaymentButtonTitle(),
+                    'description' => $this->config->getPaymentButtonDescription(),
                     'sortOrder' => $this->config->getSortOrder(),
                     'locale' => str_replace('_', '-', $this->localeResolver->getLocale()),
                     'paymentPlans' => array_map(function ($pe) {
@@ -106,5 +110,7 @@ class ConfigProvider implements ConfigProviderInterface
                 ]
             ]
         ];
+        $this->logger->info('Paymenbt Provider Config',[$config]);
+        return $config;
     }
 }
