@@ -106,10 +106,6 @@ define(
                 }, this.paymentPlans[0]);
             },
 
-            getSinglePlanTitle: function (plan) {
-                return $t('Pay in %1 installments').replace('%1', plan.installmentsCount);
-            },
-            
             getDescription: function () {
                 return this.config.description;
             },

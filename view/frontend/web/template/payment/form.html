@@ -41,7 +41,15 @@
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: getDescription()"></div>
         <p class="alma-plan-choices">
+            <!-- ko if: paymentPlans.length === 1 -->
+            <!-- ko if: paymentPlans[0].logo -->
+            <img class="alma-plan-logo"
+                 data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + paymentPlans[0].logo), alt: paymentPlans[0].logo }">
+            <!-- /ko -->
 
+            <span data-bind="text: getPlanLabel(paymentPlans[0])"></span>
+            <!-- /ko -->
+            <!-- ko ifnot: paymentPlans.length === 1 -->
             <!-- ko foreach: paymentPlans -->
             <label data-bind="attr: { for: 'alma-select-plan-' + key }">
                 <input type="radio" name="alma-selected-plan"
@@ -52,6 +60,7 @@
                 <!-- /ko -->
                 <span data-bind="text: $parent.getPlanLabel($data)"></span>
             </label>
+            <!-- /ko -->
             <!-- /ko -->
         </p>
 
