@@ -125,10 +125,10 @@ class Eligibility
      * @throws NoSuchEntityException
      * @throws RequestError
      */
-    public function getPlansEligibility(): array
+    private function getPlansEligibility(): array
     {
         if (!$this->alma || !$this->checkItemsTypes()) {
-            $this->logger->error('Alma client is empty or not good item types');
+            $this->logger->info('Alma client is empty or not good item types');
             return [];
         }
 
@@ -157,10 +157,10 @@ class Eligibility
         }
 
         if (empty($installmentsQuery)) {
-            $this->logger->error('No eligible installment in config');
+            $this->logger->info('No eligible installment in config');
             return [];
         }
-     
+
         $quote = $this->quoteFactory->create()->load($this->checkoutSession->getQuote()->getId());
         $eligibilities = $this->alma->payments->eligibility(
             $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
@@ -170,15 +170,14 @@ class Eligibility
             $eligibilities = [$eligibilities->getPlanKey() => $eligibilities];
         }
         $plansEligibility = [];
-        // 
         foreach ($availablePlans as $planKey) {
             $planConfig  = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
             if (!$planConfig) {
-                $this->logger->error('No Plan Config' ,[]);
+                $this->logger->info('No Plan Config' ,['planKey' => $planKey]);
                 continue;
             }
             if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
-                $this->logger->error('Plan is not Eligible for this country' ,[$quote->getBillingAddress()->getCountryId()]);
+                $this->logger->info('Plan is not Eligible for this country' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
                 continue;
             }
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
@@ -272,7 +271,7 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage(), $e->getTrace());
+            $this->logger->error($e->getMessage(), $e->getTrace());
             return [];
         }
     }
