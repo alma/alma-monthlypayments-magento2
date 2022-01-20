@@ -90,8 +90,8 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
-                    'title' => $this->config->getPaymentButtonTitle(),
-                    'description' => $this->config->getPaymentButtonDescription(),
+                    'title' => __($this->config->getPaymentButtonTitle()),
+                    'description' => __($this->config->getPaymentButtonDescription()),
                     'sortOrder' => $this->config->getSortOrder(),
                     'locale' => str_replace('_', '-', $this->localeResolver->getLocale()),
                     'paymentPlans' => array_map(function ($pe) {
@@ -110,7 +110,7 @@ class ConfigProvider implements ConfigProviderInterface
                 ]
             ]
         ];
-        $this->logger->info('Paymenbt Provider Config',[$config]);
+        $this->logger->info('Payment Provider Config',[$config]);
         return $config;
     }
 }

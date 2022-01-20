@@ -105,7 +105,9 @@ define(
                     return result;
                 }, this.paymentPlans[0]);
             },
-
+            getTitle:function (){
+                return this.config.title;
+            },
             getDescription: function () {
                 return this.config.description;
             },

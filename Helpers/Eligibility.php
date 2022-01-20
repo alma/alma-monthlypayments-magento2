@@ -319,6 +319,6 @@ class Eligibility
      */
     public function getMessage()
     {
-        return $this->message;
+        return __($this->message);
     }
 }
