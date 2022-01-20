@@ -71,6 +71,10 @@ class Eligibility
      * @var AlmaQuote
      */
     private $quoteData;
+    /**
+     * @var QuoteFactory
+     */
+    private $quoteFactory;
 
     /**
      * Eligibility constructor.
@@ -80,6 +84,7 @@ class Eligibility
      * @param Logger $logger
      * @param Config $config
      * @param AlmaQuote $quoteData
+     * @param QuoteFactory $quoteFactory
      */
     public function __construct(
         Session $checkoutSession,
@@ -314,6 +319,7 @@ class Eligibility
     }
 
     /**
+     * Get translated eligibility message.
      * @return string
      */
     public function getMessage()

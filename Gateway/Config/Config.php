@@ -76,13 +76,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
+     * @param Logger $logger
      * @param null $methodCode
      * @param string $pathPattern
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
-        logger $logger,
+        Logger $logger,
         $methodCode = null,
         $pathPattern = self::DEFAULT_PATH_PATTERN
     )
@@ -314,7 +315,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             try {
                 $plansConfig->updateFromApi();
             } catch (RequestError $e) {
-                $this->logger->error('getPaymentPlansConfig Error : ',[]);
+                $this->logger->error('getPaymentPlansConfig Error : ',[$e->getMessage()]);
             }
         }
 
