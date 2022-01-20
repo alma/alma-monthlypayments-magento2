@@ -86,7 +86,7 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $config = [
+        $paymentConfig = [
             'payment' => [
                 Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
@@ -110,7 +110,7 @@ class ConfigProvider implements ConfigProviderInterface
                 ]
             ]
         ];
-        $this->logger->info('Payment Provider Config',[$config]);
-        return $config;
+        $this->logger->info('Payment Provider Config',[$paymentConfig]);
+        return $paymentConfig;
     }
 }

@@ -113,10 +113,10 @@ define(
             },
 
             getPlanLabel: function (plan) {
-                const regexDeffered = new RegExp('^general:1:[0-9]{2}:0$');
+                const regexDeferred = /^general:1:[\d]{2}:0$/;
                 var label = $t('%1 installments').replace('%1', plan.installmentsCount);
 
-                if (regexDeffered.test(plan.key)){
+                if (regexDeferred.test(plan.key)){
                     label = $t('In %1 days').replace('%1', plan.deferredDays);
                 }
                 return label;
