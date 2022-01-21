@@ -26,12 +26,13 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
-use Alma\API\Endpoints\Results\Eligibility as AlmaEligibility;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
+use Magento\Quote\Model\QuoteFactory;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
@@ -70,6 +71,10 @@ class Eligibility
      * @var AlmaQuote
      */
     private $quoteData;
+    /**
+     * @var QuoteFactory
+     */
+    private $quoteFactory;
 
     /**
      * Eligibility constructor.
@@ -79,6 +84,7 @@ class Eligibility
      * @param Logger $logger
      * @param Config $config
      * @param AlmaQuote $quoteData
+     * @param QuoteFactory $quoteFactory
      */
     public function __construct(
         Session $checkoutSession,
@@ -86,7 +92,8 @@ class Eligibility
         Helpers\AlmaClient $almaClient,
         Helpers\Logger $logger,
         Config $config,
-        AlmaQuote $quoteData
+        AlmaQuote $quoteData,
+        QuoteFactory $quoteFactory
     )
     {
         $this->checkoutSession = $checkoutSession;
@@ -95,6 +102,24 @@ class Eligibility
         $this->alma = $almaClient->getDefaultClient();
         $this->config = $config;
         $this->quoteData = $quoteData;
+        $this->quoteFactory = $quoteFactory;
+    }
+
+    /**
+     * @param PaymentPlanConfigInterface[] $plansConfig
+     * @param string                       $planKey
+     *
+     * @return null|PaymentPlanConfigInterface
+     */
+    private function getPlanConfigFromKey(array $plansConfig, string $planKey): ?PaymentPlanConfigInterface
+    {
+        foreach ($plansConfig as $planConfig) {
+            if ($planConfig->planKey() === $planKey) {
+                return $planConfig;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -105,78 +130,66 @@ class Eligibility
      * @throws NoSuchEntityException
      * @throws RequestError
      */
-    public function getPlansEligibility(): array
+    private function getPlansEligibility(): array
     {
         if (!$this->alma || !$this->checkItemsTypes()) {
+            $this->logger->info('Alma client is empty or not good item types');
             return [];
         }
 
         $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         // Get enabled plans and build a list of installments counts that should be tested for eligibility
-        $enabledPlans = $this->config->getPaymentPlansConfig()->getEnabledPlans();
-        $installmentsCounts = [];
-        $queriedPlans = [];
-        $plansEligibility = [];
-        foreach ($enabledPlans as $planKey => $planConfig) {
-            if (
-                $cartTotal < $planConfig->minimumAmount() ||
-                $cartTotal > $planConfig->maximumAmount()
-            ) {
-                // If cart total is out of this plan's configured bounds, we know it's not eligible right away
-                $eligibility = new AlmaEligibility(
-                    [
-                        'installments_count' => $planConfig->installmentsCount(),
-                        'eligible' => false,
-                        'constraints' => [
-                            'purchase_amount' => [
-                                'minimum' => $planConfig->minimumAmount(),
-                                'maximum' => $planConfig->maximumAmount(),
-                            ],
-                        ],
-                        'reasons' => [
-                            'purchase_amount' => 'invalid_value'
-                        ]
-                    ]
-                );
+        $enabledPlansInConfig      = $this->config->getPaymentPlansConfig()->getEnabledPlans();
+        $installmentsQuery         = [];
+        $availablePlans            = [];
 
-                $plansEligibility[] = new PaymentPlanEligibility($planConfig, $eligibility);
-            } else {
+        foreach ($enabledPlansInConfig as $planKey => $planConfig) {
+            if (
+                $cartTotal >= $planConfig->minimumAmount() &&
+                $cartTotal <= $planConfig->maximumAmount()
+            ) {
                 // Query eligibility for the plan's installments count & keep track of which plans are queried
-                $installmentsCounts[] = [
+                $installmentsQuery[] = [
                     'purchase_amount' => $cartTotal,
                     'installments_count' => $planConfig->installmentsCount(),
                     'deferred_days' => $planConfig->deferredDays(),
                     'deferred_month' => $planConfig->deferredMonths(),
-                    'cart_total' => $cartTotal
+                    'cart_total' => $cartTotal,
                 ];
-                $queriedPlans[] = $planKey;
-
-                // Insert plan key into the "final" result array so that we can replace it with its actual eligibility
-                // result after the API call is made
-                $plansEligibility[] = $planKey;
+                $availablePlans[] = $planKey;
             }
         }
 
-        $eligibilities = [];
-
-        if (!empty($installmentsCounts)) {
-            $eligibilities = $this->alma->payments->eligibility(
-                $this->quoteData->paymentDataFromQuote($this->checkoutSession->getQuote(), $installmentsCounts),
-                true
-            );
+        if (empty($installmentsQuery)) {
+            $this->logger->info('No eligible installment in config');
+            return [];
         }
 
-        $queriedEligibilities = [];
-        foreach (array_values($eligibilities) as $idx => $eligibility) {
-            $key = $queriedPlans[$idx];
-            $planConfig = $enabledPlans[$key];
-            $queriedEligibilities[$key] = new PaymentPlanEligibility($planConfig, $eligibility);
+        $quote = $this->quoteFactory->create()->load($this->checkoutSession->getQuote()->getId());
+        $eligibilities = $this->alma->payments->eligibility(
+            $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
+            true
+        );
+        if (!is_array($eligibilities) && $eligibilities instanceof \Alma\API\Endpoints\Results\Eligibility) {
+            $eligibilities = [$eligibilities->getPlanKey() => $eligibilities];
         }
-
-        return array_map(function ($planOrKey) use ($queriedEligibilities) {
-            return is_string($planOrKey) ? $queriedEligibilities[$planOrKey] : $planOrKey;
-        }, $plansEligibility);
+        $plansEligibility = [];
+        foreach ($availablePlans as $planKey) {
+            $planConfig  = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
+            if (!$planConfig) {
+                $this->logger->info('No Plan Config' ,['planKey' => $planKey]);
+                continue;
+            }
+            if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
+                $this->logger->info('Plan is not Eligible for this country' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
+                continue;
+            }
+            $eligibility = $eligibilities[$planConfig->almaPlanKey()];
+            $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
+        }
+        // TODO check solutions bellow to update AJAX payment methods on country update:
+        return array_values($plansEligibility);
     }
 
     /**
@@ -263,6 +276,7 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
             return [];
         }
     }
@@ -305,10 +319,11 @@ class Eligibility
     }
 
     /**
+     * Get translated eligibility message.
      * @return string
      */
     public function getMessage()
     {
-        return $this->message;
+        return __($this->message);
     }
 }

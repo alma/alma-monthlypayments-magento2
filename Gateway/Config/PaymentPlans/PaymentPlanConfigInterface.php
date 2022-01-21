@@ -36,6 +36,11 @@ interface PaymentPlanConfigInterface
     public function planKey(): string;
 
     /**
+     * @return string
+     */
+    public function almaPlanKey(): string;
+
+    /**
      * @return array
      */
     public function getPaymentData(): array;

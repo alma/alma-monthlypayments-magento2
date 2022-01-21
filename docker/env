@@ -1,0 +1,26 @@
+# Installation variables
+MYSQL_HOST=db
+MYSQL_ROOT_PASSWORD=root
+MYSQL_USER=magento
+MYSQL_PASSWORD=magento
+MYSQL_DATABASE=magento
+MAGENTO_LANGUAGE=fr_FR
+MAGENTO_TIMEZONE=Europe/Paris
+MAGENTO_DEFAULT_CURRENCY=EUR
+MAGENTO_URL=http://local.magento:8080
+MAGENTO_BACKEND_FRONTNAME=admin
+MAGENTO_USE_SECURE=0
+MAGENTO_BASE_URL_SECURE=0
+MAGENTO_USE_SECURE_ADMIN=0
+MAGENTO_ADMIN_FIRSTNAME=Admin
+MAGENTO_ADMIN_LASTNAME=MyStore
+MAGENTO_ADMIN_EMAIL=admin@example.com
+MAGENTO_ADMIN_USERNAME=admin
+MAGENTO_ADMIN_PASSWORD=test2test
+# Initialisation variables
+MAGENTO_PHP_REQUIREMENTS="libpng++-dev libzip-dev libmcrypt-dev libmcrypt4 libcurl3-dev libfreetype6 libjpeg-turbo8 libjpeg-turbo8-dev libfreetype6-dev libicu-dev libxslt1-dev unzip"
+MAGENTO_ENV=dev
+MAGENTO_DEBUG=no
+MAGENTO_PHP_VERSION=7.3.12
+MAGENTO_VERSION=2.3.6
+MAGENTO_INSTALL_DIR=/var/www/html

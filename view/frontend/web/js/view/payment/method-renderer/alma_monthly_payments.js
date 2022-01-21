@@ -83,7 +83,6 @@ define(
 
             initialize: function () {
                 this._super();
-
                 this.config = window.checkoutConfig.payment[this.item.method];
                 this.paymentPlans = this.config.paymentPlans;
                 this.selectedPlanKey = ko.observable(this.defaultPlan().key);
@@ -106,13 +105,21 @@ define(
                     return result;
                 }, this.paymentPlans[0]);
             },
-
-            getSinglePlanTitle: function (plan) {
-                return $t('Pay in %1 installments').replace('%1', plan.installmentsCount);
+            getTitle:function (){
+                return this.config.title;
+            },
+            getDescription: function () {
+                return this.config.description;
             },
 
             getPlanLabel: function (plan) {
-                return $t('%1 installments').replace('%1', plan.installmentsCount);
+                const regexDeferred = /^general:1:[\d]{2}:0$/;
+                var label = $t('%1 installments').replace('%1', plan.installmentsCount);
+
+                if (regexDeferred.test(plan.key)){
+                    label = $t('In %1 days').replace('%1', plan.deferredDays);
+                }
+                return label;
             },
 
             formattedDate: function (ts) {

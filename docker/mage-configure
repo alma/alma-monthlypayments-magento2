@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+source /var/www/env
+
+su www-data <<EOSU
+set -Eeo pipefail
+
+echo "Cleaning, Upgrading, Configuring & Compiling $MAGENTO_ENV' Magento environment"
+[[ -n "$MAGENTO_ENV" ]]
+
+/var/www/html/bin/magento cache:clean
+/var/www/html/bin/magento setup:upgrade
+/var/www/html/bin/magento setup:di:compile # compile dependence injections
+if [[ x$MAGENTO_ENV == 'xdev' ]] ; then
+    /var/www/html/bin/magento deploy:mode:set developer # refresh compiled code on update
+else
+    /var/www/html/bin/magento setup:static-content:deploy --force # prod build
+fi
+
+#/var/www/html/bin/magento module:disable Magento_TwoFactorAuth
+/var/www/html/bin/magento module:disable MSP_TwoFactorAuth
+/var/www/html/bin/magento setup:di:compile
+
+EOSU

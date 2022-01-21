@@ -79,8 +79,7 @@ class Availability
         // $countryCode = ??
 
         return $this->isFullyConfigured() &&
-            $this->isAvailableForCurrency($currencyCode) /*&&
-            $this->isAvailableForCountry($countryCode)*/ ;
+            $this->isAvailableForCurrency($currencyCode);
     }
 
     /**
@@ -91,16 +90,6 @@ class Availability
     {
         // We only support Euros at the moment
         return $currencyCode === 'EUR';
-    }
-
-    /**
-     * @param $countryCode
-     * @return bool
-     */
-    public function isAvailableForCountry($countryCode)
-    {
-        // We only support France at the moment
-        return $countryCode === 'FR';
     }
 
     /**

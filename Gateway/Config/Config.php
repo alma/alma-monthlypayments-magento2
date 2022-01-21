@@ -30,15 +30,14 @@ use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
     const CODE = 'alma_monthly_payments';
 
     const ORDER_PAYMENT_URL = 'PAYMENT_URL';
-
     const CONFIG_SORT_ORDER = 'sort_order';
-    const CONFIG_DEBUG = 'debug';
     const CONFIG_API_MODE = 'api_mode';
     const CONFIG_LIVE_API_KEY = 'live_api_key';
     const CONFIG_TEST_API_KEY = 'test_api_key';
@@ -77,12 +76,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
+     * @param Logger $logger
      * @param null $methodCode
      * @param string $pathPattern
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
+        Logger $logger,
         $methodCode = null,
         $pathPattern = self::DEFAULT_PATH_PATTERN
     )
@@ -92,6 +93,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
         $this->plansConfigFactory = $plansConfigFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -150,14 +152,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getSortOrder(): int
     {
         return (int)$this->get(self::CONFIG_SORT_ORDER);
-    }
-
-    /**
-     * @return bool
-     */
-    public function canLog(): bool
-    {
-        return (bool)(int)$this->get(self::CONFIG_DEBUG, false);
     }
 
     /**
@@ -321,7 +315,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             try {
                 $plansConfig->updateFromApi();
             } catch (RequestError $e) {
-                // TODO: log error (circumvent circular dependency between Logger & Config)
+                $this->logger->error('getPaymentPlansConfig Error : ',[$e->getMessage()]);
             }
         }
 
