@@ -30,20 +30,22 @@ use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\UrlInterface;
+use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
 class PaymentDataBuilder implements BuilderInterface
 {
     /**
-     * @var UrlInterface
+     * @var Resolver
      */
-    private $urlBuilder;
+    private $locale;
+
     /**
      * @var CheckoutSession
      */
     private $checkoutSession;
+
     /**
      * @var Config
      */
@@ -51,15 +53,16 @@ class PaymentDataBuilder implements BuilderInterface
 
     /**
      * PaymentDataBuilder constructor.
-     * @param UrlInterface $urlBuilder
+     *
      * @param CheckoutSession $checkoutSession
-     * @param Config $config
+     * @param Config          $config
+     * @param Resolver        $locale
      */
-    public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession, Config $config)
+    public function __construct(CheckoutSession $checkoutSession, Config $config, Resolver $locale)
     {
-        $this->urlBuilder = $urlBuilder;
         $this->checkoutSession = $checkoutSession;
-        $this->config = $config;
+        $this->config          = $config;
+        $this->locale          = $locale;
     }
 
     /**
@@ -68,32 +71,33 @@ class PaymentDataBuilder implements BuilderInterface
      * @param array $buildSubject
      * @return array
      */
-    public function build(array $buildSubject)
+    public function build(array $buildSubject): array
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
-        $payment = $paymentDO->getPayment();
+        $payment   = $paymentDO->getPayment();
 
-        $order = $paymentDO->getOrder();
+        $order   = $paymentDO->getOrder();
         $orderId = $order->getOrderIncrementId();
         $quoteId = $this->checkoutSession->getQuoteId();
 
-        $planKey = $payment->getAdditionalInformation(PaymentDataAssignObserver::SELECTED_PLAN);
+        $planKey    = $payment->getAdditionalInformation(PaymentDataAssignObserver::SELECTED_PLAN);
         $planConfig = $this->config->getPaymentPlansConfig()->getPlans()[$planKey];
 
         return [
             'payment' => array_merge(
                 $planConfig->getPaymentData(),
                 [
-                    'return_url' => $this->config->getReturnUrl(),
-                    'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
+                    'return_url'          => $this->config->getReturnUrl(),
+                    'ipn_callback_url'    => $this->config->getIpnCallbackUrl(),
                     'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
-                    'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
-                    'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
-                    'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
-                    'custom_data' => [
+                    'purchase_amount'     => Functions::priceToCents((float) $order->getGrandTotalAmount()),
+                    'shipping_address'    => Address::dataFromAddress($order->getShippingAddress()),
+                    'billing_address'     => Address::dataFromAddress($order->getBillingAddress()),
+                    'locale'              => $this->locale->getLocale(),
+                    'custom_data'         => [
                         'order_id' => $orderId,
-                        'quote_id' => $quoteId
-                    ]
+                        'quote_id' => $quoteId,
+                    ],
                 ]
             ),
         ];

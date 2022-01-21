@@ -24,7 +24,6 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Catalog\Block\Product\ListProduct;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Framework\App\Area;
 use Magento\Framework\Exception\NoSuchEntityException;

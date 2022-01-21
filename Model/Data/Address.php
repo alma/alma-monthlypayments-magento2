@@ -41,16 +41,18 @@ class Address
     {
         $data = [];
         $map = [
-            'first_name' => 'getFirstname',
-            'last_name' => 'getLastname',
-            'company' => 'getCompany',
-            'line1' => 'getStreetLine1',
-            'line2' => 'getStreetLine2',
-            'postal_code' => 'getPostcode',
-            'city' => 'getCity',
-            'country' => 'getCountryId',
-            'email' => 'getEmail',
-            'phone' => 'getTelephone'
+            'first_name'         => 'getFirstname',
+            'last_name'          => 'getLastname',
+            'company'            => 'getCompany',
+            'line1'              => 'getStreetLine1',
+            'line2'              => 'getStreetLine2',
+            'postal_code'        => 'getPostcode',
+            'city'               => 'getCity',
+            'country'            => 'getCountryId',
+            'county_sublocality' => '',
+            'state_province'     => 'getRegionCode',
+            'email'              => 'getEmail',
+            'phone'              => 'getTelephone',
         ];
 
         foreach ($map as $attribute => $method) {

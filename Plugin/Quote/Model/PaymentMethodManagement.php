@@ -31,7 +31,7 @@ class PaymentMethodManagement
     )
     {
         $quote = $this->quoteFactory->create()->load($cartId);
-        if ($quote) {
+        if ($this->checkoutSession->hasQuote() && $quote) {
             $this->checkoutSession->setQuoteId($quote->getId());
         }
     }

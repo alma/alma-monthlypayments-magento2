@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Plugin\Checkout\Model;
 
 
+
 class ShippingInformationManagement
 {
     /**
@@ -12,11 +13,13 @@ class ShippingInformationManagement
      */
     public function __construct(
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Alma\MonthlyPayments\Helpers\Logger $logger
     )
     {
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
+        $this->logger = $logger;
     }
 
     /**
@@ -31,7 +34,7 @@ class ShippingInformationManagement
     )
     {
         $quote = $this->quoteFactory->create()->load($cartId);
-        if ($quote) {
+        if ($this->checkoutSession->hasQuote() && $quote) {
             $this->checkoutSession->setQuoteId($quote->getId());
         }
     }

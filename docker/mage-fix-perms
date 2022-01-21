@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+echo "Fixing Magento permissions"
+find /var/www/html -type f -exec chmod 644 {} \;
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html/{var,pub/static,pub/media,app/etc,generated} -type f -exec chmod g+w {} \;
+find /var/www/html/{var,pub/static,pub/media,app/etc,generated} -type d -exec chmod g+ws {} \;
+chown -R www-data:www-data /var/www/html
+chmod u+x /var/www/html/bin/magento

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+source /var/www/env
+
+su www-data <<EOSU
+set -Eeo pipefail
+
+echo "Creating Magento version '$MAGENTO_VERSION' project into $MAGENTO_INSTALL_DIR directory"
+[[ -n "$MAGENTO_VERSION" ]] && [[ -n "$MAGENTO_INSTALL_DIR " ]]
+
+composer create-project \
+    --repository-url=https://repo.magento.com/ \
+    magento/project-community-edition \
+    $MAGENTO_INSTALL_DIR \
+    $MAGENTO_VERSION
+
+EOSU
