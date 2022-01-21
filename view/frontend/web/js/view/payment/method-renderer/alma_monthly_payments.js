@@ -143,7 +143,7 @@ define(
             },
 
             totalPaid: function (cost) {
-                return priceUtils.formatPrice(parseInt(window.checkoutConfig.quoteData.grand_total) + (cost/100), window.checkoutConfig.priceFormat);
+                return priceUtils.formatPrice(parseFloat(window.checkoutConfig.quoteData.grand_total) + (cost/100), window.checkoutConfig.priceFormat);
             },
 
             getFeesMention: function (customerFee) {
