@@ -33,6 +33,9 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Locale\Resolver;
+use Magento\Store\Model\Store;
 
 class View extends Template
 {
@@ -57,6 +60,16 @@ class View extends Template
     private $product;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var Resolver
+     */
+    private $locale;
+
+    /**
      * @var array
      */
     private $plans = array();
@@ -67,6 +80,8 @@ class View extends Template
      * @param Registry $registry
      * @param Config $config
      * @param Functions $functions
+     * @param Logger $logger
+     * @param Resolver $locale
      * @param array $data
      * @throws LocalizedException
      */
@@ -75,6 +90,8 @@ class View extends Template
         Registry $registry,
         Config $config,
         Functions $functions,
+        Logger $logger,
+        Resolver $locale,
         array $data = []
     )
     {
@@ -82,6 +99,8 @@ class View extends Template
         $this->config = $config;
         $this->registry = $registry;
         $this->functions = $functions;
+        $this->logger = $logger;
+        $this->locale = $locale;
         $this->getProduct();
         $this->getPlans();
     }
@@ -120,7 +139,7 @@ class View extends Template
      */
     private function isEnabledBadge($installments_count)
     {
-        return in_array($installments_count, array(2,3,4,10,12));
+        return in_array($installments_count, array(1,2,3,4,10,12));
     }
 
     /**
@@ -199,5 +218,18 @@ class View extends Template
     public function getPrice()
     {
         return $this->functions->priceToCents($this->product->getFinalPrice());
+    }
+    /**
+     * Return locale and convert it
+     * @return string
+     */
+    public function getLocale(){
+        $locale ='en';
+        $localeStoreCode = $this->locale->getLocale();
+
+        if (preg_match('/^([a-z]{2})_([A-Z]{2})$/',$localeStoreCode,$matches)){
+            $locale = $matches[1];
+        }
+        return $locale;
     }
 }
