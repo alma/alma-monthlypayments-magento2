@@ -40,6 +40,7 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: getDescription()"></div>
+        <div data-bind="text: getPrice()" ></div>
         <p class="alma-plan-choices">
             <!-- ko if: paymentPlans.length === 1 -->
             <!-- ko if: paymentPlans[0].logo -->

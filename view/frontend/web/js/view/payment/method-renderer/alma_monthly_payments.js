@@ -34,9 +34,11 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Catalog/js/price-utils',
+        'Magento_Customer/js/customer-data',
         'uiRegistry',
+        'Magento_Checkout/js/model/quote',
     ],
-    function (ko, $, _, moment, $t, Component, fullScreenLoader, priceUtils, registry) {
+    function (ko, $, _, moment, $t, Component, fullScreenLoader, priceUtils, customerData ,registry,quote) {
         'use strict';
 
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
@@ -83,6 +85,9 @@ define(
 
             initialize: function () {
                 this._super();
+                console.log(quote.getCalculatedTotal());
+                this.almasection = customerData.get('alma_section');
+                console.log(this.almasection().customdat);
                 this.config = window.checkoutConfig.payment[this.item.method];
                 this.paymentPlans = this.config.paymentPlans;
                 this.selectedPlanKey = ko.observable(this.defaultPlan().key);
@@ -159,6 +164,16 @@ define(
                         }
                     }
                 );
+            },
+
+            getPrice: function(){
+                var price = 0;
+
+                if (this.totals()) {
+                    price = totals.getSegment('grand_total').value;
+                }
+
+                return this.getFormattedPrice(price);
             },
 
             afterPlaceOrder: function () {
