@@ -127,7 +127,9 @@ class View extends Template
                 $this->plans[] = array(
                     'installmentsCount' => $planConfig->installmentsCount(),
                     'minAmount' => $planConfig->minimumAmount(),
-                    'maxAmount' => $planConfig->maximumAmount()
+                    'maxAmount' => $planConfig->maximumAmount(),
+                    'deferredDays' => $planConfig->deferredDays(),
+                    'deferredMonths' => $planConfig->deferredMonths()
                 );
             }
         }
