@@ -67,7 +67,7 @@ class View extends Template
     /**
      * @var Resolver
      */
-    private $locale;
+    private $localeResolver;
 
     /**
      * @var array
@@ -81,7 +81,7 @@ class View extends Template
      * @param Config $config
      * @param Functions $functions
      * @param Logger $logger
-     * @param Resolver $locale
+     * @param Resolver $localeResolver
      * @param array $data
      * @throws LocalizedException
      */
@@ -91,7 +91,7 @@ class View extends Template
         Config $config,
         Functions $functions,
         Logger $logger,
-        Resolver $locale,
+        Resolver $localeResolver,
         array $data = []
     )
     {
@@ -100,7 +100,7 @@ class View extends Template
         $this->registry = $registry;
         $this->functions = $functions;
         $this->logger = $logger;
-        $this->locale = $locale;
+        $this->localeResolver = $localeResolver;
         $this->getProduct();
         $this->getPlans();
     }
@@ -227,7 +227,7 @@ class View extends Template
      */
     public function getLocale(){
         $locale ='en';
-        $localeStoreCode = $this->locale->getLocale();
+        $localeStoreCode = $this->localeResolver->getLocale();
 
         if (preg_match('/^([a-z]{2})_([A-Z]{2})$/',$localeStoreCode,$matches)){
             $locale = $matches[1];
