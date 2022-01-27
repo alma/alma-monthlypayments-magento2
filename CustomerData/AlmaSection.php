@@ -22,9 +22,9 @@ class AlmaSection implements SectionSourceInterface
     }
     public function getSectionData()
     {
+        $paymentPlans = [];
         if ($this->checkoutSession->hasQuote()){
             $plans = $this->eligibility->getEligiblePlans();
-            $paymentPlans = [];
             foreach ($plans as $key=> $plan){
                 $paymentPlans[$key] = $plan->getPlanConfig()->toArray();
                 $paymentPlans[$key]['eligibility'] = $plan->getEligibility();
