@@ -122,7 +122,6 @@ define(
             reloadAlmaSection:function (){
             customerData.invalidate(['alma_section'])
             customerData.reload(['alma_section'])
-            return;
             },
             defaultPlan: function () {
                 return self.paymentPlans().reduce(function (plan, result) {
