@@ -82,14 +82,14 @@
                 <!-- ko if: selectedPlan().eligibility.paymentPlan.length >= 5 -->
                 <li>
                     <span>
-                        <span data-bind="i18n: 'Your cart total : '"></span>
+                        <span data-bind="i18n: 'Your cart total :'"></span>
                         <span class="alma-installment--cartTotal"
                               data-bind="text: cartTotal()"></span><br />
-                        <span data-bind="i18n: 'Credit cost : '"></span><span data-bind="text: customerTotalCostAmount(selectedPlan().eligibility.customerTotalCostAmount)"></span><br />
+                        <span data-bind="i18n: 'Credit cost :'"></span><span data-bind="text: customerTotalCostAmount(selectedPlan().eligibility.customerTotalCostAmount)"></span><br />
                         <!-- ko if: hasAnnualInterestRate(selectedPlan().eligibility.annualInterestRate) -->
-                        <span data-bind="i18n: 'Annual interest rate : '"></span><span data-bind="text: selectedPlan().eligibility.annualInterestRate/100+'%'"></span><br />
+                        <span data-bind="i18n: 'Annual interest rate :'"></span><span data-bind="text: selectedPlan().eligibility.annualInterestRate/100+'%'"></span><br />
                         <!-- /ko -->
-                        <b><span data-bind="i18n: 'Total : '"></span><span data-bind="text: totalPaid(selectedPlan().eligibility.customerTotalCostAmount)"></span></b><br />
+                        <b><span data-bind="i18n: 'Total :'"></span><span data-bind="text: totalPaid(selectedPlan().eligibility.customerTotalCostAmount)"></span></b><br />
                     </span>
                 </li>
             <!-- /ko -->

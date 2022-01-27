@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <css src="https://cdn.jsdelivr.net/npm/@alma/widgets@1.x/dist/alma-widgets.min.css" src_type="url"
+        <css src="https://cdn.jsdelivr.net/npm/@alma/widgets@2.x/dist/widgets.min.css" src_type="url"
              rel="stylesheet" type="text/css"/>
     </head>
     <body>
