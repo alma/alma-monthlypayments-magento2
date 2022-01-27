@@ -28,25 +28,35 @@
     <action name="checkout/cart/estimateUpdatePost">
         <section name="alma_section"/>
     </action>
-    <action name="checkout/onepage/saveOrder">
-        <section name="alma_section"/>
-    </action>
-    <action name="checkout/sidebar/removeItem">
-        <section name="alma_section"/>
-    </action>
-    <action name="checkout/sidebar/updateItemQty">
-        <section name="alma_section"/>
-    </action>
     <action name="rest/*/V1/carts/*/payment-information">
         <section name="alma_section"/>
     </action>
     <action name="rest/*/V1/guest-carts/*/payment-information">
         <section name="alma_section"/>
     </action>
+    <action name="rest/*/V1/carts/*/estimate-shipping-methods">
+        <section name="alma_section"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/estimate-shipping-methods">
+        <section name="alma_section"/>
+    </action>
     <action name="rest/*/V1/guest-carts/*/selected-payment-method">
+        <section name="alma_section"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/set-payment-information">
         <section name="alma_section"/>
     </action>
     <action name="rest/*/V1/carts/*/selected-payment-method">
         <section name="alma_section"/>
     </action>
+    <action name="rest/*/V1/carts/*/set-payment-information">
+        <section name="alma_section"/>
+    </action>
+    <action name="checkout/onepage/saveOrder">
+        <section name="alma_section"/>
+    </action>
+    <action name="customer/ajax/login">
+        <section name="alma_section"/>
+    </action>
+
 </config>

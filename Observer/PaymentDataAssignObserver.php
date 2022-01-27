@@ -29,7 +29,7 @@ use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Quote\Api\Data\PaymentInterface;
 use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
 
-class PaymentDataAssignObserver extends AbstractDataAssignObserver 
+class PaymentDataAssignObserver extends AbstractDataAssignObserver
 {
     const SELECTED_PLAN = 'selectedPlan';
 
