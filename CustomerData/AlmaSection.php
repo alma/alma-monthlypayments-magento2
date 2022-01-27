@@ -22,14 +22,13 @@ class AlmaSection implements SectionSourceInterface
     }
     public function getSectionData()
     {
+        $this->logger->info('----- In GetSection DATA -----',[]);
         $paymentPlans = [];
-        if ($this->checkoutSession->hasQuote()){
-            $plans = $this->eligibility->getEligiblePlans();
-            foreach ($plans as $key=> $plan){
-                $paymentPlans[$key] = $plan->getPlanConfig()->toArray();
-                $paymentPlans[$key]['eligibility'] = $plan->getEligibility();
+        $plans = $this->eligibility->getEligiblePlans();
+        foreach ($plans as $key=> $plan){
+            $paymentPlans[$key] = $plan->getPlanConfig()->toArray();
+            $paymentPlans[$key]['eligibility'] = $plan->getEligibility();
 
-            }
         }
         return [
             'paymentPlans' => $paymentPlans,
