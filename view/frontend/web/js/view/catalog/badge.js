@@ -100,9 +100,11 @@ define([
             console.log('update')
             var price = getPrice();
             if(price !== false && price > 0){
+                console.log('Alma.ApiMode[config.activeMode]')
+                console.log(Alma.ApiMode[config.activeMode])
                 initWidget(
                     config.merchandId,
-                    `Alma.ApiMode.${config.activeMode}`,
+                    Alma.ApiMode[config.activeMode],
                 'alma-widget',
                     price,
                     config.locale,
