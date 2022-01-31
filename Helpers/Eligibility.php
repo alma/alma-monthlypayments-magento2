@@ -188,7 +188,7 @@ class Eligibility
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
             $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
         }
-        // TODO check solutions bellow to update AJAX payment methods on country update:
+        $this->logger->info('array_values($plansEligibility)',[array_values($plansEligibility)]);
         return array_values($plansEligibility);
     }
 

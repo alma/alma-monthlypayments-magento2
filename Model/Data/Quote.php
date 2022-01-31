@@ -70,7 +70,7 @@ class Quote
         CategoryRepositoryInterface $categoryRepository,
         Resolver $locale,
         Logger $logger
-        
+
     )
     {
         $this->customerData       = $customerData;

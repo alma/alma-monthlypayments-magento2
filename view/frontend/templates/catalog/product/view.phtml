@@ -39,27 +39,27 @@
 $config = $block->getConfig();
 
 if ($config->showProductWidget() && $block->getJsonPlans()): ?>
-    <div id="payment-plans"></div>
+    <div id="alma-widget"></div>
     <?php
     $scriptString = <<<script
 require.config({
     paths: {
-        'widgets/Alma': 'https://cdn.jsdelivr.net/npm/@alma/widgets@1.x/dist/alma-widgets.umd'
+        'widgets/Alma': 'https://cdn.jsdelivr.net/npm/@alma/widgets@2.x.x/dist/widgets.umd'
     }
 });
 
 require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Alma, $, priceUtils) {
     ;(function() {
 
-        function initWidget(merchantId, apiMode, containerId, purchaseAmount, plans) {
+        function initWidget(merchantId, apiMode, containerId, purchaseAmount,locale, plans) {
             var widgets = Alma.Widgets.initialize(merchantId, apiMode);
             widgets.add(Alma.Widgets.PaymentPlans, {
                 container: '#' + containerId,
                 purchaseAmount: purchaseAmount,
+                locale: locale,
                 plans: plans
             });
-            widgets.render();
-        }
+         }
 
         function formatPrice(priceHtml)
         {
@@ -106,8 +106,9 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                 initWidget(
                     '{$config->getMerchantId()}',
                     Alma.ApiMode.{$block->getActiveMode()},
-                    'payment-plans',
+                    'alma-widget',
                     price,
+                    '{$block->getLocale()}',
                     {$block->getJsonPlans()}
                 );
             }
@@ -116,9 +117,9 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
         if({$config->isCustomWidgetPosition()}){
             if($('{$config->getWidgetContainerSelector()}') != undefined){
                 if({$config->prependWidgetInContainer()}){
-                    $('{$config->getWidgetContainerSelector()}').prepend($('#payment-plans'));
+                    $('{$config->getWidgetContainerSelector()}').prepend($('#alma-widget'));
                 }else{
-                    $('{$config->getWidgetContainerSelector()}').append($('#payment-plans'));
+                    $('{$config->getWidgetContainerSelector()}').append($('#alma-widget'));
                 }
             }else{
                 console.error('Css container "{$config->getWidgetContainerSelector()}" not found');

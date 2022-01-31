@@ -34,11 +34,13 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Catalog/js/price-utils',
+        'Magento_Customer/js/customer-data',
         'uiRegistry',
+        'Magento_Checkout/js/model/quote',
     ],
-    function (ko, $, _, moment, $t, Component, fullScreenLoader, priceUtils, registry) {
+    function (ko, $, _, moment, $t, Component, fullScreenLoader, priceUtils, customerData ,registry,quote) {
         'use strict';
-
+        var self;
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
         // payment page to shipping and back and a payment method is removed/inserted. So we reorder them manually.
         registry.get('checkout.steps.billing-step.payment.payments-list', function (methodsList) {
@@ -80,30 +82,55 @@ define(
             defaults: {
                 template: 'Alma_MonthlyPayments/payment/form',
             },
+            totals: quote.getTotals(),
+            paymentPlans: ko.computed(function() {
+                return customerData.get('alma_section')().paymentPlans
+            }),
 
             initialize: function () {
+                self=this;
                 this._super();
+
+                self.totals.subscribe(this.reloadObserver.bind(this));
+
                 this.config = window.checkoutConfig.payment[this.item.method];
-                this.paymentPlans = this.config.paymentPlans;
+
                 this.selectedPlanKey = ko.observable(this.defaultPlan().key);
+
                 this.selectedPlan = ko.computed(function () {
                     var key = this.selectedPlanKey();
 
-                    return this.paymentPlans.find(function (plan) {
+                    var currentSelectedPlan = self.paymentPlans().find(function (plan) {
                         return plan.key === key;
-                    }) || {};
+                    });
+                    if (!currentSelectedPlan){
+                        currentSelectedPlan = self.paymentPlans().find(function (plan) {
+                            this.selectedPlanKey = ko.observable(this.defaultPlan().key);
+                            return plan.key === this.defaultPlan().key;
+                        },this) ;
+                    }
+                    return currentSelectedPlan;
                 }, this);
-                return this;
-            },
 
+            },
+            getPlans : function(){
+                return self.paymentPlans
+            },
+            reloadObserver: function(){
+                this.reloadAlmaSection();
+            },
+            reloadAlmaSection:function (){
+            customerData.invalidate(['alma_section'])
+            customerData.reload(['alma_section'])
+            },
             defaultPlan: function () {
-                return this.paymentPlans.reduce(function (plan, result) {
+                return self.paymentPlans().reduce(function (plan, result) {
                     if (plan.installmentsCount === 3 || plan.installmentsCount > result.installmentsCount) {
                         return plan;
                     }
 
                     return result;
-                }, this.paymentPlans[0]);
+                }, self.paymentPlans()[0]);
             },
             getTitle:function (){
                 return this.config.title;
@@ -131,7 +158,7 @@ define(
             },
 
             cartTotal: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.quoteData.grand_total, window.checkoutConfig.priceFormat);
+                return priceUtils.formatPrice(self.totals().grand_total, window.checkoutConfig.priceFormat);
             },
 
             customerTotalCostAmount: function (cost) {
@@ -143,7 +170,8 @@ define(
             },
 
             totalPaid: function (cost) {
-                return priceUtils.formatPrice(parseInt(window.checkoutConfig.quoteData.grand_total) + (cost/100), window.checkoutConfig.priceFormat);
+
+                return priceUtils.formatPrice(parseInt(self.totals().grand_total) + (cost/100), window.checkoutConfig.priceFormat);
             },
 
             getFeesMention: function (customerFee) {
@@ -160,7 +188,6 @@ define(
                     }
                 );
             },
-
             afterPlaceOrder: function () {
                 fullScreenLoader.startLoader();
 
