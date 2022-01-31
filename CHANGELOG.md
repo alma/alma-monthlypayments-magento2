@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v2.1.0
+------
+
+* Add i18n badge V2
+* Fixes fee plans and installments on checkout page
+
+
 v2.0.0
 ------
 
