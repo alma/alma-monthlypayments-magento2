@@ -1,4 +1,3 @@
-<?php
 /**
  * 2018 Alma / Nabla SAS
  *
@@ -22,50 +21,36 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  *
  */
-/**
- * @see \Alma\MonthlyPayments\Block\Catalog\Product\View
- */
+require.config({
+    paths: {
+        'widgets/Alma': 'https://cdn.jsdelivr.net/npm/@alma/widgets@2.x.x/dist/widgets.umd'
+    }
+});
+define([
+    'widgets/Alma',
+    'jquery',
+    'Magento_Catalog/js/price-utils'
+], function (Alma,$,priceUtils) {
+    'use strict';
 
-/** @var $block \Alma\MonthlyPayments\Block\Catalog\Product\View */
-/** @var $escaper \Magento\Framework\Escaper */
-/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
-
-$config = $block->getConfig();
-
-if ($config->showProductWidget() && $block->getJsonPlans()): ?>
-    <div id="alma-widget"></div>
-
-    <script type="text/x-magento-init">
-
-        {
-            "#alma-widget": {
-                "Alma_MonthlyPayments/js/view/catalog/badge": {
-                    "useQuantityForWidgetPrice": <?=$config->useQuantityForWidgetPrice()?>,
-                    "productId": <?=$block->getProductId()?>,
-                    "merchandId": "<?=$config->getMerchantId()?>",
-                    "activeMode": "<?=$block->getActiveMode()?>",
-                    "locale": "<?=$block->getLocale()?>",
-                    "jsonPlans": <?=$block->getJsonPlans()?>
-                }
-            }
-        }
-    </script>
-
-
-    <?php
-    $scriptString = <<<script
-require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Alma, $, priceUtils) {
-    ;(function() {
+    return function (config) {
 
         function initWidget(merchantId, apiMode, containerId, purchaseAmount,locale, plans) {
+            console.log(merchantId)
+            console.log(apiMode)
+            console.log(containerId)
+            console.log(purchaseAmount)
+            console.log(locale)
+            console.log(plans)
             var widgets = Alma.Widgets.initialize(merchantId, apiMode);
+            console.log(widgets);
             widgets.add(Alma.Widgets.PaymentPlans, {
                 container: '#' + containerId,
                 purchaseAmount: purchaseAmount,
                 locale: locale,
                 plans: plans
             });
-         }
+        }
 
         function formatPrice(priceHtml)
         {
@@ -77,11 +62,14 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
             }
             return price * qty;
         }
+
         function getPriceFromContainer(priceContainer)
         {
             if(priceContainer !== undefined && priceContainer !== null)
             {
                 var priceHtml = priceContainer.html();
+                console.log(priceHtml);
+
                 if(priceHtml !== undefined && priceHtml !== null)
                 {
                     return formatPrice(priceHtml);
@@ -91,43 +79,35 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
         }
 
         function getPrice() {
-            if({$config->useQuantityForWidgetPrice()}){
-                var priceContainer = $('#product-price-{$block->getProductId()} .price');
+            if(config.useQuantityForWidgetPrice){
+                console.log(config.useQuantityForWidgetPrice)
+                console.log(`#product-price-${config.productId}.price`)
+                var priceContainer = $(`#product-price-${config.productId} .price`);
                 var price = getPriceFromContainer(priceContainer);
+                console.log(price)
                 if(price > 0){ return price; }
 
-                priceContainer = $('#price-including-tax-product-price-{$block->getProductId()} .price');
+                priceContainer = $(`#price-including-tax-product-price-${config.productId} .price`);
                 price = getPriceFromContainer(priceContainer);
+                console.log(price)
                 if(price > 0){ return price; }
-
                 console.error('Price container not found, fallback to price without qty installments')
             }
-            return '{$block->getPrice()}';
+            return config.productId;
         }
 
         function updateWidget() {
+            console.log('update')
             var price = getPrice();
             if(price !== false && price > 0){
                 initWidget(
-                    '{$config->getMerchantId()}',
-                    Alma.ApiMode.{$block->getActiveMode()},
-                    'alma-widget',
+                    config.merchandId,
+                    `Alma.ApiMode.${config.activeMode}`,
+                'alma-widget',
                     price,
-                    '{$block->getLocale()}',
-                    {$block->getJsonPlans()}
-                );
-            }
-        }
-
-        if({$config->isCustomWidgetPosition()}){
-            if($('{$config->getWidgetContainerSelector()}') != undefined){
-                if({$config->prependWidgetInContainer()}){
-                    $('{$config->getWidgetContainerSelector()}').prepend($('#alma-widget'));
-                }else{
-                    $('{$config->getWidgetContainerSelector()}').append($('#alma-widget'));
-                }
-            }else{
-                console.error('Css container "{$config->getWidgetContainerSelector()}" not found');
+                    config.locale,
+                    config.jsonPlans
+            );
             }
         }
 
@@ -138,16 +118,17 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                     updateWidget();
                 }
             }
-        };
-
-        var targetNode = document.getElementById('product-price-{$block->getProductId()}');
+        }
+        console.log('init')
+        var targetNode = document.getElementById(`product-price-${config.productId}`);
         if(targetNode === null || targetNode === undefined)
         {
-            targetNode = document.getElementById('price-including-tax-product-price-{$block->getProductId()}');
+            targetNode = document.getElementById(`price-including-tax-product-price-${config.productId}`);
         }else{
         }
         if(targetNode !== undefined && targetNode !== null)
         {
+            console.log('init 2 ')
             var observer = new MutationObserver(callback);
             // https://developer.mozilla.org/fr/docs/Web/API/MutationObserver#MutationObserverInit
             observer.observe(targetNode, { childList: true });
@@ -155,9 +136,11 @@ require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Al
                 updateWidget();
             });
         }else{
+            console.log('init3')
+
             updateWidget();
         }
-    })()
+        console.log('init 1 ')
+        updateWidget();
+    };
 });
-script;
-endif; ?>
