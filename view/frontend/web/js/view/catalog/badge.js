@@ -35,22 +35,62 @@ define([
 
     return function (config) {
 
-        function initWidget(merchantId, apiMode, containerId, purchaseAmount,locale, plans) {
-            console.log(merchantId)
-            console.log(apiMode)
-            console.log(containerId)
-            console.log(purchaseAmount)
-            console.log(locale)
-            console.log(plans)
-            var widgets = Alma.Widgets.initialize(merchantId, apiMode);
-            console.log(widgets);
-            widgets.add(Alma.Widgets.PaymentPlans, {
-                container: '#' + containerId,
-                purchaseAmount: purchaseAmount,
-                locale: locale,
-                plans: plans
-            });
-        }
+        var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
+        var qtyNode = document.getElementById('qty');
+        qtyNode.addEventListener("input",function(){updateWidget()});
+
+        moveToCustomPosition();
+        updateWidget();
+
+        function moveToCustomPosition(){
+            if(config.customDisplay.hasCustomPosition && $(config.customDisplay.customContainerSelector) != undefined ){
+                var position = 'append';
+                if(config.customDisplay.isPrepend) {
+                    position = 'prepend'
+                }
+                $(config.customDisplay.customContainerSelector)[position]($('#'+config.containerId));
+            }
+        };
+
+        function updateWidget(){
+            widgets.add(
+                Alma.Widgets.PaymentPlans, {
+                    container: '#' + config.containerId,
+                    purchaseAmount: getPrice(),
+                    locale: config.locale,
+                    plans: config.jsonPlans
+                }
+            );
+        };
+
+        function getPrice() {
+            var price = config.productPrice;
+            if(config.useQuantityForWidgetPrice){
+                var priceContainer = $(`#product-price-${config.productId} .price`);
+                if (!priceContainer.length){
+                    // Only if tax config diplay with and without tax
+                    priceContainer = $(`#price-including-tax-product-price-${config.productId} .price`);
+                }
+                var frontPrice = getPriceFromContainer(priceContainer);
+                if( frontPrice > 0){
+                    price = frontPrice;
+                }
+            }
+            return price ;
+        };
+
+        function getPriceFromContainer(priceContainer)
+        {
+            if(priceContainer !== undefined && priceContainer !== null)
+            {
+                var priceHtml = priceContainer.html();
+                if(priceHtml !== undefined && priceHtml !== null)
+                {
+                    return formatPrice(priceHtml);
+                }
+            }
+            return false;
+        };
 
         function formatPrice(priceHtml)
         {
@@ -61,88 +101,6 @@ define([
                 qty = 1;
             }
             return price * qty;
-        }
-
-        function getPriceFromContainer(priceContainer)
-        {
-            if(priceContainer !== undefined && priceContainer !== null)
-            {
-                var priceHtml = priceContainer.html();
-                console.log(priceHtml);
-
-                if(priceHtml !== undefined && priceHtml !== null)
-                {
-                    return formatPrice(priceHtml);
-                }
-            }
-            return false;
-        }
-
-        function getPrice() {
-            if(config.useQuantityForWidgetPrice){
-                console.log(config.useQuantityForWidgetPrice)
-                console.log(`#product-price-${config.productId}.price`)
-                var priceContainer = $(`#product-price-${config.productId} .price`);
-                var price = getPriceFromContainer(priceContainer);
-                console.log(price)
-                if(price > 0){ return price; }
-
-                priceContainer = $(`#price-including-tax-product-price-${config.productId} .price`);
-                price = getPriceFromContainer(priceContainer);
-                console.log(price)
-                if(price > 0){ return price; }
-                console.error('Price container not found, fallback to price without qty installments')
-            }
-            return config.productId;
-        }
-
-        function updateWidget() {
-            console.log('update')
-            var price = getPrice();
-            if(price !== false && price > 0){
-                console.log('Alma.ApiMode[config.activeMode]')
-                console.log(Alma.ApiMode[config.activeMode])
-                initWidget(
-                    config.merchandId,
-                    Alma.ApiMode[config.activeMode],
-                'alma-widget',
-                    price,
-                    config.locale,
-                    config.jsonPlans
-            );
-            }
-        }
-
-        var callback = function(mutationsList) {
-            for(var mutation of mutationsList) {
-                if (mutation.type == 'childList')
-                {
-                    updateWidget();
-                }
-            }
-        }
-        console.log('init')
-        var targetNode = document.getElementById(`product-price-${config.productId}`);
-        if(targetNode === null || targetNode === undefined)
-        {
-            targetNode = document.getElementById(`price-including-tax-product-price-${config.productId}`);
-        }else{
-        }
-        if(targetNode !== undefined && targetNode !== null)
-        {
-            console.log('init 2 ')
-            var observer = new MutationObserver(callback);
-            // https://developer.mozilla.org/fr/docs/Web/API/MutationObserver#MutationObserverInit
-            observer.observe(targetNode, { childList: true });
-            $('#qty').change(function() {
-                updateWidget();
-            });
-        }else{
-            console.log('init3')
-
-            updateWidget();
-        }
-        console.log('init 1 ')
-        updateWidget();
+        };
     };
 });

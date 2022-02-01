@@ -31,18 +31,23 @@
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 
 $config = $block->getConfig();
-
-if ($config->showProductWidget() && $block->getJsonPlans()): ?>
-    <div id="alma-widget"></div>
-
+$containerId = 'alma-widget';
+if ($config->showProductWidget() && $block->getJsonPlans() && $block->getPrice()>0):?>
+    <div id=<?= $containerId ?> ></div>
     <script type="text/x-magento-init">
-
         {
-            "#alma-widget": {
+            "#<?=$containerId?>": {
                 "Alma_MonthlyPayments/js/view/catalog/badge": {
+                    "customDisplay" : {
+                        "hasCustomPosition" : <?=$config->isCustomWidgetPosition()?>,
+                        "customContainerSelector" : "<?=$config->getWidgetContainerSelector()?>",
+                        "isPrepend" : <?=$config->prependWidgetInContainer()?>
+                        },
+                    "containerId" : "<?=$containerId?>",
+                    "productPrice" : <?=$block->getPrice()?>,
                     "useQuantityForWidgetPrice": <?=$config->useQuantityForWidgetPrice()?>,
                     "productId": <?=$block->getProductId()?>,
-                    "merchandId": "<?=$config->getMerchantId()?>",
+                    "merchantId": "<?=$config->getMerchantId()?>",
                     "activeMode": "<?=$block->getActiveMode()?>",
                     "locale": "<?=$block->getLocale()?>",
                     "jsonPlans": <?=$block->getJsonPlans()?>
@@ -51,113 +56,4 @@ if ($config->showProductWidget() && $block->getJsonPlans()): ?>
         }
     </script>
 
-
-    <?php
-    $scriptString = <<<script
-require(['widgets/Alma','jquery','Magento_Catalog/js/price-utils'], function (Alma, $, priceUtils) {
-    ;(function() {
-
-        function initWidget(merchantId, apiMode, containerId, purchaseAmount,locale, plans) {
-            var widgets = Alma.Widgets.initialize(merchantId, apiMode);
-            widgets.add(Alma.Widgets.PaymentPlans, {
-                container: '#' + containerId,
-                purchaseAmount: purchaseAmount,
-                locale: locale,
-                plans: plans
-            });
-         }
-
-        function formatPrice(priceHtml)
-        {
-            var price = priceHtml.replace(/[^\d]/g,"");
-            var qty = $('#qty').val();
-            if(!qty.match(/^\d+$/) || !(qty > 0))
-            {
-                qty = 1;
-            }
-            return price * qty;
-        }
-        function getPriceFromContainer(priceContainer)
-        {
-            if(priceContainer !== undefined && priceContainer !== null)
-            {
-                var priceHtml = priceContainer.html();
-                if(priceHtml !== undefined && priceHtml !== null)
-                {
-                    return formatPrice(priceHtml);
-                }
-            }
-            return false;
-        }
-
-        function getPrice() {
-            if({$config->useQuantityForWidgetPrice()}){
-                var priceContainer = $('#product-price-{$block->getProductId()} .price');
-                var price = getPriceFromContainer(priceContainer);
-                if(price > 0){ return price; }
-
-                priceContainer = $('#price-including-tax-product-price-{$block->getProductId()} .price');
-                price = getPriceFromContainer(priceContainer);
-                if(price > 0){ return price; }
-
-                console.error('Price container not found, fallback to price without qty installments')
-            }
-            return '{$block->getPrice()}';
-        }
-
-        function updateWidget() {
-            var price = getPrice();
-            if(price !== false && price > 0){
-                initWidget(
-                    '{$config->getMerchantId()}',
-                    Alma.ApiMode.{$block->getActiveMode()},
-                    'alma-widget',
-                    price,
-                    '{$block->getLocale()}',
-                    {$block->getJsonPlans()}
-                );
-            }
-        }
-
-        if({$config->isCustomWidgetPosition()}){
-            if($('{$config->getWidgetContainerSelector()}') != undefined){
-                if({$config->prependWidgetInContainer()}){
-                    $('{$config->getWidgetContainerSelector()}').prepend($('#alma-widget'));
-                }else{
-                    $('{$config->getWidgetContainerSelector()}').append($('#alma-widget'));
-                }
-            }else{
-                console.error('Css container "{$config->getWidgetContainerSelector()}" not found');
-            }
-        }
-
-        var callback = function(mutationsList) {
-            for(var mutation of mutationsList) {
-                if (mutation.type == 'childList')
-                {
-                    updateWidget();
-                }
-            }
-        };
-
-        var targetNode = document.getElementById('product-price-{$block->getProductId()}');
-        if(targetNode === null || targetNode === undefined)
-        {
-            targetNode = document.getElementById('price-including-tax-product-price-{$block->getProductId()}');
-        }else{
-        }
-        if(targetNode !== undefined && targetNode !== null)
-        {
-            var observer = new MutationObserver(callback);
-            // https://developer.mozilla.org/fr/docs/Web/API/MutationObserver#MutationObserverInit
-            observer.observe(targetNode, { childList: true });
-            $('#qty').change(function() {
-                updateWidget();
-            });
-        }else{
-            updateWidget();
-        }
-    })()
-});
-script;
-endif; ?>
+<?php endif; ?>
