@@ -123,25 +123,14 @@ class View extends Template
     private function getPlans()
     {
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-            if( $this->isEnabledBadge($planConfig->installmentsCount()) ){
-                $this->plans[] = array(
-                    'installmentsCount' => $planConfig->installmentsCount(),
-                    'minAmount' => $planConfig->minimumAmount(),
-                    'maxAmount' => $planConfig->maximumAmount(),
-                    'deferredDays' => $planConfig->deferredDays(),
-                    'deferredMonths' => $planConfig->deferredMonths()
-                );
-            }
+            $this->plans[] = array(
+                'installmentsCount' => $planConfig->installmentsCount(),
+                'minAmount' => $planConfig->minimumAmount(),
+                'maxAmount' => $planConfig->maximumAmount(),
+                'deferredDays' => $planConfig->deferredDays(),
+                'deferredMonths' => $planConfig->deferredMonths()
+            );
         }
-    }
-
-    /**
-     * @param int
-     * @return bool
-     */
-    private function isEnabledBadge($installments_count)
-    {
-        return in_array($installments_count, array(1,2,3,4,10,12));
     }
 
     /**
