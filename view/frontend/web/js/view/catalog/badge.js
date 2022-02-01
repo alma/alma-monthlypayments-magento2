@@ -34,70 +34,70 @@ define([
     'use strict';
 
     return function (config) {
-
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
         var qtyNode = document.getElementById('qty');
         qtyNode.addEventListener("input",function(){updateWidget()});
 
-        moveToCustomPosition();
+        moveToCustomPosition(config.customDisplay,config.containerId);
         updateWidget();
-
-        function moveToCustomPosition(){
-            if(config.customDisplay.hasCustomPosition && $(config.customDisplay.customContainerSelector) != undefined ){
-                var position = 'append';
-                if(config.customDisplay.isPrepend) {
-                    position = 'prepend'
-                }
-                $(config.customDisplay.customContainerSelector)[position]($('#'+config.containerId));
-            }
-        }
 
         function updateWidget(){
             widgets.add(
                 Alma.Widgets.PaymentPlans, {
                     container: '#' + config.containerId,
-                    purchaseAmount: getPrice(),
+                    purchaseAmount: getPrice(config.productPrice,config.useQuantityForWidgetPrice,config.productId),
                     locale: config.locale,
                     plans: config.jsonPlans
                 }
             );
         }
+    }
 
-        function getPrice() {
-            var price = config.productPrice;
-            if(config.useQuantityForWidgetPrice){
-                var priceContainer = $(`#product-price-${config.productId} .price`);
-                if (!priceContainer.length){
-                    // Only if tax config diplay with and without tax
-                    priceContainer = $(`#price-including-tax-product-price-${config.productId} .price`);
-                }
-                var frontPrice = getPriceFromContainer(priceContainer);
-                if( frontPrice > 0){
-                    price = frontPrice;
-                }
+    function moveToCustomPosition(customDisplay,containerId){
+        if(customDisplay.hasCustomPosition && $(customDisplay.customContainerSelector) != undefined ){
+            var position = 'append';
+            if(customDisplay.isPrepend) {
+                position = 'prepend'
             }
-            return price ;
-        }
-
-        function getPriceFromContainer(priceContainer)
-        {
-            var price = 0;
-            if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
-            {
-                price = formatPrice(priceContainer.html());
-            }
-            return price;
-        }
-
-        function formatPrice(priceHtml)
-        {
-            var price = priceHtml.replace(/[^\d]/g,"");
-            var qty = $('#qty').val();
-            if(!qty.match(/^\d+$/) || (qty <= 0))
-            {
-                qty = 1;
-            }
-            return price * qty;
+            $(customDisplay.customContainerSelector)[position]($('#'+containerId));
         }
     }
+
+    function getPrice(productPrice,useQuantityForWidgetPrice,productId) {
+        var price = productPrice;
+        if(useQuantityForWidgetPrice){
+            var priceContainer = $(`#product-price-${productId} .price`);
+            if (!priceContainer.length){
+                // Only if tax config diplay with and without tax
+                priceContainer = $(`#price-including-tax-product-price-${productId} .price`);
+            }
+            var frontPrice = getPriceFromContainer(priceContainer);
+            if( frontPrice > 0){
+                price = frontPrice;
+            }
+        }
+        return price ;
+    }
+
+    function getPriceFromContainer(priceContainer)
+    {
+        var price = 0;
+        if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
+        {
+            price = formatPrice(priceContainer.html());
+        }
+        return price;
+    }
+
+    function formatPrice(priceHtml)
+    {
+        var price = priceHtml.replace(/[^\d]/g,"");
+        var qty = $('#qty').val();
+        if(!qty.match(/^\d+$/) || (qty <= 0))
+        {
+            qty = 1;
+        }
+        return price * qty;
+    }
+
 });
