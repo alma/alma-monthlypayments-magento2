@@ -30,10 +30,10 @@ define([
     'widgets/Alma',
     'jquery',
     'Magento_Catalog/js/price-utils'
-], function (Alma,$,priceUtils) {
+], function (Alma,$,priceUtils){
     'use strict';
 
-    return function (config) {
+    return function (config){
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
         var qtyNode = document.getElementById('qty');
         qtyNode.addEventListener("input",function(){updateWidget()});
@@ -63,7 +63,7 @@ define([
         }
     }
 
-    function getPrice(productPrice,useQuantityForWidgetPrice,productId) {
+    function getPrice(productPrice,useQuantityForWidgetPrice,productId){
         var price = productPrice;
         if(useQuantityForWidgetPrice){
             var priceContainer = $(`#product-price-${productId} .price`);
@@ -79,8 +79,7 @@ define([
         return price ;
     }
 
-    function getPriceFromContainer(priceContainer)
-    {
+    function getPriceFromContainer(priceContainer){
         var price = 0;
         if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
         {
@@ -89,8 +88,7 @@ define([
         return price;
     }
 
-    function formatPrice(priceHtml)
-    {
+    function formatPrice(priceHtml){
         var price = priceHtml.replace(/[^\d]/g,"");
         var qty = $('#qty').val();
         if(!qty.match(/^\d+$/) || (qty <= 0))
