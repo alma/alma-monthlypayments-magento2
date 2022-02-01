@@ -50,7 +50,7 @@ define([
                 }
                 $(config.customDisplay.customContainerSelector)[position]($('#'+config.containerId));
             }
-        };
+        }
 
         function updateWidget(){
             widgets.add(
@@ -61,7 +61,7 @@ define([
                     plans: config.jsonPlans
                 }
             );
-        };
+        }
 
         function getPrice() {
             var price = config.productPrice;
@@ -77,30 +77,27 @@ define([
                 }
             }
             return price ;
-        };
+        }
 
         function getPriceFromContainer(priceContainer)
         {
-            if(priceContainer !== undefined && priceContainer !== null)
+            var price = 0;
+            if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
             {
-                var priceHtml = priceContainer.html();
-                if(priceHtml !== undefined && priceHtml !== null)
-                {
-                    return formatPrice(priceHtml);
-                }
+                price = formatPrice(priceContainer.html());
             }
-            return false;
-        };
+            return price;
+        }
 
         function formatPrice(priceHtml)
         {
             var price = priceHtml.replace(/[^\d]/g,"");
             var qty = $('#qty').val();
-            if(!qty.match(/^\d+$/) || !(qty > 0))
+            if(!qty.match(/^\d+$/) || (qty <= 0))
             {
                 qty = 1;
             }
             return price * qty;
-        };
-    };
+        }
+    }
 });
