@@ -39,15 +39,15 @@
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
-
+        <div class="payment-method-description" data-bind="text: getDescription()"></div>
         <p class="alma-plan-choices">
             <!-- ko if: paymentPlans.length === 1 -->
-            <!-- ko if: paymentPlans[0].logo -->
+            <!-- ko if: paymentPlans()[0].logo -->
             <img class="alma-plan-logo"
-                 data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + paymentPlans[0].logo), alt: paymentPlans[0].logo }">
+                 data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + paymentPlans()[0].logo), alt: paymentPlans()[0].logo }">
             <!-- /ko -->
 
-            <span data-bind="text: getSinglePlanTitle(paymentPlans[0])"></span>
+            <span data-bind="text: getPlanLabel(paymentPlans()[0])"></span>
             <!-- /ko -->
             <!-- ko ifnot: paymentPlans.length === 1 -->
             <!-- ko foreach: paymentPlans -->
@@ -65,35 +65,35 @@
         </p>
 
         <ul class="alma-installments">
-            <!-- ko foreach: selectedPlan().paymentPlan -->
-            <li>
+                <!-- ko foreach: selectedPlan().eligibility.paymentPlan -->
+                <li>
+                    <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                    <span class="alma-installment--amount-column">
+                        <span class="alma-installment--amount"
+                              data-bind="text: $parent.formattedPrice(total_amount)"></span>
+                        <!-- ko if: customer_fee > 0 -->
+                            <span class="alma-installment--fee">
+                                <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>
+                            </span>
+                        <!-- /ko -->
+                    </span>
+                </li>
+                <!-- /ko -->
+                <!-- ko if: selectedPlan().eligibility.paymentPlan.length >= 5 -->
+                <li>
+                    <span>
+                        <span data-bind="i18n: 'Your cart total :'"></span>
+                        <span class="alma-installment--cartTotal"
+                              data-bind="text: cartTotal()"></span><br />
+                        <span data-bind="i18n: 'Credit cost :'"></span><span data-bind="text: customerTotalCostAmount(selectedPlan().eligibility.customerTotalCostAmount)"></span><br />
+                        <!-- ko if: hasAnnualInterestRate(selectedPlan().eligibility.annualInterestRate) -->
+                        <span data-bind="i18n: 'Annual interest rate :'"></span><span data-bind="text: selectedPlan().eligibility.annualInterestRate/100+'%'"></span><br />
+                        <!-- /ko -->
+                        <b><span data-bind="i18n: 'Total :'"></span><span data-bind="text: totalPaid(selectedPlan().eligibility.customerTotalCostAmount)"></span></b><br />
+                    </span>
+                </li>
+            <!-- /ko -->
 
-                <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
-                <span class="alma-installment--amount-column">
-                    <span class="alma-installment--amount"
-                          data-bind="text: $parent.formattedPrice(total_amount)"></span>
-                    <!-- ko if: customer_fee > 0 -->
-                        <span class="alma-installment--fee">
-                            <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>
-                        </span>
-                    <!-- /ko -->
-                </span>
-            </li>
-            <!-- /ko -->
-            <!-- ko if: selectedPlan().paymentPlan.length >= 5 -->
-            <li>
-                <span>
-                    <span data-bind="i18n: 'Your cart total : '"></span>
-                    <span class="alma-installment--cartTotal"
-                          data-bind="text: cartTotal()"></span><br />
-                    <span data-bind="i18n: 'Credit cost : '"></span><span data-bind="text: customerTotalCostAmount(selectedPlan().eligibility.customerTotalCostAmount)"></span><br />
-                    <!-- ko if: hasAnnualInterestRate(selectedPlan().eligibility.annualInterestRate) -->
-                    <span data-bind="i18n: 'Annual interest rate : '"></span><span data-bind="text: selectedPlan().eligibility.annualInterestRate/100+'%'"></span><br />
-                    <!-- /ko -->
-                    <b><span data-bind="i18n: 'Total : '"></span><span data-bind="text: totalPaid(selectedPlan().eligibility.customerTotalCostAmount)"></span></b><br />
-                </span>
-            </li>
-            <!-- /ko -->
         </ul>
 
         <div class="payment-method-billing-address">

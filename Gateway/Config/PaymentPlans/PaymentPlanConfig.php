@@ -147,6 +147,8 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function toArray(): array
     {
+        $this->data['key']= self::planKey();
+        $this->data['logo']= self::logoFileName();
         return $this->data;
     }
 

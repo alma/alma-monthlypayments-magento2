@@ -32,6 +32,7 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
+use Magento\Quote\Model\QuoteFactory;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
@@ -70,6 +71,10 @@ class Eligibility
      * @var AlmaQuote
      */
     private $quoteData;
+    /**
+     * @var QuoteFactory
+     */
+    private $quoteFactory;
 
     /**
      * Eligibility constructor.
@@ -79,6 +84,7 @@ class Eligibility
      * @param Logger $logger
      * @param Config $config
      * @param AlmaQuote $quoteData
+     * @param QuoteFactory $quoteFactory
      */
     public function __construct(
         Session $checkoutSession,
@@ -86,7 +92,8 @@ class Eligibility
         Helpers\AlmaClient $almaClient,
         Helpers\Logger $logger,
         Config $config,
-        AlmaQuote $quoteData
+        AlmaQuote $quoteData,
+        QuoteFactory $quoteFactory
     )
     {
         $this->checkoutSession = $checkoutSession;
@@ -95,6 +102,7 @@ class Eligibility
         $this->alma = $almaClient->getDefaultClient();
         $this->config = $config;
         $this->quoteData = $quoteData;
+        $this->quoteFactory = $quoteFactory;
     }
 
     /**
@@ -122,18 +130,20 @@ class Eligibility
      * @throws NoSuchEntityException
      * @throws RequestError
      */
-    public function getPlansEligibility(): array
+    private function getPlansEligibility(): array
     {
         if (!$this->alma || !$this->checkItemsTypes()) {
+            $this->logger->info('Alma client is empty or not good item types');
             return [];
         }
 
         $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         // Get enabled plans and build a list of installments counts that should be tested for eligibility
-        $enabledPlans      = $this->config->getPaymentPlansConfig()->getEnabledPlans();
+        $enabledPlans = $this->config->getPaymentPlansConfig()->getEnabledPlans();
         $installmentsQuery = [];
-        $availablePlans    = [];
+        $queriedPlans = [];
+        $plansEligibility = [];
         foreach ($enabledPlans as $planKey => $planConfig) {
             if (
                 $cartTotal >= $planConfig->minimumAmount() &&
@@ -152,13 +162,13 @@ class Eligibility
         }
 
         if (empty($installmentsQuery)) {
+            $this->logger->info('No eligible installment in config');
             return [];
         }
+
+        $quote = $this->quoteFactory->create()->load($this->checkoutSession->getQuote()->getId());
         $eligibilities = $this->alma->payments->eligibility(
-            $this->quoteData->eligibilityDataFromQuote(
-                $this->checkoutSession->getQuote(),
-                $installmentsQuery
-            ),
+            $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
             true
         );
         if (!is_array($eligibilities) && $eligibilities instanceof \Alma\API\Endpoints\Results\Eligibility) {
@@ -166,34 +176,20 @@ class Eligibility
         }
         $plansEligibility = [];
         foreach ($availablePlans as $planKey) {
-            $planConfig  = $this->getPlanConfigFromKey($enabledPlans, $planKey);
+            $planConfig  = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
             if (!$planConfig) {
+                $this->logger->info('No Plan Config' ,['planKey' => $planKey]);
                 continue;
             }
             if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
+                $this->logger->info('Plan is not Eligible for this country' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
                 continue;
             }
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
             $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
         }
-        // TODO check solutions bellow to update AJAX payment methods on country update:
-        // * https://magento.stackexchange.com/questions/160479/magento-2-how-to-refresh-payment-method-on-some-condition
-        // * https://magento.stackexchange.com/questions/175806/magento2-how-to-trigger-onchange-event-on-country-region-in-shipping-address
-        return array_values($plansEligibility); //TODO:check why there is cache in eligibilities from Alma if we change country in shipping checkout UI
-
-        $this->logger->info("getPlansEligibility: plansEligibility keys before array_map", array_keys($plansEligibility));
-        $arrayMap = array_map(function ($planKey) use ($plansEligibility) {
-            if (is_string($planKey) && isset($plansEligibility[$planKey])) {
-                $this->logger->info("getPlansEligibility: map plan returned", [$planKey]);
-
-                return $plansEligibility[$planKey];
-            }
-            $this->logger->info("getPlansEligibility: plan skipped because not found into queried eligibilities", [$planKey]);
-            return $this->mockUneligiblePlanConfig();
-        }, $availablePlans);
-        $this->logger->info("getPlansEligibility: return", $arrayMap);
-
-        return $arrayMap;
+        $this->logger->info('array_values($plansEligibility)',[array_values($plansEligibility)]);
+        return array_values($plansEligibility);
     }
 
     /**
@@ -280,7 +276,7 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage(), $e->getTrace());
+            $this->logger->error($e->getMessage(), $e->getTrace());
             return [];
         }
     }
@@ -323,10 +319,11 @@ class Eligibility
     }
 
     /**
+     * Get translated eligibility message.
      * @return string
      */
     public function getMessage()
     {
-        return $this->message;
+        return __($this->message);
     }
 }

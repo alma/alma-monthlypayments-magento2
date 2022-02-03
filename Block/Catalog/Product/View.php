@@ -33,6 +33,9 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Locale\Resolver;
+use Magento\Store\Model\Store;
 
 class View extends Template
 {
@@ -57,6 +60,16 @@ class View extends Template
     private $product;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var Resolver
+     */
+    private $localeResolver;
+
+    /**
      * @var array
      */
     private $plans = array();
@@ -67,6 +80,8 @@ class View extends Template
      * @param Registry $registry
      * @param Config $config
      * @param Functions $functions
+     * @param Logger $logger
+     * @param Resolver $localeResolver
      * @param array $data
      * @throws LocalizedException
      */
@@ -75,6 +90,8 @@ class View extends Template
         Registry $registry,
         Config $config,
         Functions $functions,
+        Logger $logger,
+        Resolver $localeResolver,
         array $data = []
     )
     {
@@ -82,6 +99,8 @@ class View extends Template
         $this->config = $config;
         $this->registry = $registry;
         $this->functions = $functions;
+        $this->logger = $logger;
+        $this->localeResolver = $localeResolver;
         $this->getProduct();
         $this->getPlans();
     }
@@ -104,23 +123,14 @@ class View extends Template
     private function getPlans()
     {
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-            if( $this->isEnabledBadge($planConfig->installmentsCount()) ){
-                $this->plans[] = array(
-                    'installmentsCount' => $planConfig->installmentsCount(),
-                    'minAmount' => $planConfig->minimumAmount(),
-                    'maxAmount' => $planConfig->maximumAmount()
-                );
-            }
+            $this->plans[] = array(
+                'installmentsCount' => $planConfig->installmentsCount(),
+                'minAmount' => $planConfig->minimumAmount(),
+                'maxAmount' => $planConfig->maximumAmount(),
+                'deferredDays' => $planConfig->deferredDays(),
+                'deferredMonths' => $planConfig->deferredMonths()
+            );
         }
-    }
-
-    /**
-     * @param int
-     * @return bool
-     */
-    private function isEnabledBadge($installments_count)
-    {
-        return in_array($installments_count, array(2,3,4,10,12));
     }
 
     /**
@@ -199,5 +209,18 @@ class View extends Template
     public function getPrice()
     {
         return $this->functions->priceToCents($this->product->getFinalPrice());
+    }
+    /**
+     * Return locale and convert it
+     * @return string
+     */
+    public function getLocale(){
+        $locale ='en';
+        $localeStoreCode = $this->localeResolver->getLocale();
+
+        if (preg_match('/^([a-z]{2})_([A-Z]{2})$/',$localeStoreCode,$matches)){
+            $locale = $matches[1];
+        }
+        return $locale;
     }
 }

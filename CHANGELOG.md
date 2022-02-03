@@ -1,6 +1,20 @@
 Changelog
 =========
 
+v2.1.0
+------
+
+* Add i18n badge V2
+* Fixes fee plans and installments on checkout page
+
+
+v2.0.0
+------
+
+* Add i18n with eligibility V2
+* Fixes init quote with hasquote methode in session plugin
+* Fixes circular dependency injection in gateway/config and Log
+
 v1.4.1
 ------
 

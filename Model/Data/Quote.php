@@ -35,6 +35,7 @@ use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
 use Magento\Quote\Model\Quote as MagentoQuote;
 use Magento\Quote\Model\Quote\Item;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class Quote
 {
@@ -67,13 +68,16 @@ class Quote
         Customer $customerData,
         ProductImage $productImageHelper,
         CategoryRepositoryInterface $categoryRepository,
-        Resolver $locale
+        Resolver $locale,
+        Logger $logger
+
     )
     {
         $this->customerData       = $customerData;
         $this->productImageHelper = $productImageHelper;
         $this->categoryRepository = $categoryRepository;
         $this->locale             = $locale;
+        $this->logger             = $logger;
     }
 
     /**
@@ -105,7 +109,7 @@ class Quote
         if ($shippingCountry) {
             $data['shipping_address'] = ['country' => $shippingCountry];
         }
-
+        $this->logger->info('Eligibility request payload',[$data]);
         return $data;
     }
 

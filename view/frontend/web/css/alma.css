@@ -45,3 +45,11 @@
     font-weight: lighter;
     font-size: smaller;
 }
+.alma.payment-method .payment-method-title {
+    padding: 20px 0 0px 0;
+}
+.alma.payment-method .payment-method-description {
+    font-size: smaller;
+    color:grey;
+    padding:0.8rem 0;
+}
