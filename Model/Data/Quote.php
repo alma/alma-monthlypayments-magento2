@@ -89,6 +89,7 @@ class Quote
      */
     public function eligibilityDataFromQuote(MagentoQuote $quote, array $installmentsQuery): array
     {
+        $this->logger->info('eligibilityDataFromQuote',[]);
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
         $billingAddress  = new AddressAdapter($quote->getBillingAddress());
         $billingCountry  = $billingAddress->getCountryId();
@@ -109,7 +110,7 @@ class Quote
         if ($shippingCountry) {
             $data['shipping_address'] = ['country' => $shippingCountry];
         }
-        $this->logger->info('Eligibility request payload',[$data]);
+        //$this->logger->info('Eligibility request payload',[$data]);
         return $data;
     }
 

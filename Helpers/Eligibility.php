@@ -132,6 +132,7 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
+        $this->logger->info('getPlansEligibility',[]);
         if (!$this->alma || !$this->checkItemsTypes()) {
             $this->logger->info('Alma client is empty or not good item types');
             return [];
@@ -203,6 +204,8 @@ class Eligibility
      */
     public function checkEligibility()
     {
+        $this->logger->info('checkEligibility',[]);
+
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
@@ -271,6 +274,7 @@ class Eligibility
      */
     public function getEligiblePlans(): array
     {
+        $this->logger->info('getEligiblePlans',[]);
         try {
             return array_filter($this->getPlansEligibility(), function ($planEligibility) {
                 return $planEligibility->getEligibility()->isEligible();
