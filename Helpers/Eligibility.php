@@ -75,6 +75,14 @@ class Eligibility
      * @var QuoteFactory
      */
     private $quoteFactory;
+    /**
+     * @var bool
+     */
+    private bool $alreadyLoaded;
+    /**
+     * @var PaymentPlanEligibility[]
+     */
+    private array $currentFeePlans;
 
     /**
      * Eligibility constructor.
@@ -103,6 +111,8 @@ class Eligibility
         $this->config = $config;
         $this->quoteData = $quoteData;
         $this->quoteFactory = $quoteFactory;
+        $this->alreadyLoaded = false;
+        $this->currentFeePlans = [];
     }
 
     /**
@@ -132,7 +142,12 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
-        $this->logger->info('getPlansEligibility',[]);
+        if ($this->isAlreadyLoaded()){
+            $this->logger->info('Fee plans are already loaded',[]);
+            return $this->getCurrentsFeePlans();
+        }
+        $this->logger->info('Get fee plans with API',[]);
+
         if (!$this->alma || !$this->checkItemsTypes()) {
             $this->logger->info('Alma client is empty or not good item types');
             return [];
@@ -189,8 +204,12 @@ class Eligibility
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
             $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
         }
-        $this->logger->info('array_values($plansEligibility)',[array_values($plansEligibility)]);
-        return array_values($plansEligibility);
+        $feePlans = array_values($plansEligibility);
+
+        $hasPlansLoaded = $this->setCurrentsFeePlans($feePlans);
+        $this->setIsAlreadyLoaded($hasPlansLoaded);
+
+        return $feePlans;
     }
 
     /**
@@ -202,10 +221,8 @@ class Eligibility
      *
      * TODO : Do not check Eligibility when cart is empty
      */
-    public function checkEligibility()
+    public function checkEligibility(): bool
     {
-        $this->logger->info('checkEligibility',[]);
-
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
@@ -265,16 +282,15 @@ class Eligibility
         } else {
             $this->eligible = true;
         }
-
         return $this->eligible;
     }
 
     /**
+     * Get eligible plans
      * @return PaymentPlanEligibility[]
      */
     public function getEligiblePlans(): array
     {
-        $this->logger->info('getEligiblePlans',[]);
         try {
             return array_filter($this->getPlansEligibility(), function ($planEligibility) {
                 return $planEligibility->getEligibility()->isEligible();
@@ -286,12 +302,14 @@ class Eligibility
     }
 
     /**
+     * Check if all items are eligible for alma payment
+     * excluding list in BO
      * @return bool
      *
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function checkItemsTypes()
+    private function checkItemsTypes(): bool
     {
         $quote = $this->checkoutSession->getQuote();
         $excludedProductTypes = $this->config->getExcludedProductTypes();
@@ -306,18 +324,20 @@ class Eligibility
     }
 
     /**
-     * @param $price
-     * @return float|string
+     * Get formatted Price
+     * @param int $price
+     * @return string
      */
-    private function getFormattedPrice($price)
+    private function getFormattedPrice(int $price): string
     {
         return $this->pricingHelper->currency($price, true, false);
     }
 
     /**
+     * Get eligibility Status
      * @return bool
      */
-    public function isEligible()
+    public function isEligible(): bool
     {
         return $this->eligible;
     }
@@ -326,8 +346,56 @@ class Eligibility
      * Get translated eligibility message.
      * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return __($this->message);
     }
+
+    /**
+     * Get currents fee Plans
+     *
+     * @return PaymentPlanEligibility[]
+     *
+     */
+    public function getCurrentsFeePlans(): array
+    {
+        return $this->currentFeePlans;
+    }
+
+    /**
+     * Set Currents FeePlans
+     *
+     * @param PaymentPlanEligibility[]
+     * @return bool
+     */
+    private function setCurrentsFeePlans($feePlans): bool
+    {
+        $hasFeePlans = false;
+        if (count($feePlans)>0){
+            $this->currentFeePlans = $feePlans;
+            $hasFeePlans  = true;
+        }
+        return $hasFeePlans;
+    }
+
+    /**
+     * Get loaded flag
+     * @return bool
+     */
+    public function isAlreadyLoaded(): bool
+    {
+        return $this->alreadyLoaded;
+    }
+
+    /**
+     * Set loaded flag
+     *
+     * @param bool $loaded
+     *
+     */
+    private function setIsAlreadyLoaded(bool $loaded)
+    {
+        $this->alreadyLoaded = $loaded;
+    }
+
 }
