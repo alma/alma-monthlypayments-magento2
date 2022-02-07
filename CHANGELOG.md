@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.1
+------
+
+* Fixes product page secure render for 2.3.5
+
 v2.1.0
 ------
 
