@@ -87,6 +87,7 @@ class CartEligibility
 
         $result['eligibility'] = [
             'eligible' => $this->eligibilityHelper->isEligible(),
+            'hasEnabledPaymentPlansInBo' => $this->eligibilityHelper->hasEnabledPaymentPlansInBo(),
             'message' => $this->eligibilityHelper->getMessage(),
             'display' => ($this->config->showEligibilityMessage() && $this->shouldDisplay()),
         ];

@@ -156,7 +156,7 @@ class Eligibility
         $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         // Get enabled plans and build a list of installments counts that should be tested for eligibility
-        $enabledPlansInConfig      = $this->config->getPaymentPlansConfig()->getEnabledPlans();
+        $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
         $installmentsQuery         = [];
         $availablePlans            = [];
 
@@ -226,11 +226,10 @@ class Eligibility
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
-
+        $this->eligible = false;
+        $this->message = $nonEligibilityMessage;
         if (!$this->checkItemsTypes()) {
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage . '<br>' . $excludedProductsMessage;
-
+            $this->message .='<br>' . $excludedProductsMessage;
             return false;
         }
 
@@ -238,22 +237,17 @@ class Eligibility
             $plansEligibility = $this->getPlansEligibility();
         } catch (\Exception $e) {
             $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage;
-
             return false;
         }
 
-        $this->message = $eligibilityMessage;
         $anyEligible = false;
-        $minAmount = PHP_INT_MAX;
-        $maxAmount = PHP_INT_MIN;
+        $minAmount = $this->getMinPurchaseAmountInBo();
+        $maxAmount = $this->getMaxPurchaseAmountInBo();
         foreach ($plansEligibility as $planEligibility) {
             $eligibility = $planEligibility->getEligibility();
 
             if ($eligibility->isEligible()) {
                 $anyEligible = true;
-
                 break;
             }
 
@@ -269,8 +263,6 @@ class Eligibility
 
         if (!$anyEligible) {
             $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage;
 
             if ($cartTotal > $maxAmount) {
                 $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
@@ -280,6 +272,7 @@ class Eligibility
                 $this->message .= '<br>' . sprintf(__('(Minimum amount: %s)'), $price);
             }
         } else {
+            $this->message = $eligibilityMessage;
             $this->eligible = true;
         }
         return $this->eligible;
@@ -396,6 +389,79 @@ class Eligibility
     private function setIsAlreadyLoaded(bool $loaded)
     {
         $this->alreadyLoaded = $loaded;
+    }
+
+    /**
+     * Get back office enabled payment plans
+     *
+     * @return array
+     */
+    public function getEnabledConfigPaymentPlans():array
+    {
+        return $this->config->getPaymentPlansConfig()->getEnabledPlans();
+    }
+
+    /**
+     * Get minimum purchase amount for payment plans in back office
+     *
+     * @return int
+     */
+    public function getMinPurchaseAmountInBo():int
+    {
+        $minPurchaseAmount = null;
+        $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
+        foreach ($inConfigPaymentPlans as $paymentPlan){
+            if($paymentPlan->isEnabled()){
+               if($minPurchaseAmount === null || $paymentPlan->minimumAmount() < $minPurchaseAmount){
+                   $minPurchaseAmount = $paymentPlan->minimumAmount();
+               }
+            }
+        }
+        if ($minPurchaseAmount === null){
+            $minPurchaseAmount =  0;
+        }
+        return $minPurchaseAmount;
+    }
+
+    /**
+     * Get maximum purchase amount for payment plans in back office
+     *
+     * @return int
+     */
+    public function getMaxPurchaseAmountInBo():int
+    {
+        $maxPurchaseAmount = null;
+        $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
+        foreach ($inConfigPaymentPlans as $paymentPlan){
+            if($paymentPlan->isEnabled()){
+                if($maxPurchaseAmount === null || $paymentPlan->maximumAmount() > $maxPurchaseAmount){
+                    $maxPurchaseAmount = $paymentPlan->maximumAmount();
+                }
+            }
+        }
+        if ($maxPurchaseAmount === null){
+            $maxPurchaseAmount =  0;
+        }
+        return $maxPurchaseAmount;
+    }
+
+    /**
+     * Check if at least one payment plan is enabled in Bo
+     *
+     * @return bool
+     */
+    public function hasEnabledPaymentPlansInBo():bool
+    {
+        $hasActivePlans = false;
+        $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
+        $this->logger->info('In hasEnabledPaymentPlansInBo',[$inConfigPaymentPlans]);
+        foreach ($inConfigPaymentPlans as $paymentPlan) {
+            if($paymentPlan->isEnabled()){
+                $this->logger->info('Has an active plan',[$paymentPlan]);
+                $hasActivePlans = true;
+            }
+        }
+        return $hasActivePlans;
     }
 
 }

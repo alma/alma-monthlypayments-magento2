@@ -25,9 +25,11 @@
 -->
 
 <!-- ko if: display -->
-<div class="alma-cart-eligibility">
-    <img data-bind="attr:{src: getImageUrl('Alma_MonthlyPayments/images/alma_logo.svg')}" alt="Alma">
-    <br>
-    <span class="alma-cart-eligibility--message" data-bind="html: message"></span>
-</div>
+    <!-- ko if: hasEnabledPaymentPlansInBo -->
+    <div class="alma-cart-eligibility">
+        <img data-bind="attr:{src: getImageUrl('Alma_MonthlyPayments/images/alma_logo.svg')}" alt="Alma">
+        <br>
+        <span class="alma-cart-eligibility--message" data-bind="html: message"></span>
+    </div>
+    <!-- /ko -->
 <!-- /ko -->

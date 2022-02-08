@@ -94,4 +94,9 @@ class Eligibility extends Template
     {
         return $this->availabilityHelper->isAvailable();
     }
+
+    public function hasEnabledPaymentPlansInBo()
+    {
+        return $this->eligibilityHelper->hasEnabledPaymentPlansInBo();
+    }
 }
