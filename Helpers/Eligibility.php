@@ -142,16 +142,11 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
-        if ($this->isAlreadyLoaded()){
+        if ($this->isAlreadyLoaded() || !$this->alma || !$this->checkItemsTypes() ){
             $this->logger->info('Fee plans are already loaded',[]);
             return $this->getCurrentsFeePlans();
         }
         $this->logger->info('Get fee plans with API',[]);
-
-        if (!$this->alma || !$this->checkItemsTypes()) {
-            $this->logger->info('Alma client is empty or not good item types');
-            return [];
-        }
 
         $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
@@ -411,10 +406,11 @@ class Eligibility
         $minPurchaseAmount = null;
         $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
         foreach ($inConfigPaymentPlans as $paymentPlan){
-            if($paymentPlan->isEnabled()){
-               if($minPurchaseAmount === null || $paymentPlan->minimumAmount() < $minPurchaseAmount){
-                   $minPurchaseAmount = $paymentPlan->minimumAmount();
-               }
+            if(
+                $paymentPlan->isEnabled() &&
+                ($minPurchaseAmount === null || $paymentPlan->minimumAmount() < $minPurchaseAmount)
+            ){
+                $minPurchaseAmount = $paymentPlan->minimumAmount();
             }
         }
         if ($minPurchaseAmount === null){
@@ -433,10 +429,12 @@ class Eligibility
         $maxPurchaseAmount = null;
         $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
         foreach ($inConfigPaymentPlans as $paymentPlan){
-            if($paymentPlan->isEnabled()){
-                if($maxPurchaseAmount === null || $paymentPlan->maximumAmount() > $maxPurchaseAmount){
+            if
+            (
+                $paymentPlan->isEnabled() &&
+                ($maxPurchaseAmount === null || $paymentPlan->maximumAmount() > $maxPurchaseAmount)
+            ){
                     $maxPurchaseAmount = $paymentPlan->maximumAmount();
-                }
             }
         }
         if ($maxPurchaseAmount === null){

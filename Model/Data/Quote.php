@@ -110,7 +110,6 @@ class Quote
         if ($shippingCountry) {
             $data['shipping_address'] = ['country' => $shippingCountry];
         }
-        //$this->logger->info('Eligibility request payload',[$data]);
         return $data;
     }
 
