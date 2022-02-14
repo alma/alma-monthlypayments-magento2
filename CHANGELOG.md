@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.1.2
+------
+
+* Fixes cart min and max alma eligibility
+* Add graphQL eligibility function
+
 v2.1.1
 ------
 
