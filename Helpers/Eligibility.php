@@ -75,6 +75,14 @@ class Eligibility
      * @var QuoteFactory
      */
     private $quoteFactory;
+    /**
+     * @var bool
+     */
+    private bool $alreadyLoaded;
+    /**
+     * @var PaymentPlanEligibility[]
+     */
+    private array $currentFeePlans;
 
     /**
      * Eligibility constructor.
@@ -103,6 +111,8 @@ class Eligibility
         $this->config = $config;
         $this->quoteData = $quoteData;
         $this->quoteFactory = $quoteFactory;
+        $this->alreadyLoaded = false;
+        $this->currentFeePlans = [];
     }
 
     /**
@@ -132,15 +142,16 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
-        if (!$this->alma || !$this->checkItemsTypes()) {
-            $this->logger->info('Alma client is empty or not good item types');
-            return [];
+        if ($this->isAlreadyLoaded() || !$this->alma || !$this->checkItemsTypes() ){
+            $this->logger->info('Fee plans are already loaded',[]);
+            return $this->getCurrentsFeePlans();
         }
+        $this->logger->info('Get fee plans with API',[]);
 
         $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
 
         // Get enabled plans and build a list of installments counts that should be tested for eligibility
-        $enabledPlansInConfig      = $this->config->getPaymentPlansConfig()->getEnabledPlans();
+        $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
         $installmentsQuery         = [];
         $availablePlans            = [];
 
@@ -188,8 +199,12 @@ class Eligibility
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
             $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
         }
-        $this->logger->info('array_values($plansEligibility)',[array_values($plansEligibility)]);
-        return array_values($plansEligibility);
+        $feePlans = array_values($plansEligibility);
+
+        $hasPlansLoaded = $this->setCurrentsFeePlans($feePlans);
+        $this->setIsAlreadyLoaded($hasPlansLoaded);
+
+        return $feePlans;
     }
 
     /**
@@ -201,16 +216,15 @@ class Eligibility
      *
      * TODO : Do not check Eligibility when cart is empty
      */
-    public function checkEligibility()
+    public function checkEligibility(): bool
     {
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
-
+        $this->eligible = false;
+        $this->message = $nonEligibilityMessage;
         if (!$this->checkItemsTypes()) {
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage . '<br>' . $excludedProductsMessage;
-
+            $this->message .='<br>' . $excludedProductsMessage;
             return false;
         }
 
@@ -218,22 +232,17 @@ class Eligibility
             $plansEligibility = $this->getPlansEligibility();
         } catch (\Exception $e) {
             $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage;
-
             return false;
         }
 
-        $this->message = $eligibilityMessage;
         $anyEligible = false;
-        $minAmount = PHP_INT_MAX;
-        $maxAmount = PHP_INT_MIN;
+        $minAmount = $this->getMinPurchaseAmountInBo();
+        $maxAmount = $this->getMaxPurchaseAmountInBo();
         foreach ($plansEligibility as $planEligibility) {
             $eligibility = $planEligibility->getEligibility();
 
             if ($eligibility->isEligible()) {
                 $anyEligible = true;
-
                 break;
             }
 
@@ -249,8 +258,6 @@ class Eligibility
 
         if (!$anyEligible) {
             $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
-            $this->eligible = false;
-            $this->message = $nonEligibilityMessage;
 
             if ($cartTotal > $maxAmount) {
                 $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
@@ -260,13 +267,14 @@ class Eligibility
                 $this->message .= '<br>' . sprintf(__('(Minimum amount: %s)'), $price);
             }
         } else {
+            $this->message = $eligibilityMessage;
             $this->eligible = true;
         }
-
         return $this->eligible;
     }
 
     /**
+     * Get eligible plans
      * @return PaymentPlanEligibility[]
      */
     public function getEligiblePlans(): array
@@ -282,12 +290,14 @@ class Eligibility
     }
 
     /**
+     * Check if all items are eligible for alma payment
+     * excluding list in BO
      * @return bool
      *
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function checkItemsTypes()
+    private function checkItemsTypes(): bool
     {
         $quote = $this->checkoutSession->getQuote();
         $excludedProductTypes = $this->config->getExcludedProductTypes();
@@ -302,18 +312,20 @@ class Eligibility
     }
 
     /**
-     * @param $price
-     * @return float|string
+     * Get formatted Price
+     * @param int $price
+     * @return string
      */
-    private function getFormattedPrice($price)
+    private function getFormattedPrice(int $price): string
     {
         return $this->pricingHelper->currency($price, true, false);
     }
 
     /**
+     * Get eligibility Status
      * @return bool
      */
-    public function isEligible()
+    public function isEligible(): bool
     {
         return $this->eligible;
     }
@@ -322,8 +334,132 @@ class Eligibility
      * Get translated eligibility message.
      * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return __($this->message);
     }
+
+    /**
+     * Get currents fee Plans
+     *
+     * @return PaymentPlanEligibility[]
+     *
+     */
+    public function getCurrentsFeePlans(): array
+    {
+        return $this->currentFeePlans;
+    }
+
+    /**
+     * Set Currents FeePlans
+     *
+     * @param PaymentPlanEligibility[]
+     * @return bool
+     */
+    private function setCurrentsFeePlans($feePlans): bool
+    {
+        $hasFeePlans = false;
+        if (count($feePlans)>0){
+            $this->currentFeePlans = $feePlans;
+            $hasFeePlans  = true;
+        }
+        return $hasFeePlans;
+    }
+
+    /**
+     * Get loaded flag
+     * @return bool
+     */
+    public function isAlreadyLoaded(): bool
+    {
+        return $this->alreadyLoaded;
+    }
+
+    /**
+     * Set loaded flag
+     *
+     * @param bool $loaded
+     *
+     */
+    private function setIsAlreadyLoaded(bool $loaded)
+    {
+        $this->alreadyLoaded = $loaded;
+    }
+
+    /**
+     * Get back office enabled payment plans
+     *
+     * @return array
+     */
+    public function getEnabledConfigPaymentPlans():array
+    {
+        return $this->config->getPaymentPlansConfig()->getEnabledPlans();
+    }
+
+    /**
+     * Get minimum purchase amount for payment plans in back office
+     *
+     * @return int
+     */
+    public function getMinPurchaseAmountInBo():int
+    {
+        $minPurchaseAmount = null;
+        $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
+        foreach ($inConfigPaymentPlans as $paymentPlan){
+            if(
+                $paymentPlan->isEnabled() &&
+                ($minPurchaseAmount === null || $paymentPlan->minimumAmount() < $minPurchaseAmount)
+            ){
+                $minPurchaseAmount = $paymentPlan->minimumAmount();
+            }
+        }
+        if ($minPurchaseAmount === null){
+            $minPurchaseAmount =  0;
+        }
+        return $minPurchaseAmount;
+    }
+
+    /**
+     * Get maximum purchase amount for payment plans in back office
+     *
+     * @return int
+     */
+    public function getMaxPurchaseAmountInBo():int
+    {
+        $maxPurchaseAmount = null;
+        $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
+        foreach ($inConfigPaymentPlans as $paymentPlan){
+            if
+            (
+                $paymentPlan->isEnabled() &&
+                ($maxPurchaseAmount === null || $paymentPlan->maximumAmount() > $maxPurchaseAmount)
+            ){
+                    $maxPurchaseAmount = $paymentPlan->maximumAmount();
+            }
+        }
+        if ($maxPurchaseAmount === null){
+            $maxPurchaseAmount =  0;
+        }
+        return $maxPurchaseAmount;
+    }
+
+    /**
+     * Check if at least one payment plan is enabled in Bo
+     *
+     * @return bool
+     */
+    public function hasEnabledPaymentPlansInBo():bool
+    {
+        $hasActivePlans = false;
+        $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
+        $this->logger->info('In hasEnabledPaymentPlansInBo',[$inConfigPaymentPlans]);
+        foreach ($inConfigPaymentPlans as $paymentPlan) {
+            if($paymentPlan->isEnabled()){
+                $this->logger->info('Has an active plan',[$paymentPlan]);
+                $hasActivePlans = true;
+            }
+        }
+        return $hasActivePlans;
+    }
+
 }

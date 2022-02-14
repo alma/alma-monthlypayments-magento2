@@ -30,6 +30,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class Eligibility extends Action
 {
@@ -45,10 +46,12 @@ class Eligibility extends Action
      */
     public function __construct(
         Context $context,
-        EligibilityHelper $eligibilityHelper
+        EligibilityHelper $eligibilityHelper,
+        Logger $logger
     )
     {
         parent::__construct($context);
+        $this->logger = $logger;
         $this->eligibilityHelper = $eligibilityHelper;
     }
 
@@ -60,6 +63,7 @@ class Eligibility extends Action
      */
     public function execute()
     {
+        $this->logger->info('execute Controller Payment Action',[]);
         $this->eligibilityHelper->checkEligibility();
 
         /** @var Json $json */

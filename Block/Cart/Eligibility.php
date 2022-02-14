@@ -28,6 +28,7 @@ namespace Alma\MonthlyPayments\Block\Cart;
 use Magento\Framework\View\Element\Template;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class Eligibility extends Template
 {
@@ -56,14 +57,15 @@ class Eligibility extends Template
         Config $config,
         Helpers\Eligibility $eligibilityHelper,
         Helpers\Availability $availabilityHelper,
+        Logger $logger,
         array $data = []
     )
     {
         parent::__construct($context, $data);
-
+        $this->logger = $logger;
         $this->config = $config;
         $this->eligibilityHelper = $eligibilityHelper;
-
+        $this->logger->info('Construct Cart Eligibility',[]);
         $this->checkEligibility();
         $this->availabilityHelper = $availabilityHelper;
     }
@@ -91,5 +93,10 @@ class Eligibility extends Template
     public function shouldDisplay()
     {
         return $this->availabilityHelper->isAvailable();
+    }
+
+    public function hasEnabledPaymentPlansInBo()
+    {
+        return $this->eligibilityHelper->hasEnabledPaymentPlansInBo();
     }
 }

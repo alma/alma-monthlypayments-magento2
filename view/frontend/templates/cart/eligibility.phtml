@@ -29,7 +29,7 @@
 <?php
 /** @var $block \Alma\MonthlyPayments\Block\Cart\Eligibility */
 ?>
-<?php if ($block->showEligibilityMessage()): ?>
+<?php if ($block->showEligibilityMessage() && $block->hasEnabledPaymentPlansInBo()): ?>
     <div class="alma-cart-eligibility">
         <img src="<?php echo $block->getViewFileUrl('Alma_MonthlyPayments::images/alma_logo.svg') ?>" alt="Alma">
         <br>

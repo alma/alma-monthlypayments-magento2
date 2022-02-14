@@ -45,11 +45,13 @@ define(
 
                 var eligibility = cartObservable().eligibility;
                 this.display = ko.observable(eligibility ? eligibility.display : false);
+                this.hasEnabledPaymentPlansInBo = ko.observable(eligibility ? eligibility.hasEnabledPaymentPlansInBo : false);
                 this.message = ko.observable(eligibility ? eligibility.message : '');
 
                 cartObservable.subscribe((function (newCart) {
                     var eligibility = newCart.eligibility;
                     this.display(eligibility ? eligibility.display : false);
+                    this.hasEnabledPaymentPlansInBo(eligibility ? eligibility.hasEnabledPaymentPlansInBo : false);
                     this.message(eligibility ? eligibility.message : '');
                 }).bind(this));
             },

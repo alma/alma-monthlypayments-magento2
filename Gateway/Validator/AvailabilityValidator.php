@@ -30,6 +30,7 @@ use Alma\MonthlyPayments\Helpers\Eligibility;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class AvailabilityValidator extends AbstractValidator
 {
@@ -49,12 +50,14 @@ class AvailabilityValidator extends AbstractValidator
      * @param Eligibility $eligibilityHelper
      */
     public function __construct(
+        Logger $logger,
         ResultInterfaceFactory $resultFactory,
         Availability $availabilityHelper,
         Eligibility $eligibilityHelper
     )
     {
         parent::__construct($resultFactory);
+        $this->logger = $logger;
         $this->availabilityHelper = $availabilityHelper;
         $this->eligibilityHelper = $eligibilityHelper;
     }
