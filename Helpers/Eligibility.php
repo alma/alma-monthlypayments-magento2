@@ -78,11 +78,11 @@ class Eligibility
     /**
      * @var bool
      */
-    private bool $alreadyLoaded;
+    private $alreadyLoaded;
     /**
      * @var PaymentPlanEligibility[]
      */
-    private array $currentFeePlans;
+    private $currentFeePlans;
 
     /**
      * Eligibility constructor.
