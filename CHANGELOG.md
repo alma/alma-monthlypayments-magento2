@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.3
+------
+
+* Fixes compatibility issues
+
 v2.1.2
 ------
 
