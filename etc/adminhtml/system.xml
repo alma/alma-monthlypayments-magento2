@@ -33,7 +33,7 @@
                    showInWebsite="1" showInStore="1">
                 <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer installments payments with Alma and instantly boost your sales.<br>Increase average order value by 60% and your sales by 20%.<br>With no subscription fees and no commitment, it’s risk free: you are paid upfront while your customers pay later.</div>]]></comment>
                 <fieldset_css>complex alma-section</fieldset_css>
-                <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
+                <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
 
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
                        showInStore="1">
