@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v2.2.0
+------
+
+* Use custom class for back-office display
+* Fixes total cart round credit cost
+
+
 v2.1.3
 ------
 
