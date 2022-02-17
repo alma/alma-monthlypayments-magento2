@@ -38,22 +38,3 @@
     vertical-align: middle;
     width: 50%
 }
-@font-face {
-    font-family: 'alma';
-    src: url('./fonts/alma.eot');
-    src: url('./fonts/alma.eot?#iefix') format('embedded-opentype'),
-    url('./fonts/alma.woff') format('woff'),
-    url('./fonts/alma.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-.admin__menu .level-0.item-almaconfigmenu > a:before {
-    font-family: 'alma';
-    content: 'A';
-    font-size : 3.2rem;
-    padding: 0 0 25px 0;
-
-}
-li#menu-vendor_extension-menu_id > a > span {
-display: none;
-}
