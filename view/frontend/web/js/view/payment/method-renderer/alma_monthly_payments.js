@@ -99,7 +99,7 @@ define(
                 ['merged','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption))
             },
 
-            initObservablesAndComputedFor : function (paymentOption){
+            initObservablesAndComputedFor : function (paymentOption) {
                 var paymentCode = this.getCode() + '_' + paymentOption;
                 this[`${paymentOption}PaymentCode`] = paymentCode;
 
@@ -126,7 +126,7 @@ define(
                 }
             },
 
-            selectedPlan : function (key,plans,paymentCode){
+            selectedPlan : function (key,plans,paymentCode) {
                 var currentSelectedPlan = [];
                 currentSelectedPlan = plans.find(function (plan) {
                     return plan.key === key;
@@ -137,17 +137,17 @@ define(
                 return currentSelectedPlan;
             },
 
-            fallbackIsChecked : function(paymentCode){
+            fallbackIsChecked : function (paymentCode) {
                 var isChecked = false;
                 if(( this.isChecked() == null|| this.isChecked() == this.getCode() ) && this.checkedPaymentMethod() == paymentCode){
                     isChecked = true;
                 }
                 return isChecked;
             },
-            reloadObserver: function(){
+            reloadObserver: function () {
                 this.reloadAlmaSection();
             },
-            reloadAlmaSection:function (){
+            reloadAlmaSection:function () {
             customerData.invalidate([self.almaSectionName])
             customerData.reload([self.almaSectionName])
             },
