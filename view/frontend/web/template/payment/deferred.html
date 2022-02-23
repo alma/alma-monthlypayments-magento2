@@ -1,0 +1,103 @@
+<!--
+/**
+ * 2018 Alma / Nabla SAS
+ *
+ * THE MIT LICENSE
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+ * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @author    Alma / Nabla SAS <contact@getalma.eu>
+ * @copyright 2018 Alma / Nabla SAS
+ * @license   https://opensource.org/licenses/MIT The MIT License
+ *
+ */
+-->
+<div class="alma payment-method" data-bind="css: {'_active': isCheckedDeferred}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[deferred]"
+               class="radio"
+               data-bind="attr: {'id':  getDeferredPaymentCode()}, value: getDeferredPaymentCode(), checked: checkedPaymentMethod, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label class="label" data-bind="attr: {'for':  getDeferredPaymentCode()}">
+            <span data-bind="text: almaDeferredPaymentMethod().title"></span>
+        </label>
+    </div>
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-description" data-bind="text: almaDeferredPaymentMethod().description"></div>
+        <div data-bind="text:"></div>
+        <p class="alma-plan-choices">
+        <!-- ko if: almaDeferredPaymentPlans().length === 1 -->
+        <!-- ko if: almaDeferredPaymentPlans()[0].logo -->
+        <img class="alma-plan-logo"
+             data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + almaDeferredPaymentPlans()[0].logo), alt: almaDeferredPaymentPlans()[0].logo }">
+        <!-- /ko -->
+
+        <span data-bind="text: getPlanLabel(almaDeferredPaymentPlans()[0])"></span>
+        <!-- /ko -->
+            <!-- ko if: almaDeferredPaymentPlans().length !== 1 -->
+                <!-- ko foreach: almaDeferredPaymentPlans -->
+                <label data-bind="attr: { for: 'alma-select-plan-' + key }">
+                    <input type="radio" name="alma-selected-plan-deferred"
+                           data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.deferredSelectedPlanKey ">
+                    <!-- ko if: logo -->
+                    <img class="alma-plan-logo"
+                         data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + logo), alt: logo }">
+                    <!-- /ko -->
+                    <span data-bind="text: $parent.getPlanLabel($data)"></span>
+                </label>
+                <!-- /ko -->
+            <!-- /ko -->
+        <ul class="alma-installments">
+            <!-- ko foreach: deferredSelectedPlan().eligibility.paymentPlan -->
+            <li>
+                <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                <span class="alma-installment--amount-column">
+                        <span class="alma-installment--amount"
+                              data-bind="text: $parent.formattedPrice(total_amount)"></span>
+                    <!-- ko if: customer_fee > 0 -->
+                            <span class="alma-installment--fee">
+                                <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>
+                            </span>
+                    <!-- /ko -->
+                    </span>
+            </li>
+            <!-- /ko -->
+        </p>
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                        click: placeOrder,
+                        attr: {title: $t('Place Order')}
+                        ">
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

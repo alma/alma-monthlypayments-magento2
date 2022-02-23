@@ -53,29 +53,83 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
-
+                <group id="alma_customise_checkout" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <label>Customise Alma title on decheckout </label>
+                    <field id="alma_merge_payment" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
+                           showInStore="1">
+                        <config_path>payment/alma_monthly_payments/alma_merge_payment</config_path>
+                        <label>Merge all payment methods</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                        <comment>This controls the payment method name which the user sees during checkout.</comment>
+                        <config_path>payment/alma_monthly_payments/title</config_path>
+                        <validate>required-entry</validate>
+                        <depends><field id="alma_merge_payment">1</field></depends>
+                    </field>
+                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Description</label>
+                        <comment>This controls the payment method description which the user sees during checkout.</comment>
+                        <config_path>payment/alma_monthly_payments/description</config_path>
+                        <depends><field id="alma_merge_payment">1</field></depends>
+                    </field>
+                    <group id="alma_installments_payment" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <depends><field id="alma_merge_payment">0</field></depends>
+                        <label>Payments in 2,3 and 4 installments:</label>
+                        <field id="alma_installments_payment_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <config_path>payment/alma_monthly_payments/alma_installments_payment_title</config_path>
+                            <label>Title</label>
+                            <comment>This controls payment method name for 2,3 and 4 installments which the user sees during checkout.</comment>
+                        </field>
+                        <field id="alma_installments_payment_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <config_path>payment/alma_monthly_payments/alma_installments_payment_desc</config_path>
+                            <label>Description</label>
+                            <comment>This controls payment method description for 2,3 and 4 installments which the user sees during checkout.</comment>
+                        </field>
+                    </group>
+                    <group id="alma_spread_payment" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <depends><field id="alma_merge_payment">0</field></depends>
+                        <label>Payments in more than 4 installments:</label>
+                        <field id="alma_spread_payment_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <config_path>payment/alma_monthly_payments/alma_spread_payment_title</config_path>
+                            <label>Title</label>
+                            <comment>This controls payment method name for more than 4 installments which the user sees during checkout.</comment>
+                        </field>
+                        <field id="alma_spread_payment_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <config_path>payment/alma_monthly_payments/alma_spread_payment_desc</config_path>
+                            <label>Description</label>
+                            <comment>This controls payment method description for more than 4 installments which the user sees during checkout.</comment>
+                        </field>
+                    </group>
+                    <group id="alma_deferred_payment" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <depends><field id="alma_merge_payment">0</field></depends>
+                            <label>Deferred payments:</label>
+                            <field id="alma_deferred_payment_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <config_path>payment/alma_monthly_payments/alma_deferred_payment_title</config_path>
+                                <label>Title</label>
+                                <comment>This controls payment method name for deferred payment which the user sees during checkout.</comment>
+                            </field>
+                            <field id="alma_deferred_payment_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <config_path>payment/alma_monthly_payments/alma_deferred_payment_desc</config_path>
+                                <label>Description</label>
+                                <comment>This controls payment method description for deferred payment which the user sees during checkout.</comment>
+                            </field>
+                    </group>
+                </group>
                 <!-- PAYMENT METHOD CONFIGURATION -->
-                <group id="general_config" translate="label" type="text" sortOrder="10" showInDefault="1"
+                <group id="alma_general_config" translate="label" type="text" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
-
                     <label>Payment method configuration</label>
-                    <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Title</label>
-                        <comment>This controls the payment method name which the user sees during checkout.</comment>
-                        <config_path>payment/alma_monthly_payments/title</config_path>
-                        <validate>required-entry</validate>
-                    </field>
-                    <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Description</label>
-                        <comment>This controls the payment method description which the user sees during checkout.</comment>
-                        <config_path>payment/alma_monthly_payments/description</config_path>
-                    </field>
                     <field id="payment_plans" translate="label" sortOrder="23" showInDefault="23" showInWebsite="1"
                            showInStore="1">
                         <label>Payment plans</label>

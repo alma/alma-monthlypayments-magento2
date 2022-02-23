@@ -71,9 +71,7 @@ define(
                     region.valueHasMutated();
                 }
             }
-
             region.subscribe(reorderMethods);
-            reorderMethods();
         });
 
 
@@ -83,60 +81,239 @@ define(
                 template: 'Alma_MonthlyPayments/payment/form',
             },
             totals: quote.getTotals(),
-            paymentPlans: ko.computed(function() {
-                return customerData.get('alma_section')().paymentPlans
-            }),
 
             initialize: function () {
+
                 self=this;
                 this._super();
+                this.totals.subscribe(this.reloadObserver.bind(this));
 
-                self.totals.subscribe(this.reloadObserver.bind(this));
+                this.paymentCode = this.getCode();
+                this.installmentsCode = this.getCode()+'_installments';
+                this.spreadCode = this.getCode()+'_spread';
+                this.deferredCode = this.getCode()+'_deferred';
+                this.almaSectionName = 'alma_section';
+
+                this.almaInstallmentsPaymentMethod = ko.observable(false);
+                this.almaSpreadPaymentMethod = ko.observable(false);
+                this.almaDeferredPaymentMethod = ko.observable(false);
+                this.almaMergedPaymentMethod = ko.observable(false);
+
+                this.almaInstallmentsPaymentPlans = ko.observable([]);
+                this.almaSpreadPaymentPlans = ko.observable([]);
+                this.almaDeferredPaymentPlans = ko.observable([]);
+                this.almaMergedPaymentPlans = ko.observable([]);
+
 
                 this.config = window.checkoutConfig.payment[this.item.method];
+                this.almaSection = ko.observable(customerData.get(self.almaSectionName)())
 
-                this.selectedPlanKey = ko.observable(this.defaultPlan().key);
+                this.checkedPaymentMethod = ko.observable('');
+                this.lastSelectedPlanKey =  ko.observable('');
 
-                this.selectedPlan = ko.computed(function () {
-                    var key = this.selectedPlanKey();
 
-                    var currentSelectedPlan = self.paymentPlans().find(function (plan) {
-                        return plan.key === key;
-                    });
-                    if (!currentSelectedPlan){
-                        currentSelectedPlan = self.paymentPlans().find(function (plan) {
-                            this.selectedPlanKey = ko.observable(this.defaultPlan().key);
-                            return plan.key === this.defaultPlan().key;
-                        },this) ;
+                /**
+                 * Init Installments observables and computed
+                 */
+                if(this.almaSection().paymentMethods.installments){
+                    // -- Init checked payment Method if empty
+                    if(this.checkedPaymentMethod()== '') {
+                        this.checkedPaymentMethod = ko.observable(this.installmentsCode)
                     }
-                    return currentSelectedPlan;
-                }, this);
 
+                    // -- Init Installments computed based on section
+                    this.almaInstallmentsPaymentMethod = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.installments;
+                    })
+                    this.almaInstallmentsPaymentPlans = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.installments.paymentPlans
+                    })
+
+                    // -- Init selected plan for payment schedule display
+                    this.installmentsSelectedPlanKey = ko.observable(this.defaultInstallmentsPlan().key);
+                    this.installmentsSelectedPlan = ko.computed(function () {
+                        var key = self.installmentsSelectedPlanKey();
+
+                        var currentSelectedPlan = self.almaInstallmentsPaymentPlans().find(function (plan) {
+                            return plan.key === key;
+                        });
+                        if(self.checkedPaymentMethod() == self.installmentsCode){
+                            self.lastSelectedPlanKey = currentSelectedPlan.key;
+                        }
+                        return currentSelectedPlan;
+                    })
+
+                    // -- Init selected computed for display active paymentMethod
+                    this.isCheckedInstallments = ko.computed(function() {
+                        var isChecked = false;
+                        if(( self.isChecked() == null|| self.isChecked() == self.paymentCode ) &&  self.checkedPaymentMethod() == self.installmentsCode){
+                            isChecked = true;
+                        }
+                        return isChecked;
+                    })
+                }
+
+                /**
+                 * Init Spread observables and computed
+                 */
+                if(this.almaSection().paymentMethods.spread){
+                    // -- Init checked payment Method if empty
+                    if(this.checkedPaymentMethod()== '') {
+                        this.checkedPaymentMethod = ko.observable(this.spreadCode)
+                    }
+
+                    // -- Init spread computed based on section
+                    this.almaSpreadPaymentMethod = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.spread;
+                    })
+                    this.almaSpreadPaymentPlans = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.spread.paymentPlans
+                    })
+
+                    // -- Init selected plan for payment schedule display
+                    this.spreadSelectedPlanKey = ko.observable(this.defaultSpreadPlan().key);
+                    this.spreadSelectedPlan = ko.computed(function () {
+
+                        var key = self.spreadSelectedPlanKey();
+
+                        var currentSelectedPlan = self.almaSpreadPaymentPlans().find(function (plan) {
+                            return plan.key === key;
+                        });
+                        if (self.checkedPaymentMethod() == self.spreadCode){
+                            self.lastSelectedPlanKey = currentSelectedPlan.key;
+                        }
+                        return currentSelectedPlan;
+                    })
+
+
+                    // -- Init selected computed for display active paymentMethod
+                    this.isCheckedSpread = ko.computed(function() {
+                        var isChecked = false;
+                        if(( self.isChecked() == null || self.isChecked() == self.paymentCode ) && self.checkedPaymentMethod() == self.spreadCode){
+                            isChecked = true;
+                        }
+                        return isChecked;
+                    })
+                }
+
+                /**
+                 * Init deferred observables and computed
+                 */
+                if(this.almaSection().paymentMethods.deferred){
+                    // -- Init checked payment Method if empty
+                    if(this.checkedPaymentMethod()== ''){
+                        this.checkedPaymentMethod = ko.observable(this.deferredCode)
+                    }
+
+                    // -- Init deferred computed based on section
+                    this.almaDeferredPaymentMethod = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.deferred;
+                    })
+                    this.almaDeferredPaymentPlans = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.deferred.paymentPlans
+                    })
+
+                    // -- Init selected plan for payment schedule display
+                    this.deferredSelectedPlanKey = ko.observable(this.defaultDeferredPlan().key);
+                    this.deferredSelectedPlan = ko.computed(function () {
+                        var key = self.deferredSelectedPlanKey();
+
+                        var currentSelectedPlan = self.almaDeferredPaymentPlans().find(function (plan) {
+                            return plan.key === key;
+                        });
+                        if(self.checkedPaymentMethod() == self.deferredCode){
+                            self.lastSelectedPlanKey = currentSelectedPlan.key;
+                        }
+                        return currentSelectedPlan;
+                    })
+
+                    // -- Init selected computed for display active paymentMethod
+                    this.isCheckedDeferred = ko.computed(function() {
+                        var isChecked = false;
+                        if(( self.isChecked() == null|| self.isChecked() == self.paymentCode ) && self.checkedPaymentMethod() == self.deferredCode){
+                            isChecked = true;
+                        }
+                        return isChecked;
+                    })
+                }
+
+                /**
+                 * Init Merged observables and computed
+                 */
+                if(this.almaSection().paymentMethods.merged){
+                    // -- Init checked payment Method if empty
+                    if(this.checkedPaymentMethod()== ''){
+                        this.checkedPaymentMethod = ko.observable(this.paymentCode)
+                    }
+
+                    // -- Init merged computed based on section
+                    this.almaMergedPaymentMethod = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.merged;
+                    })
+                    this.almaMergedPaymentPlans = ko.computed(function() {
+                        return customerData.get(self.almaSectionName)().paymentMethods.merged.paymentPlans
+                    })
+
+                    // -- Init selected plan for payment schedule display
+                    this.mergedSelectedPlanKey = ko.observable(this.defaultMergedPlan().key);
+                    this.mergedSelectedPlan = ko.computed(function () {
+                        var key = self.mergedSelectedPlanKey();
+
+                        var currentSelectedPlan = self.almaMergedPaymentPlans().find(function (plan) {
+                            return plan.key === key;
+                        });
+                        if(self.checkedPaymentMethod() == self.paymentCode){
+                            self.lastSelectedPlanKey = currentSelectedPlan.key;
+                        }
+                        return currentSelectedPlan;
+                    })
+
+                    // -- Init selected computed for display active paymentMethod
+                    this.isCheckedMerged = ko.computed(function() {
+                        var isChecked = false;
+                        if(( self.isChecked() == null|| self.isChecked() == self.paymentCode ) && self.checkedPaymentMethod() == self.paymentCode){
+                            isChecked = true;
+                        }
+                        return isChecked;
+                    })
+                }
             },
-            getPlans : function(){
-                return self.paymentPlans
+
+            getInstallmentsPaymentCode : function(){
+                return this.installmentsCode;
             },
+            defaultInstallmentsPlan : function(){
+                return this.almaInstallmentsPaymentPlans()[0];
+            },
+
+            getSpreadPaymentCode : function(){
+                return this.spreadCode;
+            },
+            defaultSpreadPlan : function(){
+                return this.almaSpreadPaymentPlans()[0];
+            },
+
+            getDeferredPaymentCode : function(){
+                return this.deferredCode;
+            },
+            defaultDeferredPlan : function(){
+                return this.almaDeferredPaymentPlans()[0];
+            },
+
+            getMergedPaymentCode : function(){
+                return this.paymentCode;
+            },
+            defaultMergedPlan : function(){
+                return this.almaMergedPaymentPlans()[0];
+            },
+
+
             reloadObserver: function(){
                 this.reloadAlmaSection();
             },
             reloadAlmaSection:function (){
-            customerData.invalidate(['alma_section'])
-            customerData.reload(['alma_section'])
-            },
-            defaultPlan: function () {
-                return self.paymentPlans().reduce(function (plan, result) {
-                    if (plan.installmentsCount === 3 || plan.installmentsCount > result.installmentsCount) {
-                        return plan;
-                    }
-
-                    return result;
-                }, self.paymentPlans()[0]);
-            },
-            getTitle:function (){
-                return this.config.title;
-            },
-            getDescription: function () {
-                return this.config.description;
+            customerData.invalidate([self.almaSectionName])
+            customerData.reload([self.almaSectionName])
             },
 
             getPlanLabel: function (plan) {
@@ -158,7 +335,7 @@ define(
             },
 
             cartTotal: function () {
-                return priceUtils.formatPrice(self.totals().grand_total, window.checkoutConfig.priceFormat);
+                return priceUtils.formatPrice(this.totals().grand_total, window.checkoutConfig.priceFormat);
             },
 
             customerTotalCostAmount: function (cost) {
@@ -176,20 +353,18 @@ define(
             getFeesMention: function (customerFee) {
                 return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
             },
-
             getData: function () {
                 return $.extend(
                     this._super(),
                     {
                         additional_data: {
-                            selectedPlan: this.selectedPlanKey()
+                            selectedPlan:  this.lastSelectedPlanKey
                         }
                     }
                 );
             },
             afterPlaceOrder: function () {
                 fullScreenLoader.startLoader();
-
                 // Get payment page URL from checkoutConfig and redirect
                 $.mage.redirect(this.config.redirectTo);
             }

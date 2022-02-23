@@ -41,6 +41,9 @@ use Magento\Framework\Pricing\Helper\Data;
 
 class Eligibility
 {
+    const INSTALLMENTS_TYPE = 'installments';
+    const SPREAD_TYPE = 'spread';
+    const DEFFERED_TYPE = 'deferred';
     /**
      * @var Session
      */
@@ -460,6 +463,34 @@ class Eligibility
             }
         }
         return $hasActivePlans;
+    }
+
+    public function sortEligibilities($eligibilities):array
+    {
+        $sortedEligibilities=[];
+        foreach ($eligibilities as $paymentPlan){
+
+            $planConfig = $paymentPlan->getPlanConfig();
+            $planKey = $planConfig->PlanKey();
+
+            $type = 'other';
+
+            if(preg_match('/^general:([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$/',$planKey,$matches)){
+                $this->logger->info('$matches',[$matches]);
+                if($matches[1]>1 && $matches[1]<4 && $matches[2]==0 && $matches[3]==0){
+                    $type = self::INSTALLMENTS_TYPE;
+                }
+                if($matches[1]>4 && $matches[2]==0 && $matches[3]==0){
+                    $type = self::SPREAD_TYPE;
+                }
+                if($matches[1]==1 && ($matches[2]>0 || $matches[3]>0)){
+                    $type = self::DEFFERED_TYPE;
+                }
+            }
+            $sortedEligibilities[$type][]=$paymentPlan;
+
+        }
+        return $sortedEligibilities;
     }
 
 }
