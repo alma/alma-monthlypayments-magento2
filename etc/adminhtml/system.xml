@@ -58,7 +58,8 @@
                     <depends>
                         <field id="active">1</field>
                     </depends>
-                    <label>Customise Alma title on decheckout </label>
+                    <label>Customize Alma in your checkout</label>
+                    <comment>Edit the text displayed when choosing the payment method in your checkout. It will adapt to the languages of your site.</comment>
                     <field id="alma_merge_payment" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <config_path>payment/alma_monthly_payments/alma_merge_payment</config_path>
@@ -68,14 +69,12 @@
                     <field id="title" translate="label comment" type="text" sortOrder="21" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                             <label>Title</label>
-                        <comment>This controls the payment method name which the user sees during checkout.</comment>
                         <config_path>payment/alma_monthly_payments/title</config_path>
                         <validate>required-entry</validate>
                         <depends><field id="alma_merge_payment">1</field></depends>
                     </field>
                     <field id="description" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Description</label>
-                        <comment>This controls the payment method description which the user sees during checkout.</comment>
                         <config_path>payment/alma_monthly_payments/description</config_path>
                         <depends><field id="alma_merge_payment">1</field></depends>
                     </field>
@@ -85,12 +84,10 @@
                         <field id="alma_installments_payment_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
                             <config_path>payment/alma_monthly_payments/alma_installments_payment_title</config_path>
                             <label>Title</label>
-                            <comment>This controls payment method name for 2,3 and 4 installments which the user sees during checkout.</comment>
                         </field>
                         <field id="alma_installments_payment_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
                             <config_path>payment/alma_monthly_payments/alma_installments_payment_desc</config_path>
                             <label>Description</label>
-                            <comment>This controls payment method description for 2,3 and 4 installments which the user sees during checkout.</comment>
                         </field>
                     </group>
                     <group id="alma_spread_payment" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -99,12 +96,10 @@
                         <field id="alma_spread_payment_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
                             <config_path>payment/alma_monthly_payments/alma_spread_payment_title</config_path>
                             <label>Title</label>
-                            <comment>This controls payment method name for more than 4 installments which the user sees during checkout.</comment>
                         </field>
                         <field id="alma_spread_payment_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
                             <config_path>payment/alma_monthly_payments/alma_spread_payment_desc</config_path>
                             <label>Description</label>
-                            <comment>This controls payment method description for more than 4 installments which the user sees during checkout.</comment>
                         </field>
                     </group>
                     <group id="alma_deferred_payment" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -113,12 +108,10 @@
                             <field id="alma_deferred_payment_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
                                 <config_path>payment/alma_monthly_payments/alma_deferred_payment_title</config_path>
                                 <label>Title</label>
-                                <comment>This controls payment method name for deferred payment which the user sees during checkout.</comment>
                             </field>
                             <field id="alma_deferred_payment_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
                                 <config_path>payment/alma_monthly_payments/alma_deferred_payment_desc</config_path>
                                 <label>Description</label>
-                                <comment>This controls payment method description for deferred payment which the user sees during checkout.</comment>
                             </field>
                     </group>
                 </group>

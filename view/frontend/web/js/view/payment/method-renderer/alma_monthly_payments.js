@@ -88,22 +88,7 @@ define(
                 this._super();
                 this.totals.subscribe(this.reloadObserver.bind(this));
 
-                this.paymentCode = this.getCode();
-                this.installmentsCode = this.getCode()+'_installments';
-                this.spreadCode = this.getCode()+'_spread';
-                this.deferredCode = this.getCode()+'_deferred';
                 this.almaSectionName = 'alma_section';
-
-                this.almaInstallmentsPaymentMethod = ko.observable(false);
-                this.almaSpreadPaymentMethod = ko.observable(false);
-                this.almaDeferredPaymentMethod = ko.observable(false);
-                this.almaMergedPaymentMethod = ko.observable(false);
-
-                this.almaInstallmentsPaymentPlans = ko.observable([]);
-                this.almaSpreadPaymentPlans = ko.observable([]);
-                this.almaDeferredPaymentPlans = ko.observable([]);
-                this.almaMergedPaymentPlans = ko.observable([]);
-
 
                 this.config = window.checkoutConfig.payment[this.item.method];
                 this.almaSection = ko.observable(customerData.get(self.almaSectionName)())
@@ -111,203 +96,54 @@ define(
                 this.checkedPaymentMethod = ko.observable('');
                 this.lastSelectedPlanKey =  ko.observable('');
 
+                ['merged','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption))
+            },
 
-                /**
-                 * Init Installments observables and computed
-                 */
-                if(this.almaSection().paymentMethods.installments){
+            initObservablesAndComputedFor : function (paymentOption){
+                var paymentCode = this.getCode() + '_' + paymentOption;
+                this[`${paymentOption}PaymentCode`] = paymentCode;
+
+                this[`${paymentOption}PaymentMethod`] = ko.observable(false);
+                this[`${paymentOption}PaymentPlans`] = ko.observable([]);
+
+                if(this.almaSection().paymentMethods[paymentOption]) {
+
                     // -- Init checked payment Method if empty
-                    if(this.checkedPaymentMethod()== '') {
-                        this.checkedPaymentMethod = ko.observable(this.installmentsCode)
+                    if (this.checkedPaymentMethod() == '') {
+                        this.checkedPaymentMethod = ko.observable(paymentCode)
                     }
 
                     // -- Init Installments computed based on section
-                    this.almaInstallmentsPaymentMethod = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.installments;
-                    })
-                    this.almaInstallmentsPaymentPlans = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.installments.paymentPlans
-                    })
-
+                    this[`${paymentOption}PaymentMethod`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption])
+                    this[`${paymentOption}PaymentPlans`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption].paymentPlans)
                     // -- Init selected plan for payment schedule display
-                    this.installmentsSelectedPlanKey = ko.observable(this.defaultInstallmentsPlan().key);
-                    this.installmentsSelectedPlan = ko.computed(function () {
-                        var key = self.installmentsSelectedPlanKey();
-
-                        var currentSelectedPlan = self.almaInstallmentsPaymentPlans().find(function (plan) {
-                            return plan.key === key;
-                        });
-                        if(self.checkedPaymentMethod() == self.installmentsCode){
-                            self.lastSelectedPlanKey = currentSelectedPlan.key;
-                        }
-                        return currentSelectedPlan;
-                    })
-
-                    // -- Init selected computed for display active paymentMethod
-                    this.isCheckedInstallments = ko.computed(function() {
-                        var isChecked = false;
-                        if(( self.isChecked() == null|| self.isChecked() == self.paymentCode ) &&  self.checkedPaymentMethod() == self.installmentsCode){
-                            isChecked = true;
-                        }
-                        return isChecked;
-                    })
-                }
-
-                /**
-                 * Init Spread observables and computed
-                 */
-                if(this.almaSection().paymentMethods.spread){
-                    // -- Init checked payment Method if empty
-                    if(this.checkedPaymentMethod()== '') {
-                        this.checkedPaymentMethod = ko.observable(this.spreadCode)
-                    }
-
-                    // -- Init spread computed based on section
-                    this.almaSpreadPaymentMethod = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.spread;
-                    })
-                    this.almaSpreadPaymentPlans = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.spread.paymentPlans
-                    })
-
-                    // -- Init selected plan for payment schedule display
-                    this.spreadSelectedPlanKey = ko.observable(this.defaultSpreadPlan().key);
-                    this.spreadSelectedPlan = ko.computed(function () {
-
-                        var key = self.spreadSelectedPlanKey();
-
-                        var currentSelectedPlan = self.almaSpreadPaymentPlans().find(function (plan) {
-                            return plan.key === key;
-                        });
-                        if (self.checkedPaymentMethod() == self.spreadCode){
-                            self.lastSelectedPlanKey = currentSelectedPlan.key;
-                        }
-                        return currentSelectedPlan;
-                    })
-
-
-                    // -- Init selected computed for display active paymentMethod
-                    this.isCheckedSpread = ko.computed(function() {
-                        var isChecked = false;
-                        if(( self.isChecked() == null || self.isChecked() == self.paymentCode ) && self.checkedPaymentMethod() == self.spreadCode){
-                            isChecked = true;
-                        }
-                        return isChecked;
-                    })
-                }
-
-                /**
-                 * Init deferred observables and computed
-                 */
-                if(this.almaSection().paymentMethods.deferred){
-                    // -- Init checked payment Method if empty
-                    if(this.checkedPaymentMethod()== ''){
-                        this.checkedPaymentMethod = ko.observable(this.deferredCode)
-                    }
-
-                    // -- Init deferred computed based on section
-                    this.almaDeferredPaymentMethod = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.deferred;
-                    })
-                    this.almaDeferredPaymentPlans = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.deferred.paymentPlans
-                    })
-
-                    // -- Init selected plan for payment schedule display
-                    this.deferredSelectedPlanKey = ko.observable(this.defaultDeferredPlan().key);
-                    this.deferredSelectedPlan = ko.computed(function () {
-                        var key = self.deferredSelectedPlanKey();
-
-                        var currentSelectedPlan = self.almaDeferredPaymentPlans().find(function (plan) {
-                            return plan.key === key;
-                        });
-                        if(self.checkedPaymentMethod() == self.deferredCode){
-                            self.lastSelectedPlanKey = currentSelectedPlan.key;
-                        }
-                        return currentSelectedPlan;
-                    })
-
-                    // -- Init selected computed for display active paymentMethod
-                    this.isCheckedDeferred = ko.computed(function() {
-                        var isChecked = false;
-                        if(( self.isChecked() == null|| self.isChecked() == self.paymentCode ) && self.checkedPaymentMethod() == self.deferredCode){
-                            isChecked = true;
-                        }
-                        return isChecked;
-                    })
-                }
-
-                /**
-                 * Init Merged observables and computed
-                 */
-                if(this.almaSection().paymentMethods.merged){
-                    // -- Init checked payment Method if empty
-                    if(this.checkedPaymentMethod()== ''){
-                        this.checkedPaymentMethod = ko.observable(this.paymentCode)
-                    }
-
-                    // -- Init merged computed based on section
-                    this.almaMergedPaymentMethod = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.merged;
-                    })
-                    this.almaMergedPaymentPlans = ko.computed(function() {
-                        return customerData.get(self.almaSectionName)().paymentMethods.merged.paymentPlans
-                    })
-
-                    // -- Init selected plan for payment schedule display
-                    this.mergedSelectedPlanKey = ko.observable(this.defaultMergedPlan().key);
-                    this.mergedSelectedPlan = ko.computed(function () {
-                        var key = self.mergedSelectedPlanKey();
-
-                        var currentSelectedPlan = self.almaMergedPaymentPlans().find(function (plan) {
-                            return plan.key === key;
-                        });
-                        if(self.checkedPaymentMethod() == self.paymentCode){
-                            self.lastSelectedPlanKey = currentSelectedPlan.key;
-                        }
-                        return currentSelectedPlan;
-                    })
-
-                    // -- Init selected computed for display active paymentMethod
-                    this.isCheckedMerged = ko.computed(function() {
-                        var isChecked = false;
-                        if(( self.isChecked() == null|| self.isChecked() == self.paymentCode ) && self.checkedPaymentMethod() == self.paymentCode){
-                            isChecked = true;
-                        }
-                        return isChecked;
-                    })
+                    var defaultPlan =  this[`${paymentOption}PaymentPlans`]()[0];
+                    this[`${paymentOption}SelectedPlanKey`] = ko.observable(defaultPlan.key);
+                    this[`${paymentOption}SelectedPlan`] = ko.computed(() =>
+                        self.selectedPlan(self[`${paymentOption}SelectedPlanKey`](),self[`${paymentOption}PaymentPlans`](), paymentCode)
+                    )
+                    this[`${paymentOption}IsChecked`] = ko.computed(() => self.fallbackIsChecked(paymentCode))
                 }
             },
 
-            getInstallmentsPaymentCode : function(){
-                return this.installmentsCode;
-            },
-            defaultInstallmentsPlan : function(){
-                return this.almaInstallmentsPaymentPlans()[0];
-            },
-
-            getSpreadPaymentCode : function(){
-                return this.spreadCode;
-            },
-            defaultSpreadPlan : function(){
-                return this.almaSpreadPaymentPlans()[0];
+            selectedPlan : function (key,plans,paymentCode){
+                var currentSelectedPlan = [];
+                currentSelectedPlan = plans.find(function (plan) {
+                    return plan.key === key;
+                });
+                if(self.checkedPaymentMethod() == paymentCode){
+                    self.lastSelectedPlanKey = currentSelectedPlan.key;
+                }
+                return currentSelectedPlan;
             },
 
-            getDeferredPaymentCode : function(){
-                return this.deferredCode;
+            fallbackIsChecked : function(paymentCode){
+                var isChecked = false;
+                if(( this.isChecked() == null|| this.isChecked() == this.getCode() ) && this.checkedPaymentMethod() == paymentCode){
+                    isChecked = true;
+                }
+                return isChecked;
             },
-            defaultDeferredPlan : function(){
-                return this.almaDeferredPaymentPlans()[0];
-            },
-
-            getMergedPaymentCode : function(){
-                return this.paymentCode;
-            },
-            defaultMergedPlan : function(){
-                return this.almaMergedPaymentPlans()[0];
-            },
-
-
             reloadObserver: function(){
                 this.reloadAlmaSection();
             },

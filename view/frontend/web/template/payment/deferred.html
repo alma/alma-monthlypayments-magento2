@@ -23,33 +23,33 @@
  *
  */
 -->
-<div class="alma payment-method" data-bind="css: {'_active': isCheckedDeferred}">
+<div class="alma payment-method" data-bind="css: {'_active': deferredIsChecked}">
     <div class="payment-method-title field choice">
         <input type="radio"
                name="payment[deferred]"
                class="radio"
-               data-bind="attr: {'id':  getDeferredPaymentCode()}, value: getDeferredPaymentCode(), checked: checkedPaymentMethod, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
-        <label class="label" data-bind="attr: {'for':  getDeferredPaymentCode()}">
-            <span data-bind="text: almaDeferredPaymentMethod().title"></span>
+               data-bind="attr: {'id':  deferredPaymentCode}, value: deferredPaymentCode, checked: checkedPaymentMethod, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label class="label" data-bind="attr: {'for':  deferredPaymentCode}">
+            <span data-bind="text: deferredPaymentMethod().title"></span>
         </label>
     </div>
     <div class="payment-method-content">
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
-        <div class="payment-method-description" data-bind="text: almaDeferredPaymentMethod().description"></div>
+        <div class="payment-method-description" data-bind="text: deferredPaymentMethod().description"></div>
         <div data-bind="text:"></div>
         <p class="alma-plan-choices">
-        <!-- ko if: almaDeferredPaymentPlans().length === 1 -->
-        <!-- ko if: almaDeferredPaymentPlans()[0].logo -->
+        <!-- ko if: deferredPaymentPlans().length === 1 -->
+        <!-- ko if: deferredPaymentPlans()[0].logo -->
         <img class="alma-plan-logo"
-             data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + almaDeferredPaymentPlans()[0].logo), alt: almaDeferredPaymentPlans()[0].logo }">
+             data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + deferredPaymentPlans()[0].logo), alt: deferredPaymentPlans()[0].logo }">
         <!-- /ko -->
 
-        <span data-bind="text: getPlanLabel(almaDeferredPaymentPlans()[0])"></span>
+        <span data-bind="text: getPlanLabel(deferredPaymentPlans()[0])"></span>
         <!-- /ko -->
-            <!-- ko if: almaDeferredPaymentPlans().length !== 1 -->
-                <!-- ko foreach: almaDeferredPaymentPlans -->
+            <!-- ko if: deferredPaymentPlans().length !== 1 -->
+                <!-- ko foreach: deferredPaymentPlans -->
                 <label data-bind="attr: { for: 'alma-select-plan-' + key }">
                     <input type="radio" name="alma-selected-plan-deferred"
                            data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.deferredSelectedPlanKey ">

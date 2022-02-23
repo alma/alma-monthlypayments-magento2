@@ -23,15 +23,15 @@
  *
  */
 -->
-    <!-- ko if: almaMergedPaymentMethod -->
+    <!-- ko if: mergedPaymentMethod -->
         <!-- ko template: 'Alma_MonthlyPayments/payment/merged' --><!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: almaInstallmentsPaymentMethod -->
+    <!-- ko if: installmentsPaymentMethod -->
         <!-- ko template: 'Alma_MonthlyPayments/payment/installments' --><!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: almaSpreadPaymentMethod -->
+    <!-- ko if: spreadPaymentMethod -->
         <!-- ko template: 'Alma_MonthlyPayments/payment/spread' --><!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: almaDeferredPaymentMethod -->
+    <!-- ko if: deferredPaymentMethod -->
     <!-- ko template: 'Alma_MonthlyPayments/payment/deferred' --><!-- /ko -->
     <!-- /ko -->
