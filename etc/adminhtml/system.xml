@@ -53,7 +53,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
-                <group id="alma_customise_checkout" translate="label" type="text" sortOrder="10" showInDefault="1"
+                <group id="alma_customise_checkout" translate="label comment" type="text" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                     <depends>
                         <field id="active">1</field>
