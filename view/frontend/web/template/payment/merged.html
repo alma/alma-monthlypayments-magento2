@@ -33,6 +33,8 @@
             <span data-bind="text: mergedPaymentMethod().title"></span>
         </label>
     </div>
+    <img class="alma-method-logo"
+         data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/alma_logo.svg'), alt: 'alma'}">
     <div class="payment-method-content">
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
