@@ -6,6 +6,8 @@ v2.2.0
 
 * Use custom class for back-office display
 * Fixes total cart round credit cost
+* Add Alma in back-office menu
+* Split payment methods
 
 
 v2.1.3
