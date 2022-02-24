@@ -17,9 +17,8 @@
     position: relative;
     padding : 0 10px;
     float: right;
-    bottom: 4rem;
-    width: 8%;
-    min-width: 50px;
+    bottom: 3.5rem;
+    width: 35px;
 }
 .alma.payment-method ul.alma-installments {
     padding: 0;
