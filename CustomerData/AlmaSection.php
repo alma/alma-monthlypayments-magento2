@@ -59,9 +59,11 @@ class AlmaSection implements SectionSourceInterface
         $paymentMethods = [];
         foreach ($eligibilities as $typeName => $eligibility){
             $paymentMethodText = $this->getPaymentMethodTexts($typeName);
-            $paymentMethods[$typeName]['title'] = $paymentMethodText['title'];
-            $paymentMethods[$typeName]['description'] = $paymentMethodText['description'];
-            $paymentMethods[$typeName]['paymentPlans'] = [];
+            $paymentMethods[$typeName] = [
+              'title' => $paymentMethodText['title'],
+              'description' => $paymentMethodText['description'],
+              'paymentPlans' => []
+            ];
             foreach ( $eligibility as $plan) {
                 $paymentPlan = $plan->getPlanConfig()->toArray();
                 $paymentPlan['eligibility'] = $plan->getEligibility();
