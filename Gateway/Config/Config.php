@@ -168,15 +168,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getActiveAPIKey()
     {
         $mode = $this->getActiveMode();
-
-        switch ($mode) {
-            case Client::LIVE_MODE:
-                $apiKeyType = self::CONFIG_LIVE_API_KEY;
-                break;
-            default:
-                $apiKeyType = self::CONFIG_TEST_API_KEY;
-        }
-
+        $apiKeyType = ($mode == Client::LIVE_MODE) ?
+            self::CONFIG_LIVE_API_KEY :
+            self::CONFIG_TEST_API_KEY ;
         return $this->get($apiKeyType);
     }
 
@@ -364,7 +358,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isCustomWidgetPosition()
     {
         return ($this->getWidgetPosition() ==
-        SELF::CUSTOM_WIDGET_POSITION ? 'true' : 'false');
+        self::CUSTOM_WIDGET_POSITION ? 'true' : 'false');
     }
 
     /**
@@ -372,6 +366,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getWidgetPosition()
     {
-        return $this->get(SELF::WIDGET_POSITION);
+        return $this->get(self::WIDGET_POSITION);
     }
 }
