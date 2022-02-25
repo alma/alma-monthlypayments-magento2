@@ -476,7 +476,7 @@ class Eligibility
 
             $type = 'other';
 
-            if(preg_match('/^general:([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$/',$planKey,$matches)){
+            if(preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches)){
                 $this->logger->info('$matches',[$matches]);
                 if($matches[1]>1 && $matches[1]<4 && $matches[2]==0 && $matches[3]==0){
                     $type = self::INSTALLMENTS_TYPE;
