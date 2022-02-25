@@ -1,5 +1,6 @@
 <?php
 namespace Alma\MonthlyPayments\CustomerData;
+
 use Magento\Customer\CustomerData\SectionSourceInterface;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Checkout\Model\Session;
@@ -9,6 +10,8 @@ use Alma\MonthlyPayments\Helpers\ConfigHelper;
 
 class AlmaSection implements SectionSourceInterface
 {
+    private array $paymentMethods;
+
     public function __construct(
         Logger $logger,
         Session $checkoutSession,
@@ -22,7 +25,27 @@ class AlmaSection implements SectionSourceInterface
         $this->quoteReposityory = $quoteRepository;
         $this->eligibility = $eligibility;
         $this->configHelper = $configHelper;
+        $this->paymentMethods = [
+            Eligibility::INSTALLMENTS_TYPE => [
+                'title' => __($this->configHelper->getInstallmentsPaymentTitle()),
+                'description'  => __($this->configHelper->getInstallmentsPaymentDesc()),
+            ],
+            Eligibility::SPREAD_TYPE => [
+                'title' => __($this->configHelper->getSpreadPaymentTitle()),
+                'description'  => __($this->configHelper->getSpreadPaymentDesc()),
+            ],
+            Eligibility::DEFFERED_TYPE => [
+                'title' => __($this->configHelper->getDeferredPaymentTitle()),
+                'description'  => __($this->configHelper->getDeferredPaymentDesc()),
+            ],
+            Eligibility::MERGED_TYPE => [
+                'title' => __($this->configHelper->getMergePaymentTitle()),
+                'description'  => __($this->configHelper->getMergePaymentDesc()),
+            ],
+        ];
     }
+
+
     public function getSectionData()
     {
         $this->logger->info('----- In GetSection DATA -----',[]);
@@ -54,28 +77,14 @@ class AlmaSection implements SectionSourceInterface
 
     private function getPaymentMethodTexts($typeName):array
     {
-
-        switch ($typeName){
-            case Eligibility::INSTALLMENTS_TYPE :
-                $paymentMethodTitle =__($this->configHelper->getInstallmentsPaymentTitle());
-                $paymentMethodDesc  =__($this->configHelper->getInstallmentsPaymentDesc());
-                break;
-            case Eligibility::SPREAD_TYPE :
-                $paymentMethodTitle =__($this->configHelper->getSpreadPaymentTitle());
-                $paymentMethodDesc  =__($this->configHelper->getSpreadPaymentDesc());
-                break;
-            case Eligibility::DEFFERED_TYPE :
-                $paymentMethodTitle =__($this->configHelper->getDeferredPaymentTitle());
-                $paymentMethodDesc  =__($this->configHelper->getDeferredPaymentDesc());
-                break;
-            default:
-                $paymentMethodTitle =__($this->configHelper->getMergePaymentTitle());
-                $paymentMethodDesc = __($this->configHelper->getMergePaymentDesc());
-                break;
+        foreach ($this->paymentMethods as $key => $paymentMethod) {
+            if ($key == $typeName) {
+                return $paymentMethod;
+            }
         }
-
-        return ["title"=>$paymentMethodTitle,"description"=>$paymentMethodDesc];
+        return [
+            'title' => __($this->configHelper->getMergePaymentTitle()),
+            'description' => __($this->configHelper->getMergePaymentDesc()),
+        ];
     }
-
-
 }
