@@ -466,6 +466,35 @@ class Eligibility
         return $hasActivePlans;
     }
 
+        private function buildType(int $installmentCount, bool $isDeferred) {
+        if ($installmentCount > 1 && !$isDeferred) {
+            return self::INSTALLMENTS_TYPE;
+        }
+        if ($installmentCount > 4 && !$isDeferred) {
+            return self::SPREAD_TYPE;
+        }
+        if ($installmentCount == 4 && $isDeferred) {
+            return self::DEFFERED_TYPE;
+        }
+        return 'other';
+    }
+
+    private function getPaymentType(string $planKey): string {
+
+        $matches = [];
+        $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches);
+
+        if ($isKnownType) {
+            $installmentCount = $matches[1];
+            $isDeferred = $matches[2] > 0 || $matches[3] > 0;
+
+            return $this->buildType($installmentCount, $isDeferred);
+        }
+
+        // we don't know this paymentType
+        return 'other';
+    }
+
     public function sortEligibilities($eligibilities):array
     {
         $sortedEligibilities=[];
@@ -474,20 +503,7 @@ class Eligibility
             $planConfig = $paymentPlan->getPlanConfig();
             $planKey = $planConfig->PlanKey();
 
-            $type = 'other';
-
-            if(preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches)){
-                $this->logger->info('$matches',[$matches]);
-                if($matches[1]>1 && $matches[1]<4 && $matches[2]==0 && $matches[3]==0){
-                    $type = self::INSTALLMENTS_TYPE;
-                }
-                if($matches[1]>4 && $matches[2]==0 && $matches[3]==0){
-                    $type = self::SPREAD_TYPE;
-                }
-                if($matches[1]==1 && ($matches[2]>0 || $matches[3]>0)){
-                    $type = self::DEFFERED_TYPE;
-                }
-            }
+            $type = $this->getPaymentType(string $planKey);
             $sortedEligibilities[$type][]=$paymentPlan;
 
         }
