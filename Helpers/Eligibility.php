@@ -44,7 +44,7 @@ class Eligibility
     const INSTALLMENTS_TYPE = 'installments';
     const SPREAD_TYPE = 'spread';
     const DEFFERED_TYPE = 'deferred';
-    const MERGED_TYPE = 'MERGED';
+    const MERGED_TYPE = 'merged';
     /**
      * @var Session
      */
@@ -466,21 +466,24 @@ class Eligibility
         return $hasActivePlans;
     }
 
-        private function buildType(int $installmentCount, bool $isDeferred) {
+    private function buildType($installmentCount,$isDeferred):string
+    {
+        $type = 'other';
+
         if ($installmentCount > 1 && !$isDeferred) {
-            return self::INSTALLMENTS_TYPE;
+            $type = self::INSTALLMENTS_TYPE;
         }
         if ($installmentCount > 4 && !$isDeferred) {
-            return self::SPREAD_TYPE;
+            $type = self::SPREAD_TYPE;
         }
         if ($installmentCount == 4 && $isDeferred) {
-            return self::DEFFERED_TYPE;
+            $type = self::DEFFERED_TYPE;
         }
-        return 'other';
+        return $type;
     }
 
-    private function getPaymentType(string $planKey): string {
-
+    private function getPaymentType($planKey):string
+    {
         $matches = [];
         $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches);
 
@@ -490,7 +493,6 @@ class Eligibility
 
             return $this->buildType($installmentCount, $isDeferred);
         }
-
         // we don't know this paymentType
         return 'other';
     }
@@ -503,7 +505,7 @@ class Eligibility
             $planConfig = $paymentPlan->getPlanConfig();
             $planKey = $planConfig->PlanKey();
 
-            $type = $this->getPaymentType(string $planKey);
+            $type = $this->getPaymentType($planKey);
             $sortedEligibilities[$type][]=$paymentPlan;
 
         }
