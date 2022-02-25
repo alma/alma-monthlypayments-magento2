@@ -63,6 +63,7 @@
                 </label>
                 <!-- /ko -->
             <!-- /ko -->
+        </p>
         <ul class="alma-installments">
             <!-- ko foreach: spreadSelectedPlan().eligibility.paymentPlan -->
             <li>
@@ -87,10 +88,10 @@
                         <!-- ko if: hasAnnualInterestRate(spreadSelectedPlan().eligibility.annualInterestRate) -->
                         <span data-bind="i18n: 'Annual interest rate :'"></span><span data-bind="text: spreadSelectedPlan().eligibility.annualInterestRate/100+'%'"></span><br />
                         <!-- /ko -->
-                        <b><span data-bind="i18n: 'Total :'"></span><span data-bind="text: totalPaid(spreadSelectedPlan().eligibility.customerTotalCostAmount)"></span></b><br />
+                        <strong><span data-bind="i18n: 'Total :'"></span><span data-bind="text: totalPaid(spreadSelectedPlan().eligibility.customerTotalCostAmount)"></span></strong><br />
                     </span>
             </li>
-        </p>
+        </ul>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->

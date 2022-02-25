@@ -63,6 +63,7 @@
                 </label>
                 <!-- /ko -->
             <!-- /ko -->
+        </p>
         <ul class="alma-installments">
             <!-- ko foreach: deferredSelectedPlan().eligibility.paymentPlan -->
             <li>
@@ -78,7 +79,7 @@
                     </span>
             </li>
             <!-- /ko -->
-        </p>
+        </ul>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
