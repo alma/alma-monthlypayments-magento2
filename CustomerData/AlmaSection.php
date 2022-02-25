@@ -10,7 +10,7 @@ use Alma\MonthlyPayments\Helpers\ConfigHelper;
 
 class AlmaSection implements SectionSourceInterface
 {
-    private array $paymentMethods;
+    private $paymentOptions;
 
     public function __construct(
         Logger $logger,
@@ -25,7 +25,7 @@ class AlmaSection implements SectionSourceInterface
         $this->quoteReposityory = $quoteRepository;
         $this->eligibility = $eligibility;
         $this->configHelper = $configHelper;
-        $this->paymentMethods = [
+        $this->paymentOptions = [
             Eligibility::INSTALLMENTS_TYPE => [
                 'title' => __($this->configHelper->getInstallmentsPaymentTitle()),
                 'description'  => __($this->configHelper->getInstallmentsPaymentDesc()),
@@ -79,7 +79,7 @@ class AlmaSection implements SectionSourceInterface
 
     private function getPaymentMethodTexts($typeName):array
     {
-        foreach ($this->paymentMethods as $key => $paymentMethod) {
+        foreach ($this->paymentOptions as $key => $paymentMethod) {
             if ($key == $typeName) {
                 return $paymentMethod;
             }
