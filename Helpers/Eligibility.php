@@ -476,7 +476,7 @@ class Eligibility
         if ($installmentCount > 4 && !$isDeferred) {
             $type = self::SPREAD_TYPE;
         }
-        if ($installmentCount == 4 && $isDeferred) {
+        if ($installmentCount == 1 && $isDeferred) {
             $type = self::DEFFERED_TYPE;
         }
         return $type;
