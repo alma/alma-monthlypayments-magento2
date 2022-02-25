@@ -27,9 +27,9 @@ class AlmaSection implements SectionSourceInterface
     {
         $this->logger->info('----- In GetSection DATA -----',[]);
         $areMergePaymentMethods = $this->configHelper->getAreMergedPayementMethods();
-        $eligibilities['merged'] = $this->eligibility->getEligiblePlans();
+        $eligibilities[Eligibility::MERGED_TYPE] = $this->eligibility->getEligiblePlans();
         if(!$areMergePaymentMethods){
-            $eligibilities = $this->eligibility->sortEligibilities($eligibilities['merged']);
+            $eligibilities = $this->eligibility->sortEligibilities($eligibilities[Eligibility::MERGED_TYPE]);
         }
 
         $allPaymentPlans = [];
@@ -54,8 +54,7 @@ class AlmaSection implements SectionSourceInterface
 
     private function getPaymentMethodTexts($typeName):array
     {
-        $paymentMethodTitle =__($this->configHelper->getMergePaymentTitle());
-        $paymentMethodDesc = __($this->configHelper->getMergePaymentDesc());
+
         switch ($typeName){
             case Eligibility::INSTALLMENTS_TYPE :
                 $paymentMethodTitle =__($this->configHelper->getInstallmentsPaymentTitle());
@@ -68,6 +67,10 @@ class AlmaSection implements SectionSourceInterface
             case Eligibility::DEFFERED_TYPE :
                 $paymentMethodTitle =__($this->configHelper->getDeferredPaymentTitle());
                 $paymentMethodDesc  =__($this->configHelper->getDeferredPaymentDesc());
+                break;
+            default:
+                $paymentMethodTitle =__($this->configHelper->getMergePaymentTitle());
+                $paymentMethodDesc = __($this->configHelper->getMergePaymentDesc());
                 break;
         }
 

@@ -44,6 +44,7 @@ class Eligibility
     const INSTALLMENTS_TYPE = 'installments';
     const SPREAD_TYPE = 'spread';
     const DEFFERED_TYPE = 'deferred';
+    const MERGED_TYPE = 'MERGED';
     /**
      * @var Session
      */
