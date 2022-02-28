@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Alma_MonthlyPayments::almaconfigmenu"
+             title="Alma" module="Alma_MonthlyPayments"
+             sortOrder="10"
+             resource="Magento_Backend::content"
+             action="admin/system_config/edit/section/payment/"
+        />
+    </menu>
+</config>

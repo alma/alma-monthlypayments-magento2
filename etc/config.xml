@@ -61,8 +61,16 @@
                 <customer_cancel_url
                     backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl"/>
 
+                <alma_merge_payment>0</alma_merge_payment>
                 <title>Alma monthly and deferred payments</title>
                 <description>Pay in deferred or multiple monthly payments with your credit card.</description>
+                <alma_installments_payment_title>Pay in installments with Alma</alma_installments_payment_title>
+                <alma_installments_payment_desc>Fast and secure payment by credit card</alma_installments_payment_desc>
+                <alma_spread_payment_title>Spread your payments with Alma</alma_spread_payment_title>
+                <alma_spread_payment_desc>Fast and secure payment by credit card</alma_spread_payment_desc>
+                <alma_deferred_payment_title>Buy now, Pay later with Alma</alma_deferred_payment_title>
+                <alma_deferred_payment_desc>Fast and secure payment by credit card</alma_deferred_payment_desc>
+
 
                 <show_eligibility_message>1</show_eligibility_message>
                 <eligibility_message>Eligible for monthly payments</eligibility_message>

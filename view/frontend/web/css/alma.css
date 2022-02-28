@@ -13,6 +13,13 @@
     vertical-align: bottom;
 }
 
+.alma.payment-method .alma-method-logo{
+    position: relative;
+    padding : 0 10px;
+    float: right;
+    bottom: 3.5rem;
+    width: 35px;
+}
 .alma.payment-method ul.alma-installments {
     padding: 0;
     margin-bottom: 2rem;
@@ -45,11 +52,9 @@
     font-weight: lighter;
     font-size: smaller;
 }
-.alma.payment-method .payment-method-title {
-    padding: 20px 0 0px 0;
-}
 .alma.payment-method .payment-method-description {
     font-size: smaller;
     color:grey;
-    padding:0.8rem 0;
+    position:relative;
+    bottom: 20px;
 }

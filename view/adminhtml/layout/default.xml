@@ -1,6 +1,5 @@
 <!--
-/**
- * 2018 Alma / Nabla SAS
+ * 2018-2020 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -17,21 +16,13 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @author    Alma / Nabla SAS <contact@getalma.eu>
- * @copyright 2018 Alma / Nabla SAS
+ * @author    Alma SAS <contact@getalma.eu>
+ * @copyright 2018-2020 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
- *
- */
--->
-    <!-- ko if: mergedPaymentMethod -->
-        <!-- ko template: 'Alma_MonthlyPayments/payment/merged' --><!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: installmentsPaymentMethod -->
-        <!-- ko template: 'Alma_MonthlyPayments/payment/installments' --><!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: spreadPaymentMethod -->
-        <!-- ko template: 'Alma_MonthlyPayments/payment/spread' --><!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: deferredPaymentMethod -->
-    <!-- ko template: 'Alma_MonthlyPayments/payment/deferred' --><!-- /ko -->
-    <!-- /ko -->
+ * -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Alma_MonthlyPayments::css/alma_menu.css"/>
+    </head>
+</page>

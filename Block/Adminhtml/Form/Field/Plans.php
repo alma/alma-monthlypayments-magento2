@@ -72,21 +72,15 @@ class Plans extends Field
             $p2 = $plans[$k2];
 
             // Deferred plans come last, with everything ordered by installments count or deferred duration
-            if ($p1->isDeferred() && $p2->isDeferred()) {
-                // Both deferred plans: sorted by installments count first
-                if ($p1->installmentsCount() != $p2->installmentsCount()) {
-                    return $p1->installmentsCount() - $p2->installmentsCount();
-                }
-
+            if ($p1->isDeferred() && $p2->isDeferred() && $p1->installmentsCount() == $p2->installmentsCount()) {
                 // Most deferred plans will have installmentsCount == 1 and be sorted on duration
                 return $p1->deferredDurationInDays() - $p2->deferredDurationInDays();
             } elseif ($p1->isDeferred() || $p2->isDeferred()) {
                 // Only one of the two plans is deferred: it should come last
                 return $p1->isDeferred() ? 1 : -1;
-            } else {
-                // Both plans are "regular" plans: sort them by installments count
-                return $p1->installmentsCount() - $p2->installmentsCount();
             }
+            // Both plans are "regular" plans: sort them by installments count
+            return $p1->installmentsCount() - $p2->installmentsCount();
         });
 
         return $plans;

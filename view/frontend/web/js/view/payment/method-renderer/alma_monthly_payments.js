@@ -71,9 +71,7 @@ define(
                     region.valueHasMutated();
                 }
             }
-
             region.subscribe(reorderMethods);
-            reorderMethods();
         });
 
 
@@ -83,60 +81,75 @@ define(
                 template: 'Alma_MonthlyPayments/payment/form',
             },
             totals: quote.getTotals(),
-            paymentPlans: ko.computed(function() {
-                return customerData.get('alma_section')().paymentPlans
-            }),
 
             initialize: function () {
+
                 self=this;
                 this._super();
+                this.totals.subscribe(this.reloadObserver.bind(this));
 
-                self.totals.subscribe(this.reloadObserver.bind(this));
+                this.almaSectionName = 'alma_section';
 
                 this.config = window.checkoutConfig.payment[this.item.method];
+                this.almaSection = ko.observable(customerData.get(self.almaSectionName)())
 
-                this.selectedPlanKey = ko.observable(this.defaultPlan().key);
+                this.checkedPaymentMethod = ko.observable('');
+                this.lastSelectedPlanKey =  ko.observable('');
 
-                this.selectedPlan = ko.computed(function () {
-                    var key = this.selectedPlanKey();
+                ['merged','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption))
+            },
 
-                    var currentSelectedPlan = self.paymentPlans().find(function (plan) {
-                        return plan.key === key;
-                    });
-                    if (!currentSelectedPlan){
-                        currentSelectedPlan = self.paymentPlans().find(function (plan) {
-                            this.selectedPlanKey = ko.observable(this.defaultPlan().key);
-                            return plan.key === this.defaultPlan().key;
-                        },this) ;
+            initObservablesAndComputedFor : function (paymentOption) {
+                var paymentCode = this.getCode() + '_' + paymentOption;
+                this[`${paymentOption}PaymentCode`] = paymentCode;
+
+                this[`${paymentOption}PaymentMethod`] = ko.observable(false);
+                this[`${paymentOption}PaymentPlans`] = ko.observable([]);
+
+                if(this.almaSection().paymentMethods[paymentOption]) {
+
+                    // -- Init checked payment Method if empty
+                    if (this.checkedPaymentMethod() == '') {
+                        this.checkedPaymentMethod = ko.observable(paymentCode)
                     }
-                    return currentSelectedPlan;
-                }, this);
 
+                    // -- Init Installments computed based on section
+                    this[`${paymentOption}PaymentMethod`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption])
+                    this[`${paymentOption}PaymentPlans`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption].paymentPlans)
+                    // -- Init selected plan for payment schedule display
+                    var defaultPlan =  this[`${paymentOption}PaymentPlans`]()[0];
+                    this[`${paymentOption}SelectedPlanKey`] = ko.observable(defaultPlan.key);
+                    this[`${paymentOption}SelectedPlan`] = ko.computed(() =>
+                        self.selectedPlan(self[`${paymentOption}SelectedPlanKey`](),self[`${paymentOption}PaymentPlans`](), paymentCode)
+                    )
+                    this[`${paymentOption}IsChecked`] = ko.computed(() => self.fallbackIsChecked(paymentCode))
+                }
             },
-            getPlans : function(){
-                return self.paymentPlans
+
+            selectedPlan : function (key,plans,paymentCode) {
+                var currentSelectedPlan = [];
+                currentSelectedPlan = plans.find(function (plan) {
+                    return plan.key === key;
+                });
+                if(self.checkedPaymentMethod() == paymentCode){
+                    self.lastSelectedPlanKey = currentSelectedPlan.key;
+                }
+                return currentSelectedPlan;
             },
-            reloadObserver: function(){
+
+            fallbackIsChecked : function (paymentCode) {
+                var isChecked = false;
+                if(( this.isChecked() == null|| this.isChecked() == this.getCode() ) && this.checkedPaymentMethod() == paymentCode){
+                    isChecked = true;
+                }
+                return isChecked;
+            },
+            reloadObserver: function () {
                 this.reloadAlmaSection();
             },
-            reloadAlmaSection:function (){
-            customerData.invalidate(['alma_section'])
-            customerData.reload(['alma_section'])
-            },
-            defaultPlan: function () {
-                return self.paymentPlans().reduce(function (plan, result) {
-                    if (plan.installmentsCount === 3 || plan.installmentsCount > result.installmentsCount) {
-                        return plan;
-                    }
-
-                    return result;
-                }, self.paymentPlans()[0]);
-            },
-            getTitle:function (){
-                return this.config.title;
-            },
-            getDescription: function () {
-                return this.config.description;
+            reloadAlmaSection:function () {
+            customerData.invalidate([self.almaSectionName])
+            customerData.reload([self.almaSectionName])
             },
 
             getPlanLabel: function (plan) {
@@ -158,7 +171,7 @@ define(
             },
 
             cartTotal: function () {
-                return priceUtils.formatPrice(self.totals().grand_total, window.checkoutConfig.priceFormat);
+                return priceUtils.formatPrice(this.totals().grand_total, window.checkoutConfig.priceFormat);
             },
 
             customerTotalCostAmount: function (cost) {
@@ -176,20 +189,18 @@ define(
             getFeesMention: function (customerFee) {
                 return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
             },
-
             getData: function () {
                 return $.extend(
                     this._super(),
                     {
                         additional_data: {
-                            selectedPlan: this.selectedPlanKey()
+                            selectedPlan:  this.lastSelectedPlanKey
                         }
                     }
                 );
             },
             afterPlaceOrder: function () {
                 fullScreenLoader.startLoader();
-
                 // Get payment page URL from checkoutConfig and redirect
                 $.mage.redirect(this.config.redirectTo);
             }

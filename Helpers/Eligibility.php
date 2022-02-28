@@ -41,6 +41,10 @@ use Magento\Framework\Pricing\Helper\Data;
 
 class Eligibility
 {
+    const INSTALLMENTS_TYPE = 'installments';
+    const SPREAD_TYPE = 'spread';
+    const DEFFERED_TYPE = 'deferred';
+    const MERGED_TYPE = 'merged';
     /**
      * @var Session
      */
@@ -460,6 +464,52 @@ class Eligibility
             }
         }
         return $hasActivePlans;
+    }
+
+    private function buildType($installmentCount,$isDeferred):string
+    {
+        $type = 'other';
+
+        if ($installmentCount > 1 && !$isDeferred) {
+            $type = self::INSTALLMENTS_TYPE;
+        }
+        if ($installmentCount > 4 && !$isDeferred) {
+            $type = self::SPREAD_TYPE;
+        }
+        if ($installmentCount == 1 && $isDeferred) {
+            $type = self::DEFFERED_TYPE;
+        }
+        return $type;
+    }
+
+    private function getPaymentType($planKey):string
+    {
+        $matches = [];
+        $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches);
+
+        if ($isKnownType) {
+            $installmentCount = $matches[1];
+            $isDeferred = $matches[2] > 0 || $matches[3] > 0;
+
+            return $this->buildType($installmentCount, $isDeferred);
+        }
+        // we don't know this paymentType
+        return 'other';
+    }
+
+    public function sortEligibilities($eligibilities):array
+    {
+        $sortedEligibilities=[];
+        foreach ($eligibilities as $paymentPlan){
+
+            $planConfig = $paymentPlan->getPlanConfig();
+            $planKey = $planConfig->PlanKey();
+
+            $type = $this->getPaymentType($planKey);
+            $sortedEligibilities[$type][]=$paymentPlan;
+
+        }
+        return $sortedEligibilities;
     }
 
 }
