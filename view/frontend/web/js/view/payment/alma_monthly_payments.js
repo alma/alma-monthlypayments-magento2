@@ -27,16 +27,20 @@
 define(
     [
         'uiComponent',
-        'Magento_Checkout/js/model/payment/renderer-list'
+        'Magento_Checkout/js/model/payment/renderer-list',
+        'Magento_Customer/js/customer-data'
     ],
     function (
         Component,
-        rendererList
+        rendererList,
+        customerData
     ) {
         'use strict';
 
         var methodCode = 'alma_monthly_payments';
-        if (window.checkoutConfig.payment[methodCode].paymentPlans.length > 0) {
+        var almaSectionName = 'alma_section';
+
+        if (customerData.get(almaSectionName)().allPaymentPlans.length > 0) {
             rendererList.push(
                 {
                     type: methodCode,
