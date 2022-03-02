@@ -93,24 +93,11 @@ class ConfigProvider implements ConfigProviderInterface
                     'title' => __($this->config->getPaymentButtonTitle()),
                     'description' => __($this->config->getPaymentButtonDescription()),
                     'sortOrder' => $this->config->getSortOrder(),
-                    'locale' => str_replace('_', '-', $this->localeResolver->getLocale()),
-                    'paymentPlans' => array_map(function ($pe) {
-                        $planConfig = $pe->getPlanConfig();
-
-                        $plan = $planConfig->toArray();
-                        $plan['key'] = $planConfig->planKey();
-                        $plan['logo'] = $planConfig->logoFileName();
-                        $plan['paymentPlan'] = $pe->getEligibility()->getPaymentPlan();
-
-                        // TODO : we need to take only customerTotalCostAmount and annualInterestRate
-                        $plan['eligibility'] = $pe->getEligibility();
-
-                        return $plan;
-                    }, $this->eligibilityHelper->getEligiblePlans())
+                    'locale' => str_replace('_', '-', $this->localeResolver->getLocale())
                 ]
             ]
         ];
-        $this->logger->info('Payment Provider Config',[$paymentConfig]);
+        //$this->logger->info('Payment Provider Config',[$paymentConfig]);
         return $paymentConfig;
     }
 }
