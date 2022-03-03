@@ -546,7 +546,7 @@ class Eligibility
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function getEligibilityQuote():?object
+    private function getEligibilityQuote()
     {
         if(isset($this->quote)){
             return $this->quote;
