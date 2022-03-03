@@ -43,17 +43,6 @@
         <plugin name="cart_eligibility" type="Alma\MonthlyPayments\Plugin\Checkout\CustomerData\CartEligibility"/>
     </type>
 
-    <!-- Makes sure there's a CheckoutSession with an active quote (to properly handle REST API calls from custom frontend) -->
-    <type name="Magento\Checkout\Model\ShippingInformationManagement">
-        <plugin name="set_quoteid_to_session"
-                type="Alma\MonthlyPayments\Plugin\Checkout\Model\ShippingInformationManagement" sortOrder="1"/>
-    </type>
-    <type name="Magento\Quote\Model\PaymentMethodManagement">
-        <plugin name="set_quoteid_to_session" type="Alma\MonthlyPayments\Plugin\Quote\Model\PaymentMethodManagement"
-                sortOrder="1"/>
-    </type>
-
-
     <!-- Payment Method Facade configuration -->
     <virtualType name="AlmaMonthlyPaymentsGatewayFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
