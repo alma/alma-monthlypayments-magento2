@@ -135,7 +135,7 @@ class QuoteHelper
      * @return \Magento\Quote\Model\Quote\Interceptor|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    private function getQuoteById($cartId):?\Magento\Quote\Model\Quote\Interceptor
+    public function getQuoteById($cartId):?\Magento\Quote\Model\Quote\Interceptor
     {
         $quote = null;
         try {

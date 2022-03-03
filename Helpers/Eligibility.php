@@ -356,6 +356,9 @@ class Eligibility
      */
     public function getCurrentsFeePlans(): array
     {
+        if (!$this->isAlreadyLoaded()){
+            $this->getEligiblePlans();
+        }
         return $this->currentFeePlans;
     }
 
@@ -539,6 +542,19 @@ class Eligibility
     public function setEligibilityQuote($quote):void
     {
         $this->quote=$quote;
+    }
+
+    /**
+     * @param $quoteId int
+     * @return void
+     */
+    public function setEligibilityQuoteById($quoteId):void
+    {
+        try {
+            $this->quote = $this->quoteHelper->getQuoteById($quoteId);
+        } catch (\Exception $e) {
+            $this->logger->info('Set eligibility quote by id exception : ',[$e->getMessage()]);
+        }
     }
 
     /**
