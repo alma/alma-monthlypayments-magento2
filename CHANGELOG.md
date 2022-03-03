@@ -3,6 +3,7 @@ Changelog
 
 v2.2.0
 ------
+* Add quote selector for eligibility and remove checkout session.
 
 * Use custom class for back-office display
 * Fixes total cart round credit cost

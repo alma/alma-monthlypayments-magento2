@@ -3,25 +3,41 @@ namespace Alma\MonthlyPayments\CustomerData;
 
 use Magento\Customer\CustomerData\SectionSourceInterface;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Checkout\Model\Session;
 use Magento\Quote\Model\QuoteRepository;
 use Alma\MonthlyPayments\Helpers\Eligibility;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 
 class AlmaSection implements SectionSourceInterface
 {
+    /**
+     * @var array[]
+     */
     private $paymentOptions;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var QuoteRepository
+     */
+    private $quoteReposityory;
+    /**
+     * @var Eligibility
+     */
+    private $eligibility;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
 
     public function __construct(
         Logger $logger,
-        Session $checkoutSession,
         QuoteRepository $quoteRepository,
         Eligibility $eligibility,
         ConfigHelper $configHelper
     )
     {
         $this->logger = $logger;
-        $this->checkoutSession = $checkoutSession;
         $this->quoteReposityory = $quoteRepository;
         $this->eligibility = $eligibility;
         $this->configHelper = $configHelper;
@@ -48,7 +64,6 @@ class AlmaSection implements SectionSourceInterface
 
     public function getSectionData()
     {
-        $this->logger->info('----- In GetSection DATA -----',[]);
         $areMergePaymentMethods = $this->configHelper->getAreMergedPayementMethods();
         $eligibilities[Eligibility::MERGED_TYPE] = $this->eligibility->getEligiblePlans();
         if(!$areMergePaymentMethods){

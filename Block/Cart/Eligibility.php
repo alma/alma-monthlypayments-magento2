@@ -25,6 +25,9 @@
 
 namespace Alma\MonthlyPayments\Block\Cart;
 
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
@@ -72,7 +75,12 @@ class Eligibility extends Template
 
     public function checkEligibility()
     {
-        $this->eligibilityHelper->checkEligibility();
+        try {
+            $this->eligibilityHelper->checkEligibility();
+        } catch (\InvalidArgumentException $e) {
+            $this->logger->info('InvalidArgumentException : ',[$e->getMessage()]);
+            return false;
+        }
     }
 
     public function isEligible()
