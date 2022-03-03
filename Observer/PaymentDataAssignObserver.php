@@ -42,7 +42,7 @@ class PaymentDataAssignObserver extends AbstractDataAssignObserver
     /**
      * @var Logger
      */
-    private Logger $logger;
+    private $logger;
 
     public function __construct(
         Logger $logger

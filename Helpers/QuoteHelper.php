@@ -29,7 +29,6 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Checkout\Model\Session;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Quote\Model\QuoteRepository;
-use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
 
 class QuoteHelper
 {
@@ -54,30 +53,22 @@ class QuoteHelper
     private $quoteRepository;
 
     /**
-     * @var MaskedQuoteIdToQuoteIdInterface
-     */
-    private $maskedQuoteIdToQuoteId;
-
-    /**
      * @param Logger $logger
      * @param UserContextInterface $userContext
      * @param QuoteRepository $quoteRepository
      * @param Session $checkoutSession
-     * @param MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
      */
     public function __construct(
         Logger $logger,
         UserContextInterface $userContext,
         QuoteRepository $quoteRepository,
-        Session $checkoutSession,
-        MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
+        Session $checkoutSession
     )
     {
         $this->logger = $logger;
         $this->userContext = $userContext;
         $this->quoteRepository = $quoteRepository;
         $this->checkoutSession = $checkoutSession;
-        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId;
     }
 
     /**
@@ -170,16 +161,6 @@ class QuoteHelper
     private function getQuoteIdFromSession():?int
     {
         return $this->checkoutSession->getQuoteId();
-    }
-
-    /**
-     * @param $maskedQuoteId
-     * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    private function getQuoteIdByMaskedQuoteId($maskedQuoteId): int
-    {
-        return  $this->maskedQuoteIdToQuoteId->execute($maskedQuoteId);
     }
 
     /**
