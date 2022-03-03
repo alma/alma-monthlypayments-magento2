@@ -134,16 +134,16 @@ class Eligibility
      * @throws LocalizedException
      * @throws NoSuchEntityException
      * @throws RequestError
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function getPlansEligibility(): array
     {
         $this->logger->info('get Plans Eligibility',[]);
         if (!$this->alma){
-            throw new \Exception('Alma client is not define');
+            throw new \InvalidArgumentException('Alma client is not define');
         }
         if (!$this->checkItemsTypes()){
-            throw new \Exception($this->config->getExcludedProductsMessage());
+            throw new \InvalidArgumentException($this->config->getExcludedProductsMessage());
         }
 
         if ($this->isAlreadyLoaded()){

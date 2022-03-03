@@ -98,8 +98,6 @@ class Quote
         $billingCountry  = $billingAddress->getCountryId();
         $shippingCountry = $shippingAddress->getCountryId();
 
-        $customer = $quote->getCustomer();
-
         $data = [
             'online'          => 'online',
             'purchase_amount' => Functions::priceToCents((float) $quote->getGrandTotal()),
