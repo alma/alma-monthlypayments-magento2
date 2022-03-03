@@ -138,6 +138,7 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
+        $this->logger->info('get Plans Eligibility',[]);
         if (!$this->alma){
             throw new \Exception('Alma client is not define');
         }
@@ -216,6 +217,8 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
+        $this->logger->info('CheckEligibility',[]);
+
         if(!isset($this->quote)){
             throw new \InvalidArgumentException('No Quote for eligibility');
         }
@@ -539,11 +542,11 @@ class Eligibility
     }
 
     /**
-     * @return Quote|null
+     * @return Quote|Interceptor|null
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function getEligibilityQuote():?Quote
+    private function getEligibilityQuote():?object
     {
         if(isset($this->quote)){
             return $this->quote;
