@@ -27,7 +27,7 @@ namespace Alma\MonthlyPayments\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Quote\Api\Data\PaymentInterface;
-use Alma\MonthlyPayments\Model\Ui\ConfigProvider;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentDataAssignObserver extends AbstractDataAssignObserver
 {
@@ -39,13 +39,15 @@ class PaymentDataAssignObserver extends AbstractDataAssignObserver
     protected $additionalInformationList = [
         self::SELECTED_PLAN
     ];
+    /**
+     * @var Logger
+     */
+    private Logger $logger;
 
     public function __construct(
-        \Alma\MonthlyPayments\Helpers\Logger $logger,
-        ConfigProvider $configProvider
+        Logger $logger
     ) {
         $this->logger = $logger;
-        $this->configProvider = $configProvider;
     }
 
 
