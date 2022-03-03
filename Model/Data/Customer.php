@@ -125,37 +125,7 @@ class Customer
                 // just ignore
             }
         }
-
-        // Find all orders completed by the customer in the past
-        $this->searchCriteriaBuilder
-            ->addFilter('status', Order::STATE_COMPLETE)
-            ->setSortOrders([
-                new SortOrder([SortOrder::FIELD => "created_at", SortOrder::DIRECTION => SortOrder::SORT_DESC])
-            ])
-            ->setPageSize(100);
-
-        if ($customer) {
-            $this->searchCriteriaBuilder->addFilter('customer_id', $customer->getId());
-        } elseif ($customerData['email']) {
-            $this->searchCriteriaBuilder->addFilter('customer_email', $customerData['email']);
-        } else {
-            return $customerData;
-        }
-
-        $customerData['metadata']['past_orders'] = [];
-
-        $criteria = $this->searchCriteriaBuilder->create();
-        $orders = $this->orderRepository->getList($criteria)->getItems();
-
-        foreach ($orders as $order) {
-            $customerData['metadata']['past_orders'][] = [
-                "id" => $order->getEntityId(),
-                "amount" => Functions::priceToCents($order->getTotalPaid()),
-                "date" => strtotime($order->getCreatedAt()),
-                "payment_method" => $order->getPayment()->getMethod()
-            ];
-        }
-
+        
         return $customerData;
     }
 }
