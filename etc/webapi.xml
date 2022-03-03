@@ -32,7 +32,7 @@
         </resources>
     </route>
 
-    <route url="/V1/alma/payments/url" method="GET">
+    <route url="/V1/alma/payments/url/:orderId" method="GET">
         <service class="Alma\MonthlyPayments\Api\PaymentInterface" method="getPaymentUrl"/>
         <resources>
             <resource ref="anonymous"/>
