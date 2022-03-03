@@ -55,6 +55,10 @@ class Quote
      * @var Resolver
      */
     private $locale;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Quote constructor.
@@ -89,7 +93,6 @@ class Quote
      */
     public function eligibilityDataFromQuote(MagentoQuote $quote, array $installmentsQuery): array
     {
-        $this->logger->info('eligibilityDataFromQuote',[]);
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
         $billingAddress  = new AddressAdapter($quote->getBillingAddress());
         $billingCountry  = $billingAddress->getCountryId();
@@ -102,7 +105,7 @@ class Quote
             'purchase_amount' => Functions::priceToCents((float) $quote->getGrandTotal()),
             'locale'          => $this->locale->getLocale(),
             'queries'         => $installmentsQuery,
-            'customer'        => $this->customerData->dataFromCustomer($customer, [$billingAddress, $shippingAddress]),
+            'customer'        => '',
         ];
         if ($billingCountry) {
             $data['billing_address'] = ['country' => $billingCountry];
