@@ -50,8 +50,8 @@ class AvailabilityValidator extends AbstractValidator
      * @param Eligibility $eligibilityHelper
      */
     public function __construct(
-        Logger $logger,
         ResultInterfaceFactory $resultFactory,
+        Logger $logger,
         Availability $availabilityHelper,
         Eligibility $eligibilityHelper
     )

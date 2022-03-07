@@ -33,11 +33,11 @@ use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
 use Magento\Quote\Model\QuoteFactory;
-use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data;
+use Alma\MonthlyPayments\Helpers\QuoteHelper;
 
 class Eligibility
 {
@@ -45,10 +45,6 @@ class Eligibility
     const SPREAD_TYPE = 'spread';
     const DEFFERED_TYPE = 'deferred';
     const MERGED_TYPE = 'merged';
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
     /**
      * @var Data
      */
@@ -87,77 +83,78 @@ class Eligibility
      * @var PaymentPlanEligibility[]
      */
     private $currentFeePlans;
+    /**
+     * @var QuoteHelper
+     */
+    private $quoteHelper;
+
+    /**
+     * @var null
+     */
+    private $quote;
 
     /**
      * Eligibility constructor.
-     * @param Session $checkoutSession
      * @param Data $pricingHelper
      * @param AlmaClient $almaClient
      * @param Logger $logger
      * @param Config $config
      * @param AlmaQuote $quoteData
      * @param QuoteFactory $quoteFactory
+     * @param QuoteHelper $quoteHelper
+     * @throws LocalizedException
      */
     public function __construct(
-        Session $checkoutSession,
         Data $pricingHelper,
         Helpers\AlmaClient $almaClient,
         Helpers\Logger $logger,
         Config $config,
         AlmaQuote $quoteData,
-        QuoteFactory $quoteFactory
+        QuoteFactory $quoteFactory,
+        QuoteHelper $quoteHelper
     )
     {
-        $this->checkoutSession = $checkoutSession;
         $this->pricingHelper = $pricingHelper;
-        $this->logger = $logger;
         $this->alma = $almaClient->getDefaultClient();
+        $this->logger = $logger;
         $this->config = $config;
         $this->quoteData = $quoteData;
         $this->quoteFactory = $quoteFactory;
+        $this->quoteHelper = $quoteHelper;
         $this->alreadyLoaded = false;
         $this->currentFeePlans = [];
+        $this->quote = $this->getEligibilityQuote();
     }
 
     /**
-     * @param PaymentPlanConfigInterface[] $plansConfig
-     * @param string                       $planKey
-     *
-     * @return null|PaymentPlanConfigInterface
-     */
-    private function getPlanConfigFromKey(array $plansConfig, string $planKey): ?PaymentPlanConfigInterface
-    {
-        foreach ($plansConfig as $planConfig) {
-            if ($planConfig->planKey() === $planKey) {
-                return $planConfig;
-            }
-        }
-
-        return null;
-    }
-
-    /**
+     * Get eligibility plans
      * @return PaymentPlanEligibility[]
      *
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
      * @throws RequestError
+     * @throws InvalidArgumentException
      */
     private function getPlansEligibility(): array
     {
-        if ($this->isAlreadyLoaded() || !$this->alma || !$this->checkItemsTypes() ){
+        if (!$this->alma){
+            throw new \InvalidArgumentException('Alma client is not define');
+        }
+        if (!$this->checkItemsTypes()){
+            throw new \InvalidArgumentException($this->config->getExcludedProductsMessage());
+        }
+
+        if ($this->isAlreadyLoaded()){
             $this->logger->info('Fee plans are already loaded',[]);
             return $this->getCurrentsFeePlans();
         }
-        $this->logger->info('Get fee plans with API',[]);
 
-        $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
-
-        // Get enabled plans and build a list of installments counts that should be tested for eligibility
+        $cartTotal = Functions::priceToCents((float)$this->quote->getGrandTotal());
+        // Get enabled plans in BO and build a list of installments counts that should be tested for eligibility
         $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
         $installmentsQuery         = [];
-        $availablePlans            = [];
+        $availablePlansKeyInBo     = [];
 
         foreach ($enabledPlansInConfig as $planKey => $planConfig) {
             if (
@@ -172,42 +169,40 @@ class Eligibility
                     'deferred_month' => $planConfig->deferredMonths(),
                     'cart_total' => $cartTotal,
                 ];
-                $availablePlans[] = $planKey;
+                $availablePlansKeyInBo[] = $planKey;
             }
         }
 
         if (empty($installmentsQuery)) {
-            $this->logger->info('No eligible installment in config');
+            $this->logger->info('No eligible installment in config for this amount');
             return [];
         }
 
-        $quote = $this->quoteFactory->create()->load($this->checkoutSession->getQuote()->getId());
         $eligibilities = $this->alma->payments->eligibility(
-            $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
+            $this->quoteData->eligibilityDataFromQuote($this->quote,$installmentsQuery),
             true
         );
-        if (!is_array($eligibilities) && $eligibilities instanceof \Alma\API\Endpoints\Results\Eligibility) {
-            $eligibilities = [$eligibilities->getPlanKey() => $eligibilities];
-        }
+
+        $eligibilities = $this->formatResultEligibility($eligibilities);
+
         $plansEligibility = [];
-        foreach ($availablePlans as $planKey) {
+        foreach ($availablePlansKeyInBo as $planKey) {
             $planConfig  = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
+
             if (!$planConfig) {
                 $this->logger->info('No Plan Config' ,['planKey' => $planKey]);
                 continue;
             }
+            // Check if bo plan is in eligibility list
             if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
-                $this->logger->info('Plan is not Eligible for this country' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
+                $this->logger->info('Configured plan is not eligible : ' ,['planKey' => $planKey, 'country' => $this->quote->getBillingAddress()->getCountryId()]);
                 continue;
             }
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
             $plansEligibility[$planConfig->planKey()] = new PaymentPlanEligibility($planConfig, $eligibility);
         }
         $feePlans = array_values($plansEligibility);
-
-        $hasPlansLoaded = $this->setCurrentsFeePlans($feePlans);
-        $this->setIsAlreadyLoaded($hasPlansLoaded);
-
+        $this->setCurrentsFeePlans($feePlans);
         return $feePlans;
     }
 
@@ -218,15 +213,20 @@ class Eligibility
      * @throws LocalizedException
      * @throws NoSuchEntityException
      *
-     * TODO : Do not check Eligibility when cart is empty
      */
     public function checkEligibility(): bool
     {
+
+        if(!isset($this->quote)){
+            throw new \InvalidArgumentException('No Quote for eligibility');
+        }
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
+
         $this->eligible = false;
         $this->message = $nonEligibilityMessage;
+
         if (!$this->checkItemsTypes()) {
             $this->message .='<br>' . $excludedProductsMessage;
             return false;
@@ -244,24 +244,14 @@ class Eligibility
         $maxAmount = $this->getMaxPurchaseAmountInBo();
         foreach ($plansEligibility as $planEligibility) {
             $eligibility = $planEligibility->getEligibility();
-
             if ($eligibility->isEligible()) {
                 $anyEligible = true;
                 break;
             }
-
-            $reasons = $eligibility->getReasons();
-            if (key_exists('purchase_amount', $reasons) && $reasons['purchase_amount'] == 'invalid_value') {
-                $minAmount = min($minAmount, $eligibility->getConstraints()['purchase_amount']['minimum']);
-                $maxAmount = max($maxAmount, $eligibility->getConstraints()['purchase_amount']['maximum']);
-            } else {
-                $minAmount = min($minAmount, $planEligibility->getPlanConfig()->minimumAmount());
-                $maxAmount = max($maxAmount, $planEligibility->getPlanConfig()->maximumAmount());
-            }
         }
 
         if (!$anyEligible) {
-            $cartTotal = Functions::priceToCents((float)$this->checkoutSession->getQuote()->getGrandTotal());
+            $cartTotal = Functions::priceToCents((float)$this->quote->getGrandTotal());
 
             if ($cartTotal > $maxAmount) {
                 $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
@@ -288,8 +278,8 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage(), $e->getTrace());
-            return [];
+            $this->logger->info($e->getMessage(), [$e->getTrace()]);
+        return [];
         }
     }
 
@@ -303,16 +293,29 @@ class Eligibility
      */
     private function checkItemsTypes(): bool
     {
-        $quote = $this->checkoutSession->getQuote();
         $excludedProductTypes = $this->config->getExcludedProductTypes();
-
-        foreach ($quote->getAllItems() as $item) {
+        foreach ($this->quote->getAllItems() as $item) {
             if (in_array($item->getProductType(), $excludedProductTypes)) {
                 return false;
             }
         }
-
         return true;
+    }
+
+    /**
+     * @param PaymentPlanConfigInterface[] $plansConfig
+     * @param string                       $planKey
+     *
+     * @return null|PaymentPlanConfigInterface
+     */
+    private function getPlanConfigFromKey(array $plansConfig, string $planKey): ?PaymentPlanConfigInterface
+    {
+        foreach ($plansConfig as $planConfig) {
+            if ($planConfig->planKey() === $planKey) {
+                return $planConfig;
+            }
+        }
+        return null;
     }
 
     /**
@@ -351,6 +354,9 @@ class Eligibility
      */
     public function getCurrentsFeePlans(): array
     {
+        if (!$this->isAlreadyLoaded()){
+            $this->getEligiblePlans();
+        }
         return $this->currentFeePlans;
     }
 
@@ -366,6 +372,8 @@ class Eligibility
         if (count($feePlans)>0){
             $this->currentFeePlans = $feePlans;
             $hasFeePlans  = true;
+            $this->setIsAlreadyLoaded($hasFeePlans);
+
         }
         return $hasFeePlans;
     }
@@ -456,16 +464,59 @@ class Eligibility
     {
         $hasActivePlans = false;
         $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
-        $this->logger->info('In hasEnabledPaymentPlansInBo',[$inConfigPaymentPlans]);
         foreach ($inConfigPaymentPlans as $paymentPlan) {
             if($paymentPlan->isEnabled()){
-                $this->logger->info('Has an active plan',[$paymentPlan]);
-                $hasActivePlans = true;
+                return true;
             }
         }
         return $hasActivePlans;
     }
 
+    /**
+     * @param PaymentPlanEligibility[] $eligibilities
+     * @return array
+     */
+    public function sortEligibilities($eligibilities):array
+    {
+        $sortedEligibilities=[];
+        foreach ($eligibilities as $paymentPlan){
+
+            $planConfig = $paymentPlan->getPlanConfig();
+            $planKey = $planConfig->planKey();
+
+            $type = $this->getPaymentType($planKey);
+            $sortedEligibilities[$type][]=$paymentPlan;
+
+        }
+        return $sortedEligibilities;
+    }
+
+    /**
+     * Get payment type according to plan key ( like general:10:0:0 ) for split ordering
+     * @param string $planKey
+     * @return string
+     */
+    private function getPaymentType($planKey):string
+    {
+        $matches = [];
+        $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches);
+
+        if ($isKnownType) {
+            $installmentCount = $matches[1];
+            $isDeferred = $matches[2] > 0 || $matches[3] > 0;
+
+            return $this->buildType($installmentCount, $isDeferred);
+        }
+        // We don't know this paymentType
+        return 'other';
+    }
+
+    /**
+     * Build type for according to installment count and is deferred flag
+     * @param int $installmentCount
+     * @param bool $isDeferred
+     * @return string
+     */
     private function buildType($installmentCount,$isDeferred):string
     {
         $type = 'other';
@@ -482,34 +533,53 @@ class Eligibility
         return $type;
     }
 
-    private function getPaymentType($planKey):string
+    /**
+     * @param Quote $quote
+     * @return void
+     */
+    public function setEligibilityQuote($quote):void
     {
-        $matches = [];
-        $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches);
-
-        if ($isKnownType) {
-            $installmentCount = $matches[1];
-            $isDeferred = $matches[2] > 0 || $matches[3] > 0;
-
-            return $this->buildType($installmentCount, $isDeferred);
-        }
-        // we don't know this paymentType
-        return 'other';
+        $this->quote=$quote;
     }
 
-    public function sortEligibilities($eligibilities):array
+    /**
+     * @param $quoteId int
+     * @return void
+     */
+    public function setEligibilityQuoteById($quoteId):void
     {
-        $sortedEligibilities=[];
-        foreach ($eligibilities as $paymentPlan){
-
-            $planConfig = $paymentPlan->getPlanConfig();
-            $planKey = $planConfig->PlanKey();
-
-            $type = $this->getPaymentType($planKey);
-            $sortedEligibilities[$type][]=$paymentPlan;
-
+        try {
+            $this->quote = $this->quoteHelper->getQuoteById($quoteId);
+        } catch (\Exception $e) {
+            $this->logger->info('Set eligibility quote by id exception : ',[$e->getMessage()]);
         }
-        return $sortedEligibilities;
     }
 
+    /**
+     * @return Quote|Interceptor|null
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    private function getEligibilityQuote()
+    {
+        if(isset($this->quote)){
+            return $this->quote;
+        }
+        $this->quote = $this->quoteHelper->getQuote();
+        return $this->quote;
+    }
+
+    /**
+     * Convert instanceof \Alma\API\Endpoints\Results\Eligibility in array
+     * @param $eligibilities
+     * @return array
+     */
+    private function formatResultEligibility($eligibilities):array
+    {
+        if (!is_array($eligibilities) && $eligibilities instanceof \Alma\API\Endpoints\Results\Eligibility) {
+            $eligibilities = [$eligibilities->getPlanKey() => $eligibilities];
+            $this->logger->info('is instanceof \Alma\API\Endpoints\Results\Eligibility',[$eligibilities]);
+        }
+        return $eligibilities;
+    }
 }

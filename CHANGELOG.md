@@ -3,7 +3,9 @@ Changelog
 
 v2.2.0
 ------
-
+* Add quote selector for eligibility and remove checkout session.
+* Fix get alma payment Url
+* Remove customer data in eligibility
 * Use custom class for back-office display
 * Fixes total cart round credit cost
 * Add Alma in back-office menu

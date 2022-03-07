@@ -64,7 +64,12 @@ class Eligibility extends Action
     public function execute()
     {
         $this->logger->info('execute Controller Payment Action',[]);
-        $this->eligibilityHelper->checkEligibility();
+        try {
+            $this->eligibilityHelper->checkEligibility();
+        } catch (\InvalidArgumentException $e) {
+            $this->logger->info('Control payment eligibility InvalidArgumentException : ',[$e->getMessage()]);
+            return false;
+        }
 
         /** @var Json $json */
         $json = $this->resultFactory->create(ResultFactory::TYPE_JSON);

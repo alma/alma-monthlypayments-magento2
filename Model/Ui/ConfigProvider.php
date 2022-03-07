@@ -28,17 +28,13 @@ namespace Alma\MonthlyPayments\Model\Ui;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Eligibility;
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
 use Alma\MonthlyPayments\Helpers\Logger;
 
 class ConfigProvider implements ConfigProviderInterface
 {
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
+
     /**
      * @var UrlInterface
      */
@@ -58,14 +54,12 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * ConfigProvider constructor.
-     * @param CheckoutSession $checkoutSession
      * @param UrlInterface $urlBuilder
      * @param Config $config
      * @param Eligibility $eligibilityHelper
      * @param ResolverInterface $localeResolver
      */
     public function __construct(
-        CheckoutSession $checkoutSession,
         UrlInterface $urlBuilder,
         Config $config,
         Eligibility $eligibilityHelper,
@@ -73,7 +67,6 @@ class ConfigProvider implements ConfigProviderInterface
         Logger $logger
     )
     {
-        $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
         $this->eligibilityHelper = $eligibilityHelper;
@@ -86,31 +79,16 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $paymentConfig = [
+        return [
             'payment' => [
                 Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => __($this->config->getPaymentButtonTitle()),
                     'description' => __($this->config->getPaymentButtonDescription()),
                     'sortOrder' => $this->config->getSortOrder(),
-                    'locale' => str_replace('_', '-', $this->localeResolver->getLocale()),
-                    'paymentPlans' => array_map(function ($pe) {
-                        $planConfig = $pe->getPlanConfig();
-
-                        $plan = $planConfig->toArray();
-                        $plan['key'] = $planConfig->planKey();
-                        $plan['logo'] = $planConfig->logoFileName();
-                        $plan['paymentPlan'] = $pe->getEligibility()->getPaymentPlan();
-
-                        // TODO : we need to take only customerTotalCostAmount and annualInterestRate
-                        $plan['eligibility'] = $pe->getEligibility();
-
-                        return $plan;
-                    }, $this->eligibilityHelper->getEligiblePlans())
+                    'locale' => str_replace('_', '-', $this->localeResolver->getLocale())
                 ]
             ]
         ];
-        $this->logger->info('Payment Provider Config',[$paymentConfig]);
-        return $paymentConfig;
     }
 }

@@ -39,10 +39,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 
 class Quote
 {
-    /**
-     * @var Customer
-     */
-    private $customerData;
+
     /**
      * @var ProductImage
      */
@@ -55,17 +52,19 @@ class Quote
      * @var Resolver
      */
     private $locale;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Quote constructor.
      *
-     * @param Customer                    $customerData
      * @param ProductImage                $productImageHelper
      * @param CategoryRepositoryInterface $categoryRepository
      * @param Resolver                    $locale ;
  */
     public function __construct(
-        Customer $customerData,
         ProductImage $productImageHelper,
         CategoryRepositoryInterface $categoryRepository,
         Resolver $locale,
@@ -73,7 +72,6 @@ class Quote
 
     )
     {
-        $this->customerData       = $customerData;
         $this->productImageHelper = $productImageHelper;
         $this->categoryRepository = $categoryRepository;
         $this->locale             = $locale;
@@ -89,20 +87,16 @@ class Quote
      */
     public function eligibilityDataFromQuote(MagentoQuote $quote, array $installmentsQuery): array
     {
-        $this->logger->info('eligibilityDataFromQuote',[]);
         $shippingAddress = new AddressAdapter($quote->getShippingAddress());
         $billingAddress  = new AddressAdapter($quote->getBillingAddress());
         $billingCountry  = $billingAddress->getCountryId();
         $shippingCountry = $shippingAddress->getCountryId();
-
-        $customer = $quote->getCustomer();
 
         $data = [
             'online'          => 'online',
             'purchase_amount' => Functions::priceToCents((float) $quote->getGrandTotal()),
             'locale'          => $this->locale->getLocale(),
             'queries'         => $installmentsQuery,
-            'customer'        => $this->customerData->dataFromCustomer($customer, [$billingAddress, $shippingAddress]),
         ];
         if ($billingCountry) {
             $data['billing_address'] = ['country' => $billingCountry];
