@@ -138,7 +138,6 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
-        $this->logger->info('get Plans Eligibility',[]);
         if (!$this->alma){
             throw new \InvalidArgumentException('Alma client is not define');
         }
@@ -155,7 +154,7 @@ class Eligibility
         // Get enabled plans in BO and build a list of installments counts that should be tested for eligibility
         $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
         $installmentsQuery         = [];
-        $availablePlansKeyInBo            = [];
+        $availablePlansKeyInBo     = [];
 
         foreach ($enabledPlansInConfig as $planKey => $planConfig) {
             if (
@@ -217,7 +216,6 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-        $this->logger->info('CheckEligibility',[]);
 
         if(!isset($this->quote)){
             throw new \InvalidArgumentException('No Quote for eligibility');
@@ -280,7 +278,7 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
-            $this->logger->info('Get Eligible plans exception',[$e->getMessage()]);
+            $this->logger->info($e->getMessage(), [$e->getTrace()]);
         return [];
         }
     }
@@ -475,7 +473,7 @@ class Eligibility
     }
 
     /**
-     * @param $eligibilities [$paymentPlan]
+     * @param PaymentPlanEligibility[] $eligibilities
      * @return array
      */
     public function sortEligibilities($eligibilities):array
@@ -484,7 +482,7 @@ class Eligibility
         foreach ($eligibilities as $paymentPlan){
 
             $planConfig = $paymentPlan->getPlanConfig();
-            $planKey = $planConfig->PlanKey();
+            $planKey = $planConfig->planKey();
 
             $type = $this->getPaymentType($planKey);
             $sortedEligibilities[$type][]=$paymentPlan;
@@ -495,7 +493,7 @@ class Eligibility
 
     /**
      * Get payment type according to plan key ( like general:10:0:0 ) for split ordering
-     * @param $planKey
+     * @param string $planKey
      * @return string
      */
     private function getPaymentType($planKey):string
@@ -515,8 +513,8 @@ class Eligibility
 
     /**
      * Build type for according to installment count and is deferred flag
-     * @param $installmentCount
-     * @param $isDeferred
+     * @param int $installmentCount
+     * @param bool $isDeferred
      * @return string
      */
     private function buildType($installmentCount,$isDeferred):string
@@ -536,7 +534,7 @@ class Eligibility
     }
 
     /**
-     * @param $quote Quote
+     * @param Quote $quote
      * @return void
      */
     public function setEligibilityQuote($quote):void

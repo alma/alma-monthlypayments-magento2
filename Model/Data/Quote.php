@@ -39,10 +39,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 
 class Quote
 {
-    /**
-     * @var Customer
-     */
-    private $customerData;
+
     /**
      * @var ProductImage
      */
@@ -63,13 +60,11 @@ class Quote
     /**
      * Quote constructor.
      *
-     * @param Customer                    $customerData
      * @param ProductImage                $productImageHelper
      * @param CategoryRepositoryInterface $categoryRepository
      * @param Resolver                    $locale ;
  */
     public function __construct(
-        Customer $customerData,
         ProductImage $productImageHelper,
         CategoryRepositoryInterface $categoryRepository,
         Resolver $locale,
@@ -77,7 +72,6 @@ class Quote
 
     )
     {
-        $this->customerData       = $customerData;
         $this->productImageHelper = $productImageHelper;
         $this->categoryRepository = $categoryRepository;
         $this->locale             = $locale;
@@ -103,7 +97,6 @@ class Quote
             'purchase_amount' => Functions::priceToCents((float) $quote->getGrandTotal()),
             'locale'          => $this->locale->getLocale(),
             'queries'         => $installmentsQuery,
-            'customer'        => '',
         ];
         if ($billingCountry) {
             $data['billing_address'] = ['country' => $billingCountry];

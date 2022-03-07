@@ -72,7 +72,7 @@ class QuoteHelper
     }
 
     /**
-     * @param null $cartId
+     * @param int|null $cartId
      * @return \Magento\Quote\Model\Quote|null
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -82,18 +82,15 @@ class QuoteHelper
         $quote = null;
         $quoteById = $this->getQuoteById($cartId);
         if (isset($quoteById)){
-            $this->logger->info('Cart id define quote',[]);
             return $quoteById;
         }
         $contextUserQuote = $this->getQuoteByContextUserId();
         if(isset($contextUserQuote)){
-            $this->logger->info('Is Quote Context User',[]);
             return $contextUserQuote;
         }
 
         $sessionQuote = $this->getQuoteFromSession();
         if (isset($sessionQuote)){
-            $this->logger->info('Is Session Quote',[]);
             return $sessionQuote;
         }
         return $quote;
