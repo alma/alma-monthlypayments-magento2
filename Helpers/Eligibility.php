@@ -38,6 +38,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data;
 use Alma\MonthlyPayments\Helpers\QuoteHelper;
+use Magento\Quote\Api\Data\CartInterface;
 
 class Eligibility
 {
@@ -123,7 +124,6 @@ class Eligibility
         $this->quoteHelper = $quoteHelper;
         $this->alreadyLoaded = false;
         $this->currentFeePlans = [];
-        $this->quote = $this->getEligibilityQuote();
     }
 
     /**
@@ -138,6 +138,7 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
+        $quote=$this->getEligibilityQuote();
         if (!$this->alma){
             throw new \InvalidArgumentException('Alma client is not define');
         }
@@ -150,7 +151,7 @@ class Eligibility
             return $this->getCurrentsFeePlans();
         }
 
-        $cartTotal = Functions::priceToCents((float)$this->quote->getGrandTotal());
+        $cartTotal = Functions::priceToCents((float)$quote->getGrandTotal());
         // Get enabled plans in BO and build a list of installments counts that should be tested for eligibility
         $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
         $installmentsQuery         = [];
@@ -179,7 +180,7 @@ class Eligibility
         }
 
         $eligibilities = $this->alma->payments->eligibility(
-            $this->quoteData->eligibilityDataFromQuote($this->quote,$installmentsQuery),
+            $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
             true
         );
 
@@ -195,7 +196,7 @@ class Eligibility
             }
             // Check if bo plan is in eligibility list
             if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
-                $this->logger->info('Configured plan is not eligible : ' ,['planKey' => $planKey, 'country' => $this->quote->getBillingAddress()->getCountryId()]);
+                $this->logger->info('Configured plan is not eligible : ' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
                 continue;
             }
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
@@ -216,10 +217,7 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-
-        if(!isset($this->quote)){
-            throw new \InvalidArgumentException('No Quote for eligibility');
-        }
+        $quote = $this->getEligibilityQuote();
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
@@ -251,7 +249,7 @@ class Eligibility
         }
 
         if (!$anyEligible) {
-            $cartTotal = Functions::priceToCents((float)$this->quote->getGrandTotal());
+            $cartTotal = Functions::priceToCents((float)$quote->getGrandTotal());
 
             if ($cartTotal > $maxAmount) {
                 $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
@@ -293,8 +291,9 @@ class Eligibility
      */
     private function checkItemsTypes(): bool
     {
+        $quote = $this->getEligibilityQuote();
         $excludedProductTypes = $this->config->getExcludedProductTypes();
-        foreach ($this->quote->getAllItems() as $item) {
+        foreach ($quote->getAllItems() as $item) {
             if (in_array($item->getProductType(), $excludedProductTypes)) {
                 return false;
             }
@@ -542,31 +541,19 @@ class Eligibility
         $this->quote=$quote;
     }
 
-    /**
-     * @param $quoteId int
-     * @return void
-     */
-    public function setEligibilityQuoteById($quoteId):void
-    {
-        try {
-            $this->quote = $this->quoteHelper->getQuoteById($quoteId);
-        } catch (\Exception $e) {
-            $this->logger->info('Set eligibility quote by id exception : ',[$e->getMessage()]);
-        }
-    }
 
     /**
-     * @return Quote|Interceptor|null
+     * @return Magento\Quote\Api\Data\CartInterface|null
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function getEligibilityQuote()
+    private function getEligibilityQuote():?CartInterface
     {
-        if(isset($this->quote)){
-            return $this->quote;
+        $quote=$this->quoteHelper->getQuote();
+        if(!isset($quote)){
+            throw new \InvalidArgumentException('No Quote for eligibility');
         }
-        $this->quote = $this->quoteHelper->getQuote();
-        return $this->quote;
+        return $quote;
     }
 
     /**
