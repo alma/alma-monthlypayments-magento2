@@ -86,7 +86,6 @@ class QuoteHelper
      */
     public function getQuote():?CartInterface
     {
-        $quote = null;
         if(isset($this->quoteId)){
             $quoteById = $this->getQuoteById();
         }
@@ -102,7 +101,7 @@ class QuoteHelper
         if (isset($sessionQuote)){
             return $sessionQuote;
         }
-        return $quote;
+        return null;
     }
 
     /**

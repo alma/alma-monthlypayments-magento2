@@ -138,7 +138,12 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
-        $quote=$this->getEligibilityQuote();
+        try {
+            $quote = $this->getEligibilityQuote();
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
+        $this->logger->info('piou piou',[]);
         if (!$this->alma){
             throw new \InvalidArgumentException('Alma client is not define');
         }
@@ -217,7 +222,12 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-        $quote = $this->getEligibilityQuote();
+        $this->logger->info('checkEligibility',[]);
+        try {
+            $quote = $this->getEligibilityQuote();
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
@@ -291,7 +301,11 @@ class Eligibility
      */
     private function checkItemsTypes(): bool
     {
-        $quote = $this->getEligibilityQuote();
+        try {
+            $quote = $this->getEligibilityQuote();
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
         $excludedProductTypes = $this->config->getExcludedProductTypes();
         foreach ($quote->getAllItems() as $item) {
             if (in_array($item->getProductType(), $excludedProductTypes)) {
@@ -551,6 +565,7 @@ class Eligibility
     {
         $quote=$this->quoteHelper->getQuote();
         if(!isset($quote)){
+            $this->logger->info('No Quote for eligibility',[]);
             throw new \InvalidArgumentException('No Quote for eligibility');
         }
         return $quote;
