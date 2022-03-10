@@ -72,10 +72,6 @@ class Eligibility
      */
     private $quoteData;
     /**
-     * @var QuoteFactory
-     */
-    private $quoteFactory;
-    /**
      * @var bool
      */
     private $alreadyLoaded;
