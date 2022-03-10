@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.2.1
+------
+* Catch eligibility exception
+* Remove quote init in constructor
+* Change quoteHelper return type
+
 v2.2.0
 ------
 * Add quote selector for eligibility and remove checkout session.
