@@ -143,7 +143,7 @@ class Eligibility
         } catch (\InvalidArgumentException $e) {
             return false;
         }
-        $this->logger->info('piou piou',[]);
+
         if (!$this->alma){
             throw new \InvalidArgumentException('Alma client is not define');
         }
