@@ -32,7 +32,6 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
-use Magento\Quote\Model\QuoteFactory;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -89,10 +88,6 @@ class Eligibility
      */
     private $quoteHelper;
 
-    /**
-     * @var null
-     */
-    private $quote;
 
     /**
      * Eligibility constructor.
@@ -101,9 +96,7 @@ class Eligibility
      * @param Logger $logger
      * @param Config $config
      * @param AlmaQuote $quoteData
-     * @param QuoteFactory $quoteFactory
      * @param QuoteHelper $quoteHelper
-     * @throws LocalizedException
      */
     public function __construct(
         Data $pricingHelper,
@@ -111,7 +104,6 @@ class Eligibility
         Helpers\Logger $logger,
         Config $config,
         AlmaQuote $quoteData,
-        QuoteFactory $quoteFactory,
         QuoteHelper $quoteHelper
     )
     {
@@ -120,7 +112,6 @@ class Eligibility
         $this->logger = $logger;
         $this->config = $config;
         $this->quoteData = $quoteData;
-        $this->quoteFactory = $quoteFactory;
         $this->quoteHelper = $quoteHelper;
         $this->alreadyLoaded = false;
         $this->currentFeePlans = [];
@@ -134,14 +125,14 @@ class Eligibility
      * @throws LocalizedException
      * @throws NoSuchEntityException
      * @throws RequestError
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private function getPlansEligibility(): array
     {
         try {
             $quote = $this->getEligibilityQuote();
         } catch (\InvalidArgumentException $e) {
-            return false;
+            throw new \InvalidArgumentException($e->getMessage());
         }
 
         if (!$this->alma){
@@ -547,17 +538,7 @@ class Eligibility
     }
 
     /**
-     * @param Quote $quote
-     * @return void
-     */
-    public function setEligibilityQuote($quote):void
-    {
-        $this->quote=$quote;
-    }
-
-
-    /**
-     * @return Magento\Quote\Api\Data\CartInterface|null
+     * @return \Magento\Quote\Api\Data\CartInterface|null
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
