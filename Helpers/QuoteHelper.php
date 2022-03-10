@@ -122,8 +122,8 @@ class QuoteHelper
     private function getQuoteFromSession():?CartInterface
     {
         $quote = null;
-        $quoteId = $this->getQuoteIdFromSession();
-        if($quoteId != null){
+        $sessionQuoteId = $this->getQuoteIdFromSession();
+        if($sessionQuoteId != null){
             $quote = $this->checkoutSession->getQuote();
         }
         return $quote;
