@@ -534,7 +534,7 @@ class Eligibility
     }
 
     /**
-     * @return \Magento\Quote\Api\Data\CartInterface|null
+     * @return CartInterface|null
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */

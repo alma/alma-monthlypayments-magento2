@@ -55,7 +55,7 @@ class QuoteHelper
     private $quoteRepository;
 
     /**
-     * @var null
+     * @var null|int
      */
     private $quoteId;
 
@@ -80,7 +80,7 @@ class QuoteHelper
     }
 
     /**
-     * @return \Magento\Quote\Api\Data\CartInterface|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -116,7 +116,7 @@ class QuoteHelper
 
     /**
      * Get quote from session if is define
-     * @return \Magento\Quote\Api\Data\CartInterface|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getQuoteFromSession():?CartInterface
@@ -131,7 +131,7 @@ class QuoteHelper
 
 
     /**
-     * @return \Magento\Quote\Api\Data\CartInterface|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getQuoteByContextUserId():?CartInterface
@@ -146,7 +146,7 @@ class QuoteHelper
 
     /**
      * Load quote with cartID
-     * @return \Magento\Quote\Api\Data\CartInterface|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getQuoteById():?CartInterface
