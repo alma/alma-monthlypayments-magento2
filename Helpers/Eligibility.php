@@ -38,6 +38,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data;
 use Alma\MonthlyPayments\Helpers\QuoteHelper;
 use Magento\Quote\Api\Data\CartInterface;
+use \InvalidArgumentException;
 
 class Eligibility
 {
@@ -121,21 +122,21 @@ class Eligibility
      * @throws LocalizedException
      * @throws NoSuchEntityException
      * @throws RequestError
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function getPlansEligibility(): array
     {
         try {
             $quote = $this->getEligibilityQuote();
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException($e->getMessage());
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException($e->getMessage());
         }
 
         if (!$this->alma){
-            throw new \InvalidArgumentException('Alma client is not define');
+            throw new InvalidArgumentException('Alma client is not define');
         }
         if (!$this->checkItemsTypes()){
-            throw new \InvalidArgumentException($this->config->getExcludedProductsMessage());
+            throw new InvalidArgumentException($this->config->getExcludedProductsMessage());
         }
 
         if ($this->isAlreadyLoaded()){
@@ -205,14 +206,14 @@ class Eligibility
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
-     *
+     * @throws InvalidArgumentException
      */
     public function checkEligibility(): bool
     {
         $this->logger->info('checkEligibility',[]);
         try {
             $quote = $this->getEligibilityQuote();
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return false;
         }
         $eligibilityMessage = $this->config->getEligibilityMessage();
@@ -285,12 +286,13 @@ class Eligibility
      *
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     * @throws InvalidArgumentException
      */
     private function checkItemsTypes(): bool
     {
         try {
             $quote = $this->getEligibilityQuote();
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return false;
         }
         $excludedProductTypes = $this->config->getExcludedProductTypes();
@@ -533,17 +535,19 @@ class Eligibility
         return $type;
     }
 
+
     /**
      * @return CartInterface|null
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     * @throws InvalidArgumentException
      */
     private function getEligibilityQuote():?CartInterface
     {
         $quote=$this->quoteHelper->getQuote();
         if(!isset($quote)){
             $this->logger->info('No Quote for eligibility',[]);
-            throw new \InvalidArgumentException('No Quote for eligibility');
+            throw new InvalidArgumentException('No Quote for eligibility');
         }
         return $quote;
     }
