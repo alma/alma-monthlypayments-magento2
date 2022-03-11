@@ -147,7 +147,6 @@ class QuoteHelper
     /**
      * Load quote with cartID
      * @return CartInterface|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getQuoteById():?CartInterface
     {
