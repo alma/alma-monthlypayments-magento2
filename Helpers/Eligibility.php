@@ -32,12 +32,12 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
-use Magento\Quote\Model\QuoteFactory;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data;
 use Alma\MonthlyPayments\Helpers\QuoteHelper;
+use Magento\Quote\Api\Data\CartInterface;
 
 class Eligibility
 {
@@ -72,10 +72,6 @@ class Eligibility
      */
     private $quoteData;
     /**
-     * @var QuoteFactory
-     */
-    private $quoteFactory;
-    /**
      * @var bool
      */
     private $alreadyLoaded;
@@ -88,10 +84,6 @@ class Eligibility
      */
     private $quoteHelper;
 
-    /**
-     * @var null
-     */
-    private $quote;
 
     /**
      * Eligibility constructor.
@@ -100,9 +92,7 @@ class Eligibility
      * @param Logger $logger
      * @param Config $config
      * @param AlmaQuote $quoteData
-     * @param QuoteFactory $quoteFactory
      * @param QuoteHelper $quoteHelper
-     * @throws LocalizedException
      */
     public function __construct(
         Data $pricingHelper,
@@ -110,7 +100,6 @@ class Eligibility
         Helpers\Logger $logger,
         Config $config,
         AlmaQuote $quoteData,
-        QuoteFactory $quoteFactory,
         QuoteHelper $quoteHelper
     )
     {
@@ -119,11 +108,9 @@ class Eligibility
         $this->logger = $logger;
         $this->config = $config;
         $this->quoteData = $quoteData;
-        $this->quoteFactory = $quoteFactory;
         $this->quoteHelper = $quoteHelper;
         $this->alreadyLoaded = false;
         $this->currentFeePlans = [];
-        $this->quote = $this->getEligibilityQuote();
     }
 
     /**
@@ -134,10 +121,16 @@ class Eligibility
      * @throws LocalizedException
      * @throws NoSuchEntityException
      * @throws RequestError
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private function getPlansEligibility(): array
     {
+        try {
+            $quote = $this->getEligibilityQuote();
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException($e->getMessage());
+        }
+
         if (!$this->alma){
             throw new \InvalidArgumentException('Alma client is not define');
         }
@@ -150,7 +143,7 @@ class Eligibility
             return $this->getCurrentsFeePlans();
         }
 
-        $cartTotal = Functions::priceToCents((float)$this->quote->getGrandTotal());
+        $cartTotal = Functions::priceToCents((float)$quote->getGrandTotal());
         // Get enabled plans in BO and build a list of installments counts that should be tested for eligibility
         $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
         $installmentsQuery         = [];
@@ -179,7 +172,7 @@ class Eligibility
         }
 
         $eligibilities = $this->alma->payments->eligibility(
-            $this->quoteData->eligibilityDataFromQuote($this->quote,$installmentsQuery),
+            $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
             true
         );
 
@@ -195,7 +188,7 @@ class Eligibility
             }
             // Check if bo plan is in eligibility list
             if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
-                $this->logger->info('Configured plan is not eligible : ' ,['planKey' => $planKey, 'country' => $this->quote->getBillingAddress()->getCountryId()]);
+                $this->logger->info('Configured plan is not eligible : ' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
                 continue;
             }
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];
@@ -216,9 +209,11 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-
-        if(!isset($this->quote)){
-            throw new \InvalidArgumentException('No Quote for eligibility');
+        $this->logger->info('checkEligibility',[]);
+        try {
+            $quote = $this->getEligibilityQuote();
+        } catch (\InvalidArgumentException $e) {
+            return false;
         }
         $eligibilityMessage = $this->config->getEligibilityMessage();
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
@@ -251,7 +246,7 @@ class Eligibility
         }
 
         if (!$anyEligible) {
-            $cartTotal = Functions::priceToCents((float)$this->quote->getGrandTotal());
+            $cartTotal = Functions::priceToCents((float)$quote->getGrandTotal());
 
             if ($cartTotal > $maxAmount) {
                 $price = $this->getFormattedPrice(Helpers\Functions::priceFromCents($maxAmount));
@@ -293,8 +288,13 @@ class Eligibility
      */
     private function checkItemsTypes(): bool
     {
+        try {
+            $quote = $this->getEligibilityQuote();
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
         $excludedProductTypes = $this->config->getExcludedProductTypes();
-        foreach ($this->quote->getAllItems() as $item) {
+        foreach ($quote->getAllItems() as $item) {
             if (in_array($item->getProductType(), $excludedProductTypes)) {
                 return false;
             }
@@ -534,39 +534,18 @@ class Eligibility
     }
 
     /**
-     * @param Quote $quote
-     * @return void
-     */
-    public function setEligibilityQuote($quote):void
-    {
-        $this->quote=$quote;
-    }
-
-    /**
-     * @param $quoteId int
-     * @return void
-     */
-    public function setEligibilityQuoteById($quoteId):void
-    {
-        try {
-            $this->quote = $this->quoteHelper->getQuoteById($quoteId);
-        } catch (\Exception $e) {
-            $this->logger->info('Set eligibility quote by id exception : ',[$e->getMessage()]);
-        }
-    }
-
-    /**
-     * @return Quote|Interceptor|null
+     * @return CartInterface|null
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function getEligibilityQuote()
+    private function getEligibilityQuote():?CartInterface
     {
-        if(isset($this->quote)){
-            return $this->quote;
+        $quote=$this->quoteHelper->getQuote();
+        if(!isset($quote)){
+            $this->logger->info('No Quote for eligibility',[]);
+            throw new \InvalidArgumentException('No Quote for eligibility');
         }
-        $this->quote = $this->quoteHelper->getQuote();
-        return $this->quote;
+        return $quote;
     }
 
     /**

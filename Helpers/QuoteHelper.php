@@ -29,9 +29,11 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Checkout\Model\Session;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Quote\Api\Data\CartInterface;
 
 class QuoteHelper
 {
+    /**
     /**
      * @var Logger
      */
@@ -53,6 +55,11 @@ class QuoteHelper
     private $quoteRepository;
 
     /**
+     * @var null|int
+     */
+    private $quoteId;
+
+    /**
      * @param Logger $logger
      * @param UserContextInterface $userContext
      * @param QuoteRepository $quoteRepository
@@ -69,18 +76,19 @@ class QuoteHelper
         $this->userContext = $userContext;
         $this->quoteRepository = $quoteRepository;
         $this->checkoutSession = $checkoutSession;
+        $this->quoteId=null;
     }
 
     /**
-     * @param int|null $cartId
-     * @return \Magento\Quote\Model\Quote|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getQuote($cartId=null):?\Magento\Quote\Model\Quote
+    public function getQuote():?CartInterface
     {
-        $quote = null;
-        $quoteById = $this->getQuoteById($cartId);
+        if(isset($this->quoteId)){
+            $quoteById = $this->getQuoteById();
+        }
         if (isset($quoteById)){
             return $quoteById;
         }
@@ -93,19 +101,29 @@ class QuoteHelper
         if (isset($sessionQuote)){
             return $sessionQuote;
         }
-        return $quote;
+        return null;
     }
 
     /**
+     * @param $quoteId int
+     * @return void
+     */
+    public function setEligibilityQuoteId($quoteId):void
+    {
+        $this->quoteId = $quoteId;
+    }
+
+
+    /**
      * Get quote from session if is define
-     * @return \Magento\Quote\Model\Quote|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getQuoteFromSession():?\Magento\Quote\Model\Quote
+    private function getQuoteFromSession():?CartInterface
     {
         $quote = null;
-        $quoteId = $this->getQuoteIdFromSession();
-        if($quoteId != null){
+        $sessionQuoteId = $this->getQuoteIdFromSession();
+        if($sessionQuoteId != null){
             $quote = $this->checkoutSession->getQuote();
         }
         return $quote;
@@ -113,10 +131,10 @@ class QuoteHelper
 
 
     /**
-     * @return \Magento\Quote\Model\Quote|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getQuoteByContextUserId():?\Magento\Quote\Model\Quote
+    private function getQuoteByContextUserId():?CartInterface
     {
         $quote = null;
         $customerUserId = $this->getContextUserId();
@@ -128,15 +146,14 @@ class QuoteHelper
 
     /**
      * Load quote with cartID
-     * @param $cartId
-     * @return \Magento\Quote\Model\Quote\Interceptor|null
+     * @return CartInterface|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getQuoteById($cartId):?\Magento\Quote\Model\Quote\Interceptor
+    private function getQuoteById():?CartInterface
     {
         $quote = null;
         try {
-            $quote = $this->quoteRepository->get($cartId);
+            $quote = $this->quoteRepository->get($this->quoteId);
         } catch (\Exception $e) {
             $this->logger->info('getQuoteById Exeption : ',[$e->getMessage()]);
         }
@@ -159,17 +176,5 @@ class QuoteHelper
     {
         return $this->checkoutSession->getQuoteId();
     }
-
-    /**
-     * @param $quote
-     * @return void
-     */
-    public function setQuoteInSession($quote):void
-    {
-        if (!$this->checkoutSession->hasQuote() && $quote) {
-            $this->checkoutSession->replaceQuote($quote);
-        }
-    }
-
 
 }
