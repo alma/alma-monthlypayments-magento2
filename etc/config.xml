@@ -71,6 +71,7 @@
                 <alma_deferred_payment_title>Buy now, Pay later with Alma</alma_deferred_payment_title>
                 <alma_deferred_payment_desc>Fast and secure payment by credit card</alma_deferred_payment_desc>
 
+                <trigger_is_allowed>0</trigger_is_allowed>
 
                 <show_eligibility_message>1</show_eligibility_message>
                 <eligibility_message>Eligible for monthly payments</eligibility_message>

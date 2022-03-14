@@ -110,3 +110,5 @@
 "Customize Alma in your checkout","Customize Alma in your checkout"
 "Edit the text displayed when choosing the payment method in your checkout. It will adapt to the languages of your site.","Edit the text displayed when choosing the payment method in your checkout. It will adapt to the languages of your site."
 "Merge all payment methods","Merge all payment methods"
+"Payment upon trigger","Payment upon trigger"
+"This option is available only for Alma payment in 2x, 3x and 4x. When it's turned on, your clients will pay the first installment at the order status change. When your client order on your website, Alma will only ask for a payment authorization. Only status handled by Alma are available in the menu below. Please contact Alma if you need us to add another status.","This option is available only for Alma payment in 2x, 3x and 4x. When it's turned on, your clients will pay the first installment at the order status change. When your client order on your website, Alma will only ask for a payment authorization. Only status handled by Alma are available in the menu below. Please contact Alma if you need us to add another status."

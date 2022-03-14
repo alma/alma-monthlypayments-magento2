@@ -89,6 +89,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
             'deferredDays' => intval($plan->deferred_days),
             'deferredMonths' => intval($plan->deferred_months),
 
+            'deferredTriggerEnable' => isset($plan->deferred_trigger_limit_days),
+            'deferredTriggerDays' => $plan->deferred_trigger_limit_days,
+
             'enabled' => $plan->installments_count === 3,
 
             'minAllowedAmount' => $plan->min_purchase_amount,
@@ -257,6 +260,22 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     public function deferredMonths(): int
     {
         return intval($this->data['deferredMonths']);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasDeferredTrigger(): bool
+    {
+        return $this->data['deferredTriggerEnable'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function maxDeferredTriggerDays(): int
+    {
+        return intval($this->data['deferredTriggerDays']);
     }
 
     /**
