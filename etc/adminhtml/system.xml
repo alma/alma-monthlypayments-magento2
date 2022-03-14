@@ -133,7 +133,7 @@
                 </group>
 
                 <!-- CART DISPLAY CONFIGURATION -->
-                <group id="cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                <group id="alma_cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -162,7 +162,7 @@
                 </group>
 
                 <!-- PRODUCT PAGE DISPLAY CONFIGURATION -->
-                <group id="product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
+                <group id="alma_product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -215,7 +215,7 @@
                 </group>
 
                 <!-- EXCLUDED PRODUCTS CONFIGURATION -->
-                <group id="excluded_products_config" translate="label comment" type="text" sortOrder="30"
+                <group id="alma_excluded_products_config" translate="label comment" type="text" sortOrder="30"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -242,7 +242,7 @@
                 </group>
 
                 <!-- API CONFIGURATION -->
-                <group id="api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
+                <group id="alma_api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\ApiFieldset</frontend_model>
                     <depends>
