@@ -26,8 +26,12 @@ namespace Alma\MonthlyPayments\Block\Adminhtml\Form\Field;
 
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
+use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Serialize\Serializer\Json;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Plans extends Field
 {
@@ -35,6 +39,23 @@ class Plans extends Field
      * @var string
      */
     protected $_template = 'Alma_MonthlyPayments::form/field/plans.phtml';
+
+    /**
+     * @param Context $context
+     * @param array $data
+     * @param SecureHtmlRenderer|null $secureRenderer
+     * @param Logger $logger
+     */
+    public function __construct(
+        Context $context,
+        array $data = [],
+        ?SecureHtmlRenderer $secureRenderer = null,
+        Logger $logger
+    ) {
+        parent::__construct($context, $data, $secureRenderer);
+        $this->logger = $logger;
+
+    }
 
     /**
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
@@ -64,7 +85,6 @@ class Plans extends Field
             return $plan->isDeferred() || $plan->installmentsCount() > 1;
         });
 
-        // TODO: plan sorting should be done at a higher level
         uksort($plans, function ($k1, $k2) use ($plans) {
             /** @var PaymentPlanConfig $p1 */
             $p1 = $plans[$k1];
