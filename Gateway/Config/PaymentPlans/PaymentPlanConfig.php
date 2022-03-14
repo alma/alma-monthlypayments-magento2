@@ -29,7 +29,9 @@ use Alma\API\Entities\FeePlan;
 class PaymentPlanConfig implements PaymentPlanConfigInterface
 {
     const TRANSIENT_KEY_MIN_ALLOWED_AMOUNT = 'minAllowedAmount';
+    const KEY_MIN_AMOUNT = 'minAmount';
     const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
+    const KEY_MAX_AMOUNT = 'maxAmount';
     const TRANSIENT_KEY_MERCHANT_FEES = 'merchantFees';
     const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
     const ALLOWED_MONTHLY_PLANS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

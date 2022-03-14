@@ -38,6 +38,7 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\Serializer\Json;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentPlans extends Serialized
 {
@@ -64,6 +65,20 @@ class PaymentPlans extends Serialized
      */
     private $plansConfigFactory;
 
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param MessageManager $messageManager
+     * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
+     * @param Config $almaConfig
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     * @param Json|null $serializer
+     * @param Logger $logger
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -75,7 +90,8 @@ class PaymentPlans extends Serialized
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = [],
-        Json $serializer = null
+        Json $serializer = null,
+        Logger $logger
     )
     {
         parent::__construct(
@@ -93,6 +109,7 @@ class PaymentPlans extends Serialized
         $this->messageManager = $messageManager;
         $this->serializer = $serializer ?: new Json();
         $this->plansConfigFactory = $plansConfigFactory;
+        $this->logger = $logger;
     }
 
     protected function _afterLoad()
@@ -126,7 +143,7 @@ class PaymentPlans extends Serialized
         if (!is_array($value)) {
             $value = $this->serializer->unserialize($value);
         }
-
+        $value = $this->correctMinMaxLimit($value);
         // Remove transient values from the serialized data: it should always come fresh from the API
         foreach (PaymentPlanConfig::transientKeys() as $key) {
             foreach ($value as $planKey => &$planConfig) {
@@ -138,5 +155,22 @@ class PaymentPlans extends Serialized
         $this->setValue($value);
 
         return parent::beforeSave();
+    }
+
+    /**
+     * @param $plans
+     * @return array
+     */
+    private function correctMinMaxLimit($plans):array
+    {
+        foreach ($plans as &$plan) {
+            if($plan[PaymentPlanConfig::KEY_MIN_AMOUNT]<$plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]){
+                $plan[PaymentPlanConfig::KEY_MIN_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT];
+            }
+            if($plan[PaymentPlanConfig::KEY_MAX_AMOUNT]>$plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT]){
+                $plan[PaymentPlanConfig::KEY_MAX_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT];
+            }
+        }
+        return $plans;
     }
 }
