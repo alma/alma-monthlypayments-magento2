@@ -42,7 +42,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get merge payment config flag
      * @return int
      */
-    public function getAreMergedPayementMethods()
+    public function getAreMergedPaymentMethods()
     {
         return (bool)(int)$this->getConfigByCode(self::MERGE_PAYEMENT_METHODS);
     }

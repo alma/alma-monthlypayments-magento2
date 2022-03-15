@@ -64,7 +64,7 @@ class AlmaSection implements SectionSourceInterface
 
     public function getSectionData()
     {
-        $areMergePaymentMethods = $this->configHelper->getAreMergedPayementMethods();
+        $areMergePaymentMethods = $this->configHelper->getAreMergedPaymentMethods();
         $eligibilities[Eligibility::MERGED_TYPE] = $this->eligibility->getEligiblePlans();
         if(!$areMergePaymentMethods){
             $eligibilities = $this->eligibility->sortEligibilities($eligibilities[Eligibility::MERGED_TYPE]);
