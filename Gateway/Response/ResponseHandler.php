@@ -30,9 +30,23 @@ use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class ResponseHandler implements HandlerInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @param Logger $logger
+     */
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * Handles transaction id
      *
@@ -52,6 +66,7 @@ class ResponseHandler implements HandlerInterface
 
         $payment->setTransactionId($almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_URL, $almaPayment->url);
+        $payment->setAdditionalInformation(Config::ORDER_PAYMENT_TRIGGER, $almaPayment->deferred_trigger);
         $payment->setIsTransactionClosed(false);
 
         $order = $payment->getOrder();
