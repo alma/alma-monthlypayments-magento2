@@ -26,6 +26,7 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
@@ -33,6 +34,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -50,6 +52,14 @@ class PaymentDataBuilder implements BuilderInterface
      * @var Config
      */
     private $config;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * PaymentDataBuilder constructor.
@@ -58,11 +68,13 @@ class PaymentDataBuilder implements BuilderInterface
      * @param Config          $config
      * @param Resolver        $locale
      */
-    public function __construct(CheckoutSession $checkoutSession, Config $config, Resolver $locale)
+    public function __construct(CheckoutSession $checkoutSession, Config $config, Resolver $locale , ConfigHelper $configHelper,Logger $logger)
     {
         $this->checkoutSession = $checkoutSession;
         $this->config          = $config;
         $this->locale          = $locale;
+        $this->configHelper    = $configHelper;
+        $this->logger          = $logger;
     }
 
     /**
@@ -83,23 +95,32 @@ class PaymentDataBuilder implements BuilderInterface
         $planKey    = $payment->getAdditionalInformation(PaymentDataAssignObserver::SELECTED_PLAN);
         $planConfig = $this->config->getPaymentPlansConfig()->getPlans()[$planKey];
 
-        return [
-            'payment' => array_merge(
-                $planConfig->getPaymentData(),
-                [
-                    'return_url'          => $this->config->getReturnUrl(),
-                    'ipn_callback_url'    => $this->config->getIpnCallbackUrl(),
-                    'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
-                    'purchase_amount'     => Functions::priceToCents((float) $order->getGrandTotalAmount()),
-                    'shipping_address'    => Address::dataFromAddress($order->getShippingAddress()),
-                    'billing_address'     => Address::dataFromAddress($order->getBillingAddress()),
-                    'locale'              => $this->locale->getLocale(),
-                    'custom_data'         => [
-                        'order_id' => $orderId,
-                        'quote_id' => $quoteId,
-                    ],
-                ]
-            ),
+        $configArray = [
+            'return_url'          => $this->config->getReturnUrl(),
+            'ipn_callback_url'    => $this->config->getIpnCallbackUrl(),
+            'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
+            'purchase_amount'     => Functions::priceToCents((float) $order->getGrandTotalAmount()),
+            'shipping_address'    => Address::dataFromAddress($order->getShippingAddress()),
+            'billing_address'     => Address::dataFromAddress($order->getBillingAddress()),
+            'locale'              => $this->locale->getLocale(),
+            'custom_data'         => [
+                'order_id' => $orderId,
+                'quote_id' => $quoteId,
+            ],
         ];
+        $configArray = $this->trigger($configArray,$planConfig);
+        $this->logger->info('$this->configHelper->getTranslatedTrigger()',[$this->configHelper->getTranslatedTrigger()]);
+        return ['payment' => array_merge($planConfig->getPaymentData(),$configArray)];
+    }
+
+    private function trigger($configArray,$planConfig):array
+    {
+        if ($this->configHelper->triggerIsEnabled() && $planConfig->hasDeferredTrigger()){
+            $configArray['deferred'] = 'trigger';
+            $configArray['deferred_description'] = $this->configHelper->getTranslatedTrigger();
+        }else {
+            $this->logger->info('No Trigger on this payment',[]);
+        }
+        return $configArray;
     }
 }

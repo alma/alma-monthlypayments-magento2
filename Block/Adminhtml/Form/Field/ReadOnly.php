@@ -5,7 +5,7 @@ namespace Alma\MonthlyPayments\Block\Adminhtml\Form\Field;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class Disabled extends Field
+class ReadOnly extends Field
 {
     /**
      * Retrieve element HTML markup
@@ -15,7 +15,7 @@ class Disabled extends Field
      */
     protected function _getElementHtml(AbstractElement $element)
     {
-        $element->setDisabled('disabled');
+        $element->setReadonly(true);
         return $element->getElementHtml();
     }
 }
