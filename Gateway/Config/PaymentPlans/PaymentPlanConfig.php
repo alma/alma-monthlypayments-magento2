@@ -81,6 +81,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public static function defaultConfigForFeePlan(FeePlan $plan): array
     {
+        $deferred_trigger_limit_days = $plan->getDeferredTriggerLimitDays();
         return [
             'kind' => $plan->kind,
 
@@ -89,8 +90,8 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
             'deferredDays' => intval($plan->deferred_days),
             'deferredMonths' => intval($plan->deferred_months),
 
-            'deferredTriggerEnable' => isset($plan->deferred_trigger_limit_days),
-            'deferredTriggerDays' => $plan->deferred_trigger_limit_days,
+            'deferredTriggerEnable' => isset($deferred_trigger_limit_days),
+            'deferredTriggerDays' => $deferred_trigger_limit_days,
 
             'enabled' => $plan->installments_count === 3,
 
