@@ -25,13 +25,10 @@
 namespace Alma\MonthlyPayments\Block\Adminhtml\Form\Field;
 
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
-use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Serialize\Serializer\Json;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Plans extends Field
 {
@@ -43,18 +40,15 @@ class Plans extends Field
     /**
      * @param Context $context
      * @param array $data
-     * @param SecureHtmlRenderer|null $secureRenderer
-     * @param Logger $logger
+         * @param Logger $logger
      */
     public function __construct(
         Context $context,
         Logger $logger ,
-        array $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null
+        array $data = []
     ) {
-        parent::__construct($context, $data, $secureRenderer);
+        parent::__construct($context, $data);
         $this->logger = $logger;
-
     }
 
     /**
