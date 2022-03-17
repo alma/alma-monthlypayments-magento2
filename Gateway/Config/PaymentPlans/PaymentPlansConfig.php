@@ -61,8 +61,8 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     public function __construct(
         AlmaClient $almaClient,
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
-        $data = [],
-        Logger $logger
+        Logger $logger,
+        $data = []
     )
     {
         $this->serializer = new Json();

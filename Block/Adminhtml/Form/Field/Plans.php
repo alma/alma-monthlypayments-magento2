@@ -48,9 +48,9 @@ class Plans extends Field
      */
     public function __construct(
         Context $context,
+        Logger $logger ,
         array $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null,
-        Logger $logger
+        ?SecureHtmlRenderer $secureRenderer = null
     ) {
         parent::__construct($context, $data, $secureRenderer);
         $this->logger = $logger;

@@ -87,11 +87,11 @@ class PaymentPlans extends Serialized
         MessageManager $messageManager,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         Config $almaConfig,
+        Logger $logger,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = [],
-        Json $serializer = null,
-        Logger $logger
+        Json $serializer = null
     )
     {
         parent::__construct(

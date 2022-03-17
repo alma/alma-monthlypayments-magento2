@@ -13,7 +13,7 @@ use Magento\Sales\Model\Order\Shipment;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Alma\API\Client;
-use \Exception;
+use \InvalidArgumentException;
 
 class ShipmentObserver implements ObserverInterface
 {
@@ -29,7 +29,8 @@ class ShipmentObserver implements ObserverInterface
     public function __construct(Logger $logger, AlmaClient $almaClient )
     {
         $this->logger = $logger;
-        $this->almaClient = $almaClient->getDefaultClient();    }
+        $this->almaClient = $almaClient->getDefaultClient();
+    }
 
     /**
      * @param Observer $observer
@@ -50,7 +51,7 @@ class ShipmentObserver implements ObserverInterface
                     $order->addCommentToStatusHistory(__('Alma payment trigger is sent'));
                 }
 
-            } catch (Exception $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->logger->info('Error in payment on shipping : ',[$e]);
                 return;
             }
@@ -137,7 +138,7 @@ class ShipmentObserver implements ObserverInterface
     /**
      * @param $order
      * @return string
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function getPaymentIdFromUrl($order):string
     {
@@ -148,6 +149,6 @@ class ShipmentObserver implements ObserverInterface
                 return $matches[2];
             }
         }
-        throw new Exception('No payment_id in order');
+        throw new InvalidArgumentException('No payment_id in order');
     }
 }
