@@ -162,6 +162,14 @@ define(
                 return label;
             },
 
+            onShippingLabel: function(numInstallment) {
+                var label = $t('%1 month later').replace('%1', numInstallment);
+                if (numInstallment==0){
+                    label = window.checkoutConfig.payment[this.item.method].trigger_label;
+                }
+                return label;
+            },
+
             formattedDate: function (ts) {
                 return (new Date(ts * 1000)).toLocaleDateString(this.config.locale);
             },

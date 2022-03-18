@@ -37,37 +37,42 @@
          data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/alma_logo.svg'), alt: 'alma'}">
     <div class="payment-method-content">
         <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: installmentsPaymentMethod().description"></div>
         <div data-bind="text:"></div>
         <p class="alma-plan-choices">
         <!-- ko if: installmentsPaymentPlans().length === 1 -->
-        <!-- ko if: installmentsPaymentPlans()[0].logo -->
-        <img class="alma-plan-logo"
-             data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + installmentsPaymentPlans()[0].logo), alt: installmentsPaymentPlans()[0].logo }">
-        <!-- /ko -->
-
+            <!-- ko if: installmentsPaymentPlans()[0].logo -->
+            <img class="alma-plan-logo"
+                 data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + installmentsPaymentPlans()[0].logo), alt: installmentsPaymentPlans()[0].logo }">
+            <!-- /ko -->
         <span data-bind="text: getPlanLabel(installmentsPaymentPlans()[0])"></span>
         <!-- /ko -->
-            <!-- ko if: installmentsPaymentPlans().length !== 1 -->
-                <!-- ko foreach: installmentsPaymentPlans -->
-                <label data-bind="attr: { for: 'alma-select-plan-' + key }">
-                    <input type="radio" name="alma-selected-plan-installments"
-                           data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.installmentsSelectedPlanKey ">
-                    <!-- ko if: logo -->
-                    <img class="alma-plan-logo"
-                         data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + logo), alt: logo }">
-                    <!-- /ko -->
-                    <span data-bind="text: $parent.getPlanLabel($data)"></span>
-                </label>
+        <!-- ko if: installmentsPaymentPlans().length !== 1 -->
+            <!-- ko foreach: installmentsPaymentPlans -->
+            <label data-bind="attr: { for: 'alma-select-plan-' + key }">
+                <input type="radio" name="alma-selected-plan-installments"
+                       data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.installmentsSelectedPlanKey ">
+                <!-- ko if: logo -->
+                <img class="alma-plan-logo"
+                     data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + logo), alt: logo }">
                 <!-- /ko -->
+                <span data-bind="text: $parent.getPlanLabel($data)"></span>
+            </label>
             <!-- /ko -->
+        <!-- /ko -->
         </p>
+
         <ul class="alma-installments">
             <!-- ko foreach: installmentsSelectedPlan().eligibility.paymentPlan -->
             <li>
+                <!-- ko if: $parent.installmentsSelectedPlan().deferredTriggerEnable -->
+                <span class="alma-installment--due-date" data-bind="text: $parent.onShippingLabel($index())"></span>
+                <!-- /ko -->
+                <!-- ko ifnot: $parent.installmentsSelectedPlan().deferredTriggerEnable -->
                 <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                <!-- /ko -->
                 <span class="alma-installment--amount-column">
                         <span class="alma-installment--amount"
                               data-bind="text: $parent.formattedPrice(total_amount)"></span>
@@ -79,7 +84,7 @@
                     </span>
             </li>
             <!-- /ko -->
-        </up>
+        </ul>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
