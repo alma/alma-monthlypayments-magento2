@@ -181,7 +181,8 @@ define(
             },
 
             cartTotal: function () {
-                return priceUtils.formatPrice(this.totals().grand_total, window.checkoutConfig.priceFormat);
+                console.log(this.totals())
+                return priceUtils.formatPrice(this.totals().base_grand_total, window.checkoutConfig.priceFormat);
             },
 
             customerTotalCostAmount: function (cost) {
