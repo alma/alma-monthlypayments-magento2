@@ -84,7 +84,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => __($this->config->getPaymentButtonTitle()),
                     'description' => __($this->config->getPaymentButtonDescription()),
-                    'trigger_label' => __($this->configHelper->getTrigger()),
+                    'triggerEnable' => __($this->configHelper->triggerIsEnabled()),
+                    'triggerLabel' => __($this->configHelper->getTrigger()),
                     'sortOrder' => $this->config->getSortOrder(),
                     'locale' => str_replace('_', '-', $this->localeResolver->getLocale())
                 ]

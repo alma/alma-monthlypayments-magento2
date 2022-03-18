@@ -67,10 +67,10 @@
         <ul class="alma-installments">
             <!-- ko foreach: installmentsSelectedPlan().eligibility.paymentPlan -->
             <li>
-                <!-- ko if: $parent.installmentsSelectedPlan().deferredTriggerEnable -->
-                <span class="alma-installment--due-date" data-bind="text: $parent.onShippingLabel($index())"></span>
+                <!-- ko if: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
+                     <span class="alma-installment--due-date" data-bind="text: $parent.onTriggerLabel($index())"></span>
                 <!-- /ko -->
-                <!-- ko ifnot: $parent.installmentsSelectedPlan().deferredTriggerEnable -->
+                <!-- ko ifnot: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
                 <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
                 <!-- /ko -->
                 <span class="alma-installment--amount-column">

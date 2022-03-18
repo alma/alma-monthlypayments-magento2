@@ -161,11 +161,13 @@ define(
                 }
                 return label;
             },
-
-            onShippingLabel: function(numInstallment) {
+            triggerIsEnable: function() {
+                return window.checkoutConfig.payment[this.item.method].triggerEnable;
+            },
+            onTriggerLabel: function(numInstallment) {
                 var label = $t('%1 month later').replace('%1', numInstallment);
                 if (numInstallment==0){
-                    label = window.checkoutConfig.payment[this.item.method].trigger_label;
+                    label = window.checkoutConfig.payment[this.item.method].triggerLabel;
                 }
                 return label;
             },
