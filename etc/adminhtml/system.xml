@@ -39,6 +39,7 @@
                        showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\ModuleVersion</frontend_model>
                 </field>
 
                 <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"

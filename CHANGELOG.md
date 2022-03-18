@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v2.3.0
+------
+* Feature : payment uppon trigger
+* Fix : Tax grand total in p>4
+* Fix : White space in transaltation "Your cart total : "
+* Feature : add module version on enable comment 
+
 v2.2.1
 ------
 * Catch eligibility exception
