@@ -13,14 +13,6 @@ use Magento\Framework\Module\ResourceInterface;
 class ModuleVersion extends Field
 {
     /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var array
-     */
-    private $data;
-    /**
      * @var ResourceInterface
      */
     private $resource;
