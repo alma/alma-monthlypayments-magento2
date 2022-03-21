@@ -25,11 +25,10 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Magento\Framework\Message\Manager as MessageManager;
-use \InvalidArgumentException;
-use \Exception;
 
 class PaymentPlansHelper
 {
@@ -68,7 +67,7 @@ class PaymentPlansHelper
 
         try {
             $plansConfig =$this->updatePlanConfigFromApi();
-        } catch (InvalidArgumentException $e) {
+        } catch (RequestError $e) {
             $this->messageManager->addErrorMessage(__($e->getMessage()));
             return false;
         }
@@ -93,15 +92,16 @@ class PaymentPlansHelper
 
     /**
      * @return PaymentPlansConfigInterface
+     * @throws RequestError
      */
     public function updatePlanConfigFromApi():PaymentPlansConfigInterface
     {
         $plansConfig = $this->createPlanConfig();
         try {
             $plansConfig->updateFromApi();
-        } catch (Exception $e) {
+        } catch (RequestError $e) {
             $this->logger->info('Error fetching Alma payment plans : ',[$e->getMessage()]);
-            throw new InvalidArgumentException("Error fetching Alma payment plans - displayed information might not be accurate");
+            throw new RequestError("Error fetching Alma payment plans - displayed information might not be accurate");
         }
         return $plansConfig;
     }
