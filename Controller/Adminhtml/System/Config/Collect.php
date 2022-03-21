@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Controller\Adminhtml\System\Config;
 
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -10,10 +9,7 @@ use Magento\Framework\App\Response\Http\FileFactory;
 
 class Collect extends Action
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
+
     /**
      * @var FileFactory
      */
@@ -22,16 +18,13 @@ class Collect extends Action
     /**
      * @param FileFactory $fileFactory
      * @param Context $context
-     * @param Logger $logger
      */
     public function __construct(
         FileFactory $fileFactory,
-        Context $context,
-        Logger $logger
+        Context $context
     )
     {
     parent::__construct($context);
-        $this->logger = $logger;
         $this->fileFactory = $fileFactory;
     }
 

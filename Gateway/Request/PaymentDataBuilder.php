@@ -68,7 +68,13 @@ class PaymentDataBuilder implements BuilderInterface
      * @param Config          $config
      * @param Resolver        $locale
      */
-    public function __construct(CheckoutSession $checkoutSession, Config $config, Resolver $locale , ConfigHelper $configHelper,Logger $logger)
+    public function __construct(
+        CheckoutSession $checkoutSession,
+        Config $config,
+        Resolver $locale ,
+        ConfigHelper $configHelper,
+        Logger $logger
+    )
     {
         $this->checkoutSession = $checkoutSession;
         $this->config          = $config;
@@ -108,18 +114,17 @@ class PaymentDataBuilder implements BuilderInterface
                 'quote_id' => $quoteId,
             ],
         ];
+        $this->logger->info('Create payment for order_id: ',[$orderId]);
         $configArray = $this->trigger($configArray,$planConfig);
-        $this->logger->info('$this->configHelper->getTranslatedTrigger()',[$this->configHelper->getTranslatedTrigger()]);
         return ['payment' => array_merge($planConfig->getPaymentData(),$configArray)];
     }
 
     private function trigger($configArray,$planConfig):array
     {
         if ($this->configHelper->triggerIsEnabled() && $planConfig->hasDeferredTrigger()){
+            $this->logger->info('Add trigger data for plan : ',[$planConfig->plankey()]);
             $configArray['deferred'] = 'trigger';
             $configArray['deferred_description'] = $this->configHelper->getTranslatedTrigger();
-        }else {
-            $this->logger->info('No Trigger on this payment',[]);
         }
         return $configArray;
     }

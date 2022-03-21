@@ -7,7 +7,8 @@ v2.3.0
 * Fix tax grand total in p>4
 * Fix white space in transaltation "Your cart total : "
 * Feature add module version on enable comment 
-* feature add collect logs in back office
+* Feature add collect logs in back office
+* Feature add control for min and max value for each plan
 
 v2.2.1
 ------

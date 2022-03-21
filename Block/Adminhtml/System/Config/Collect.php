@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config;
 
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Exception\LocalizedException;
 
@@ -17,23 +16,15 @@ class Collect extends Field
     protected $_template = 'Alma_MonthlyPayments::form/field/collect.phtml';
 
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @param Context $context
-     * @param Logger $logger
      * @param array $data
      */
     public function __construct(
         Context $context,
-        Logger $logger,
         array $data = []
     )
     {
         parent::__construct($context, $data);
-        $this->logger = $logger;
     }
 
     /**

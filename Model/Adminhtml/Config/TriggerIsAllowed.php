@@ -4,27 +4,22 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Magento\Config\Model\Config\Source\Yesno;
-use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 
 class TriggerIsAllowed extends Yesno
 {
     const ALLOWED_LABEL = 'Yes';
     const NOT_ALLOWED_LABEL = 'No';
-    /**
-     * @var Logger
-     */
-    private $logger;
+
     /**
      * @var PaymentPlansHelper
      */
     private $paymentPlansHelper;
 
     public function __construct(
-        Logger $logger,
         PaymentPlansHelper $paymentPlansHelper
     )
     {
-        $this->logger = $logger;
         $this->paymentPlansHelper = $paymentPlansHelper;
     }
 

@@ -84,6 +84,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     {
         $alma = $this->almaClient->getDefaultClient();
         if (!$alma) {
+            $this->logger->info('Default client is not set - Impossible to update from Api',[]);
             return;
         }
 

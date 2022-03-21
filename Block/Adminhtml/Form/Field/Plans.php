@@ -28,7 +28,6 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Serialize\Serializer\Json;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class Plans extends Field
 {
@@ -40,15 +39,12 @@ class Plans extends Field
     /**
      * @param Context $context
      * @param array $data
-         * @param Logger $logger
      */
     public function __construct(
         Context $context,
-        Logger $logger ,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->logger = $logger;
     }
 
     /**

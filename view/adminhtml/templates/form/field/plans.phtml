@@ -88,7 +88,7 @@ $jsId = $block->escapeJs($blockId);
                 <input id="<?= $htmlId ?>_min-amount"
                        type="text"
                        class="validate-number input-text admin__control-text"
-                       data-bind="value: minAmount">
+                       data-bind="value: minAmount,attr: {'min': minAllowedAmount,'max': maxAllowedAmount}">
                 <span class="note">
                     <?= __('Minimum purchase amount for which this payment plan will be enabled') ?>
                 </span>
@@ -99,7 +99,7 @@ $jsId = $block->escapeJs($blockId);
                 <input id="<?= $htmlId ?>_max-amount"
                        type="text"
                        class="validate-number input-text admin__control-text"
-                       data-bind="value: maxAmount">
+                       data-bind="value: maxAmount,attr: {'min': minAllowedAmount,'max': maxAllowedAmount}">
                 <span class="note">
                     <?= __('Maximum purchase amount for which this payment plan will be enabled') ?>
                 </span>
@@ -237,6 +237,38 @@ $jsId = $block->escapeJs($blockId);
                             }
 
                             currentPlan.maxAmount = almaPriceToCents(value);
+                            this.currentPlan(currentPlan);
+                        }
+                    });
+                    this.maxAllowedAmount = ko.computed({
+                        owner: this,
+                        read: function () {
+                            return almaPriceFromCents(this.currentPlan() ? this.currentPlan().maxAllowedAmount : 0);
+                        },
+
+                        write: function (value) {
+                            let currentPlan = this.currentPlan();
+                            if (!currentPlan) {
+                                return;
+                            }
+
+                            currentPlan.maxAllowedAmount = almaPriceToCents(value);
+                            this.currentPlan(currentPlan);
+                        }
+                    });
+                    this.minAllowedAmount = ko.computed({
+                        owner: this,
+                        read: function () {
+                            return almaPriceFromCents(this.currentPlan() ? this.currentPlan().minAllowedAmount : 0);
+                        },
+
+                        write: function (value) {
+                            let currentPlan = this.currentPlan();
+                            if (!currentPlan) {
+                                return;
+                            }
+
+                            currentPlan.minAllowedAmount = almaPriceToCents(value);
                             this.currentPlan(currentPlan);
                         }
                     });

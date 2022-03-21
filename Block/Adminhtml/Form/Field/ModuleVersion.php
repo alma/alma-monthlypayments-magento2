@@ -2,8 +2,6 @@
 
 namespace Alma\MonthlyPayments\Block\Adminhtml\Form\Field;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
@@ -39,7 +37,7 @@ class ModuleVersion extends Field
     protected function _getElementHtml(AbstractElement $element):string
     {
         $moduleVersion= $this->resource->getDataVersion('Alma_MonthlyPayments');
-        $element->setComment(__("v". $moduleVersion));
+        $element->setComment(sprintf(__("v%s"),$moduleVersion));
         return $element->getElementHtml();
     }
 }
