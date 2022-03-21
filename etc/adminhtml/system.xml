@@ -54,6 +54,13 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
                 </field>
+                <field id="alma_log" translate="label comment" type="button" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <depends>
+                        <field id="debug">1</field>
+                    </depends>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Collect</frontend_model>
+                    <label>Download logs</label>
+                </field>
                 <group id="alma_customise_checkout" translate="label comment" type="text" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                     <depends>

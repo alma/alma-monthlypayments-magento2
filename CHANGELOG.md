@@ -3,10 +3,11 @@ Changelog
 
 v2.3.0
 ------
-* Feature : payment uppon trigger
-* Fix : Tax grand total in p>4
-* Fix : White space in transaltation "Your cart total : "
-* Feature : add module version on enable comment 
+* Feature add payment uppon trigger
+* Fix tax grand total in p>4
+* Fix white space in transaltation "Your cart total : "
+* Feature add module version on enable comment 
+* feature add collect logs in back office
 
 v2.2.1
 ------
