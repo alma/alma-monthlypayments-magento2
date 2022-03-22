@@ -5,7 +5,7 @@ v2.3.0
 ------
 * Feature add payment uppon trigger
 * Fix tax grand total in p>4
-* Fix white space in transaltation "Your cart total : "
+* Fix white space in translatation "Your cart total : "
 * Feature add module version on enable comment 
 * Feature add collect logs in back office
 * Feature add control for min and max value for each plan
