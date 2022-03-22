@@ -210,7 +210,6 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-        $this->logger->info('checkEligibility',[]);
         try {
             $quote = $this->getEligibilityQuote();
         } catch (InvalidArgumentException $e) {
@@ -546,7 +545,6 @@ class Eligibility
     {
         $quote=$this->quoteHelper->getQuote();
         if(!isset($quote)){
-            $this->logger->info('No Quote for eligibility',[]);
             throw new InvalidArgumentException('No Quote for eligibility');
         }
         return $quote;
