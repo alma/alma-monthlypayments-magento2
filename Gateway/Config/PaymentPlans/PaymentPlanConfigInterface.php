@@ -86,6 +86,16 @@ interface PaymentPlanConfigInterface
     public function deferredMonths(): int;
 
     /**
+     * @return bool
+     */
+    public function hasDeferredTrigger(): bool;
+
+    /**
+     * @return int
+     */
+    public function maxDeferredTriggerDays(): int;
+
+    /**
      * Returns deferred duration in days – approximate value (invariably using 30 days for 1 month) but it's OK as it's
      * mainly being used for sorting purposes.
      */

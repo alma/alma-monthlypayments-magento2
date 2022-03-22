@@ -29,7 +29,9 @@ use Alma\API\Entities\FeePlan;
 class PaymentPlanConfig implements PaymentPlanConfigInterface
 {
     const TRANSIENT_KEY_MIN_ALLOWED_AMOUNT = 'minAllowedAmount';
+    const KEY_MIN_AMOUNT = 'minAmount';
     const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
+    const KEY_MAX_AMOUNT = 'maxAmount';
     const TRANSIENT_KEY_MERCHANT_FEES = 'merchantFees';
     const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
     const ALLOWED_MONTHLY_PLANS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -79,6 +81,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public static function defaultConfigForFeePlan(FeePlan $plan): array
     {
+        $deferred_trigger_limit_days = $plan->getDeferredTriggerLimitDays();
         return [
             'kind' => $plan->kind,
 
@@ -86,6 +89,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
 
             'deferredDays' => intval($plan->deferred_days),
             'deferredMonths' => intval($plan->deferred_months),
+
+            'deferredTriggerEnable' => isset($deferred_trigger_limit_days),
+            'deferredTriggerDays' => $deferred_trigger_limit_days,
 
             'enabled' => $plan->installments_count === 3,
 
@@ -255,6 +261,22 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     public function deferredMonths(): int
     {
         return intval($this->data['deferredMonths']);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasDeferredTrigger(): bool
+    {
+        return $this->data['deferredTriggerEnable'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function maxDeferredTriggerDays(): int
+    {
+        return intval($this->data['deferredTriggerDays']);
     }
 
     /**

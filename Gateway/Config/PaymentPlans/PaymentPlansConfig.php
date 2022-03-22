@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 use Alma\API\Entities\FeePlan;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Magento\Framework\Serialize\Serializer\Json;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentPlansConfig implements PaymentPlansConfigInterface
 {
@@ -44,6 +45,10 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
      * @var PaymentPlanConfigInterfaceFactory
      */
     private $planConfigFactory;
+    /**
+     * @var Logger
+     */
+    private  $logger;
 
     /**
      * PaymentPlansConfig constructor.
@@ -51,10 +56,12 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
      * @param AlmaClient $almaClient
      * @param PaymentPlanConfigInterfaceFactory $planConfigFactory
      * @param array|string $data
+     * @param Logger $logger
      */
     public function __construct(
         AlmaClient $almaClient,
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
+        Logger $logger,
         $data = []
     )
     {
@@ -67,6 +74,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
         $this->data = $data;
         $this->almaClient = $almaClient;
         $this->planConfigFactory = $planConfigFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -76,11 +84,11 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     {
         $alma = $this->almaClient->getDefaultClient();
         if (!$alma) {
+            $this->logger->info('Default client is not set - Impossible to update from Api',[]);
             return;
         }
 
         $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
-
         foreach ($feePlans as $plan) {
             $key = PaymentPlanConfig::keyForFeePlan($plan);
             $this->setPlanAllowed($key, $plan->allowed);

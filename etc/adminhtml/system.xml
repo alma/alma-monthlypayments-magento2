@@ -39,6 +39,7 @@
                        showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\ModuleVersion</frontend_model>
                 </field>
 
                 <field id="sort_order" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
@@ -52,6 +53,13 @@
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>
+                </field>
+                <field id="alma_log" translate="label comment" type="button" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <depends>
+                        <field id="debug">1</field>
+                    </depends>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Collect</frontend_model>
+                    <label>Download logs</label>
                 </field>
                 <group id="alma_customise_checkout" translate="label comment" type="text" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
@@ -131,9 +139,42 @@
                         <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\Plans</frontend_model>
                     </field>
                 </group>
+                <!-- PAYMENT ON TRIGGER DISPLAY CONFIGURATION -->
+                <group id="alma_trigger_config" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <label>Payment upon trigger</label>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
+                    <comment>This option is available only for Alma payment in 2x, 3x and 4x. When it's turned on, your clients will pay the first installment at the order status change. When your client order on your website, Alma will only ask for a payment authorization. Only status handled by Alma are available in the menu below. Please contact Alma if you need us to add another status.</comment>
+                    <field id="trigger_is_allowed" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Payment on trigger allowed on alma dashboard</label>
+                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\TriggerAllowed</frontend_model>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TriggerIsAllowed</source_model>
+                        <config_path>payment/alma_monthly_payments/trigger_is_allowed</config_path>
+                    </field>
+                    <field id="trigger_is_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <depends>
+                            <field id="trigger_is_allowed">1</field>
+                        </depends>
+                        <label>Activate the payment upon trigger</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/alma_monthly_payments/trigger_is_enabled</config_path>
+                    </field>
+                    <field id="trigger_typology" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <depends>
+                            <field id="trigger_is_allowed">1</field>
+                            <field id="trigger_is_enabled">1</field>
+                        </depends>
+                        <label>Trigger typology</label>
+                        <comment></comment>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TriggerTypology</source_model>
+                        <config_path>payment/alma_monthly_payments/trigger_typology</config_path>
+                    </field>
+                </group>
 
                 <!-- CART DISPLAY CONFIGURATION -->
-                <group id="cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                <group id="alma_cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -160,9 +201,8 @@
                         <config_path>payment/alma_monthly_payments/non_eligibility_message</config_path>
                     </field>
                 </group>
-
                 <!-- PRODUCT PAGE DISPLAY CONFIGURATION -->
-                <group id="product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
+                <group id="alma_product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -215,7 +255,7 @@
                 </group>
 
                 <!-- EXCLUDED PRODUCTS CONFIGURATION -->
-                <group id="excluded_products_config" translate="label comment" type="text" sortOrder="30"
+                <group id="alma_excluded_products_config" translate="label comment" type="text" sortOrder="30"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
@@ -242,7 +282,7 @@
                 </group>
 
                 <!-- API CONFIGURATION -->
-                <group id="api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
+                <group id="alma_api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\ApiFieldset</frontend_model>
                     <depends>

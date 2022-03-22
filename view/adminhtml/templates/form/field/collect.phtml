@@ -1,0 +1,32 @@
+<?php /* @var $block \Alma\MonthlyPayments\Block\Adminhtml\System\Config\Collect */?>
+
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function(jQuery){
+
+        jQuery('#collect_button').click(function () {
+            var data = {
+                'form_key': window.FORM_KEY
+            };
+            jQuery.ajax({
+                url : '<?php echo $block->getAjaxUrl() ?>',
+                data: data,
+                showLoader: true,
+                success: function(response) {
+                    var lines = response.trim().split('\n').slice(-100);
+                    var element = document.createElement('a');
+                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(lines.join('\n')));
+                    element.setAttribute('download', 'alma'+Date.now()+'.log');
+                    element.click();
+                }
+            });
+            return true;
+        });
+
+    });
+</script>
+
+<?php echo $block->getButtonHtml() ?>
+

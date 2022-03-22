@@ -19,6 +19,10 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const DEFERRED_PAYMENT_DESC = 'alma_deferred_payment_desc';
     const MERGE_PAYMENT_TITLE = 'title';
     const MERGE_PAYMENT_DESC = 'description';
+    const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
+    const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
+    const TRIGGER_TYPOLOGY = 'trigger_typology';
+
     /**
      * @return bool
      */
@@ -38,11 +42,36 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $code, ScopeInterface::SCOPE_STORE, $storeId
         );
     }
+
+    /**
+     * @return bool
+     */
+    public function triggerIsEnabled():bool
+    {
+        return ($this->getConfigByCode(self::TRIGGER_IS_ALLOWED) && $this->getConfigByCode(self::TRIGGER_IS_ENABLED));
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrigger():string
+    {
+        return $this->getConfigByCode(self::TRIGGER_TYPOLOGY);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTranslatedTrigger():string
+    {
+        return __($this->getTrigger());
+    }
+
     /**
      * Get merge payment config flag
      * @return int
      */
-    public function getAreMergedPayementMethods()
+    public function getAreMergedPaymentMethods()
     {
         return (bool)(int)$this->getConfigByCode(self::MERGE_PAYEMENT_METHODS);
     }

@@ -25,9 +25,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
-use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Magento\Config\Model\Config\Backend\Serialized;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -38,6 +36,7 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\Serializer\Json;
+use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentPlans extends Serialized
 {
@@ -52,10 +51,6 @@ class PaymentPlans extends Serialized
      */
     protected $hasError;
     /**
-     * @var Config
-     */
-    private $almaConfig;
-    /**
      * @var Json
      */
     protected $serializer;
@@ -63,7 +58,24 @@ class PaymentPlans extends Serialized
      * @var PaymentPlansConfigInterfaceFactory
      */
     private $plansConfigFactory;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param MessageManager $messageManager
+     * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     * @param Json|null $serializer
+     * @param Logger $logger
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -71,7 +83,7 @@ class PaymentPlans extends Serialized
         TypeListInterface $cacheTypeList,
         MessageManager $messageManager,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
-        Config $almaConfig,
+        Logger $logger,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = [],
@@ -89,10 +101,10 @@ class PaymentPlans extends Serialized
             $serializer
         );
 
-        $this->almaConfig = $almaConfig;
         $this->messageManager = $messageManager;
         $this->serializer = $serializer ?: new Json();
         $this->plansConfigFactory = $plansConfigFactory;
+        $this->logger = $logger;
     }
 
     protected function _afterLoad()
@@ -126,7 +138,7 @@ class PaymentPlans extends Serialized
         if (!is_array($value)) {
             $value = $this->serializer->unserialize($value);
         }
-
+        $value = $this->forceMinMaxLimit($value);
         // Remove transient values from the serialized data: it should always come fresh from the API
         foreach (PaymentPlanConfig::transientKeys() as $key) {
             foreach ($value as $planKey => &$planConfig) {
@@ -138,5 +150,32 @@ class PaymentPlans extends Serialized
         $this->setValue($value);
 
         return parent::beforeSave();
+    }
+
+    /**
+     * Check if min and max value are in Alma limit for each plan configuration before serialize it in core_config database
+     *
+     * @param array $plans
+     * @return array
+     */
+    private function forceMinMaxLimit(array $plans):array
+    {
+        foreach ($plans as &$plan) {
+            if($plan[PaymentPlanConfig::KEY_MIN_AMOUNT]<$plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MIN_AMOUNT]>$plan[PaymentPlanConfig::KEY_MAX_AMOUNT]){
+                $this->logger->info('Change min Amount: '.$plan[PaymentPlanConfig::KEY_MAX_AMOUNT].' - Min allowed Amount: '.$plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]. '- Max Amount: '.$plan[PaymentPlanConfig::KEY_MAX_AMOUNT],[]);
+                $this->messageManager->addErrorMessage(
+                    sprintf(__("Minimum amount is %s€ for plan %s"),($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]/100),$plan["key"])
+                );
+                $plan[PaymentPlanConfig::KEY_MIN_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT];
+            }
+            if($plan[PaymentPlanConfig::KEY_MAX_AMOUNT]>$plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MAX_AMOUNT]<$plan[PaymentPlanConfig::KEY_MIN_AMOUNT]){
+                $this->logger->info('Change max Amount: '.$plan[PaymentPlanConfig::KEY_MAX_AMOUNT].' - Max allowed Amount: '.$plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT]. '- Min Amount: '.$plan[PaymentPlanConfig::KEY_MIN_AMOUNT],[]);
+                $this->messageManager->addErrorMessage(
+                    sprintf(__("Maximum amount is %s€ for plan %s"),($plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT]/100),$plan["key"])
+                );
+                $plan[PaymentPlanConfig::KEY_MAX_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT];
+            }
+        }
+        return $plans;
     }
 }

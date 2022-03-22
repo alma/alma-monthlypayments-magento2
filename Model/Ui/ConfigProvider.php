@@ -26,7 +26,7 @@
 namespace Alma\MonthlyPayments\Model\Ui;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Helpers\Eligibility;
+use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
@@ -44,34 +44,33 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $config;
     /**
-     * @var Eligibility
-     */
-    private $eligibilityHelper;
-    /**
      * @var ResolverInterface
      */
     private $localeResolver;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
 
     /**
      * ConfigProvider constructor.
      * @param UrlInterface $urlBuilder
      * @param Config $config
-     * @param Eligibility $eligibilityHelper
      * @param ResolverInterface $localeResolver
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Config $config,
-        Eligibility $eligibilityHelper,
         ResolverInterface $localeResolver,
+        ConfigHelper $configHelper,
         Logger $logger
     )
     {
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
-        $this->eligibilityHelper = $eligibilityHelper;
         $this->localeResolver = $localeResolver;
         $this->logger = $logger;
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -85,6 +84,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
                     'title' => __($this->config->getPaymentButtonTitle()),
                     'description' => __($this->config->getPaymentButtonDescription()),
+                    'triggerEnable' => __($this->configHelper->triggerIsEnabled()),
+                    'triggerLabel' => __($this->configHelper->getTrigger()),
                     'sortOrder' => $this->config->getSortOrder(),
                     'locale' => str_replace('_', '-', $this->localeResolver->getLocale())
                 ]
