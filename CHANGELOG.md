@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.3.1
+------
+* Fix alma-php-client requirement
+* I18n
+
 v2.3.0
 ------
 * Feature add payment uppon trigger
