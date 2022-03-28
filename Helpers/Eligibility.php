@@ -211,6 +211,7 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
+        $this->eligible = false;
         try {
             $quote = $this->getEligibilityQuote();
         } catch (InvalidArgumentException $e) {
