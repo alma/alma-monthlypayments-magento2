@@ -68,18 +68,16 @@ class Eligibility extends Template
         $this->logger = $logger;
         $this->config = $config;
         $this->eligibilityHelper = $eligibilityHelper;
-        $this->logger->info('Construct Cart Eligibility',[]);
         $this->checkEligibility();
         $this->availabilityHelper = $availabilityHelper;
     }
 
-    public function checkEligibility()
+    public function checkEligibility():void
     {
         try {
             $this->eligibilityHelper->checkEligibility();
         } catch (\InvalidArgumentException $e) {
             $this->logger->info('InvalidArgumentException : ',[$e->getMessage()]);
-            return false;
         }
     }
 

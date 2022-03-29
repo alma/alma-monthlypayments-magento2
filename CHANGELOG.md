@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.3.2
+------
+* Fix eligibility initialisation for : isEligible() must be of the type boolean
+
+
 v2.3.1
 ------
 * Fix alma-php-client requirement

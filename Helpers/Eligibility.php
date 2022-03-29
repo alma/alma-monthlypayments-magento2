@@ -111,6 +111,7 @@ class Eligibility
         $this->quoteData = $quoteData;
         $this->quoteHelper = $quoteHelper;
         $this->alreadyLoaded = false;
+        $this->eligible = false;
         $this->currentFeePlans = [];
     }
 
@@ -210,7 +211,6 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-        $this->eligible = false;
         try {
             $quote = $this->getEligibilityQuote();
         } catch (InvalidArgumentException $e) {
