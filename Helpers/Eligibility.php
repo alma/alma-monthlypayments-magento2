@@ -111,6 +111,7 @@ class Eligibility
         $this->quoteData = $quoteData;
         $this->quoteHelper = $quoteHelper;
         $this->alreadyLoaded = false;
+        $this->eligible = false;
         $this->currentFeePlans = [];
     }
 
@@ -210,7 +211,6 @@ class Eligibility
      */
     public function checkEligibility(): bool
     {
-        $this->logger->info('checkEligibility',[]);
         try {
             $quote = $this->getEligibilityQuote();
         } catch (InvalidArgumentException $e) {
@@ -220,7 +220,6 @@ class Eligibility
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
 
-        $this->eligible = false;
         $this->message = $nonEligibilityMessage;
 
         if (!$this->checkItemsTypes()) {

@@ -56,18 +56,15 @@ class Eligibility extends Action
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return false|Json
      */
     public function execute()
     {
         $this->logger->info('execute Controller Payment Action',[]);
         try {
             $this->eligibilityHelper->checkEligibility();
-        } catch (\InvalidArgumentException $e) {
-            $this->logger->info('Control payment eligibility InvalidArgumentException : ',[$e->getMessage()]);
+        } catch (\Exception $e) {
+            $this->logger->info('Control payment eligibility Exception : ',[$e->getMessage()]);
             return false;
         }
 
