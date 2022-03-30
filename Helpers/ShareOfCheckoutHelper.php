@@ -51,11 +51,16 @@ class ShareOfCheckoutHelper
      * @var null
      */
     private $endTime;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
 
     public function __construct(
         Logger $logger,
         CollectionFactory $collectionFactory,
         OrderHelper $orderHelper,
+        ConfigHelper $configHelper,
         AlmaClient $almaClient
     )
     {
@@ -68,17 +73,19 @@ class ShareOfCheckoutHelper
         $this->almaClient = $almaClient->getDefaultClient();
         $this->startTime = null;
         $this->endTime = null;
+        $this->configHelper = $configHelper;
     }
 
     /**
+     * @return void
      * @throws RequestError
      */
-    public function shareDay()
+    public function shareDay():void
     {
         if (!$this->almaClient){
             throw new \InvalidArgumentException('Alma client is not define');
         }
-        $res=[];
+        $res=null;
         try {
             $res = $this->almaClient->shareOfCheckout->share($this->getPayload());
         } catch (RequestError $e) {
@@ -88,14 +95,19 @@ class ShareOfCheckoutHelper
             $this->writeLogs();
             $this->flushOrderCollection();
         }
-        return $res;
     }
 
+    /**
+     * @return int
+     */
     public function countShareOfCheckoutOrders():int
     {
         return $this->getShareOfCheckoutOrderCollection()->count();
     }
 
+    /**
+     * @return string
+     */
     public function getLastUpdateDate():string
     {
         // TODO - Create api call
@@ -106,17 +118,28 @@ class ShareOfCheckoutHelper
         return date('Y-m-d',strtotime('-2 days'));
     }
 
+    /**
+     * @param $startTime
+     * @return void
+     */
     public function setShareOfCheckoutFromDate($startTime):void
     {
         $this->startTime = $startTime.' 00:00:00';
         $this->setShareOfCheckoutToDate($startTime);
     }
 
+    /**
+     * @param $endTime
+     * @return void
+     */
     public function setShareOfCheckoutToDate($endTime):void
     {
         $this->endTime = $endTime.' 23:59:59';
     }
 
+    /**
+     * @return OrderSearchResultInterface
+     */
     private function getShareOfCheckoutOrderCollection():OrderSearchResultInterface
     {
         if(count($this->orderCollection)){
@@ -129,6 +152,9 @@ class ShareOfCheckoutHelper
         return $this->orderCollection;
     }
 
+    /**
+     * @return array
+     */
     private function getTotalsOrders():array
     {
         if(count($this->totalShareOfCheckoutOrders)){
@@ -152,6 +178,9 @@ class ShareOfCheckoutHelper
         return $this->totalShareOfCheckoutOrders;
     }
 
+    /**
+     * @return array
+     */
     private function getTotalsPaymentMethods():array
     {
         if(count($this->totalShareOfCheckoutCheckouts)){
@@ -184,11 +213,18 @@ class ShareOfCheckoutHelper
         return $this->totalShareOfCheckoutCheckouts;
     }
 
+    /**
+     * @param $currency
+     * @return array
+     */
     private function initOrderResult($currency):array
     {
         return [self::TOTAL_AMOUNT_KEY=>0,self::TOTAL_COUNT_KEY=>0,self::CURRENCY_KEY=>$currency];
     }
 
+    /**
+     * @return void
+     */
     private function checkOrderCollectionExist():void
     {
         if(!count($this->orderCollection)){
@@ -196,6 +232,9 @@ class ShareOfCheckoutHelper
         }
     }
 
+    /**
+     * @return string
+     */
     private function getShareOfCheckoutFromDate():string
     {
         if(isset($this->startTime)){
@@ -205,6 +244,9 @@ class ShareOfCheckoutHelper
         return date('Y-m-d',strtotime('yesterday')).' 00:00:00';
     }
 
+    /**
+     * @return string
+     */
     private function getShareOfCheckoutToDate():string
     {
         if(isset($this->endTime)){
@@ -213,6 +255,9 @@ class ShareOfCheckoutHelper
         return date('Y-m-d',strtotime('yesterday')).' 23:59:59';
     }
 
+    /**
+     * @return array
+     */
     private function getPayload(): array
     {
         return [
@@ -223,6 +268,9 @@ class ShareOfCheckoutHelper
         ];
     }
 
+    /**
+     * @return void
+     */
     public function flushOrderCollection():void
     {
         $this->orderCollection = [];
@@ -230,6 +278,17 @@ class ShareOfCheckoutHelper
         $this->totalShareOfCheckoutCheckouts = [];
     }
 
+    /**
+     * @return string
+     */
+    public function getShareOfCheckoutEnabledDate():string
+    {
+        return $this->configHelper->getShareOfCheckoutEnabledDate();
+    }
+
+    /**
+     * @return void
+     */
     private function writeLogs():void
     {
         $this->logger->info('Share start date',[$this->getShareOfCheckoutFromDate()]);

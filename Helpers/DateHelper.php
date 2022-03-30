@@ -20,15 +20,17 @@ class DateHelper
      * @param string $to
      * @return array
      */
-    public function getDatesInInterval($from,$to = null):array
+    public function getDatesInInterval($from,$shareOfCheckoutEnabledDate,$to = null):array
     {
         if(!isset($to)){
             $to = strtotime('-1 day');
         }
         $datesInInterval = [];
         $startTimestamp = strtotime('+1 day',strtotime($from));
-        for ($i = $startTimestamp; $i <= $to ; $i = strtotime('+1 day', $i)) {
-            $datesInInterval[] = date('Y-m-d',$i);
+        for ($i = $startTimestamp; $i <= $to ; $i = strtotime('+1 day', $i)) {$this->logger->info('$shareOfCheckoutEnabledDate',[strtotime($shareOfCheckoutEnabledDate)]);
+            if($i > strtotime($shareOfCheckoutEnabledDate)){
+                $datesInInterval[] = date('Y-m-d',$i);
+            }
         }
         return $datesInInterval;
     }
