@@ -91,7 +91,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get merge payment config flag
      * @return int
      */
-    public function getAreMergedPaymentMethods()
+    public function getAreMergedPaymentMethods(): int
     {
         return (bool)(int)$this->getConfigByCode(self::MERGE_PAYEMENT_METHODS);
     }
@@ -99,7 +99,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get payment installment title
      * @return string
      */
-    public function getInstallmentsPaymentTitle()
+    public function getInstallmentsPaymentTitle(): string
     {
         return (string)$this->getConfigByCode(self::INSTALLMENTS_PAYMENT_TITLE);
     }
@@ -108,7 +108,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get payment installment description
      * @return string
      */
-    public function getInstallmentsPaymentDesc()
+    public function getInstallmentsPaymentDesc(): string
     {
         return (string)$this->getConfigByCode(self::INSTALLMENTS_PAYMENT_DESC);
     }
@@ -117,7 +117,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get payment spread title
      * @return string
      */
-    public function getSpreadPaymentTitle()
+    public function getSpreadPaymentTitle(): string
     {
         return (string)$this->getConfigByCode(self::SPREAD_PAYMENT_TITLE);
     }
@@ -125,7 +125,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get payment spread description
      * @return string
      */
-    public function getSpreadPaymentDesc()
+    public function getSpreadPaymentDesc(): string
     {
         return (string)$this->getConfigByCode(self::SPREAD_PAYMENT_DESC);
     }
@@ -134,7 +134,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get deferred payment title
      * @return string
      */
-    public function getDeferredPaymentTitle()
+    public function getDeferredPaymentTitle(): string
     {
         return (string)$this->getConfigByCode(self::DEFERRED_PAYMENT_TITLE);
     }
@@ -142,7 +142,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get deferred payment description
      * @return string
      */
-    public function getDeferredPaymentDesc()
+    public function getDeferredPaymentDesc(): string
     {
         return (string)$this->getConfigByCode(self::DEFERRED_PAYMENT_DESC);
     }
@@ -151,7 +151,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get merge payment title
      * @return string
      */
-    public function getMergePaymentTitle()
+    public function getMergePaymentTitle(): string
     {
         return (string)$this->getConfigByCode(self::MERGE_PAYMENT_TITLE);
     }
@@ -159,7 +159,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get merge payment description
      * @return string
      */
-    public function getMergePaymentDesc()
+    public function getMergePaymentDesc(): string
     {
         return (string)$this->getConfigByCode(self::MERGE_PAYMENT_DESC);
     }
@@ -167,9 +167,18 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get merge payment description
      * @return string
      */
-    public function shareOfCheckoutIsEnabled()
+    public function shareOfCheckoutIsEnabled(): string
     {
         return (string)$this->getConfigByCode(self::SHARE_CHECKOUT_ENABLE_KEY);
+    }
+
+    /**
+     * Get share of checkout enable date
+     * @return string
+     */
+    public function getShareOfCheckoutEnabledDate(): string
+    {
+        return (string)$this->getConfigByCode(self::SHARE_CHECKOUT_DATE_KEY);
     }
 
     /**

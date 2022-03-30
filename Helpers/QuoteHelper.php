@@ -154,7 +154,7 @@ class QuoteHelper
         try {
             $quote = $this->quoteRepository->get($this->quoteId);
         } catch (\Exception $e) {
-            $this->logger->info('getQuoteById Exeption : ',[$e->getMessage()]);
+            $this->logger->info('getQuoteById Exception : ',[$e->getMessage()]);
         }
         return $quote;
     }

@@ -140,7 +140,6 @@ class Eligibility
         }
 
         if ($this->isAlreadyLoaded()){
-            $this->logger->info('Fee plans are already loaded',[]);
             return $this->getCurrentsFeePlans();
         }
 

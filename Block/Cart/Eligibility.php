@@ -68,7 +68,6 @@ class Eligibility extends Template
         $this->logger = $logger;
         $this->config = $config;
         $this->eligibilityHelper = $eligibilityHelper;
-        $this->logger->info('Construct Cart Eligibility',[]);
         $this->checkEligibility();
         $this->availabilityHelper = $availabilityHelper;
     }
