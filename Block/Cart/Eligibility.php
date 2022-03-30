@@ -72,18 +72,16 @@ class Eligibility extends Template
         $this->availabilityHelper = $availabilityHelper;
     }
 
+    /**
+     * @return void
+     */
     public function checkEligibility():void
     {
         try {
             $this->eligibilityHelper->checkEligibility();
-        } catch (\InvalidArgumentException $e) {
-            $this->logger->info('InvalidArgumentException : ',[$e->getMessage()]);
+        } catch (\Exception $e) {
+            $this->logger->info('Check Eligibility Exception : ',[$e->getMessage()]);
         }
-    }
-
-    public function isEligible()
-    {
-        return $this->eligibilityHelper->isEligible();
     }
 
     public function showEligibilityMessage()
