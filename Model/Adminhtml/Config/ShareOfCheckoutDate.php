@@ -56,13 +56,9 @@ class ShareOfCheckoutDate extends \Magento\Framework\App\Config\Value
     public function afterSave()
     {
         if ($this->isValueChanged() && $this->getValue()){
-            $this->logger->info('Set now',[]);
             $this->configHelper->saveShareOfCheckoutDate(date('Y-m-d'));
         }elseif ($this->isValueChanged() && !$this->getValue()) {
-            $this->logger->info('Delete Value',[]);
             $this->configHelper->deleteShareOfCheckoutDate();
-        } else {
-            $this->logger->info('no change',[]);
         }
         return parent::afterSave();
     }

@@ -52,12 +52,20 @@ class ShareOfCheckout
     public function shareDays():void
     {
         ini_set('max_execution_time', 30);
+
         if(!$this->configHelper->shareOfCheckoutIsEnabled()){
             $this->logger->info('Share Of Checkout is not enabled',[]);
             return;
         }
+        $shareOfCheckoutEnabledDate = $this->shareOfCheckoutHelper->getShareOfCheckoutEnabledDate();
+
+       if($shareOfCheckoutEnabledDate ==''){
+            $this->logger->info('No enable date in config',[]);
+            return;
+        }
+
         $lastUpdateDate = $this->shareOfCheckoutHelper->getLastUpdateDate();
-        $DatesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate);
+        $DatesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate,$shareOfCheckoutEnabledDate);
         foreach ($DatesToShare as $date) {
             try {
                 $this->shareOfCheckoutHelper->setShareOfCheckoutFromDate($date);
