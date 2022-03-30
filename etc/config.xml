@@ -84,6 +84,7 @@
                 <widget_price_use_qty>1</widget_price_use_qty>
                 <widget_position>catalog.product.view.before.addtocart.alma.widget</widget_position>
                 <widget_container_css_selector>#maincontent</widget_container_css_selector>
+                <share_checkout_enable>0</share_checkout_enable>
             </alma_monthly_payments>
         </payment>
     </default>

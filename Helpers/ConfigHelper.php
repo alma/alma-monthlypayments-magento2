@@ -1,8 +1,10 @@
 <?php
 namespace Alma\MonthlyPayments\Helpers;
 
+use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 
 class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -13,6 +15,24 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
+    const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
+    const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
+
+    /**
+     * @var WriterInterface
+     */
+    private $writer;
+
+
+    public function __construct(
+        Context $context,
+        WriterInterface $writer
+    )
+    {
+        parent::__construct($context);
+        $this->writer = $writer;
+    }
+
 
     /**
      * @return bool

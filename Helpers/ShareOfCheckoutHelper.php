@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\RequestError;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
@@ -13,6 +14,7 @@ class ShareOfCheckoutHelper
     public const TOTAL_AMOUNT_KEY="total_amount";
     public const CURRENCY_KEY="currency";
     public const PAYMENT_METHOD_KEY="payment_method_name";
+    public const SHARED_ORDER_STATES=['processing','complete'];
     /**
      * @var Logger
      */
@@ -37,11 +39,24 @@ class ShareOfCheckoutHelper
      * @var array
      */
     private $totalShareOfCheckoutCheckouts;
+    /**
+     * @var AlmaClient
+     */
+    private $almaClient;
+    /**
+     * @var null
+     */
+    private $startTime;
+    /**
+     * @var null
+     */
+    private $endTime;
 
     public function __construct(
         Logger $logger,
         CollectionFactory $collectionFactory,
-        OrderHelper $orderHelper
+        OrderHelper $orderHelper,
+        AlmaClient $almaClient
     )
     {
         $this->logger = $logger;
@@ -50,37 +65,77 @@ class ShareOfCheckoutHelper
         $this->totalShareOfCheckoutOrders = [];
         $this->totalShareOfCheckoutCheckouts = [];
         $this->orderHelper = $orderHelper;
+        $this->almaClient = $almaClient->getDefaultClient();
+        $this->startTime = null;
+        $this->endTime = null;
     }
 
-    public function getShareOfCheckoutOrderCollection():OrderSearchResultInterface
+    /**
+     * @throws RequestError
+     */
+    public function shareDay()
     {
-        if(count($this->orderCollection)){
-            $this->logger->info('Is already Set',[]);
-            return $this->orderCollection;
+        if (!$this->almaClient){
+            throw new \InvalidArgumentException('Alma client is not define');
         }
-        $this->orderCollection = $this->collectionFactory->create()->addAttributeToSelect('*')->addFieldToFilter('created_at', [
-            'from' => [$this->getShareOfCheckoutFromDate()],
-            'to' => [$this->toShareOfCheckoutDate()],
-        ])->addFieldToFilter('state',['in'=>['processing','complete']]);
-        return $this->orderCollection;
+        $res=[];
+        try {
+            $res = $this->almaClient->shareOfCheckout->share($this->getPayload());
+        } catch (RequestError $e) {
+            $this->logger->info('ShareOfCheckoutHelper::share error get message :',[$e->getMessage()]);
+            throw new RequestError($e->getMessage(), null, $res);
+        } finally {
+            $this->writeLogs();
+            $this->flushOrderCollection();
+        }
+        return $res;
     }
 
     public function countShareOfCheckoutOrders():int
     {
-        if(count($this->orderCollection)){
-            return $this->orderCollection->count();
-        }
         return $this->getShareOfCheckoutOrderCollection()->count();
+    }
+
+    public function getLastUpdateDate():string
+    {
+        // TODO - Create api call
+        $lastUpdateByApi = null;
+        if (isset($lastUpdateByApi)){
+            return $lastUpdateByApi;
+        }
+        return date('Y-m-d',strtotime('-2 days'));
+    }
+
+    public function setShareOfCheckoutFromDate($startTime):void
+    {
+        $this->startTime = $startTime.' 00:00:00';
+        $this->setShareOfCheckoutToDate($startTime);
+    }
+
+    public function setShareOfCheckoutToDate($endTime):void
+    {
+        $this->endTime = $endTime.' 23:59:59';
+    }
+
+    private function getShareOfCheckoutOrderCollection():OrderSearchResultInterface
+    {
+        if(count($this->orderCollection)){
+            return $this->orderCollection;
+        }
+        $this->orderCollection = $this->collectionFactory->create()->addAttributeToSelect('*')->addFieldToFilter('created_at', [
+            'from' => [$this->getShareOfCheckoutFromDate()],
+            'to' => [$this->getShareOfCheckoutToDate()],
+        ])->addFieldToFilter('state',['in'=> self::SHARED_ORDER_STATES]);
+        return $this->orderCollection;
     }
 
     private function getTotalsOrders():array
     {
         if(count($this->totalShareOfCheckoutOrders)){
-             return $this->totalShareOfCheckoutOrders;
+            return $this->totalShareOfCheckoutOrders;
         }
 
         $this->checkOrderCollectionExist();
-
 
         $ordersByCurrency = [];
         /** @var OrderInterface $order */
@@ -97,7 +152,7 @@ class ShareOfCheckoutHelper
         return $this->totalShareOfCheckoutOrders;
     }
 
-    private function getTotalsCheckouts():array
+    private function getTotalsPaymentMethods():array
     {
         if(count($this->totalShareOfCheckoutCheckouts)){
             return $this->totalShareOfCheckoutCheckouts;
@@ -143,22 +198,42 @@ class ShareOfCheckoutHelper
 
     private function getShareOfCheckoutFromDate():string
     {
-        return '2022-03-15 00:00:00';
+        if(isset($this->startTime)){
+            return $this->startTime;
+        }
+
+        return date('Y-m-d',strtotime('yesterday')).' 00:00:00';
     }
 
-    private function toShareOfCheckoutDate():string
+    private function getShareOfCheckoutToDate():string
     {
-        return '2022-03-22 23:59:59';
+        if(isset($this->endTime)){
+            return $this->endTime;
+        }
+        return date('Y-m-d',strtotime('yesterday')).' 23:59:59';
     }
 
-    public function getPayload(): array
+    private function getPayload(): array
     {
         return [
             "start_time"=> $this->getShareOfCheckoutFromDate(),
-            "end_time"  => $this->toShareOfCheckoutDate(),
+            "end_time"  => $this->getShareOfCheckoutToDate(),
             "orders"    => $this->getTotalsOrders(),
-            "checkouts" => $this->getTotalsCheckouts()
+            "payment_methods" => $this->getTotalsPaymentMethods()
         ];
+    }
+
+    public function flushOrderCollection():void
+    {
+        $this->orderCollection = [];
+        $this->totalShareOfCheckoutOrders = [];
+        $this->totalShareOfCheckoutCheckouts = [];
+    }
+
+    private function writeLogs():void
+    {
+        $this->logger->info('Share start date',[$this->getShareOfCheckoutFromDate()]);
+        $this->logger->info('Orders send',[$this->countShareOfCheckoutOrders()]);
     }
 
 }
