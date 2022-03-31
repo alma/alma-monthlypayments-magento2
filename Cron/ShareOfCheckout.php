@@ -64,14 +64,21 @@ class ShareOfCheckout
             return;
         }
 
-        $lastUpdateDate = $this->shareOfCheckoutHelper->getLastUpdateDate();
+        try {
+            $lastUpdateDate = $this->shareOfCheckoutHelper->getLastUpdateDate();
+        } catch (RequestError $e) {
+            $this->logger->info('Get Last Update Date error - end of process - message : ',[$e->getMessage()]);
+            return;
+        }
+
         $DatesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate,$shareOfCheckoutEnabledDate);
         foreach ($DatesToShare as $date) {
             try {
                 $this->shareOfCheckoutHelper->setShareOfCheckoutFromDate($date);
                 $this->shareOfCheckoutHelper->shareDay();
             } catch (RequestError $e) {
-                //throw new RequestError($e->getMessage(), null, null);
+                $this->logger->info('Share of checkout error - end of process - message : ',[$e->getMessage()]);
+                return;
             }
         }
     }

@@ -107,15 +107,21 @@ class ShareOfCheckoutHelper
 
     /**
      * @return string
+     * @throws RequestError
      */
     public function getLastUpdateDate():string
     {
-        // TODO - Create api call
-        $lastUpdateByApi = null;
-        if (isset($lastUpdateByApi)){
-            return $lastUpdateByApi;
+        $lastUpdateByApi =null;
+        if (!$this->almaClient){
+            throw new \InvalidArgumentException('Alma client is not define');
         }
-        return date('Y-m-d',strtotime('-2 days'));
+        try {
+            $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDate();
+            // TODO - extract date from json
+            return $lastUpdateByApi;
+        } catch (RequestError $e) {
+            throw new RequestError($e->getMessage(), null);
+        }
     }
 
     /**
