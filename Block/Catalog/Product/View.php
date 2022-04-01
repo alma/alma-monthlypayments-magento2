@@ -73,6 +73,10 @@ class View extends Template
      * @var array
      */
     private $plans = array();
+    /**
+     * @var Helpers\ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * View constructor.
@@ -88,6 +92,7 @@ class View extends Template
     public function __construct(
         Context $context,
         Registry $registry,
+        Helpers\ApiConfigHelper $apiConfigHelper,
         Config $config,
         Functions $functions,
         Logger $logger,
@@ -103,6 +108,7 @@ class View extends Template
         $this->localeResolver = $localeResolver;
         $this->getProduct();
         $this->getPlans();
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -155,7 +161,7 @@ class View extends Template
      */
     public function getActiveMode()
     {
-        return strtoupper($this->config->getActiveMode());
+        return strtoupper($this->apiConfigHelper->getActiveMode());
     }
 
     /**

@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Observer\Admin;
 
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\App\Cache\Type\Config as CacheTypeConfig;
@@ -53,9 +54,14 @@ class ConfigObserver implements ObserverInterface
      * @var TypeListInterface
      */
     private $cacheTypeList;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     public function __construct(
         Config $config,
+        ApiConfigHelper $apiConfigHelper,
         ResourceConfig $resourceConfig,
         Availability $availabilityHelper,
         TypeListInterface $cacheTypeList
@@ -65,6 +71,7 @@ class ConfigObserver implements ObserverInterface
         $this->availabilityHelper = $availabilityHelper;
         $this->config = $config;
         $this->cacheTypeList = $cacheTypeList;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     // Update the fully_configured flag depending on whether we can correctly connect to Alma with provided API keys
@@ -80,8 +87,8 @@ class ConfigObserver implements ObserverInterface
             $this->resourceConfig->saveConfig($configPath, $merchant->id, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
         }
 
-        if ($this->config->isFullyConfigured() !== $fully_configured) {
-            $configPath = $this->config->getFieldPath(Config::CONFIG_FULLY_CONFIGURED);
+        if ($this->apiConfigHelper->isFullyConfigured() !== $fully_configured) {
+            $configPath = $this->config->getFieldPath(ApiConfigHelper::CONFIG_FULLY_CONFIGURED);
             $this->resourceConfig->saveConfig($configPath, $fully_configured, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
 
             $this->cacheTypeList->cleanType(CacheTypeConfig::TYPE_IDENTIFIER);

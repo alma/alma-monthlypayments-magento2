@@ -40,8 +40,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const ORDER_PAYMENT_TRIGGER = 'TRIGGER';
     const CONFIG_SORT_ORDER = 'sort_order';
     const CONFIG_API_MODE = 'api_mode';
-    const CONFIG_LIVE_API_KEY = 'live_api_key';
-    const CONFIG_TEST_API_KEY = 'test_api_key';
     const CONFIG_ELIGIBILITY_MESSAGE = 'eligibility_message';
     const CONFIG_NON_ELIGIBILITY_MESSAGE = 'non_eligibility_message';
     const CONFIG_SHOW_ELIGIBILITY_MESSAGE = 'show_eligibility_message';
@@ -49,7 +47,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const CONFIG_DESCRIPTION = 'description';
     const CONFIG_EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
     const CONFIG_EXCLUDED_PRODUCTS_MESSAGE = 'excluded_products_message';
-    const CONFIG_FULLY_CONFIGURED = 'fully_configured';
     const CONFIG_RETURN_URL = 'return_url';
     const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
     const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
@@ -67,8 +64,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const WIDGET_CONTAINER_PREPEND = 'widget_container_prepend';
 
     const CUSTOM_WIDGET_POSITION = 'catalog.product.view.custom.alma.widget';
-    private $widgetContainer;
 
+    private $widgetContainer;
     private $pathPattern;
     private $methodCode;
     private $plansConfigFactory;
@@ -90,30 +87,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     )
     {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
-
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
         $this->plansConfigFactory = $plansConfigFactory;
         $this->logger = $logger;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setMethodCode($methodCode)
-    {
-        $this->methodCode = $methodCode;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPathPattern($pathPattern)
-    {
-        $this->pathPattern = $pathPattern;
-    }
-
-    /**
+     /**
      * @param string $field
      * @return string
      */
@@ -131,16 +111,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function get($field, $default = null, $storeId = null)
     {
         $value = parent::getValue($field, $storeId);
-
         if ($value === null) {
             $value = $default;
         }
-
         return $value;
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function getIsActive(): bool
     {
@@ -153,50 +131,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getSortOrder(): int
     {
         return (int)$this->get(self::CONFIG_SORT_ORDER);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getActiveMode()
-    {
-        return $this->get(self::CONFIG_API_MODE, Client::LIVE_MODE);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getActiveAPIKey()
-    {
-        $mode = $this->getActiveMode();
-        $apiKeyType = ($mode == Client::LIVE_MODE) ?
-            self::CONFIG_LIVE_API_KEY :
-            self::CONFIG_TEST_API_KEY ;
-        return $this->get($apiKeyType);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getLiveKey()
-    {
-        return $this->get(self::CONFIG_LIVE_API_KEY, '');
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getTestKey()
-    {
-        return $this->get(self::CONFIG_TEST_API_KEY, '');
-    }
-
-    /**
-     * @return bool
-     */
-    public function needsAPIKeys(): bool
-    {
-        return empty(trim($this->getLiveKey())) || empty(trim($this->getTestKey()));
     }
 
     /**
@@ -253,14 +187,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getExcludedProductsMessage()
     {
         return $this->get(self::CONFIG_EXCLUDED_PRODUCTS_MESSAGE);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFullyConfigured(): bool
-    {
-        return !$this->needsAPIKeys() && (bool)(int)$this->get(self::CONFIG_FULLY_CONFIGURED, false);
     }
 
     /**
