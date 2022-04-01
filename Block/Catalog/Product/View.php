@@ -77,6 +77,10 @@ class View extends Template
      * @var Helpers\ApiConfigHelper
      */
     private $apiConfigHelper;
+    /**
+     * @var Helpers\WidgetConfigHelper
+     */
+    private $widgetConfigHelper;
 
     /**
      * View constructor.
@@ -93,6 +97,7 @@ class View extends Template
         Context $context,
         Registry $registry,
         Helpers\ApiConfigHelper $apiConfigHelper,
+        Helpers\WidgetConfigHelper $widgetConfigHelper,
         Config $config,
         Functions $functions,
         Logger $logger,
@@ -109,6 +114,7 @@ class View extends Template
         $this->getProduct();
         $this->getPlans();
         $this->apiConfigHelper = $apiConfigHelper;
+        $this->widgetConfigHelper = $widgetConfigHelper;
     }
 
     /**
@@ -157,6 +163,14 @@ class View extends Template
     }
 
     /**
+     * @return Config
+     */
+    public function getWidgetConfig()
+    {
+        return $this->widgetConfigHelper;
+    }
+
+    /**
      * @return string
      */
     public function getActiveMode()
@@ -169,7 +183,7 @@ class View extends Template
      */
     public function _toHtml()
     {
-        return ($this->getNameInLayout() == $this->config->getWidgetPosition()
+        return ($this->getNameInLayout() == $this->widgetConfigHelper->getWidgetPosition()
         && !$this->isExcluded() ? parent::_toHtml() : '');
     }
 

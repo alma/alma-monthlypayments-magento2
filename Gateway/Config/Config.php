@@ -56,16 +56,10 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const ALMA_IS_ACTIVE = 'active';
     const ALMA_API_MODE = 'api_mode';
     const ALMA_MERCHANT_ID = 'merchant_id';
-    const WIDGET_POSITION = 'widget_position';
-    const WIDGET_ACTIVE = 'widget_active';
-    const WIDGET_CONTAINER = 'widget_container_css_selector';
-    const WIDGET_PRICE_USE_QTY = 'widget_price_use_qty';
+
     const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
-    const WIDGET_CONTAINER_PREPEND = 'widget_container_prepend';
 
-    const CUSTOM_WIDGET_POSITION = 'catalog.product.view.custom.alma.widget';
 
-    private $widgetContainer;
     private $pathPattern;
     private $methodCode;
     private $plansConfigFactory;
@@ -242,57 +236,4 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
         return $plansConfig;
     }
-
-    /**
-     * @return bool
-     */
-    public function showProductWidget()
-    {
-        return ((bool)(int)$this->get(self::WIDGET_ACTIVE) && $this->getIsActive());
     }
-
-    /**
-     * @return string
-     */
-    public function getWidgetContainerSelector()
-    {
-        if (!$this->widgetContainer) {
-            $this->widgetContainer =
-                $this->get(self::WIDGET_CONTAINER);
-        }
-        return $this->widgetContainer;
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function useQuantityForWidgetPrice()
-    {
-        return ((bool)(int)$this->get(self::WIDGET_PRICE_USE_QTY) ? 'true' : 'false');
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function prependWidgetInContainer()
-    {
-        return ((bool)(int)$this->get(self::WIDGET_CONTAINER_PREPEND) == 0 ? 'true' : 'false');
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function isCustomWidgetPosition()
-    {
-        return ($this->getWidgetPosition() ==
-        self::CUSTOM_WIDGET_POSITION ? 'true' : 'false');
-    }
-
-    /**
-     * @return string
-     */
-    public function getWidgetPosition()
-    {
-        return $this->get(self::WIDGET_POSITION);
-    }
-}
