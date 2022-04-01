@@ -43,8 +43,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const CONFIG_ELIGIBILITY_MESSAGE = 'eligibility_message';
     const CONFIG_NON_ELIGIBILITY_MESSAGE = 'non_eligibility_message';
     const CONFIG_SHOW_ELIGIBILITY_MESSAGE = 'show_eligibility_message';
-    const CONFIG_TITLE = 'title';
-    const CONFIG_DESCRIPTION = 'description';
     const CONFIG_EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
     const CONFIG_EXCLUDED_PRODUCTS_MESSAGE = 'excluded_products_message';
     const CONFIG_RETURN_URL = 'return_url';
@@ -149,22 +147,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function showEligibilityMessage(): bool
     {
         return ((bool)(int)$this->get(self::CONFIG_SHOW_ELIGIBILITY_MESSAGE) && $this->getIsActive());
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getPaymentButtonTitle()
-    {
-        return $this->get(self::CONFIG_TITLE);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getPaymentButtonDescription()
-    {
-        return $this->get(self::CONFIG_DESCRIPTION);
     }
 
     /**

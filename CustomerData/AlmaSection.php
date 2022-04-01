@@ -1,11 +1,9 @@
 <?php
 namespace Alma\MonthlyPayments\CustomerData;
 
+use Alma\MonthlyPayments\Helpers\CheckoutConfigHelper;
 use Magento\Customer\CustomerData\SectionSourceInterface;
-use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Quote\Model\QuoteRepository;
 use Alma\MonthlyPayments\Helpers\Eligibility;
-use Alma\MonthlyPayments\Helpers\ConfigHelper;
 
 class AlmaSection implements SectionSourceInterface
 {
@@ -14,57 +12,52 @@ class AlmaSection implements SectionSourceInterface
      */
     private $paymentOptions;
     /**
-     * @var Logger
-     */
-    private $logger;
-    /**
-     * @var QuoteRepository
-     */
-    private $quoteReposityory;
-    /**
      * @var Eligibility
      */
     private $eligibility;
     /**
-     * @var ConfigHelper
+     * @var CheckoutConfigHelper
      */
-    private $configHelper;
+    private $checkoutConfigHelper;
 
+    /**
+     * @param Eligibility $eligibility
+     * @param CheckoutConfigHelper $checkoutConfigHelper
+     */
     public function __construct(
-        Logger $logger,
-        QuoteRepository $quoteRepository,
         Eligibility $eligibility,
-        ConfigHelper $configHelper
+        CheckoutConfigHelper $checkoutConfigHelper
     )
     {
-        $this->logger = $logger;
-        $this->quoteReposityory = $quoteRepository;
         $this->eligibility = $eligibility;
-        $this->configHelper = $configHelper;
+        $this->checkoutConfigHelper = $checkoutConfigHelper;
         $this->paymentOptions = [
             Eligibility::INSTALLMENTS_TYPE => [
-                'title' => __($this->configHelper->getInstallmentsPaymentTitle()),
-                'description'  => __($this->configHelper->getInstallmentsPaymentDesc()),
+                'title' => __($this->checkoutConfigHelper->getInstallmentsPaymentTitle()),
+                'description'  => __($this->checkoutConfigHelper->getInstallmentsPaymentDesc()),
             ],
             Eligibility::SPREAD_TYPE => [
-                'title' => __($this->configHelper->getSpreadPaymentTitle()),
-                'description'  => __($this->configHelper->getSpreadPaymentDesc()),
+                'title' => __($this->checkoutConfigHelper->getSpreadPaymentTitle()),
+                'description'  => __($this->checkoutConfigHelper->getSpreadPaymentDesc()),
             ],
             Eligibility::DEFFERED_TYPE => [
-                'title' => __($this->configHelper->getDeferredPaymentTitle()),
-                'description'  => __($this->configHelper->getDeferredPaymentDesc()),
+                'title' => __($this->checkoutConfigHelper->getDeferredPaymentTitle()),
+                'description'  => __($this->checkoutConfigHelper->getDeferredPaymentDesc()),
             ],
             Eligibility::MERGED_TYPE => [
-                'title' => __($this->configHelper->getMergePaymentTitle()),
-                'description'  => __($this->configHelper->getMergePaymentDesc()),
+                'title' => __($this->checkoutConfigHelper->getMergePaymentTitle()),
+                'description'  => __($this->checkoutConfigHelper->getMergePaymentDesc()),
             ],
         ];
     }
 
 
-    public function getSectionData()
+    /**
+     * @return array
+     */
+    public function getSectionData(): array
     {
-        $areMergePaymentMethods = $this->configHelper->getAreMergedPaymentMethods();
+        $areMergePaymentMethods = $this->checkoutConfigHelper->getAreMergedPaymentMethods();
         $eligibilities[Eligibility::MERGED_TYPE] = $this->eligibility->getEligiblePlans();
         if(!$areMergePaymentMethods){
             $eligibilities = $this->eligibility->sortEligibilities($eligibilities[Eligibility::MERGED_TYPE]);
@@ -100,8 +93,8 @@ class AlmaSection implements SectionSourceInterface
             }
         }
         return [
-            'title' => __($this->configHelper->getMergePaymentTitle()),
-            'description' => __($this->configHelper->getMergePaymentDesc()),
+            'title' => __($this->checkoutConfigHelper->getMergePaymentTitle()),
+            'description' => __($this->checkoutConfigHelper->getMergePaymentDesc()),
         ];
     }
 }
