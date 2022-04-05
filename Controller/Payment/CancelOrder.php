@@ -73,7 +73,7 @@ class CancelOrder extends Action
         try {
             $order->addStatusHistoryComment(__('Order canceled by customer'))->save();
         } catch (\Exception $e){
-            $this->logger->info('Cancel order - save history erro',[$e->getMessage()]);
+            $this->logger->info('Cancel order - save history error',[$e->getMessage()]);
         }
         $this->orderManagement->cancel($order->getEntityId());
         return $this->redirectToCart();
