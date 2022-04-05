@@ -78,7 +78,6 @@ class CartEligibility
     public function afterGetSectionData(\Magento\Checkout\CustomerData\Cart $subject, $result)
     {
         try {
-            $this->logger->info('afterGetSectionData',[]);
             $this->eligibilityHelper->checkEligibility();
         } catch (\Exception $e) {
             $this->logger->warning("Error checking for cart eligibility in minicart: {$e->getMessage()}");
