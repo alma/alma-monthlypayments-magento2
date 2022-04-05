@@ -36,6 +36,8 @@ use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\Locale\Resolver;
 use Magento\Store\Model\Store;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+Use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
 
 class View extends Template
 {
@@ -74,11 +76,11 @@ class View extends Template
      */
     private $plans = array();
     /**
-     * @var Helpers\ApiConfigHelper
+     * @var ApiConfigHelper
      */
     private $apiConfigHelper;
     /**
-     * @var Helpers\WidgetConfigHelper
+     * @var WidgetConfigHelper
      */
     private $widgetConfigHelper;
 
@@ -96,8 +98,8 @@ class View extends Template
     public function __construct(
         Context $context,
         Registry $registry,
-        Helpers\ApiConfigHelper $apiConfigHelper,
-        Helpers\WidgetConfigHelper $widgetConfigHelper,
+        ApiConfigHelper $apiConfigHelper,
+        WidgetConfigHelper $widgetConfigHelper,
         Config $config,
         Functions $functions,
         Logger $logger,
