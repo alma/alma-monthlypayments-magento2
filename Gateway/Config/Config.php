@@ -40,16 +40,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const ORDER_PAYMENT_TRIGGER = 'TRIGGER';
     const CONFIG_SORT_ORDER = 'sort_order';
     const CONFIG_API_MODE = 'api_mode';
-    const CONFIG_LIVE_API_KEY = 'live_api_key';
-    const CONFIG_TEST_API_KEY = 'test_api_key';
     const CONFIG_ELIGIBILITY_MESSAGE = 'eligibility_message';
     const CONFIG_NON_ELIGIBILITY_MESSAGE = 'non_eligibility_message';
     const CONFIG_SHOW_ELIGIBILITY_MESSAGE = 'show_eligibility_message';
-    const CONFIG_TITLE = 'title';
-    const CONFIG_DESCRIPTION = 'description';
     const CONFIG_EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
     const CONFIG_EXCLUDED_PRODUCTS_MESSAGE = 'excluded_products_message';
-    const CONFIG_FULLY_CONFIGURED = 'fully_configured';
     const CONFIG_RETURN_URL = 'return_url';
     const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
     const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
@@ -59,15 +54,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const ALMA_IS_ACTIVE = 'active';
     const ALMA_API_MODE = 'api_mode';
     const ALMA_MERCHANT_ID = 'merchant_id';
-    const WIDGET_POSITION = 'widget_position';
-    const WIDGET_ACTIVE = 'widget_active';
-    const WIDGET_CONTAINER = 'widget_container_css_selector';
-    const WIDGET_PRICE_USE_QTY = 'widget_price_use_qty';
-    const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
-    const WIDGET_CONTAINER_PREPEND = 'widget_container_prepend';
 
-    const CUSTOM_WIDGET_POSITION = 'catalog.product.view.custom.alma.widget';
-    private $widgetContainer;
+    const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
+
 
     private $pathPattern;
     private $methodCode;
@@ -90,30 +79,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     )
     {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
-
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
         $this->plansConfigFactory = $plansConfigFactory;
         $this->logger = $logger;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setMethodCode($methodCode)
-    {
-        $this->methodCode = $methodCode;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPathPattern($pathPattern)
-    {
-        $this->pathPattern = $pathPattern;
-    }
-
-    /**
+     /**
      * @param string $field
      * @return string
      */
@@ -131,16 +103,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function get($field, $default = null, $storeId = null)
     {
         $value = parent::getValue($field, $storeId);
-
         if ($value === null) {
             $value = $default;
         }
-
         return $value;
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function getIsActive(): bool
     {
@@ -153,50 +123,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getSortOrder(): int
     {
         return (int)$this->get(self::CONFIG_SORT_ORDER);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getActiveMode()
-    {
-        return $this->get(self::CONFIG_API_MODE, Client::LIVE_MODE);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getActiveAPIKey()
-    {
-        $mode = $this->getActiveMode();
-        $apiKeyType = ($mode == Client::LIVE_MODE) ?
-            self::CONFIG_LIVE_API_KEY :
-            self::CONFIG_TEST_API_KEY ;
-        return $this->get($apiKeyType);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getLiveKey()
-    {
-        return $this->get(self::CONFIG_LIVE_API_KEY, '');
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getTestKey()
-    {
-        return $this->get(self::CONFIG_TEST_API_KEY, '');
-    }
-
-    /**
-     * @return bool
-     */
-    public function needsAPIKeys(): bool
-    {
-        return empty(trim($this->getLiveKey())) || empty(trim($this->getTestKey()));
     }
 
     /**
@@ -224,22 +150,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
-     * @return mixed|null
-     */
-    public function getPaymentButtonTitle()
-    {
-        return $this->get(self::CONFIG_TITLE);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getPaymentButtonDescription()
-    {
-        return $this->get(self::CONFIG_DESCRIPTION);
-    }
-
-    /**
      * @return false|string[]
      */
     public function getExcludedProductTypes()
@@ -253,14 +163,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getExcludedProductsMessage()
     {
         return $this->get(self::CONFIG_EXCLUDED_PRODUCTS_MESSAGE);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFullyConfigured(): bool
-    {
-        return !$this->needsAPIKeys() && (bool)(int)$this->get(self::CONFIG_FULLY_CONFIGURED, false);
     }
 
     /**
@@ -316,57 +218,4 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
         return $plansConfig;
     }
-
-    /**
-     * @return bool
-     */
-    public function showProductWidget()
-    {
-        return ((bool)(int)$this->get(self::WIDGET_ACTIVE) && $this->getIsActive());
     }
-
-    /**
-     * @return string
-     */
-    public function getWidgetContainerSelector()
-    {
-        if (!$this->widgetContainer) {
-            $this->widgetContainer =
-                $this->get(self::WIDGET_CONTAINER);
-        }
-        return $this->widgetContainer;
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function useQuantityForWidgetPrice()
-    {
-        return ((bool)(int)$this->get(self::WIDGET_PRICE_USE_QTY) ? 'true' : 'false');
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function prependWidgetInContainer()
-    {
-        return ((bool)(int)$this->get(self::WIDGET_CONTAINER_PREPEND) == 0 ? 'true' : 'false');
-    }
-
-    /**
-     * @return string used by javascript in view.phtml
-     */
-    public function isCustomWidgetPosition()
-    {
-        return ($this->getWidgetPosition() ==
-        self::CUSTOM_WIDGET_POSITION ? 'true' : 'false');
-    }
-
-    /**
-     * @return string
-     */
-    public function getWidgetPosition()
-    {
-        return $this->get(self::WIDGET_POSITION);
-    }
-}

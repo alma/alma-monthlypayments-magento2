@@ -27,15 +27,14 @@ namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
 use Magento\Catalog\Block\Product\Context;
 use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Helpers;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Alma\MonthlyPayments\Helpers\Functions;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\Locale\Resolver;
-use Magento\Store\Model\Store;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+Use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
 
 class View extends Template
 {
@@ -50,19 +49,9 @@ class View extends Template
     private $registry;
 
     /**
-     * @var Functions
-     */
-    private $functions;
-
-    /**
      * @var Product
      */
     private $product;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
      * @var Resolver
@@ -73,14 +62,20 @@ class View extends Template
      * @var array
      */
     private $plans = array();
-
     /**
-     * View constructor.
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
+    /**
+     * @var WidgetConfigHelper
+     */
+    private $widgetConfigHelper;
+    /**
      * @param Context $context
      * @param Registry $registry
+     * @param ApiConfigHelper $apiConfigHelper
+     * @param WidgetConfigHelper $widgetConfigHelper
      * @param Config $config
-     * @param Functions $functions
-     * @param Logger $logger
      * @param Resolver $localeResolver
      * @param array $data
      * @throws LocalizedException
@@ -88,9 +83,9 @@ class View extends Template
     public function __construct(
         Context $context,
         Registry $registry,
+        ApiConfigHelper $apiConfigHelper,
+        WidgetConfigHelper $widgetConfigHelper,
         Config $config,
-        Functions $functions,
-        Logger $logger,
         Resolver $localeResolver,
         array $data = []
     )
@@ -98,11 +93,11 @@ class View extends Template
         parent::__construct($context, $data);
         $this->config = $config;
         $this->registry = $registry;
-        $this->functions = $functions;
-        $this->logger = $logger;
         $this->localeResolver = $localeResolver;
         $this->getProduct();
         $this->getPlans();
+        $this->apiConfigHelper = $apiConfigHelper;
+        $this->widgetConfigHelper = $widgetConfigHelper;
     }
 
     /**
@@ -151,11 +146,19 @@ class View extends Template
     }
 
     /**
+     * @return Config
+     */
+    public function getWidgetConfig()
+    {
+        return $this->widgetConfigHelper;
+    }
+
+    /**
      * @return string
      */
     public function getActiveMode()
     {
-        return strtoupper($this->config->getActiveMode());
+        return strtoupper($this->apiConfigHelper->getActiveMode());
     }
 
     /**
@@ -163,7 +166,7 @@ class View extends Template
      */
     public function _toHtml()
     {
-        return ($this->getNameInLayout() == $this->config->getWidgetPosition()
+        return ($this->getNameInLayout() == $this->widgetConfigHelper->getWidgetPosition()
         && !$this->isExcluded() ? parent::_toHtml() : '');
     }
 
@@ -208,7 +211,7 @@ class View extends Template
      */
     public function getPrice()
     {
-        return $this->functions->priceToCents($this->product->getFinalPrice());
+        return Functions::priceToCents($this->product->getFinalPrice());
     }
     /**
      * Return locale and convert it

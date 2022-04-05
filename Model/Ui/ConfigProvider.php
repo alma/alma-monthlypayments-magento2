@@ -26,6 +26,7 @@
 namespace Alma\MonthlyPayments\Model\Ui;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\CheckoutConfigHelper;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Locale\ResolverInterface;
@@ -51,26 +52,32 @@ class ConfigProvider implements ConfigProviderInterface
      * @var ConfigHelper
      */
     private $configHelper;
+    /**
+     * @var CheckoutConfigHelper
+     */
+    private $checkoutConfigHelper;
 
     /**
      * ConfigProvider constructor.
      * @param UrlInterface $urlBuilder
      * @param Config $config
      * @param ResolverInterface $localeResolver
+     * @param ConfigHelper $configHelper
+     * @param CheckoutConfigHelper $checkoutConfigHelper
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Config $config,
         ResolverInterface $localeResolver,
         ConfigHelper $configHelper,
-        Logger $logger
+        CheckoutConfigHelper $checkoutConfigHelper
     )
     {
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
         $this->localeResolver = $localeResolver;
-        $this->logger = $logger;
         $this->configHelper = $configHelper;
+        $this->checkoutConfigHelper = $checkoutConfigHelper;
     }
 
     /**
@@ -82,8 +89,8 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
-                    'title' => __($this->config->getPaymentButtonTitle()),
-                    'description' => __($this->config->getPaymentButtonDescription()),
+                    'title' => __($this->checkoutConfigHelper->getMergePaymentTitle()),
+                    'description' => __($this->checkoutConfigHelper->getMergePaymentDesc()),
                     'triggerEnable' => __($this->configHelper->triggerIsEnabled()),
                     'triggerLabel' => __($this->configHelper->getTrigger()),
                     'sortOrder' => $this->config->getSortOrder(),

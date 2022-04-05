@@ -31,21 +31,22 @@
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 
 $config = $block->getConfig();
+$widgetConfig = $block->getWidgetConfig();
 $containerId = 'alma-widget';
-if ($config->showProductWidget() && $block->getJsonPlans() && $block->getPrice()>0):?>
+if ($widgetConfig->showProductWidget() && $block->getJsonPlans() && $block->getPrice()>0):?>
     <div id=<?= $containerId ?> ></div>
     <script type="text/x-magento-init">
         {
             "#<?=$containerId?>": {
                 "Alma_MonthlyPayments/js/view/catalog/badge": {
                     "customDisplay" : {
-                        "hasCustomPosition" : <?=$config->isCustomWidgetPosition()?>,
-                        "customContainerSelector" : "<?=$config->getWidgetContainerSelector()?>",
-                        "isPrepend" : <?=$config->prependWidgetInContainer()?>
+                        "hasCustomPosition" : <?=$widgetConfig->isCustomWidgetPosition()?>,
+                        "customContainerSelector" : "<?=$widgetConfig->getWidgetContainerSelector()?>",
+                        "isPrepend" : <?=$widgetConfig->prependWidgetInContainer()?>
                         },
                     "containerId" : "<?=$containerId?>",
                     "productPrice" : <?=$block->getPrice()?>,
-                    "useQuantityForWidgetPrice": <?=$config->useQuantityForWidgetPrice()?>,
+                    "useQuantityForWidgetPrice": <?=$widgetConfig->useQuantityForWidgetPrice()?>,
                     "productId": <?=$block->getProductId()?>,
                     "merchantId": "<?=$config->getMerchantId()?>",
                     "activeMode": "<?=$block->getActiveMode()?>",

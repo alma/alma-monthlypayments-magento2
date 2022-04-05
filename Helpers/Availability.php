@@ -27,15 +27,10 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Entities\Merchant;
 use Alma\API\RequestError;
-use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Availability
 {
-    /**
-     * @var Config
-     */
-    private $config;
     /**
      * @var StoreManagerInterface
      */
@@ -48,25 +43,29 @@ class Availability
      * @var Logger
      */
     private $logger;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * Availability constructor.
-     * @param Config $config
      * @param StoreManagerInterface $storeManager
      * @param AlmaClient $almaClient
+     * @param ApiConfigHelper $apiConfigHelper
      * @param Logger $logger
      */
     public function __construct(
-        Config $config,
         StoreManagerInterface $storeManager,
         AlmaClient $almaClient,
+        ApiConfigHelper $apiConfigHelper,
         Logger $logger
     )
     {
-        $this->config = $config;
         $this->storeManager = $storeManager;
         $this->almaClient = $almaClient;
         $this->logger = $logger;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -97,7 +96,7 @@ class Availability
      */
     public function isFullyConfigured()
     {
-        return $this->config->isFullyConfigured();
+        return $this->apiConfigHelper->isFullyConfigured();
     }
 
     /**
@@ -115,8 +114,8 @@ class Availability
         }
 
         $keys = [
-            'live' => $this->config->getLiveKey(),
-            'test' => $this->config->getTestKey(),
+            'live' => $this->apiConfigHelper->getLiveKey(),
+            'test' => $this->apiConfigHelper->getTestKey(),
         ];
 
         if ($apiKey) {

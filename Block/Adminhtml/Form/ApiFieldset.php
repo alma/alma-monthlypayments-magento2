@@ -24,7 +24,7 @@
 
 namespace Alma\MonthlyPayments\Block\Adminhtml\Form;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Fieldset;
@@ -40,28 +40,27 @@ use Magento\Framework\View\Helper\Js;
 class ApiFieldset extends Fieldset
 {
     /**
-     * @var Config
+     * @var ApiConfigHelper
      */
-    private $config;
+    private $apiConfigHelper;
 
     /**
      * ApiFieldset constructor.
      * @param Context $context
      * @param Session $authSession
      * @param Js $jsHelper
-     * @param Config $config
      * @param array $data
      */
     public function __construct(
         Context $context,
         Session $authSession,
         Js $jsHelper,
-        Config $config,
+        ApiConfigHelper $apiConfigHelper,
         array $data = []
     )
     {
         parent::__construct($context, $authSession, $jsHelper, $data);
-        $this->config = $config;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -72,7 +71,7 @@ class ApiFieldset extends Fieldset
      */
     protected function _isCollapseState($element): bool
     {
-        return !$this->config->isFullyConfigured();
+        return !$this->apiConfigHelper->isFullyConfigured();
     }
 
     /**
@@ -85,7 +84,7 @@ class ApiFieldset extends Fieldset
     protected function _getHeaderCommentHtml($element): string
     {
         $comment = $element->getComment();
-        if (!$this->config->isFullyConfigured()) {
+        if (!$this->apiConfigHelper->isFullyConfigured()) {
             $comment .= '<br>' . __("Other configuration settings will be made available after you provide valid API keys.");
         }
 

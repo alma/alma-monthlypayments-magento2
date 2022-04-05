@@ -25,16 +25,12 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\API\Client;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
 
 class AlmaClient
 {
-    /** @var Config */
-    private $config;
-
     /** @var Client */
     private $alma;
     /**
@@ -49,26 +45,29 @@ class AlmaClient
      * @var ModuleListInterface
      */
     private $moduleList;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * AlmaClient constructor.
-     * @param Config $config
      * @param Logger $logger
      * @param ProductMetadataInterface $productMetadata
      * @param ModuleListInterface $moduleList
      */
     public function __construct(
-        Config $config,
         Logger $logger,
         ProductMetadataInterface $productMetadata,
+        ApiConfigHelper $apiConfigHelper,
         ModuleListInterface $moduleList
     )
     {
-        $this->config = $config;
         $this->alma = null;
         $this->logger = $logger;
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -77,7 +76,7 @@ class AlmaClient
     public function getDefaultClient()
     {
         if ($this->alma === null) {
-            $this->alma = $this->createInstance($this->config->getActiveAPIKey(), $this->config->getActiveMode());
+            $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey(), $this->apiConfigHelper->getActiveMode());
         }
 
         return $this->alma;
