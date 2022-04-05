@@ -70,6 +70,11 @@ class CancelOrder extends Action
             $this->logger->info('Cancel order - get order error',[$e->getMessage()]);
             return $this->redirectToCart();
         }
+        try {
+            $order->addStatusHistoryComment(__('Order canceled by customer'))->save();
+        } catch (\Exception $e){
+            $this->logger->info('Cancel order - save history erro',[$e->getMessage()]);
+        }
         $this->orderManagement->cancel($order->getEntityId());
         return $this->redirectToCart();
     }
@@ -82,6 +87,7 @@ class CancelOrder extends Action
     private function getOrder():OrderInterface
     {
         $orderId = $this->getOrderId();
+        $this->logger->info('$orderId',[$orderId]);
         $orderModel = $this->orderFactory->create();
         return $orderModel->loadByIncrementId($orderId);
     }
