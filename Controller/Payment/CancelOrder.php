@@ -55,25 +55,24 @@ class CancelOrder extends Action
 
     public function execute()
     {
-        $this->logger->info('In Cancel',[$this->getRequest()->getParams()]);
         $paymentId = $this->getRequest()->getParam('pid');
         try {
             $this->almaPayment = $this->paymentValidation->getAlmaPayment($paymentId);
         } catch (RequestError $e) {
-            $this->logger->info('Cancel order - get alma Payment error',[$e->getMessage()]);
+            $this->logger->error('Cancel order - get alma Payment error',[$e->getMessage()]);
             return $this->redirectToCart();
         }
 
         try {
             $order = $this->getOrder();
         } catch (InvalidArgumentException $e) {
-            $this->logger->info('Cancel order - get order error',[$e->getMessage()]);
+            $this->logger->error('Cancel order - get order error',[$e->getMessage()]);
             return $this->redirectToCart();
         }
         try {
             $order->addStatusHistoryComment(__('Order canceled by customer'))->save();
         } catch (\Exception $e){
-            $this->logger->info('Cancel order - save history error',[$e->getMessage()]);
+            $this->logger->error('Cancel order - save history error',[$e->getMessage()]);
         }
         $this->orderManagement->cancel($order->getEntityId());
         return $this->redirectToCart();
@@ -87,7 +86,6 @@ class CancelOrder extends Action
     private function getOrder():OrderInterface
     {
         $orderId = $this->getOrderId();
-        $this->logger->info('$orderId',[$orderId]);
         $orderModel = $this->orderFactory->create();
         return $orderModel->loadByIncrementId($orderId);
     }
