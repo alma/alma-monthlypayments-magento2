@@ -27,18 +27,15 @@
 define(
     [
         'uiComponent',
-        'Magento_Checkout/js/model/payment/renderer-list',
-        'Magento_Customer/js/customer-data'
+        'Magento_Checkout/js/model/payment/renderer-list'
     ],
     function (
         Component,
-        rendererList,
-        customerData
+        rendererList
     ) {
         'use strict';
 
         var methodCode = 'alma_monthly_payments';
-        var almaSectionName = 'alma_section';
             rendererList.push(
                 {
                     type: methodCode,
