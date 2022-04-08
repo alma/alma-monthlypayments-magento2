@@ -29,7 +29,6 @@ define(
         'ko',
         'jquery',
         'underscore',
-        'moment',
         'mage/translate',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/model/full-screen-loader',
@@ -38,7 +37,7 @@ define(
         'uiRegistry',
         'Magento_Checkout/js/model/quote',
     ],
-    function (ko, $, _, moment, $t, Component, fullScreenLoader, priceUtils, customerData ,registry,quote) {
+    function (ko, $, _, $t, Component, fullScreenLoader, priceUtils, customerData ,registry,quote) {
         'use strict';
         var self;
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
@@ -83,18 +82,15 @@ define(
             totals: quote.getTotals(),
 
             initialize: function () {
-
                 self=this;
                 this._super();
-                this.totals.subscribe(this.reloadObserver.bind(this));
-
                 this.almaSectionName = 'alma_section';
 
                 this.config = window.checkoutConfig.payment[this.item.method];
                 this.almaSection = ko.observable(customerData.get(self.almaSectionName)())
 
                 this.checkedPaymentMethod = ko.observable('');
-                this.lastSelectedPlanKey =  ko.observable('');
+                this.lastSelectedPlanKey =  ko.observable({});
 
                 ['merged','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption))
             },
@@ -107,17 +103,14 @@ define(
                 this[`${paymentOption}PaymentPlans`] = ko.observable([]);
 
                 if(this.almaSection().paymentMethods[paymentOption]) {
-
-                    // -- Init checked payment Method if empty
-                    if (this.checkedPaymentMethod() == '') {
-                        this.checkedPaymentMethod = ko.observable(paymentCode)
-                    }
-
                     // -- Init Installments computed based on section
                     this[`${paymentOption}PaymentMethod`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption])
                     this[`${paymentOption}PaymentPlans`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption].paymentPlans)
                     // -- Init selected plan for payment schedule display
-                    var defaultPlan =  this[`${paymentOption}PaymentPlans`]()[0];
+                    var defaultPlan = '';
+                    if (this[`${paymentOption}PaymentPlans`]()[0] != undefined){
+                    defaultPlan = this[`${paymentOption}PaymentPlans`]()[0];
+                    }
                     this[`${paymentOption}SelectedPlanKey`] = ko.observable(defaultPlan.key);
                     this[`${paymentOption}SelectedPlan`] = ko.computed(() =>
                         self.selectedPlan(self[`${paymentOption}SelectedPlanKey`](),self[`${paymentOption}PaymentPlans`](), paymentCode)
@@ -128,11 +121,15 @@ define(
 
             selectedPlan : function (key,plans,paymentCode) {
                 var currentSelectedPlan = [];
+                if (key == undefined){
+                    return currentSelectedPlan;
+                }
                 currentSelectedPlan = plans.find(function (plan) {
                     return plan.key === key;
                 });
+                currentSelectedPlan.paymentCode = paymentCode;
                 if(self.checkedPaymentMethod() == paymentCode){
-                    self.lastSelectedPlanKey = currentSelectedPlan.key;
+                    self.lastSelectedPlanKey()[paymentCode] = currentSelectedPlan.key;
                 }
                 return currentSelectedPlan;
             },
@@ -144,14 +141,6 @@ define(
                 }
                 return isChecked;
             },
-            reloadObserver: function () {
-                this.reloadAlmaSection();
-            },
-            reloadAlmaSection:function () {
-            customerData.invalidate([self.almaSectionName])
-            customerData.reload([self.almaSectionName])
-            },
-
             getPlanLabel: function (plan) {
                 const regexDeferred = /^general:1:[\d]{2}:0$/;
                 var label = $t('%1 installments').replace('%1', plan.installmentsCount);
@@ -181,7 +170,6 @@ define(
             },
 
             cartTotal: function () {
-                console.log(this.totals())
                 return priceUtils.formatPrice(this.totals().base_grand_total, window.checkoutConfig.priceFormat);
             },
 
@@ -194,18 +182,22 @@ define(
             },
 
             totalPaid: function (cost) {
-                return priceUtils.formatPrice(parseFloat(window.checkoutConfig.quoteData.grand_total) + (cost/100), window.checkoutConfig.priceFormat);
+                return priceUtils.formatPrice(parseFloat(this.totals().base_grand_total) + (cost/100), window.checkoutConfig.priceFormat);
             },
 
             getFeesMention: function (customerFee) {
                 return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
+            },
+            getSelectedPlanForCurrentPaymentMethod:function(){
+                const currentPaymentMehod = self.checkedPaymentMethod();
+                return self.lastSelectedPlanKey()[currentPaymentMehod];
             },
             getData: function () {
                 return $.extend(
                     this._super(),
                     {
                         additional_data: {
-                            selectedPlan:  this.lastSelectedPlanKey
+                            selectedPlan:  this.getSelectedPlanForCurrentPaymentMethod()
                         }
                     }
                 );
