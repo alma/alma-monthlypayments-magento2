@@ -90,6 +90,10 @@ class AlmaSection implements SectionSourceInterface
         ];
     }
 
+    /**
+     * @param $typeName
+     * @return array
+     */
     private function getPaymentMethodTexts($typeName):array
     {
         foreach ($this->paymentOptions as $key => $paymentMethod) {
