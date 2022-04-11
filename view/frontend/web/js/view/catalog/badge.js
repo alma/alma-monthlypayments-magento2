@@ -72,6 +72,7 @@ define([
                 priceContainer = $(`#price-including-tax-product-price-${productId} .price`);
             }
             var frontPrice = getPriceFromContainer(priceContainer);
+
             if( frontPrice > 0){
                 price = frontPrice;
             }
@@ -89,13 +90,17 @@ define([
     }
 
     function formatPrice(priceHtml){
+        var multiplier = 100;
+        if (priceHtml.match(/[,.]/g)){
+            multiplier = 1;
+        }
         var price = priceHtml.replace(/[^\d]/g,"");
         var qty = $('#qty').val();
         if(!qty.match(/^\d+$/) || (qty <= 0))
         {
             qty = 1;
         }
-        return price * qty;
+        return price * multiplier * qty;
     }
 
 });
