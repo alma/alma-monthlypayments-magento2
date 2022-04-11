@@ -26,14 +26,27 @@
 /*global define*/
 define(
     [
+        'jquery',
         'uiComponent',
-        'Magento_Checkout/js/model/payment/renderer-list'
+        'Magento_Checkout/js/model/payment/renderer-list',
+        'Magento_Customer/js/customer-data',
+        'Magento_Checkout/js/model/quote',
     ],
     function (
+        $,
         Component,
-        rendererList
+        rendererList,
+        customerData,
+        quote
     ) {
         'use strict';
+        quote.totals.subscribe(function(){
+            reloadAlmaSection();
+        }, null, 'change');
+
+        function reloadAlmaSection() {
+            customerData.reload(['alma_section'])
+        };
 
         var methodCode = 'alma_monthly_payments';
             rendererList.push(
