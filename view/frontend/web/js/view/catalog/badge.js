@@ -34,6 +34,7 @@ define([
     'use strict';
 
     return function (config){
+        console.log(config)
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
         var qtyNode = document.getElementById('qty');
         qtyNode.addEventListener("input",function(){updateWidget()});
@@ -90,9 +91,10 @@ define([
     }
 
     function formatPrice(priceHtml){
-        var multiplier = 100;
-        if (priceHtml.match(/[,.]/g)){
-            multiplier = 1;
+        var multiplier = 1;
+        var countSeparator = priceHtml.match(/[.,]/g) || [];
+        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][0-9]{3}/g).test(priceHtml))){
+            multiplier = 100;
         }
         var price = priceHtml.replace(/[^\d]/g,"");
         var qty = $('#qty').val();
