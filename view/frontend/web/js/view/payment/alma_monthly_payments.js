@@ -47,13 +47,13 @@ define(
         }
 
         var methodCode = 'alma_monthly_payments';
-            rendererList.push(
-                {
-                    type: methodCode,
-                    component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
-                }
-            );
-        /** Add view logic here if needed */
+
+        rendererList.push(
+            {
+                type: methodCode,
+                component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
+            }
+        );
         return Component.extend({});
     }
 );
