@@ -93,7 +93,7 @@ define([
     function formatPrice(priceHtml){
         var multiplier = 1;
         var countSeparator = priceHtml.match(/[.,]/g) || [];
-        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][0-9]{3}/g).test(priceHtml))){
+        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][\d]{3}/g).test(priceHtml))){
             multiplier = 100;
         }
         var price = priceHtml.replace(/[^\d]/g,"");
