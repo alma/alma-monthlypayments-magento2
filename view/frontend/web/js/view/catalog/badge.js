@@ -84,24 +84,48 @@ define([
         var price = 0;
         if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
         {
-            price = formatPrice(priceContainer.html());
+            price = getPricePerQty(convertHtmlPriceToCent(priceContainer.html()));
         }
         return price;
     }
 
-    function formatPrice(priceHtml){
-        var multiplier = 1;
-        var countSeparator = priceHtml.match(/[.,]/g) || [];
-        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][\d]{3}/g).test(priceHtml))){
-            multiplier = 100;
-        }
+    /**
+     *
+     * @param priceHtml The price extracted from HTML
+     * @returns {number} price in cent
+     */
+    function convertHtmlPriceToCent(priceHtml){
+        var centMultiplier = getCentMultiplier(priceHtml);
         var price = priceHtml.replace(/[^\d]/g,"");
+        return price * centMultiplier;
+    }
+
+    /**
+     *
+     * @param {number} priceInCent Html price in cent
+     * @returns {number} final price for qty
+     */
+    function getPricePerQty(priceInCent){
         var qty = $('#qty').val();
         if(!qty.match(/^\d+$/) || (qty <= 0))
         {
             qty = 1;
         }
-        return price * multiplier * qty;
+        return priceInCent * qty;
+    }
+
+    /**
+     *
+     * @param   {string} priceHtml The price extracted from HTML
+     * @returns {number} 1 for flaot or 100 for integer
+     */
+    function getCentMultiplier(priceHtml){
+        var multiplier = 1;
+        var countSeparator = priceHtml.match(/[.,]/g) || [];
+        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][\d]{3}/g).test(priceHtml))){
+            multiplier = 100;
+        }
+        return multiplier;
     }
 
 });
