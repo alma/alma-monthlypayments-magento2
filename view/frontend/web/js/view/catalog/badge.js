@@ -34,7 +34,6 @@ define([
     'use strict';
 
     return function (config){
-        console.log(config)
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
         var qtyNode = document.getElementById('qty');
         qtyNode.addEventListener("input",function(){updateWidget()});
