@@ -14,7 +14,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\OrderFactory;
 
-class CancelOrder extends Action
+class Cancel extends Action
 {
     /**
      * @var Logger
