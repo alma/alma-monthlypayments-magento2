@@ -28,27 +28,32 @@ define(
     [
         'uiComponent',
         'Magento_Checkout/js/model/payment/renderer-list',
-        'Magento_Customer/js/customer-data'
+        'Magento_Customer/js/customer-data',
+        'Magento_Checkout/js/model/quote',
     ],
     function (
         Component,
         rendererList,
-        customerData
+        customerData,
+        quote
     ) {
         'use strict';
+        quote.totals.subscribe(function(){
+            reloadAlmaSection();
+        }, null, 'change');
+
+        function reloadAlmaSection() {
+            customerData.reload(['alma_section'])
+        }
 
         var methodCode = 'alma_monthly_payments';
-        var almaSectionName = 'alma_section';
 
-        if (customerData.get(almaSectionName)().allPaymentPlans.length > 0) {
-            rendererList.push(
-                {
-                    type: methodCode,
-                    component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
-                }
-            );
-        }
-        /** Add view logic here if needed */
+        rendererList.push(
+            {
+                type: methodCode,
+                component: 'Alma_MonthlyPayments/js/view/payment/method-renderer/alma_monthly_payments'
+            }
+        );
         return Component.extend({});
     }
 );

@@ -23,6 +23,7 @@
  *
  */
 -->
+<!-- ko if: mergedPaymentPlans().length >= 1 -->
 <div class="alma payment-method" data-bind="css: {'_active': mergedIsChecked}">
     <div class="payment-method-title field choice">
         <input type="radio"
@@ -40,17 +41,7 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: mergedPaymentMethod().description"></div>
-        <div data-bind="text:"></div>
         <p class="alma-plan-choices">
-        <!-- ko if: mergedPaymentPlans().length === 1 -->
-        <!-- ko if: mergedPaymentPlans()[0].logo -->
-        <img class="alma-plan-logo"
-             data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + mergedPaymentPlans()[0].logo), alt: mergedPaymentPlans()[0].logo }">
-        <!-- /ko -->
-
-        <span data-bind="text: getPlanLabel(mergedPaymentPlans()[0])"></span>
-        <!-- /ko -->
-            <!-- ko if: mergedPaymentPlans().length !== 1 -->
                 <!-- ko foreach: mergedPaymentPlans -->
                 <label data-bind="attr: { for: 'alma-select-plan-' + key }">
                     <input type="radio" name="alma-selected-plan-installments"
@@ -62,9 +53,9 @@
                     <span data-bind="text: $parent.getPlanLabel($data)"></span>
                 </label>
                 <!-- /ko -->
-            <!-- /ko -->
         </p>
         <ul class="alma-installments">
+            <!-- ko if: mergedSelectedPlan().eligibility -->
             <!-- ko foreach: mergedSelectedPlan().eligibility.paymentPlan -->
             <li>
                 <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
@@ -93,7 +84,7 @@
                     </span>
                 </li>
             <!-- /ko -->
-
+        <!-- /ko -->
         </ul>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
@@ -120,3 +111,4 @@
 
     </div>
 </div>
+<!--/ko-->

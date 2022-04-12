@@ -60,7 +60,12 @@ class AlmaSection implements SectionSourceInterface
         $areMergePaymentMethods = $this->checkoutConfigHelper->getAreMergedPaymentMethods();
         $eligibilities[Eligibility::MERGED_TYPE] = $this->eligibility->getEligiblePlans();
         if(!$areMergePaymentMethods){
-            $eligibilities = $this->eligibility->sortEligibilities($eligibilities[Eligibility::MERGED_TYPE]);
+            $enabledPlanInBO = $this->eligibility->getEnabledConfigPaymentPlans();
+            foreach ($enabledPlanInBO as $planConfig){
+                $type = $this->eligibility->getPaymentType($planConfig->planKey());
+                $eligibilities[$type] = [];
+            }
+            $eligibilities = $this->eligibility->sortEligibilities($eligibilities);
         }
 
         $allPaymentPlans = [];
@@ -85,6 +90,10 @@ class AlmaSection implements SectionSourceInterface
         ];
     }
 
+    /**
+     * @param $typeName
+     * @return array
+     */
     private function getPaymentMethodTexts($typeName):array
     {
         foreach ($this->paymentOptions as $key => $paymentMethod) {

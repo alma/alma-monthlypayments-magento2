@@ -479,17 +479,17 @@ class Eligibility
      */
     public function sortEligibilities($eligibilities):array
     {
-        $sortedEligibilities=[];
-        foreach ($eligibilities as $paymentPlan){
+        foreach ($eligibilities[self::MERGED_TYPE] as $paymentPlan){
 
             $planConfig = $paymentPlan->getPlanConfig();
             $planKey = $planConfig->planKey();
 
             $type = $this->getPaymentType($planKey);
-            $sortedEligibilities[$type][]=$paymentPlan;
+            $eligibilities[$type][]=$paymentPlan;
 
         }
-        return $sortedEligibilities;
+        unset($eligibilities[self::MERGED_TYPE]);
+        return $eligibilities;
     }
 
     /**
@@ -497,7 +497,7 @@ class Eligibility
      * @param string $planKey
      * @return string
      */
-    private function getPaymentType($planKey):string
+    public function getPaymentType($planKey):string
     {
         $matches = [];
         $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/',$planKey,$matches);
