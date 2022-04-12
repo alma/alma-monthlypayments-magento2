@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.4.0
+------
+* Fix shipping cost in checkout page
+* Fix badge price for front without cents
+* Refactor helpers
+
 v2.3.2
 ------
 * Fix eligibility initialisation for : isEligible() must be of the type boolean
