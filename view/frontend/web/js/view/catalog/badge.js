@@ -34,6 +34,10 @@ define([
     'use strict';
 
     return function (config){
+        var priceContainer = getHtmlPriceContainer(config.productId,false);
+        priceContainer.on('DOMSubtreeModified', function () {
+            updateWidget();
+        });
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
         var qtyNode = document.getElementById('qty');
         qtyNode.addEventListener("input",function(){updateWidget()});
@@ -53,24 +57,32 @@ define([
         }
     }
 
-    function moveToCustomPosition(customDisplay,containerId){
+    /**
+     *
+     * @param customDisplay Widget config define in view/frontend/templates/catalog/product/view.phtml
+     * @param baseContainerId Base container who contain the widget
+     */
+    function moveToCustomPosition(customDisplay,baseContainerId){
         if(customDisplay.hasCustomPosition && $(customDisplay.customContainerSelector) != undefined ){
             var position = 'append';
             if(customDisplay.isPrepend) {
                 position = 'prepend'
             }
-            $(customDisplay.customContainerSelector)[position]($('#'+containerId));
+            $(customDisplay.customContainerSelector)[position]($('#'+baseContainerId));
         }
     }
 
+    /**
+     *
+     * @param productPrice Php product price in cent - not good for configurable products
+     * @param useQuantityForWidgetPrice back office setup
+     * @param productId product Id
+     * @returns {number} price in cent
+     */
     function getPrice(productPrice,useQuantityForWidgetPrice,productId){
         var price = productPrice;
         if(useQuantityForWidgetPrice){
-            var priceContainer = $(`#product-price-${productId} .price`);
-            if (!priceContainer.length){
-                // Only if tax config diplay with and without tax
-                priceContainer = $(`#price-including-tax-product-price-${productId} .price`);
-            }
+            var priceContainer = getHtmlPriceContainer(productId,'price');
             var frontPrice = getPriceFromContainer(priceContainer);
 
             if( frontPrice > 0){
@@ -80,6 +92,30 @@ define([
         return price ;
     }
 
+    /**
+     *
+     * @param productId Id of product for Id concatenation
+     * @param subClass Sub class to select
+     * @returns {*}
+     */
+    function getHtmlPriceContainer(productId,subClass = false){
+        var classToSelect = ''
+        if (subClass){
+            classToSelect = '.'+subClass;
+        }
+        var priceContainer = $(`#product-price-${productId} ${classToSelect}`);
+        if (!priceContainer.length){
+            // Only if tax config is diplay with and without tax
+            priceContainer = $(`#price-including-tax-product-price-${productId} ${classToSelect}`);
+        }
+        return priceContainer;
+    }
+
+    /**
+     *
+     * @param priceContainer Container with the price to extract
+     * @returns {number} price in cent
+     */
     function getPriceFromContainer(priceContainer){
         var price = 0;
         if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
