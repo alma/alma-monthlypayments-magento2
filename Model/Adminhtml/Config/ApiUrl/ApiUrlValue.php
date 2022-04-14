@@ -77,7 +77,7 @@ class ApiUrlValue extends Value implements ProcessorInterface
      */
     public function processValue($value): string
     {
-        if (empty($value) || ($value == $this->getOldDefaultUrl())) {
+        if (empty($value)) {
             $value = $this->storeManager->getStore()->getUrl(
                 $this->urlPath,
                 ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
@@ -90,7 +90,7 @@ class ApiUrlValue extends Value implements ProcessorInterface
      * @return string
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    private function getOldDefaultUrl(): string
+    public function getOldDefaultUrl(): string
     {
         return $this->storeManager->getStore()->getUrl(
             $this->oldUrlPath,
