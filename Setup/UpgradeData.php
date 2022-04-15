@@ -44,7 +44,7 @@ class UpgradeData implements UpgradeDataInterface
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
         $version = $context->getVersion();
-        if (version_compare($version, '2.3.2') < 0) {
+        if (version_compare($version, '2.3.2', '<')) {
             $path = sprintf(ConfigGateway::DEFAULT_PATH_PATTERN, Config::CODE, ApiConfigHelper::CONFIG_CUSTOMER_CANCEL_URL);
             $oldProcessedPath = $this->customerCancelUrl->getOldDefaultUrl();
             $newProcessedPath = $this->customerCancelUrl->processValue('');
@@ -55,7 +55,7 @@ class UpgradeData implements UpgradeDataInterface
             try {
                 $this->resourceConnection->getConnection()->update($tableName,$replace,$where);
             } catch (Exception $e) {
-                $this->logger->info('UpgradeData Exception : ',[$e->getMessage()]);
+                $this->logger->error('UpgradeData Exception : ',[$e->getMessage()]);
             }
         }
     }
