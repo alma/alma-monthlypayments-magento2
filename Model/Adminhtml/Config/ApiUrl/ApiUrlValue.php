@@ -38,6 +38,7 @@ use Magento\Store\Model\StoreManagerInterface;
 class ApiUrlValue extends Value implements ProcessorInterface
 {
     protected $urlPath = null;
+    protected $oldUrlPath = null;
 
     /**
      * @var StoreManagerInterface
@@ -74,7 +75,7 @@ class ApiUrlValue extends Value implements ProcessorInterface
      * @inheritDoc
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function processValue($value)
+    public function processValue($value): string
     {
         if (empty($value)) {
             $value = $this->storeManager->getStore()->getUrl(
@@ -82,8 +83,19 @@ class ApiUrlValue extends Value implements ProcessorInterface
                 ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
             );
         }
-
         return $value;
+    }
+
+    /**
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getOldDefaultUrl(): string
+    {
+        return $this->storeManager->getStore()->getUrl(
+            $this->oldUrlPath,
+            ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
+        );
     }
 }
 
