@@ -3,25 +3,24 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
-use Alma\MonthlyPayments\Gateway\Config\Config;
 
-class ApiConfigHelper extends Config
+class ApiConfigHelper extends ConfigHelper
 {
     const CONFIG_LIVE_API_KEY = 'live_api_key';
     const CONFIG_TEST_API_KEY = 'test_api_key';
     const CONFIG_FULLY_CONFIGURED = 'fully_configured';
+    const CONFIG_API_MODE = 'api_mode';
 
     /**
      * @return mixed|null
      */
     public function getActiveAPIKey()
     {
-
         $mode = $this->getActiveMode();
         $apiKeyType = ($mode == Client::LIVE_MODE) ?
             self::CONFIG_LIVE_API_KEY :
             self::CONFIG_TEST_API_KEY ;
-        return $this->get($apiKeyType);
+        return $this->getConfigByCode($apiKeyType);
     }
 
     /**
@@ -29,7 +28,7 @@ class ApiConfigHelper extends Config
      */
     public function getLiveKey()
     {
-        return $this->get(self::CONFIG_LIVE_API_KEY, '');
+        return $this->getConfigByCode(self::CONFIG_LIVE_API_KEY);
     }
 
     /**
@@ -37,7 +36,7 @@ class ApiConfigHelper extends Config
      */
     public function getTestKey()
     {
-        return $this->get(self::CONFIG_TEST_API_KEY, '');
+        return $this->getConfigByCode(self::CONFIG_TEST_API_KEY);
     }
     /**
      * @return bool
@@ -51,7 +50,7 @@ class ApiConfigHelper extends Config
      */
     public function isFullyConfigured(): bool
     {
-        return !$this->needsAPIKeys() && (bool)(int)$this->get(self::CONFIG_FULLY_CONFIGURED, false);
+        return !$this->needsAPIKeys() && (bool)(int)$this->getConfigByCode(self::CONFIG_FULLY_CONFIGURED);
     }
 
     /**
@@ -59,6 +58,6 @@ class ApiConfigHelper extends Config
      */
     public function getActiveMode()
     {
-        return $this->get(self::CONFIG_API_MODE, Client::LIVE_MODE);
+        return $this->getConfigByCode(self::CONFIG_API_MODE);
     }
 }
