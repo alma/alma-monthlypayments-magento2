@@ -30,11 +30,11 @@ define([
     'widgets/Alma',
     'jquery',
     'Magento_Catalog/js/price-utils'
-], function (Alma,$,priceUtils){
+], function (Alma, $, priceUtils){
     'use strict';
 
     return function (config){
-        var priceContainer = getHtmlPriceContainer(config.productId,false);
+        var priceContainer = getHtmlPriceContainer(config.productId, false);
         priceContainer.on('DOMSubtreeModified', function () {
             updateWidget();
         });
@@ -42,14 +42,14 @@ define([
         var qtyNode = document.getElementById('qty');
         qtyNode.addEventListener("input",function(){updateWidget()});
 
-        moveToCustomPosition(config.customDisplay,config.containerId);
+        moveToCustomPosition(config.customDisplay, config.containerId);
         updateWidget();
 
         function updateWidget(){
             widgets.add(
                 Alma.Widgets.PaymentPlans, {
                     container: '#' + config.containerId,
-                    purchaseAmount: getPrice(config.productPrice,config.useQuantityForWidgetPrice,config.productId),
+                    purchaseAmount: getPrice(config.productPrice, config.useQuantityForWidgetPrice, config.productId),
                     locale: config.locale,
                     plans: config.jsonPlans
                 }
@@ -62,7 +62,7 @@ define([
      * @param customDisplay Widget config define in view/frontend/templates/catalog/product/view.phtml
      * @param baseContainerId Base container who contain the widget
      */
-    function moveToCustomPosition(customDisplay,baseContainerId){
+    function moveToCustomPosition(customDisplay, baseContainerId){
         if(customDisplay.hasCustomPosition && $(customDisplay.customContainerSelector) != undefined ){
             var position = 'append';
             if(customDisplay.isPrepend) {
@@ -79,7 +79,7 @@ define([
      * @param productId product Id
      * @returns {number} price in cent
      */
-    function getPrice(productPrice,useQuantityForWidgetPrice,productId){
+    function getPrice(productPrice, useQuantityForWidgetPrice, productId){
         var price = productPrice;
         if(useQuantityForWidgetPrice){
             var priceContainer = getHtmlPriceContainer(productId,'price');
@@ -98,8 +98,8 @@ define([
      * @param subClass Sub class to select
      * @returns {*}
      */
-    function getHtmlPriceContainer(productId,subClass = false){
-        var classToSelect = ''
+    function getHtmlPriceContainer(productId, subClass = false){
+        var classToSelect = '';
         if (subClass){
             classToSelect = '.'+subClass;
         }
