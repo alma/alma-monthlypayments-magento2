@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.5.0
+------
+* Change badge price for configurable product
+* Cancel pending order with Alma payment page return button
+* Fix isFullyConfigured missing function in config
+
 v2.4.0
 ------
 * Fix shipping cost in checkout page
