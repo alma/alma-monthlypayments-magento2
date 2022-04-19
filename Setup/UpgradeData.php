@@ -2,7 +2,6 @@
 namespace Alma\MonthlyPayments\Setup;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl;
 use Magento\Framework\App\ResourceConnection;
@@ -44,8 +43,8 @@ class UpgradeData implements UpgradeDataInterface
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
         $version = $context->getVersion();
-        if (version_compare($version, '2.3.2', '<')) {
-            $path = sprintf(ConfigGateway::DEFAULT_PATH_PATTERN, Config::CODE, ApiConfigHelper::CONFIG_CUSTOMER_CANCEL_URL);
+        if (version_compare($version, '2.5.0', '<')) {
+            $path = sprintf(ConfigGateway::DEFAULT_PATH_PATTERN, Config::CODE, Config::CONFIG_CUSTOMER_CANCEL_URL);
             $oldProcessedPath = $this->customerCancelUrl->getOldDefaultUrl();
             $newProcessedPath = $this->customerCancelUrl->processValue('');
 
