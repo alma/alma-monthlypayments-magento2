@@ -25,10 +25,10 @@
 
 namespace Alma\MonthlyPayments\Gateway\Config;
 
-use Alma\API\Client;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Alma\MonthlyPayments\Helpers\Logger;
 
@@ -39,7 +39,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const ORDER_PAYMENT_URL = 'PAYMENT_URL';
     const ORDER_PAYMENT_TRIGGER = 'TRIGGER';
     const CONFIG_SORT_ORDER = 'sort_order';
-    const CONFIG_API_MODE = 'api_mode';
     const CONFIG_ELIGIBILITY_MESSAGE = 'eligibility_message';
     const CONFIG_NON_ELIGIBILITY_MESSAGE = 'non_eligibility_message';
     const CONFIG_SHOW_ELIGIBILITY_MESSAGE = 'show_eligibility_message';
@@ -61,11 +60,16 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     private $pathPattern;
     private $methodCode;
     private $plansConfigFactory;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
+     * @param ApiConfigHelper $apiConfigHelper
      * @param Logger $logger
      * @param null $methodCode
      * @param string $pathPattern
@@ -73,6 +77,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
+        ApiConfigHelper $apiConfigHelper,
         Logger $logger,
         $methodCode = null,
         $pathPattern = self::DEFAULT_PATH_PATTERN
@@ -83,6 +88,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->pathPattern = $pathPattern;
         $this->plansConfigFactory = $plansConfigFactory;
         $this->logger = $logger;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
      /**
@@ -207,7 +213,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         /** @var PaymentPlansConfigInterface $plansConfig */
         $plansConfig = $this->plansConfigFactory->create(["data" => $data]);
 
-        if (empty($data) && $this->isFullyConfigured()) {
+        if (empty($data) && $this->apiConfigHelper->isFullyConfigured()) {
             // No plans config data has ever been saved – fetch what we need
             try {
                 $plansConfig->updateFromApi();
