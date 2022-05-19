@@ -47,6 +47,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const CONFIG_RETURN_URL = 'return_url';
     const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
     const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
+    const FAILURE_RETURN_URL = 'failure_return_url';
     const CONFIG_MERCHANT_ID = 'merchant_id';
     const CONFIG_PAYMENT_PLANS = 'payment_plans';
 
@@ -193,6 +194,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getCustomerCancelUrl()
     {
         return $this->get(self::CONFIG_CUSTOMER_CANCEL_URL);
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getFailureReturnUrl()
+    {
+        return $this->get(self::FAILURE_RETURN_URL);
     }
 
     /**

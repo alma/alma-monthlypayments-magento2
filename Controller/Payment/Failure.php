@@ -12,7 +12,7 @@ use Magento\Framework\App\Action\Context;
 use Alma\MonthlyPayments\Helpers\PaymentValidation;
 use Magento\Sales\Api\OrderManagementInterface;
 
-class Cancel extends Action
+class Failure extends Action
 {
     /**
      * @var Logger
@@ -57,6 +57,7 @@ class Cancel extends Action
     )
     {
         parent::__construct($context);
+
         $this->logger = $logger;
         $this->paymentValidation = $paymentValidation;
         $this->orderManagement = $orderManagement;
@@ -81,7 +82,7 @@ class Cancel extends Action
             return $this->redirectToCart();
         }
         try {
-            $order->addStatusHistoryComment(__('Order canceled by customer'))->save();
+            $order->addStatusHistoryComment(__('Rejected payment'))->save();
         } catch (\Exception $e){
             $this->logger->error('Cancel order - save history error',[$e->getMessage()]);
         }

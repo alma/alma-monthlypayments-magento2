@@ -61,7 +61,8 @@
                     backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\IpnCallbackUrlValue"/>
                 <customer_cancel_url
                     backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl"/>
-
+                <failure_return_url
+                    backend_model="Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\FailureReturnUrl"/>
                 <alma_merge_payment>0</alma_merge_payment>
                 <title>Alma monthly and deferred payments</title>
                 <description>Pay in deferred or multiple monthly payments with your credit card.</description>
