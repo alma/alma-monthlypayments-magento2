@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v2.5.1
+v2.6.0
 ------
 * Add rejected payment url in config back office.
 * Add failure_return_url in payment payload.
