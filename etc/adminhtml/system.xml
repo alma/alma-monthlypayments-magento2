@@ -334,6 +334,13 @@
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>customer_cancel_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/customer_cancel_url</config_path>
                     </field>
+                    <field id="failure_return_url" translate="label comment" type="text" sortOrder="16"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Failure return url</label>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\FailureReturnUrl</backend_model>
+                        <comment><![CDATA[<b>Advanced.</b> Overrides the <code>failure_return_url</code> value of created payments]]></comment>
+                        <config_path>payment/alma_monthly_payments/failure_return_url</config_path>
+                    </field>
                 </group>
             </group>
         </section>
