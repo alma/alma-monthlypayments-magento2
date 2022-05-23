@@ -24,7 +24,7 @@ class OrderHelper extends AbstractHelper
     }
 
     /**
-     * @param $orderId
+     * @param int $orderId
      * @return OrderInterface
      */
     public function getOrderById($orderId):OrderInterface
