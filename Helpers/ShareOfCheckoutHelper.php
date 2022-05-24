@@ -3,18 +3,27 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\RequestError;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 
 
-class ShareOfCheckoutHelper
+class ShareOfCheckoutHelper extends AbstractHelper
 {
-    public const TOTAL_COUNT_KEY="total_order_count";
-    public const TOTAL_AMOUNT_KEY="total_amount";
-    public const CURRENCY_KEY="currency";
-    public const PAYMENT_METHOD_KEY="payment_method_name";
-    public const SHARED_ORDER_STATES=['processing','complete'];
+    const TOTAL_COUNT_KEY="total_order_count";
+    const TOTAL_AMOUNT_KEY="total_amount";
+    const COUNT_KEY="order_count";
+    const AMOUNT_KEY="amount";
+    const CURRENCY_KEY="currency";
+    const PAYMENT_METHOD_KEY="payment_method_name";
+    const SHARED_ORDER_STATES=['processing','complete'];
+    const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
+    const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
+
+
     /**
      * @var Logger
      */
@@ -51,19 +60,16 @@ class ShareOfCheckoutHelper
      * @var null
      */
     private $endTime;
-    /**
-     * @var ConfigHelper
-     */
-    private $configHelper;
 
     public function __construct(
         Logger $logger,
         CollectionFactory $collectionFactory,
         OrderHelper $orderHelper,
-        ConfigHelper $configHelper,
-        AlmaClient $almaClient
+        AlmaClient $almaClient,
+        Context $context
     )
     {
+        parent::__construct($context);
         $this->logger = $logger;
         $this->collectionFactory = $collectionFactory;
         $this->orderCollection = [];
@@ -73,7 +79,13 @@ class ShareOfCheckoutHelper
         $this->almaClient = $almaClient->getDefaultClient();
         $this->startTime = null;
         $this->endTime = null;
-        $this->configHelper = $configHelper;
+    }
+
+    public function shareOfCheckoutIsEnabled($storeId = null):bool
+    {
+        return $this->scopeConfig->getValue(
+            ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_ENABLE_KEY, ScopeInterface::SCOPE_STORE, $storeId
+        );
     }
 
     /**
@@ -87,9 +99,10 @@ class ShareOfCheckoutHelper
         }
         $res=null;
         try {
-            $res = $this->almaClient->shareOfCheckout->share($this->getPayload());
+            $payload = $this->getPayload();
+            $this->logger->info('Share of checkout payload',[$payload]);
+            $this->almaClient->shareOfCheckout->share($this->getPayload());
         } catch (RequestError $e) {
-            $this->logger->info('ShareOfCheckoutHelper::share error get message :',[$e->getMessage()]);
             throw new RequestError($e->getMessage(), null, $res);
         } finally {
             $this->writeLogs();
@@ -116,10 +129,12 @@ class ShareOfCheckoutHelper
             throw new \InvalidArgumentException('Alma client is not define');
         }
         try {
-            $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDate();
-            // TODO - extract date from json
-            return $lastUpdateByApi;
+            $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
+            return date('Y-m-d',$lastUpdateByApi['end_time']);
         } catch (RequestError $e) {
+            if($e->response->responseCode == '404'){
+                return date('Y-m-d',strtotime('-2 days'));
+            }
             throw new RequestError($e->getMessage(), null);
         }
     }
@@ -175,7 +190,7 @@ class ShareOfCheckoutHelper
         {
             $currency = $this->orderHelper->getOrderCurrency($order);
             if (!isset($ordersByCurrency[$currency])){
-                $ordersByCurrency[$currency]=$this->initOrderResult($currency);
+                $ordersByCurrency[$currency]=$this->initTotalOrderResult($currency);
             }
             $ordersByCurrency[$currency][self::TOTAL_AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
             $ordersByCurrency[$currency][self::TOTAL_COUNT_KEY] ++ ;
@@ -192,7 +207,6 @@ class ShareOfCheckoutHelper
         if(count($this->totalShareOfCheckoutCheckouts)){
             return $this->totalShareOfCheckoutCheckouts;
         }
-
         $this->checkOrderCollectionExist();
 
         $ordersByCheckouts = [];
@@ -208,8 +222,8 @@ class ShareOfCheckoutHelper
                 $ordersByCheckouts[$paymentMethodCode]['orders'][$currency]=$this->initOrderResult($currency);
             }
             $ordersByCheckouts[$paymentMethodCode][self::PAYMENT_METHOD_KEY] = $paymentMethodCode;
-            $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::TOTAL_AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
-            $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::TOTAL_COUNT_KEY] ++;
+            $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
+            $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::COUNT_KEY] ++;
         }
         foreach ($ordersByCheckouts as $paymentKey => $paymentMethodOrders)
         {
@@ -224,6 +238,14 @@ class ShareOfCheckoutHelper
      * @return array
      */
     private function initOrderResult($currency):array
+    {
+        return [self::AMOUNT_KEY=>0,self::COUNT_KEY=>0,self::CURRENCY_KEY=>$currency];
+    }
+    /**
+     * @param $currency
+     * @return array
+     */
+    private function initTotalOrderResult($currency):array
     {
         return [self::TOTAL_AMOUNT_KEY=>0,self::TOTAL_COUNT_KEY=>0,self::CURRENCY_KEY=>$currency];
     }
@@ -287,10 +309,12 @@ class ShareOfCheckoutHelper
     /**
      * @return string
      */
-    public function getShareOfCheckoutEnabledDate():string
+    public function getShareOfCheckoutEnabledDate($storeId = null):string
     {
-        return $this->configHelper->getShareOfCheckoutEnabledDate();
-    }
+
+        return $this->scopeConfig->getValue(
+            ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_DATE_KEY, ScopeInterface::SCOPE_STORE, $storeId
+        );    }
 
     /**
      * @return void

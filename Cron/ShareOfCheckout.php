@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Cron;
 
 use Alma\API\RequestError;
-use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\DateHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckoutHelper;
@@ -23,43 +22,36 @@ class ShareOfCheckout
      * @var DateHelper
      */
     private $dateHelper;
-    /**
-     * @var ConfigHelper
-     */
-    private $configHelper;
-
 
     /**
      * @param Logger $logger
      * @param ShareOfCheckoutHelper $shareOfCheckoutHelper
+     * @param DateHelper $dateHelper
      */
     public function __construct(
         Logger $logger,
         ShareOfCheckoutHelper $shareOfCheckoutHelper,
-        DateHelper $dateHelper,
-        ConfigHelper $configHelper
+        DateHelper $dateHelper
     )
     {
         $this->logger = $logger;
         $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
         $this->dateHelper = $dateHelper;
-        $this->configHelper = $configHelper;
     }
 
     /**
-     * @throws RequestError
+     * @return void
      */
     public function shareDays():void
     {
         ini_set('max_execution_time', 30);
-
-        if(!$this->configHelper->shareOfCheckoutIsEnabled()){
+        if(!$this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()){
             $this->logger->info('Share Of Checkout is not enabled',[]);
             return;
         }
         $shareOfCheckoutEnabledDate = $this->shareOfCheckoutHelper->getShareOfCheckoutEnabledDate();
 
-       if($shareOfCheckoutEnabledDate ==''){
+        if($shareOfCheckoutEnabledDate ==''){
             $this->logger->info('No enable date in config',[]);
             return;
         }
@@ -82,6 +74,4 @@ class ShareOfCheckout
             }
         }
     }
-
-
 }
