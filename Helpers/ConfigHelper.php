@@ -17,17 +17,6 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_TYPOLOGY = 'trigger_typology';
 
     /**
-     * @param Context $context
-     */
-    public function __construct(
-        Context $context
-    )
-    {
-        parent::__construct($context);
-    }
-
-
-    /**
      * @return bool
      */
     public function canLog(): bool
