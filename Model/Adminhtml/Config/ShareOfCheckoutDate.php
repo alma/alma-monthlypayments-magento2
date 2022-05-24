@@ -4,6 +4,8 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckoutHelper;
+use Magento\Framework\App\Config\Value;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -12,53 +14,49 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 
-class ShareOfCheckoutDate extends \Magento\Framework\App\Config\Value
+class ShareOfCheckoutDate extends Value
 {
 
     /**
-     * @var Logger
+     * @var ShareOfCheckoutHelper
      */
-    private $logger;
-    /**
-     * @var ConfigHelper
-     */
-    private $configHelper;
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
+    private $shareOfCheckoutHelper;
 
+    /**
+     * @param ShareOfCheckoutHelper $shareOfCheckoutHelper
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct
     (
-        Logger $logger,
-        ConfigHelper $configHelper,
+        ShareOfCheckoutHelper $shareOfCheckoutHelper,
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        WriterInterface $configWriter,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     )
     {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
-        $this->logger = $logger;
-        $this->configHelper = $configHelper;
-        $this->configWriter = $configWriter;
+        $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
     }
 
-    public function beforeSave()
-    {
-        return parent::beforeSave();
-    }
-
+    /**
+     * @return ShareOfCheckoutDate
+     */
     public function afterSave()
     {
         if ($this->isValueChanged() && $this->getValue()){
-            $this->configHelper->saveShareOfCheckoutDate(date('Y-m-d'));
+            $this->shareOfCheckoutHelper->saveShareOfCheckoutDate(date('Y-m-d'));
         }elseif ($this->isValueChanged() && !$this->getValue()) {
-            $this->configHelper->deleteShareOfCheckoutDate();
+            $this->shareOfCheckoutHelper->deleteShareOfCheckoutDate();
         }
         return parent::afterSave();
     }

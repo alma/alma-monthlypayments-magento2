@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\RequestError;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -60,13 +61,26 @@ class ShareOfCheckoutHelper extends AbstractHelper
      * @var null
      */
     private $endTime;
+    /**
+     * @var WriterInterface
+     */
+    private $configWriter;
 
+    /**
+     * @param Logger $logger
+     * @param CollectionFactory $collectionFactory
+     * @param OrderHelper $orderHelper
+     * @param AlmaClient $almaClient
+     * @param Context $context
+     * @param WriterInterface $configWriter
+     */
     public function __construct(
         Logger $logger,
         CollectionFactory $collectionFactory,
         OrderHelper $orderHelper,
         AlmaClient $almaClient,
-        Context $context
+        Context $context,
+        WriterInterface $configWriter
     )
     {
         parent::__construct($context);
@@ -79,8 +93,13 @@ class ShareOfCheckoutHelper extends AbstractHelper
         $this->almaClient = $almaClient->getDefaultClient();
         $this->startTime = null;
         $this->endTime = null;
+        $this->configWriter = $configWriter;
     }
 
+    /**
+     * @param $storeId
+     * @return bool
+     */
     public function shareOfCheckoutIsEnabled($storeId = null):bool
     {
         return $this->scopeConfig->getValue(
@@ -268,7 +287,6 @@ class ShareOfCheckoutHelper extends AbstractHelper
         if(isset($this->startTime)){
             return $this->startTime;
         }
-
         return date('Y-m-d',strtotime('yesterday')).' 00:00:00';
     }
 
@@ -309,11 +327,10 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getShareOfCheckoutEnabledDate($storeId = null):string
+    public function getShareOfCheckoutEnabledDate():string
     {
-
         return $this->scopeConfig->getValue(
-            ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_DATE_KEY, ScopeInterface::SCOPE_STORE, $storeId
+            $this->getShareOfCheckoutDateKey(), ScopeInterface::SCOPE_STORE
         );    }
 
     /**
@@ -325,4 +342,28 @@ class ShareOfCheckoutHelper extends AbstractHelper
         $this->logger->info('Orders send',[$this->countShareOfCheckoutOrders()]);
     }
 
+    /**
+     * @param $date
+     * @return void
+     */
+    public function saveShareOfCheckoutDate($date): void
+    {
+        $this->configWriter->save($this->getShareOfCheckoutDateKey(),$date);
+    }
+
+    /**
+     * @return void
+     */
+    public function deleteShareOfCheckoutDate(): void
+    {
+        $this->configWriter->delete($this->getShareOfCheckoutDateKey());
+    }
+
+    /**
+     * @return string
+     */
+    private function getShareOfCheckoutDateKey():string
+    {
+        return ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_DATE_KEY;
+    }
 }
