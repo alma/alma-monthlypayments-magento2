@@ -135,14 +135,6 @@ class ShareOfCheckoutHelper extends AbstractHelper
     }
 
     /**
-     * @return int
-     */
-    public function countShareOfCheckoutOrders():int
-    {
-        return $this->getShareOfCheckoutOrderCollection()->count();
-    }
-
-    /**
      * @return string
      * @throws RequestError
      */
@@ -170,16 +162,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
     public function setShareOfCheckoutFromDate($startTime):void
     {
         $this->startTime = $startTime.' 00:00:00';
-        $this->setShareOfCheckoutToDate($startTime);
-    }
-
-    /**
-     * @param $endTime
-     * @return void
-     */
-    public function setShareOfCheckoutToDate($endTime):void
-    {
-        $this->endTime = $endTime.' 23:59:59';
+        $this->endTime   = $startTime.' 23:59:59';
     }
 
     /**
@@ -350,7 +333,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
     private function writeLogs():void
     {
         $this->logger->info('Share start date',[$this->getShareOfCheckoutFromDate()]);
-        $this->logger->info('Orders send',[$this->countShareOfCheckoutOrders()]);
+        $this->logger->info('Orders send',[$this->getShareOfCheckoutOrderCollection()->count()]);
     }
 
     /**

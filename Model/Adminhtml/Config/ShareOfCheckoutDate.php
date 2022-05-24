@@ -37,11 +37,10 @@ class ShareOfCheckoutDate extends Value
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        AbstractDb $resourceCollection = null
     )
     {
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
+        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, []);
         $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
     }
 
