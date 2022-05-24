@@ -2,8 +2,6 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
-use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckoutHelper;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Model\Context;
@@ -12,7 +10,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
-use Magento\Framework\App\Config\Storage\WriterInterface;
 
 class ShareOfCheckoutDate extends Value
 {

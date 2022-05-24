@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\RequestError;
+use InvalidArgumentException;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -97,14 +98,18 @@ class ShareOfCheckoutHelper extends AbstractHelper
     }
 
     /**
-     * @param $storeId
      * @return bool
      */
-    public function shareOfCheckoutIsEnabled($storeId = null):bool
+    public function shareOfCheckoutIsEnabled():bool
     {
-        return $this->scopeConfig->getValue(
-            ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_ENABLE_KEY, ScopeInterface::SCOPE_STORE, $storeId
+        $isEnable =  $this->scopeConfig->getValue(
+            ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_ENABLE_KEY, ScopeInterface::SCOPE_STORE
         );
+        if (!$isEnable){
+            $this->logger->info('Share Of Checkout is not enabled',[$isEnable]);
+            throw new InvalidArgumentException('Share Of Checkout is not enabled');
+        }
+        return $isEnable;
     }
 
     /**
@@ -114,7 +119,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
     public function shareDay():void
     {
         if (!$this->almaClient){
-            throw new \InvalidArgumentException('Alma client is not define');
+            throw new InvalidArgumentException('Alma client is not define');
         }
         $res=null;
         try {
@@ -329,9 +334,15 @@ class ShareOfCheckoutHelper extends AbstractHelper
      */
     public function getShareOfCheckoutEnabledDate():string
     {
-        return $this->scopeConfig->getValue(
+        $shareOfCheckoutEnabledDate = $this->scopeConfig->getValue(
             $this->getShareOfCheckoutDateKey(), ScopeInterface::SCOPE_STORE
-        );    }
+        );
+        if($shareOfCheckoutEnabledDate == ''){
+            $this->logger->info('No enable date in config',[]);
+            throw new InvalidArgumentException('No enable date in config');
+        }
+        return $shareOfCheckoutEnabledDate;
+    }
 
     /**
      * @return void
