@@ -7,7 +7,6 @@ use Alma\MonthlyPayments\Helpers\DateHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckoutHelper;
 
-
 class ShareOfCheckout
 {
     /**
@@ -32,35 +31,39 @@ class ShareOfCheckout
         Logger $logger,
         ShareOfCheckoutHelper $shareOfCheckoutHelper,
         DateHelper $dateHelper
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
         $this->dateHelper = $dateHelper;
     }
 
     /**
+     *
      * @return void
      */
-    public function shareDays():void
+    public function shareDays(): void
     {
         ini_set('max_execution_time', 30);
-        try {
-            $this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled();
-            $shareOfCheckoutEnabledDate = $this->shareOfCheckoutHelper->getShareOfCheckoutEnabledDate();
-            $lastUpdateDate = $this->shareOfCheckoutHelper->getLastUpdateDate();
-        } catch (RequestError $e) {
-            $this->logger->info('Get Last Update Date error - end of process - message : ',[$e->getMessage()]);
+
+        if (!$this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()) {
             return;
         }
 
-        $DatesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate,$shareOfCheckoutEnabledDate);
+        try {
+            $shareOfCheckoutEnabledDate = $this->shareOfCheckoutHelper->getShareOfCheckoutEnabledDate();
+            $lastUpdateDate = $this->shareOfCheckoutHelper->getLastUpdateDate();
+        } catch (RequestError $e) {
+            $this->logger->info('Get Last Update Date error - end of process - message : ', [$e->getMessage()]);
+            return;
+        }
+
+        $DatesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate, $shareOfCheckoutEnabledDate);
         foreach ($DatesToShare as $date) {
             try {
                 $this->shareOfCheckoutHelper->setShareOfCheckoutFromDate($date);
                 $this->shareOfCheckoutHelper->shareDay();
             } catch (RequestError $e) {
-                $this->logger->info('Share of checkout error - end of process - message : ',[$e->getMessage()]);
+                $this->logger->info('Share of checkout error - end of process - message : ', [$e->getMessage()]);
                 return;
             }
         }

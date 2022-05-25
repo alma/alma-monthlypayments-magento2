@@ -12,16 +12,15 @@ use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 
-
 class ShareOfCheckoutHelper extends AbstractHelper
 {
-    const TOTAL_COUNT_KEY="total_order_count";
-    const TOTAL_AMOUNT_KEY="total_amount";
-    const COUNT_KEY="order_count";
-    const AMOUNT_KEY="amount";
-    const CURRENCY_KEY="currency";
-    const PAYMENT_METHOD_KEY="payment_method_name";
-    const SHARED_ORDER_STATES=['processing','complete'];
+    const TOTAL_COUNT_KEY = "total_order_count";
+    const TOTAL_AMOUNT_KEY = "total_amount";
+    const COUNT_KEY = "order_count";
+    const AMOUNT_KEY = "amount";
+    const CURRENCY_KEY = "currency";
+    const PAYMENT_METHOD_KEY = "payment_method_name";
+    const SHARED_ORDER_STATES = ['processing', 'complete'];
     const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
     const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
 
@@ -82,8 +81,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
         AlmaClient $almaClient,
         Context $context,
         WriterInterface $configWriter
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->logger = $logger;
         $this->collectionFactory = $collectionFactory;
@@ -100,31 +98,27 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return bool
      */
-    public function shareOfCheckoutIsEnabled():bool
+    public function shareOfCheckoutIsEnabled(): bool
     {
-        $isEnable =  $this->scopeConfig->getValue(
-            ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_ENABLE_KEY, ScopeInterface::SCOPE_STORE
+        return $this->scopeConfig->getValue(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_ENABLE_KEY,
+            ScopeInterface::SCOPE_STORE
         );
-        if (!$isEnable){
-            $this->logger->info('Share Of Checkout is not enabled',[$isEnable]);
-            throw new InvalidArgumentException('Share Of Checkout is not enabled');
-        }
-        return $isEnable;
     }
 
     /**
      * @return void
      * @throws RequestError
      */
-    public function shareDay():void
+    public function shareDay(): void
     {
-        if (!$this->almaClient){
+        if (!$this->almaClient) {
             throw new InvalidArgumentException('Alma client is not define');
         }
-        $res=null;
+        $res = null;
         try {
             $payload = $this->getPayload();
-            $this->logger->info('Share of checkout payload',[$payload]);
+            $this->logger->info('Share of checkout payload', [$payload]);
             $this->almaClient->shareOfCheckout->share($this->getPayload());
         } catch (RequestError $e) {
             throw new RequestError($e->getMessage(), null, $res);
@@ -138,54 +132,53 @@ class ShareOfCheckoutHelper extends AbstractHelper
      * @return string
      * @throws RequestError
      */
-    public function getLastUpdateDate():string
+    public function getLastUpdateDate(): string
     {
-        $lastUpdateByApi =null;
-        if (!$this->almaClient){
-            throw new \InvalidArgumentException('Alma client is not define');
+        if (!$this->almaClient) {
+            throw new InvalidArgumentException('Alma client is not define');
         }
         try {
             $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
-            return date('Y-m-d',$lastUpdateByApi['end_time']);
+            return date('Y-m-d', $lastUpdateByApi['end_time']);
         } catch (RequestError $e) {
-            if($e->response->responseCode == '404'){
-                return date('Y-m-d',strtotime('-2 days'));
+            if ($e->response->responseCode == '404') {
+                return date('Y-m-d', strtotime('-2 days'));
             }
             throw new RequestError($e->getMessage(), null);
         }
     }
 
     /**
-     * @param $startTime
+     * @param string $startTime
      * @return void
      */
-    public function setShareOfCheckoutFromDate($startTime):void
+    public function setShareOfCheckoutFromDate(string $startTime): void
     {
-        $this->startTime = $startTime.' 00:00:00';
-        $this->endTime   = $startTime.' 23:59:59';
+        $this->startTime = $startTime . ' 00:00:00';
+        $this->endTime   = $startTime . ' 23:59:59';
     }
 
     /**
      * @return OrderSearchResultInterface
      */
-    private function getShareOfCheckoutOrderCollection():OrderSearchResultInterface
+    private function getShareOfCheckoutOrderCollection(): OrderSearchResultInterface
     {
-        if(count($this->orderCollection)){
+        if (count($this->orderCollection)) {
             return $this->orderCollection;
         }
         $this->orderCollection = $this->collectionFactory->create()->addAttributeToSelect('*')->addFieldToFilter('created_at', [
             'from' => [$this->getShareOfCheckoutFromDate()],
             'to' => [$this->getShareOfCheckoutToDate()],
-        ])->addFieldToFilter('state',['in'=> self::SHARED_ORDER_STATES]);
+        ])->addFieldToFilter('state', ['in' => self::SHARED_ORDER_STATES]);
         return $this->orderCollection;
     }
 
     /**
      * @return array
      */
-    private function getTotalsOrders():array
+    private function getTotalsOrders(): array
     {
-        if(count($this->totalShareOfCheckoutOrders)){
+        if (count($this->totalShareOfCheckoutOrders)) {
             return $this->totalShareOfCheckoutOrders;
         }
 
@@ -193,11 +186,10 @@ class ShareOfCheckoutHelper extends AbstractHelper
 
         $ordersByCurrency = [];
         /** @var OrderInterface $order */
-        foreach ($this->orderCollection as $order)
-        {
+        foreach ($this->orderCollection as $order) {
             $currency = $this->orderHelper->getOrderCurrency($order);
-            if (!isset($ordersByCurrency[$currency])){
-                $ordersByCurrency[$currency]=$this->initTotalOrderResult($currency);
+            if (!isset($ordersByCurrency[$currency])) {
+                $ordersByCurrency[$currency] = $this->initTotalOrderResult($currency);
             }
             $ordersByCurrency[$currency][self::TOTAL_AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
             $ordersByCurrency[$currency][self::TOTAL_COUNT_KEY] ++ ;
@@ -209,60 +201,58 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return array
      */
-    private function getTotalsPaymentMethods():array
+    private function getTotalsPaymentMethods(): array
     {
-        if(count($this->totalShareOfCheckoutCheckouts)){
+        if (count($this->totalShareOfCheckoutCheckouts)) {
             return $this->totalShareOfCheckoutCheckouts;
         }
         $this->checkOrderCollectionExist();
 
         $ordersByCheckouts = [];
         /** @var OrderInterface $order */
-        foreach ($this->orderCollection as $order)
-        {
+        foreach ($this->orderCollection as $order) {
             $paymentMethodCode = $this->orderHelper->getOrderPaymentMethodCode($order);
-            if(!isset($ordersByCheckouts[$paymentMethodCode])){
-                $ordersByCheckouts[$paymentMethodCode]=['orders'=>[]];
+            if (!isset($ordersByCheckouts[$paymentMethodCode])) {
+                $ordersByCheckouts[$paymentMethodCode] = ['orders' => []];
             }
             $currency = $this->orderHelper->getOrderCurrency($order);
-            if(!isset($ordersByCheckouts[$paymentMethodCode]['orders'][$currency])){
-                $ordersByCheckouts[$paymentMethodCode]['orders'][$currency]=$this->initOrderResult($currency);
+            if (!isset($ordersByCheckouts[$paymentMethodCode]['orders'][$currency])) {
+                $ordersByCheckouts[$paymentMethodCode]['orders'][$currency] = $this->initOrderResult($currency);
             }
             $ordersByCheckouts[$paymentMethodCode][self::PAYMENT_METHOD_KEY] = $paymentMethodCode;
             $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
             $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::COUNT_KEY] ++;
         }
-        foreach ($ordersByCheckouts as $paymentKey => $paymentMethodOrders)
-        {
-            $ordersByCheckouts[$paymentKey]['orders']= array_values($paymentMethodOrders['orders']);
+        foreach ($ordersByCheckouts as $paymentKey => $paymentMethodOrders) {
+            $ordersByCheckouts[$paymentKey]['orders'] = array_values($paymentMethodOrders['orders']);
         }
         $this->totalShareOfCheckoutCheckouts = array_values($ordersByCheckouts);
         return $this->totalShareOfCheckoutCheckouts;
     }
 
     /**
-     * @param $currency
+     * @param string $currency
      * @return array
      */
-    private function initOrderResult($currency):array
+    private function initOrderResult(string $currency): array
     {
-        return [self::AMOUNT_KEY=>0,self::COUNT_KEY=>0,self::CURRENCY_KEY=>$currency];
+        return [self::AMOUNT_KEY => 0, self::COUNT_KEY => 0, self::CURRENCY_KEY => $currency];
     }
     /**
      * @param $currency
      * @return array
      */
-    private function initTotalOrderResult($currency):array
+    private function initTotalOrderResult($currency): array
     {
-        return [self::TOTAL_AMOUNT_KEY=>0,self::TOTAL_COUNT_KEY=>0,self::CURRENCY_KEY=>$currency];
+        return [self::TOTAL_AMOUNT_KEY => 0, self::TOTAL_COUNT_KEY => 0, self::CURRENCY_KEY => $currency];
     }
 
     /**
      * @return void
      */
-    private function checkOrderCollectionExist():void
+    private function checkOrderCollectionExist(): void
     {
-        if(!count($this->orderCollection)){
+        if (!count($this->orderCollection)) {
             $this->getShareOfCheckoutOrderCollection();
         }
     }
@@ -270,23 +260,23 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return string
      */
-    private function getShareOfCheckoutFromDate():string
+    private function getShareOfCheckoutFromDate(): string
     {
-        if(isset($this->startTime)){
+        if (isset($this->startTime)) {
             return $this->startTime;
         }
-        return date('Y-m-d',strtotime('yesterday')).' 00:00:00';
+        return date('Y-m-d', strtotime('yesterday')) . ' 00:00:00';
     }
 
     /**
      * @return string
      */
-    private function getShareOfCheckoutToDate():string
+    private function getShareOfCheckoutToDate(): string
     {
-        if(isset($this->endTime)){
+        if (isset($this->endTime)) {
             return $this->endTime;
         }
-        return date('Y-m-d',strtotime('yesterday')).' 23:59:59';
+        return date('Y-m-d', strtotime('yesterday')) . ' 23:59:59';
     }
 
     /**
@@ -295,17 +285,17 @@ class ShareOfCheckoutHelper extends AbstractHelper
     private function getPayload(): array
     {
         return [
-            "start_time"=> $this->getShareOfCheckoutFromDate(),
-            "end_time"  => $this->getShareOfCheckoutToDate(),
-            "orders"    => $this->getTotalsOrders(),
-            "payment_methods" => $this->getTotalsPaymentMethods()
+            "start_time"        => $this->getShareOfCheckoutFromDate(),
+            "end_time"          => $this->getShareOfCheckoutToDate(),
+            "orders"            => $this->getTotalsOrders(),
+            "payment_methods"   => $this->getTotalsPaymentMethods()
         ];
     }
 
     /**
      * @return void
      */
-    public function flushOrderCollection():void
+    public function flushOrderCollection(): void
     {
         $this->orderCollection = [];
         $this->totalShareOfCheckoutOrders = [];
@@ -315,13 +305,14 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getShareOfCheckoutEnabledDate():string
+    public function getShareOfCheckoutEnabledDate(): string
     {
         $shareOfCheckoutEnabledDate = $this->scopeConfig->getValue(
-            $this->getShareOfCheckoutDateKey(), ScopeInterface::SCOPE_STORE
+            $this->getShareOfCheckoutDateKey(),
+            ScopeInterface::SCOPE_STORE
         );
-        if($shareOfCheckoutEnabledDate == ''){
-            $this->logger->info('No enable date in config',[]);
+        if ($shareOfCheckoutEnabledDate == '') {
+            $this->logger->info('No enable date in config', []);
             throw new InvalidArgumentException('No enable date in config');
         }
         return $shareOfCheckoutEnabledDate;
@@ -330,19 +321,19 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return void
      */
-    private function writeLogs():void
+    private function writeLogs(): void
     {
-        $this->logger->info('Share start date',[$this->getShareOfCheckoutFromDate()]);
-        $this->logger->info('Orders send',[$this->getShareOfCheckoutOrderCollection()->count()]);
+        $this->logger->info('Share start date', [$this->getShareOfCheckoutFromDate()]);
+        $this->logger->info('Orders send', [$this->getShareOfCheckoutOrderCollection()->count()]);
     }
 
     /**
-     * @param $date
+     * @param string $date
      * @return void
      */
-    public function saveShareOfCheckoutDate($date): void
+    public function saveShareOfCheckoutDate(string $date): void
     {
-        $this->configWriter->save($this->getShareOfCheckoutDateKey(),$date);
+        $this->configWriter->save($this->getShareOfCheckoutDateKey(), $date);
     }
 
     /**
@@ -356,8 +347,8 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return string
      */
-    private function getShareOfCheckoutDateKey():string
+    private function getShareOfCheckoutDateKey(): string
     {
-        return ConfigHelper::XML_PATH_PAYMENT.'/'.ConfigHelper::XML_PATH_METHODE.'/'.self::SHARE_CHECKOUT_DATE_KEY;
+        return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_DATE_KEY;
     }
 }
