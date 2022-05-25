@@ -46,7 +46,7 @@ class ShareOfCheckout
         ini_set('max_execution_time', 30);
 
         if (!$this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()) {
-            return;
+            return ;
         }
 
         try {
@@ -57,11 +57,10 @@ class ShareOfCheckout
             return;
         }
 
-        $DatesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate, $shareOfCheckoutEnabledDate);
-        foreach ($DatesToShare as $date) {
+        $datesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate, $shareOfCheckoutEnabledDate);
+        foreach ($datesToShare as $date) {
             try {
-                $this->shareOfCheckoutHelper->setShareOfCheckoutFromDate($date);
-                $this->shareOfCheckoutHelper->shareDay();
+                $this->shareOfCheckoutHelper->shareDay($date);
             } catch (RequestError $e) {
                 $this->logger->info('Share of checkout error - end of process - message : ', [$e->getMessage()]);
                 return;
