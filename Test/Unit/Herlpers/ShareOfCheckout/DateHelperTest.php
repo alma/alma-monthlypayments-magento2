@@ -26,72 +26,65 @@ class DateHelperTest extends TestCase
     {
         $this->assertInstanceOf(AbstractHelper::class, $this->dateHelper);
     }
-
-    public function testGetDateIntervalShouldReturnAnArray(): void
+    public function getDataIntervalProvider(): array
     {
-        $activationDate = '2022-03-01';
-        $from = '';
-        $to = '';
-        $this->assertIsArray($this->dateHelper->getDatesInInterval($activationDate, $from, $to));
+        $now = time();
+        return [
+            'should return only 1 day' => [
+                '2022-01-01',
+                '2022-04-02',
+                '2022-04-03',
+                ['2022-04-02']
+            ],
+            'should return various days' => [
+                '2022-01-01',
+                '2022-04-01',
+                '2022-04-04',
+                ['2022-04-01','2022-04-02','2022-04-03']
+            ],
+            'should not be return days before activation day' => [
+                '2022-04-29',
+                '2022-04-01',
+                '2022-05-03',
+                ['2022-04-30','2022-05-01','2022-05-02']
+            ],
+            'should use yesterday if to date is empty' => [
+                '2022-01-01',
+                date('Y-m-d', strtotime('-3 day', $now)),
+                '',
+                [date('Y-m-d', strtotime('-3 day', $now)),date('Y-m-d', strtotime('-2 day', $now)),date('Y-m-d', strtotime('-1 day', $now))]
+            ],
+        ];
     }
 
-    public function testGetDateIntervalShouldReturnDay02(): void
+    public function getErrorsDataIntervalProvider(): array
     {
-        $activationDate = '2022-03-01';
-        $from = '2022-04-01';
-        $to = '2022-04-02';
-        $this->assertEquals(['2022-04-01'], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-        ;
+        return [
+            'No return with empty activation date' => [
+            '',
+            '2022-04-02',
+            '2022-04-04'
+            ],
+            'No return with empty from date' => [
+            '2022-01-01',
+            '',
+            '2022-04-04'
+            ],
+        ];
     }
-    public function testGetDateIntervalShouldReturnDay03(): void
+
+    /**
+     * @dataProvider getDataIntervalProvider
+     */
+    public function testGetDateInterval($activationDate, $from, $to, $expected): void
     {
-        $activationDate = '2022-03-01';
-        $from = '2022-04-02';
-        $to = '2022-04-03';
-        $this->assertEquals(['2022-04-02'], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-        ;
+        $this->assertEquals($expected, $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
     }
-    public function testGetDateIntervalShouldReturnDay02And03(): void
+    /**
+     * @dataProvider getErrorsDataIntervalProvider
+     */
+    public function testGetDateIntervalErrors($activationDate, $from, $to): void
     {
-        $activationDate = '2022-03-01';
-        $from = '2022-04-01';
-        $to = '2022-04-03';
-        $this->assertEquals(['2022-04-01','2022-04-02'], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-    }
-    public function testGetDateIntervalShouldReturnDay02And03And04(): void
-    {
-        $activationDate = '2022-03-01';
-        $from = '2022-04-01';
-        $to = '2022-04-04';
-        $this->assertEquals(['2022-04-01','2022-04-02','2022-04-03'], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-    }
-    public function testGetDateIntervalShouldNotReturnDateBeforeActivationDate(): void
-    {
-        $activationDate = '2022-04-29';
-        $from = '2022-04-25';
-        $to = '2022-05-03';
-        $this->assertEquals(['2022-04-30','2022-05-01','2022-05-02'], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-    }
-    public function testGetDateIntervalShouldUseYesterdayDateIdToIsUndefined(): void
-    {
-        $activationDate = '2020-01-01';
-        $from = date('Y-m-d', strtotime('-4 day', time()));
-        $to = '';
-        $this->assertEquals([date('Y-m-d', strtotime('-4 day', time())),date('Y-m-d', strtotime('-3 day', time())),date('Y-m-d', strtotime('-2 day', time())),date('Y-m-d', strtotime('-1 day', time()))], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-    }
-    public function testGetDateIntervalShouldReturnVoidArrayWithoutActivationDate(): void
-    {
-        $activationDate = '';
-        $from = '2022-04-25';
-        $to = '2022-05-02';
         $this->assertEquals([], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
     }
-    public function testGetDateIntervalShouldReturnVoidArrayWithoutFromDate(): void
-    {
-        $activationDate = '2022-01-01';
-        $from = '';
-        $to = '2022-05-02';
-        $this->assertEquals([], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
-    }
-
 }

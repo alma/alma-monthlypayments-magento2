@@ -3,17 +3,9 @@
 namespace Alma\MonthlyPayments\Helpers\ShareOfCheckout;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
 
 class DateHelper extends AbstractHelper
 {
-    /**
-     * @param Context $context
-     */
-    public function __construct(Context $context)
-    {
-        parent::__construct($context);
-    }
 
     /**
      *
