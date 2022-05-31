@@ -66,7 +66,7 @@ class DateHelperTest extends TestCase
             '2022-03-04'
             ],
             'No return with empty from date' => [
-            '2022-02-01',
+            '2021-02-03',
             '',
             '2022-04-04'
             ],
