@@ -3,9 +3,9 @@
 namespace Alma\MonthlyPayments\Cron;
 
 use Alma\API\RequestError;
-use Alma\MonthlyPayments\Helpers\DateHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Alma\MonthlyPayments\Helpers\ShareOfCheckoutHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\DateHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\ShareOfCheckoutHelper;
 
 class ShareOfCheckout
 {
@@ -43,8 +43,7 @@ class ShareOfCheckout
      */
     public function shareDays(): void
     {
-        ini_set('max_execution_time', 30);
-
+        ini_set('max_execution_time', 60);
         if (!$this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()) {
             return ;
         }
