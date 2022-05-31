@@ -17,6 +17,11 @@ class DateHelperTest extends TestCase
         $this->dateHelper = new DateHelper($context);
     }
 
+    public function tearDown(): void
+    {
+        $this->dateHelper = null;
+    }
+
     public function testInstanceDateHelper(): void
     {
         $this->assertInstanceOf(DateHelper::class, $this->dateHelper);

@@ -21,6 +21,11 @@ class PayloadBuilderTest extends TestCase
         $this->payloadBuilder = new PayloadBuilder($context, $this->dateHelper, $this->orderHelper);
     }
 
+    public function tearDown(): void
+    {
+        $this->payloadBuilder = null;
+    }
+
     public function testInstancePayloadBuilder(): void
     {
         $this->assertInstanceOf(PayloadBuilder::class, $this->payloadBuilder);

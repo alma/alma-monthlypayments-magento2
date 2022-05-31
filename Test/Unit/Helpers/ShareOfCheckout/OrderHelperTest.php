@@ -26,6 +26,11 @@ class OrderHelperTest extends TestCase
         $this->orderHelper = new OrderHelper($context, $this->collectionFactory, $orderHelper, $dateHelper);
     }
 
+    public function tearDown(): void
+    {
+        $this->orderHelper = null;
+    }
+
     public function testInstancePayloadBuilder(): void
     {
         $this->assertInstanceOf(OrderHelper::class, $this->orderHelper);
