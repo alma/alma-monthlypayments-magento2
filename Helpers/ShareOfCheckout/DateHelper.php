@@ -6,6 +6,14 @@ use Magento\Framework\App\Helper\AbstractHelper;
 
 class DateHelper extends AbstractHelper
 {
+    /**
+     * @var string
+     */
+    private $endTime;
+    /**
+     * @var string
+     */
+    private $startTime;
 
     /**
      *
@@ -35,9 +43,40 @@ class DateHelper extends AbstractHelper
         return $datesInInterval;
     }
 
+    /**
+     * @param string $date
+     *
+     * @return string
+     */
     private function dateMoreOneDay(string $date): string
     {
         return date('Y-m-d', strtotime('+1 day', strtotime($date)));
     }
 
+
+    /**
+     * @param $date
+     *
+     * @return void
+     */
+    public function setShareDates($date): void
+    {
+        $this->startTime = $date . ' 00:00:00';
+        $this->endTime   = $date . ' 23:59:59';
+    }
+
+    /**
+     * @return string
+     */
+    public function getStartDate(): string
+    {
+        return $this->startTime;
+    }
+    /**
+     * @return string
+     */
+    public function getEndDate(): string
+    {
+        return $this->endTime;
+    }
 }
