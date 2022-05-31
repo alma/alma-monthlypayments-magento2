@@ -119,11 +119,11 @@ class OrderHelper extends AbstractHelper
     }
 
     /**
-     * @param OrderSearchResultInterface $orderCollection
+     * @param OrderSearchResultInterface|array $orderCollection
      *
      * @return void
      */
-    public function setOrderCollection(OrderSearchResultInterface $orderCollection): void
+    public function setOrderCollection($orderCollection): void
     {
         $this->orderCollection = $orderCollection;
     }

@@ -115,14 +115,14 @@ class ShareOfCheckoutHelper extends AbstractHelper
     public function getLastUpdateDate(): string
     {
         if (!$this->almaClient) {
-            throw new InvalidArgumentException('Alma client is not define');
+            throw new InvalidArgumentException('Alma client is not defined');
         }
         try {
             $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
             return date('Y-m-d', $lastUpdateByApi['end_time']);
         } catch (RequestError $e) {
             if ($e->response->responseCode == '404') {
-                return date('Y-m-d', strtotime('-2 days'));
+                return date('Y-m-d', strtotime('-1 day'));
             }
             throw new RequestError($e->getMessage(), null);
         }
@@ -137,7 +137,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
             $this->getShareOfCheckoutDateKey(),
             ScopeInterface::SCOPE_STORE
         );
-        if ($shareOfCheckoutEnabledDate == '') {
+        if (empty($shareOfCheckoutEnabledDate)) {
             $this->logger->info('No enable date in config', []);
             throw new InvalidArgumentException('No enable date in config');
         }

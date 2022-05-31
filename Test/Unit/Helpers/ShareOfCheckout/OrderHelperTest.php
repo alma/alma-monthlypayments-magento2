@@ -7,6 +7,7 @@ use Alma\MonthlyPayments\Helpers\ShareOfCheckout\DateHelper;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\OrderHelper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +41,7 @@ class OrderHelperTest extends TestCase
         $expectedResult = [
             'total_order_count' => 0,
             'total_amount' => 0,
-            'currency' => 'EUR',
+            'currency' => self::EURO_CURRENCY,
             ];
         $this->assertEquals($expectedResult, $this->orderHelper->initTotalOrderResult(self::EURO_CURRENCY));
     }
@@ -50,7 +51,7 @@ class OrderHelperTest extends TestCase
         $expectedResult = [
             'order_count' => 0,
             'amount' => 0,
-            'currency' => 'EUR',
+            'currency' => self::EURO_CURRENCY,
         ];
         $this->assertEquals($expectedResult, $this->orderHelper->initOrderResult(self::EURO_CURRENCY));
     }
@@ -73,13 +74,6 @@ class OrderHelperTest extends TestCase
             )
             ->willReturnSelf();
         $this->orderHelper->createOrderCollection();
-    }
-
-    public function testGerOrderCollection(): void
-    {
-        $mockOrderSearchResultInterface = $this->createMock(OrderSearchResultInterface::class);
-        $this->orderHelper->setOrderCollection($mockOrderSearchResultInterface);
-        $this->assertEquals($mockOrderSearchResultInterface, $this->orderHelper->getOrderCollection());
     }
 
 }

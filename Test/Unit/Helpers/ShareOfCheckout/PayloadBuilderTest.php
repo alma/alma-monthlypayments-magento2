@@ -17,8 +17,8 @@ class PayloadBuilderTest extends TestCase
     {
         $context = $this->createMock(Context::class);
         $this->dateHelper = $this->createMock(DateHelper::class);
-        $this->orderHerlper = $this->createMock(OrderHelper::class);
-        $this->payloadBuilder = new PayloadBuilder($context, $this->dateHelper, $this->orderHerlper);
+        $this->orderHelper = $this->createMock(OrderHelper::class);
+        $this->payloadBuilder = new PayloadBuilder($context, $this->dateHelper, $this->orderHelper);
     }
 
     public function testInstancePayloadBuilder(): void
