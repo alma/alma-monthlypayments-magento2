@@ -19,9 +19,9 @@ class OrderHelper extends AbstractHelper
     const PAYMENT_METHOD_KEY = "payment_method_name";
 
     /**
-     * @var array
+     * @var OrderSearchResultInterface|null
      */
-    private $orderCollection;
+    private $orderCollection = null;
     /**
      * @var CollectionFactory
      */
@@ -53,7 +53,6 @@ class OrderHelper extends AbstractHelper
         $this->collectionFactory = $collectionFactory;
         $this->orderHelper = $orderHelper;
         $this->dateHelper = $dateHelper;
-        $this->orderCollection = [];
     }
 
     /**
@@ -119,21 +118,21 @@ class OrderHelper extends AbstractHelper
     }
 
     /**
-     * @param OrderSearchResultInterface|array $orderCollection
+     * @param OrderSearchResultInterface|null $orderCollection
      *
      * @return void
      */
-    public function setOrderCollection($orderCollection): void
+    public function setOrderCollection(?OrderSearchResultInterface $orderCollection): void
     {
         $this->orderCollection = $orderCollection;
     }
 
     /**
-     * @return OrderSearchResultInterface
+     * @return OrderSearchResultInterface|null
      */
-    public function getOrderCollection(): OrderSearchResultInterface
+    public function getOrderCollection(): ?OrderSearchResultInterface
     {
-        if (!count($this->orderCollection)) {
+        if (!$this->orderCollection) {
             $this->createOrderCollection();
         }
         return $this->orderCollection;
@@ -159,7 +158,7 @@ class OrderHelper extends AbstractHelper
      */
     public function flushOrderCollection(): void
     {
-        $this->orderCollection = [];
+        $this->orderCollection = null;
     }
 
 }
