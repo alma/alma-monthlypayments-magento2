@@ -28,6 +28,7 @@ namespace Alma\MonthlyPayments\Helpers;
 use Alma\API\Entities\Instalment;
 use Alma\API\Entities\Payment;
 use Alma\API\RequestError;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationError;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Phrase;
