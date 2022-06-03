@@ -162,15 +162,7 @@ class PaymentValidationTest extends TestCase
 
     private function createNewPaymentValidation(): PaymentValidation
     {
-        return new PaymentValidation(
-            $this->logger,
-            $this->checkoutSession,
-            $this->almaClient,
-            $this->paymentProcessor,
-            $this->quoteRepository,
-            $this->builderInterface,
-            $this->orderHelper
-        );
+        return new PaymentValidation(...$this->getConstructorDependency());
     }
     private function getConstructorDependency(): array
     {
