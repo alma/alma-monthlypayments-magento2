@@ -33,26 +33,10 @@ class RefundDataBuilder implements BuilderInterface
     public function build(array $buildSubject): array
     {
         /** @var PaymentDataObject $buildSubject['payment'] */
-        $refundPayload['payment_id'] =  $this->getAlmaPaymentId($buildSubject['payment']);
-        $refundPayload['merchant_id'] = $this->getAlmaMerchantId();
+        $refundPayload['payment_id'] =  $buildSubject['payment']->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
+        $refundPayload['merchant_id'] = $this->config->getMerchantId();
         $refundPayload['amount'] = $buildSubject['amount'];
         return $refundPayload;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlmaMerchantId(): string
-    {
-        return $this->config->getMerchantId();
-    }
-    /**
-     * @param InfoInterface $payment
-     *
-     * @return string
-     */
-    public function getAlmaPaymentId(InfoInterface $payment): string
-    {
-        return $payment->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
-    }
 }
