@@ -4,6 +4,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Request\RefundDataBuilder;
+use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Model\Info;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,8 @@ class RefundDataBuilderTest extends TestCase
         $this->assertInstanceOf(BuilderInterface::class, $this->createNewRefundDataBuilder());
     }
 
+
+
     public function testRefundPayloadStructure(): void
     {
         $mockPaymentId = 'payment_11uNKOn3uuKhgUdY2eU6AZF1oKifmetCKZ';
@@ -30,15 +33,18 @@ class RefundDataBuilderTest extends TestCase
             ->method('getAdditionalInformation')
             ->with(Config::ORDER_PAYMENT_ID)
             ->willReturn($mockPaymentId);
+        $paymentDataObject = $this->createMock(PaymentDataObject::class);
+        $paymentDataObject->expects($this->once())
+            ->method('getPayment')
+            ->willReturn($infoPaymentMock);
         $buildSubjectMock = [
-            'payment' => $infoPaymentMock,
+            'payment' => $paymentDataObject,
             'amount' => $mockAmount
         ];
         $this->config->expects($this->once())
             ->method('getMerchantId')
             ->willReturn($mockMerchantId);
         $refundDataBuilder = $this->createNewRefundDataBuilder();
-
         $resultMock = [
             'payment_id' => $mockPaymentId,
             'merchant_id' => $mockMerchantId,

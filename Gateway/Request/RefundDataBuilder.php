@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Model\InfoInterface;
@@ -33,7 +34,9 @@ class RefundDataBuilder implements BuilderInterface
     public function build(array $buildSubject): array
     {
         /** @var PaymentDataObject $buildSubject['payment'] */
-        $refundPayload['payment_id'] =  $buildSubject['payment']->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
+        $payment = $buildSubject['payment']->getPayment();
+        /** @var InfoInterface $payment */
+        $refundPayload['payment_id'] =  $payment->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
         $refundPayload['merchant_id'] = $this->config->getMerchantId();
         $refundPayload['amount'] = $buildSubject['amount'];
         return $refundPayload;

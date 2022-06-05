@@ -23,46 +23,59 @@
  *
  */
 
-namespace Alma\MonthlyPayments\Gateway\Http;
+namespace Alma\MonthlyPayments\Gateway\Http\Client;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
-use Magento\Payment\Gateway\Http\TransferBuilder;
-use Magento\Payment\Gateway\Http\TransferFactoryInterface;
+use Alma\API\RequestError;
+use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 
-class TransferFactory implements TransferFactoryInterface
+class RefundClient implements ClientInterface
 {
-    /**
-     * @var TransferBuilder
-     */
-    private $transferBuilder;
-    /**
-     * @var Config
-     */
-    private $config;
 
     /**
-     * @param TransferBuilder $transferBuilder
-     * @param Config $config
+     * @var Logger
+     */
+    private $logger;
+
+    /** @var \Alma\API\Client|null */
+    private $alma;
+
+    /**
+     * @param Logger $logger
+     * @param AlmaClient $almaClient
      */
     public function __construct(
-        TransferBuilder $transferBuilder,
-        Config $config
+        Logger $logger,
+        AlmaClient $almaClient
     ) {
-        $this->transferBuilder = $transferBuilder;
-        $this->config = $config;
+        $this->logger = $logger;
+        $this->alma = $almaClient->getDefaultClient();
     }
 
     /**
-     * Builds gateway transfer object
+     * Places request to gateway. Returns result as ENV array
      *
-     * @param array $request
-     * @return TransferInterface
+     * @param TransferInterface $transferObject
+     * @return array
      */
-    public function create(array $request): TransferInterface
+    public function placeRequest(TransferInterface $transferObject): array
     {
-        return $this->transferBuilder
-            ->setBody($request)
-            ->build();
+        try {
+            $payloadData = $transferObject->getBody();
+            $refund = $this->alma->payments->partialRefund($payloadData['payment_id'], Functions::PriceToCents($payloadData['amount']), $payloadData['merchant_id'], 'Refund with Magento 2 module');
+        } catch (RequestError $e) {
+            $this->logger->error("Error creating refund:", [$e]);
+            return [
+                'resultCode' => 0,
+                'fails' => $e->response,
+            ];
+        }
+        return [
+            'resultCode' => 1,
+            'almaRefund' => $refund,
+        ];
     }
 }
