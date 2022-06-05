@@ -40,7 +40,7 @@ class Functions
      * @param $price
      * @return int
      */
-    public static function priceToCents($price)
+    public static function priceToCents($price): int
     {
         return (int)(round($price * 100));
     }
