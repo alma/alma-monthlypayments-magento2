@@ -115,15 +115,13 @@ class PaymentDataBuilder implements BuilderInterface
                 'quote_id' => $quoteId,
             ],
         ];
-        $this->logger->info('Create payment for order_id: ',[$orderId]);
-        $configArray = $this->trigger($configArray,$planConfig);
-        return ['payment' => array_merge($planConfig->getPaymentData(),$configArray)];
+        $configArray = $this->trigger($configArray, $planConfig);
+        return ['payment' => array_merge($planConfig->getPaymentData(), $configArray)];
     }
 
-    private function trigger($configArray,$planConfig):array
+    private function trigger($configArray, $planConfig): array
     {
-        if ($this->configHelper->triggerIsEnabled() && $planConfig->hasDeferredTrigger()){
-            $this->logger->info('Add trigger data for plan : ',[$planConfig->plankey()]);
+        if ($this->configHelper->triggerIsEnabled() && $planConfig->hasDeferredTrigger()) {
             $configArray['deferred'] = 'trigger';
             $configArray['deferred_description'] = $this->configHelper->getTranslatedTrigger();
         }
