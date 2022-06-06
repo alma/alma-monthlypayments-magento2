@@ -23,6 +23,7 @@ class RefundDataBuilder implements BuilderInterface
 
     /**
      * @param Config $config
+     * @param OrderRepository $orderRepository
      */
     public function __construct(
         Config $config,
@@ -36,6 +37,8 @@ class RefundDataBuilder implements BuilderInterface
      * @param array $buildSubject
      *
      * @return array
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function build(array $buildSubject): array
     {
