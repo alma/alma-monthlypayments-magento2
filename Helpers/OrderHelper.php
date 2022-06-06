@@ -20,18 +20,6 @@ class OrderHelper
     /**
      * @param OrderInterface $order
      *
-     * @return int
-     */
-    public function getOrderPaymentAmount(OrderInterface $order): int
-    {
-        /** @var OrderPaymentInterface $payment */
-        $payment = $order->getPayment();
-        return Functions::priceToCents($payment->getAmountPaid() - $payment->getAmountRefunded());
-    }
-
-    /**
-     * @param OrderInterface $order
-     *
      * @return string
      */
     public function getOrderPaymentMethodCode(OrderInterface $order): string

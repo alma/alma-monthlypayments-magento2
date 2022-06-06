@@ -2,13 +2,14 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers\ShareOfCheckout;
 
-use Alma\MonthlyPayments\Helpers\OrderHelper as GlobalOrderHelper;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\DateHelper;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\OrderHelper;
-use Alma\MonthlyPayments\Test\Stub\StubOrder;
-use Alma\MonthlyPayments\Test\Stub\StubOrderCollection;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\TestFramework\Unit\Helper\ObjectManager as ObjectManagerHelper;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Api\Data\OrderSearchResultInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use PHPUnit\Framework\TestCase;
@@ -19,11 +20,9 @@ class OrderHelperTest extends TestCase
 
     public function setUp(): void
     {
-        $context = $this->createMock(Context::class);
+        $this->context = $this->createMock(Context::class);
         $this->collectionFactory = $this->createMock(CollectionFactory::class);
-        $orderHelper = $this->createMock(GlobalOrderHelper::class);
-        $dateHelper = $this->createMock(DateHelper::class);
-        $this->orderHelper = new OrderHelper($context, $this->collectionFactory, $orderHelper, $dateHelper);
+        $this->dateHelper = $this->createMock(DateHelper::class);
     }
 
     public function tearDown(): void
@@ -33,12 +32,12 @@ class OrderHelperTest extends TestCase
 
     public function testInstancePayloadBuilder(): void
     {
-        $this->assertInstanceOf(OrderHelper::class, $this->orderHelper);
+        $this->assertInstanceOf(OrderHelper::class, $this->createNewOrderHelper());
     }
 
     public function testImplementAbstractHelperInterface(): void
     {
-        $this->assertInstanceOf(AbstractHelper::class, $this->orderHelper);
+        $this->assertInstanceOf(AbstractHelper::class, $this->createNewOrderHelper());
     }
 
     public function testInitTotalOrderResultFormat(): void
@@ -48,7 +47,7 @@ class OrderHelperTest extends TestCase
             'total_amount'      => 0,
             'currency'          => self::EURO_CURRENCY,
         ];
-        $this->assertEquals($expectedResult, $this->orderHelper->initTotalOrderResult(self::EURO_CURRENCY));
+        $this->assertEquals($expectedResult, $this->createNewOrderHelper()->initTotalOrderResult(self::EURO_CURRENCY));
     }
 
     public function testInitOrderResultFormat(): void
@@ -58,7 +57,7 @@ class OrderHelperTest extends TestCase
             'amount'      => 0,
             'currency'    => self::EURO_CURRENCY,
         ];
-        $this->assertEquals($expectedResult, $this->orderHelper->initOrderResult(self::EURO_CURRENCY));
+        $this->assertEquals($expectedResult, $this->createNewOrderHelper()->initOrderResult(self::EURO_CURRENCY));
     }
 
     public function testCreateOrderCollectionParams(): void
@@ -82,20 +81,170 @@ class OrderHelperTest extends TestCase
             )
             ->willReturnSelf()
         ;
-        $this->orderHelper->createOrderCollection();
+        $this->createNewOrderHelper()->createOrderCollection();
     }
 
-    public function testGetShareOfCheckoutByPaymentMethods(): void
+    public function testCreatOrderCollectionNotCallIfOrderCollectionExist(): void
     {
-
-        $collection = new StubOrderCollection([
-            new StubOrder('EUR', 100, 0, 'ALMA'),
-            new StubOrder('EUR', 100, 0, 'ALMA'),
-            new StubOrder('EUR', 100, 0, 'ALMA'),
-        ]);
-        $this->orderHelper->setOrderCollection($collection);
-        $shareOfCheckout = $this->orderHelper->getShareOfCheckoutByPaymentMethods();
-        var_dump($shareOfCheckout);
-        $this->assertEquals(['to be defined'], $shareOfCheckout);
+        $orderHelperMock = $this->getMockBuilder(OrderHelper::class)
+            ->onlyMethods(['createOrderCollection'])
+            ->setConstructorArgs($this->getConstructorDependency())
+            ->getMock();
+        $orderHelperMock->setOrderCollection($this->createMock(OrderSearchResultInterface::class));
+        $orderHelperMock->expects($this->never())
+            ->method('createOrderCollection');
+        $orderHelperMock->getOrderCollection();
     }
+
+    public function testCreatOrderCollectionIsCallIfOrderCollectionNotExist(): void
+    {
+        $orderHelperMock = $this->getMockBuilder(OrderHelper::class)
+            ->onlyMethods(['createOrderCollection'])
+            ->setConstructorArgs($this->getConstructorDependency())
+            ->getMock();
+        $orderHelperMock->expects($this->once())
+            ->method('createOrderCollection');
+        $orderHelperMock->getOrderCollection();
+    }
+
+    public function testSetOrderCollection(): void
+    {
+        $orderHelper = $this->createNewOrderHelper();
+        $orderSearchResultInterface = $this->createMock(OrderSearchResultInterface::class);
+        $orderHelper->setOrderCollection($orderSearchResultInterface);
+        $this->assertEquals($orderSearchResultInterface, $orderHelper->getOrderCollection());
+    }
+
+    /**
+     * @dataProvider totalOrderDataProvider
+     */
+    public function testGetTotalsOrdersResult($orders, $result): void
+    {
+        $orderHelper = $this->createNewOrderHelper();
+        $orderHelper->setOrderCollection($orders);
+        $this->assertEquals(
+            $result,
+            $orderHelper->getTotalsOrders()
+        );
+    }
+
+    /**
+     * @dataProvider paymentMethodOrderDataProvider
+     */
+    public function testGetPaymentMethodOrdersResult($orders, $result): void
+    {
+        $orderHelper = $this->createNewOrderHelper();
+        $orderHelper->setOrderCollection($orders);
+        $this->assertEquals(
+            $result,
+            $orderHelper->getShareOfCheckoutByPaymentMethods()
+        );
+    }
+
+    private function createNewOrderHelper(): OrderHelper
+    {
+        return new OrderHelper(...$this->getConstructorDependency());
+    }
+
+    private function getConstructorDependency(): array
+    {
+        return [
+            $this->context,
+            $this->collectionFactory,
+            $this->dateHelper
+        ];
+    }
+    public function totalOrderDataProvider(): array
+    {
+        return [
+            'Multi devise orders ' => [
+                'orders' => $this->getMockOrderCollection(),
+                'result' => [
+                    [
+                        'total_amount' => 33000,
+                        'total_order_count' => 3,
+                        'currency' => 'EUR',
+                    ],
+                    [
+                        'total_amount' => 5000,
+                        'total_order_count' => 1,
+                        'currency' => 'USD',
+                    ]
+                ]
+            ]
+        ];
+    }
+    public function paymentMethodOrderDataProvider(): array
+    {
+        return [
+            'Multi devise orders ' => [
+                'orders' => $this->getMockOrderCollection(),
+                'result' => [
+                    [
+                        'payment_method_name' => 'Alma',
+                        'orders' => [
+                            [
+                            'amount' => 22000,
+                            'order_count' => 2,
+                            'currency' => 'EUR'
+                            ]
+                        ]
+                    ],
+                    [
+                        'payment_method_name' => 'Paypal',
+                        'orders' => [
+                            [
+                                'amount' => 11000,
+                                'order_count' => 1,
+                                'currency' => 'EUR'
+                            ],
+                            [
+                                'amount' => 5000,
+                                'order_count' => 1,
+                                'currency' => 'USD'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+
+    private function getMockOrderCollection()
+    {
+        $objectManagerHelper = new ObjectManagerHelper($this);
+        return $objectManagerHelper->getCollectionMock(
+            Collection::class,
+            [
+                $this->mockOrderFactory('Alma', 'EUR', '100', '0'),
+                $this->mockOrderFactory('Alma', 'EUR', '120', '0'),
+                $this->mockOrderFactory('Paypal', 'EUR', '110', '0'),
+                $this->mockOrderFactory('Paypal', 'USD', '100', '50'),
+            ]
+        );
+    }
+
+    private function mockOrderFactory($paymentMethodeCode, $currencyCode, $amountPaid, $amountRefund): Order
+    {
+        $payment = $this->createMock(OrderPaymentInterface::class);
+        $payment->expects($this->any())
+            ->method('getMethod')
+            ->willReturn($paymentMethodeCode);
+        $payment->expects($this->once())
+            ->method('getAmountPaid')
+            ->willReturn($amountPaid);
+        $payment->expects($this->once())
+            ->method('getAmountRefunded')
+            ->willReturn($amountRefund);
+        $order = $this->createMock(Order::class);
+        $order->expects($this->any())
+            ->method('getPayment')
+            ->willReturn($payment);
+        $order->expects($this->once())
+            ->method('getOrderCurrencyCode')
+            ->willReturn($currencyCode);
+        return $order;
+    }
+
 }

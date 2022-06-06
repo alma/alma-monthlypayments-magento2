@@ -2,10 +2,11 @@
 
 namespace Alma\MonthlyPayments\Helpers\ShareOfCheckout;
 
-use Alma\MonthlyPayments\Helpers\OrderHelper as GlobalOrderHelper;
+use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
@@ -27,10 +28,6 @@ class OrderHelper extends AbstractHelper
      */
     private $collectionFactory;
     /**
-     * @var GlobalOrderHelper
-     */
-    private $orderHelper;
-    /**
      * @var DateHelper
      */
     private $dateHelper;
@@ -40,18 +37,15 @@ class OrderHelper extends AbstractHelper
     /**
      * @param Context $context
      * @param CollectionFactory $collectionFactory
-     * @param GlobalOrderHelper $orderHelper
      * @param DateHelper $dateHelper
      */
     public function __construct(
         Context $context,
         CollectionFactory $collectionFactory,
-        GlobalOrderHelper $orderHelper,
         DateHelper $dateHelper
     ) {
         parent::__construct($context);
         $this->collectionFactory = $collectionFactory;
-        $this->orderHelper = $orderHelper;
         $this->dateHelper = $dateHelper;
     }
 
@@ -63,11 +57,11 @@ class OrderHelper extends AbstractHelper
         $ordersByCurrency = [];
         /** @var OrderInterface $order */
         foreach ($this->getOrderCollection() as $order) {
-            $currency = $this->orderHelper->getOrderCurrency($order);
+            $currency = $order->getOrderCurrencyCode();
             if (!isset($ordersByCurrency[$currency])) {
                 $ordersByCurrency[$currency] = $this->initTotalOrderResult($currency);
             }
-            $ordersByCurrency[$currency][self::TOTAL_AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
+            $ordersByCurrency[$currency][self::TOTAL_AMOUNT_KEY] += $this->getOrderPaymentAmount($order);
             $ordersByCurrency[$currency][self::TOTAL_COUNT_KEY] ++ ;
         }
         return array_values($ordersByCurrency);
@@ -81,16 +75,16 @@ class OrderHelper extends AbstractHelper
         $ordersByCheckouts = [];
         /** @var OrderInterface $order */
         foreach ($this->getOrderCollection() as $order) {
-            $paymentMethodCode = $this->orderHelper->getOrderPaymentMethodCode($order);
+            $paymentMethodCode = $order->getPayment()->getMethod();
             if (!isset($ordersByCheckouts[$paymentMethodCode])) {
                 $ordersByCheckouts[$paymentMethodCode] = ['orders' => []];
             }
-            $currency = $this->orderHelper->getOrderCurrency($order);
+            $currency = $order->getOrderCurrencyCode();
             if (!isset($ordersByCheckouts[$paymentMethodCode]['orders'][$currency])) {
                 $ordersByCheckouts[$paymentMethodCode]['orders'][$currency] = $this->initOrderResult($currency);
             }
             $ordersByCheckouts[$paymentMethodCode][self::PAYMENT_METHOD_KEY] = $paymentMethodCode;
-            $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::AMOUNT_KEY] += $this->orderHelper->getOrderPaymentAmount($order);
+            $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::AMOUNT_KEY] += $this->getOrderPaymentAmount($order);
             $ordersByCheckouts[$paymentMethodCode]['orders'][$currency][self::COUNT_KEY] ++;
         }
         foreach ($ordersByCheckouts as $paymentKey => $paymentMethodOrders) {
@@ -159,6 +153,19 @@ class OrderHelper extends AbstractHelper
     public function flushOrderCollection(): void
     {
         $this->orderCollection = null;
+    }
+
+
+    /**
+     * @param OrderInterface $order
+     *
+     * @return int
+     */
+    private function getOrderPaymentAmount(OrderInterface $order): int
+    {
+        /** @var OrderPaymentInterface $payment */
+        $payment = $order->getPayment();
+        return Functions::priceToCents($payment->getAmountPaid() - $payment->getAmountRefunded());
     }
 
 }
