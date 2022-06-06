@@ -2,7 +2,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
-use Alma\MonthlyPayments\Helpers\ShareOfCheckoutHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\ShareOfCheckoutHelper;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
@@ -49,9 +49,9 @@ class ShareOfCheckoutDate extends Value
      */
     public function afterSave()
     {
-        if ($this->isValueChanged() && $this->getValue()){
+        if ($this->isValueChanged() && $this->getValue()) {
             $this->shareOfCheckoutHelper->saveShareOfCheckoutDate(date('Y-m-d'));
-        }elseif ($this->isValueChanged() && !$this->getValue()) {
+        } elseif ($this->isValueChanged() && !$this->getValue()) {
             $this->shareOfCheckoutHelper->deleteShareOfCheckoutDate();
         }
         return parent::afterSave();
