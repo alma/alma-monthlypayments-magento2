@@ -4,24 +4,26 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Request\RefundDataBuilder;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Model\Info;
+use Magento\Sales\Model\OrderRepository;
 use PHPUnit\Framework\TestCase;
 
 class RefundDataBuilderTest extends TestCase
 {
     public function setUp(): void
     {
+        $this->logger = $this->createMock(Logger::class);
         $this->config = $this->createMock(Config::class);
+        $this->orderRepository = $this->createMock(OrderRepository::class);
     }
 
     public function testRefundDataBuilderIsInstanceOffBuilderInterface(): void
     {
         $this->assertInstanceOf(BuilderInterface::class, $this->createNewRefundDataBuilder());
     }
-
-
 
     public function testRefundPayloadStructure(): void
     {
@@ -61,7 +63,9 @@ class RefundDataBuilderTest extends TestCase
     private function getConstructorDependency(): array
     {
         return [
-            $this->config
+            $this->logger,
+            $this->config,
+            $this->orderRepository
         ];
     }
 }
