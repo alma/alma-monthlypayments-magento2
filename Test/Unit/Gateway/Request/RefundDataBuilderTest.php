@@ -17,7 +17,6 @@ class RefundDataBuilderTest extends TestCase
 {
     public function setUp(): void
     {
-        $this->logger = $this->createMock(Logger::class);
         $this->config = $this->createMock(Config::class);
         $this->orderRepository = $this->createMock(OrderRepository::class);
     }
@@ -88,7 +87,6 @@ class RefundDataBuilderTest extends TestCase
     private function getConstructorDependency(): array
     {
         return [
-            $this->logger,
             $this->config,
             $this->orderRepository
         ];
