@@ -81,12 +81,13 @@ class RefundHandlerTest extends TestCase
                         'isFullRefund' => true,
                         'customerFee' => 1600,
                         'refunds' => $this->getAlmaRefunds(),
-                        'formatPriceReturn' => ['€22', '€48', '€48', '€16'],
+                        'formatPriceReturn' => ['€22', '€48', '€48', '€16', '€48'],
                         'lastRefundId' => 'refund_3333333333',
                         'lastRefundData' => [
                             'created' => '1654472730',
                             'amount' => '€48',
-                            'customer_fee' => '€16'
+                            'customer_fee' => '€16',
+                            'magento_refund' => '€48'
                         ]
                     ]
                 ]

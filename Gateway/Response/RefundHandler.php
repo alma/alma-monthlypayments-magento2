@@ -19,6 +19,7 @@ class RefundHandler implements HandlerInterface
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);
+        $amountDO = SubjectReader::readAmount($handlingSubject);
         /** @var  Payment $payment */
         $payment = $paymentDO->getPayment();
 
@@ -36,6 +37,7 @@ class RefundHandler implements HandlerInterface
         }
         if ($response['isFullRefund']) {
             $lastRefundData['customer_fee'] = $payment->formatPrice(Functions::priceFromCents($almaPayment->customer_fee));
+            $lastRefundData['magento_refund'] = $payment->formatPrice($amountDO);
         }
         $payment->setTransactionId($lastRefundId);
         $payment->setTransactionAdditionalInfo(Transaction::RAW_DETAILS, $lastRefundData);
