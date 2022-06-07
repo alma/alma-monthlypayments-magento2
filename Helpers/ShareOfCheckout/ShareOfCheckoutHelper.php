@@ -66,6 +66,9 @@ class ShareOfCheckoutHelper extends AbstractHelper
         parent::__construct($context);
         $this->logger = $logger;
         $this->almaClient = $almaClient->getDefaultClient();
+        if (!$this->almaClient) {
+            throw new InvalidArgumentException('Alma client is not define');
+        }
         $this->configWriter = $configWriter;
         $this->payloadBuilder = $payloadBuilder;
         $this->orderHelper = $orderHelper;
@@ -90,9 +93,6 @@ class ShareOfCheckoutHelper extends AbstractHelper
      */
     public function shareDay(string $date): void
     {
-        if (!$this->almaClient) {
-            throw new InvalidArgumentException('Alma client is not define');
-        }
         $res = null;
         try {
             $this->dateHelper->setShareDates($date);
@@ -114,9 +114,6 @@ class ShareOfCheckoutHelper extends AbstractHelper
      */
     public function getLastUpdateDate(): string
     {
-        if (!$this->almaClient) {
-            throw new InvalidArgumentException('Alma client is not defined');
-        }
         try {
             $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
             return date('Y-m-d', $lastUpdateByApi['end_time']);
