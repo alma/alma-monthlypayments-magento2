@@ -10,17 +10,11 @@ use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order\Payment;
-use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
+use Magento\Sales\Model\Order\Payment\Transaction;
 use PHPUnit\Framework\TestCase;
 
 class RefundHandlerTest extends TestCase
 {
-    public function setUp(): void
-    {
-        $this->logger = $this->createMock(Logger::class);
-        $this->transactionBuilder = $this->createMock(BuilderInterface::class);
-    }
-
     public function testRefundHandlerIsInstanceOffHandlerInterface(): void
     {
         $this->assertInstanceOf(HandlerInterface::class, $this->createNewRefundHandler());
@@ -31,17 +25,21 @@ class RefundHandlerTest extends TestCase
         return new RefundHandler(...$this->getConstructorDependency());
     }
 
-    public function testTransactionIsSetWithLastRefundParams(): void
+    /**
+     * @dataProvider refundDataProvider
+     */
+    public function testTransactionIsSetWithLastRefundParams($provider): void
     {
-
         $paymentMock =  $this->createMock(Payment::class);
-        $paymentMock->expects($this->exactly(2))
+        $paymentMock->expects($this->any())
             ->method('formatPrice')
-            ->with('48.0')
-            ->willReturn('€48.00');
+            ->willReturnOnConsecutiveCalls(...$provider['formatPriceReturn']);
         $paymentMock->expects($this->once())
             ->method('setTransactionId')
-            ->with('refund_3333333333');
+            ->with($provider['lastRefundId']);
+        $paymentMock->expects($this->once())
+            ->method('setTransactionAdditionalInfo')
+            ->with(Transaction::RAW_DETAILS, $provider['lastRefundData']);
         $paymentMock->expects($this->once())
             ->method('addTransaction')
             ->with(TransactionInterface::TYPE_REFUND);
@@ -52,17 +50,53 @@ class RefundHandlerTest extends TestCase
 
         $handlingSubjectMock['payment'] = $paymentDataMock;
         $handlingSubjectMock['amount'] = '48';
+
         $almaPaymentMock =  $this->createMock(AlmaPayment::class);
-        $almaPaymentMock->refunds = $this->getAlmaRefunds();
+        $almaPaymentMock->refunds = $provider['refunds'];
         $responseMock['almaRefund'] = $almaPaymentMock;
+        $responseMock['isFullRefund'] = $provider['isFullRefund'];
+        $responseMock['customerFee'] = $provider['customerFee'];
         $refundHandler = $this->createNewRefundHandler();
         $refundHandler->handle($handlingSubjectMock, $responseMock);
+    }
+
+    public function refundDataProvider(): array
+    {
+        return [
+            'Test not full refund' => [
+                    [
+                        'isFullRefund' => false,
+                        'customerFee' => 0,
+                        'refunds' => $this->getAlmaRefunds(),
+                        'formatPriceReturn' => ['€22', '€48', '€48'],
+                        'lastRefundId' => 'refund_3333333333',
+                        'lastRefundData' => [
+                            'created' => '1654472730',
+                            'amount' => '€48'
+                        ]
+                    ]
+                ],
+            'Test with full refund' => [
+                    [
+                        'isFullRefund' => true,
+                        'customerFee' => 1600,
+                        'refunds' => $this->getAlmaRefunds(),
+                        'formatPriceReturn' => ['€22', '€48', '€48', '€16'],
+                        'lastRefundId' => 'refund_3333333333',
+                        'lastRefundData' => [
+                            'created' => '1654472730',
+                            'amount' => '€48',
+                            'customer_fee' => '€16'
+                        ]
+                    ]
+                ]
+            ];
     }
 
     private function getAlmaRefunds(): array
     {
         return [
-            new Refund(['id' => 'refund_1111111111','created' => '1654472700','amount' => '3800']),
+            new Refund(['id' => 'refund_1111111111','created' => '1654472700','amount' => '2200']),
             new Refund(['id' => 'refund_2222222222','created' => '1654472720','amount' => '4800']),
             new Refund(['id' => 'refund_3333333333','created' => '1654472730','amount' => '4800']),
         ];
@@ -71,8 +105,7 @@ class RefundHandlerTest extends TestCase
     private function getConstructorDependency(): array
     {
         return [
-            $this->logger,
-            $this->transactionBuilder
+
         ];
     }
 }
