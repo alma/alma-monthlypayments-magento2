@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 
 class RefundHandlerTest extends TestCase
 {
+
+    const CREATED_TIMESTAMP = '1654472730';
+
     public function testRefundHandlerIsInstanceOffHandlerInterface(): void
     {
         $this->assertInstanceOf(HandlerInterface::class, $this->createNewRefundHandler());
@@ -71,7 +74,7 @@ class RefundHandlerTest extends TestCase
                         'formatPriceReturn' => ['€22', '€48', '€48'],
                         'lastRefundId' => 'refund_3333333333',
                         'lastRefundData' => [
-                            'created' => '1654472730',
+                            'created' => self::CREATED_TIMESTAMP,
                             'amount' => '€48'
                         ]
                     ]
@@ -84,7 +87,7 @@ class RefundHandlerTest extends TestCase
                         'formatPriceReturn' => ['€22', '€48', '€48', '€16', '€48'],
                         'lastRefundId' => 'refund_3333333333',
                         'lastRefundData' => [
-                            'created' => '1654472730',
+                            'created' => self::CREATED_TIMESTAMP,
                             'amount' => '€48',
                             'customer_fee' => '€16',
                             'magento_refund' => '€48'
@@ -99,7 +102,7 @@ class RefundHandlerTest extends TestCase
         return [
             new Refund(['id' => 'refund_1111111111','created' => '1654472700','amount' => '2200']),
             new Refund(['id' => 'refund_2222222222','created' => '1654472720','amount' => '4800']),
-            new Refund(['id' => 'refund_3333333333','created' => '1654472730','amount' => '4800']),
+            new Refund(['id' => 'refund_3333333333','created' => self::CREATED_TIMESTAMP,'amount' => '4800']),
         ];
     }
 

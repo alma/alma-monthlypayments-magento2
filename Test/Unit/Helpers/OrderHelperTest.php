@@ -8,21 +8,18 @@ use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Magento\Framework\App\Helper\Context;
 
 class OrderHelperTest extends TestCase
 {
     /**
-     * @var OrderHelper
-     */
-    private $orderHelper;
-    /**
-     * @var OrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderRepositoryInterface|MockObject
      */
     private $orderRepository;
     /**
-     * @var OrderFactory|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderFactory|MockObject
      */
     private $orderFactory;
 

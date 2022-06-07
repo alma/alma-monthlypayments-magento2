@@ -19,7 +19,6 @@ class AlmaPaymentValidationErrorTest extends TestCase
 
     public function testPaymentValidationErrorExtendsException(): void
     {
-        $paymentValidationError = new AlmaPaymentValidationError();
         $this->assertInstanceOf(Exception::class, $this->paymentValidationError);
     }
 
