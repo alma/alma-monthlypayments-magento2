@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v2.6.1
+------
+* Fix CDN version 2.8.0
+
 v2.6.0
 ------
 * Add rejected payment url in config back office.
