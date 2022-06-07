@@ -23,7 +23,7 @@
  */
 require.config({
     paths: {
-        'widgets/Alma': 'https://cdn.jsdelivr.net/npm/@alma/widgets@2.x.x/dist/widgets.umd'
+        'widgets/Alma': 'https://cdn.jsdelivr.net/npm/@alma/widgets@2.8.0/dist/widgets.umd'
     }
 });
 define([
