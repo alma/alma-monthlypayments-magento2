@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v2.6.2
+------
+* Fix virtual cart compatibility
+
 v2.6.1
 ------
 * Fix CDN version 2.8.0
