@@ -29,7 +29,6 @@ use Alma\MonthlyPayments\Model\Data\Customer;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use function PHPUnit\Framework\isEmpty;
 
 class CustomerDataBuilder implements BuilderInterface
 {
@@ -73,8 +72,11 @@ class CustomerDataBuilder implements BuilderInterface
             $customer = $this->customerRepository->getById($customerId);
         }
 
-        $addressArray = [$order->getBillingAddress()];
-        if (!isEmpty($order->getShippingAddress())) {
+        $addressArray = [];
+        if ($order->getBillingAddress()) {
+            $addressArray[] = $order->getBillingAddress();
+        }
+        if ($order->getShippingAddress()) {
             $addressArray[] = $order->getShippingAddress();
         }
         return [
