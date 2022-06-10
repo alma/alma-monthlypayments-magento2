@@ -313,7 +313,6 @@ class PaymentValidation
     public function addTransactionToPayment(OrderPayment $payment, Order $order, AlmaPayment $almaPayment)
     {
         $paymentData = $this->createPaymentData($order, $almaPayment);
-        $this->logger->info('$paymentData', [$paymentData]);
         $transaction = $this->transactionBuilder->setPayment($payment)
             ->setOrder($order)
             ->setTransactionId($almaPayment->id)
@@ -324,7 +323,6 @@ class PaymentValidation
         $payment = $this->addTransactionComment($order, $payment, $transaction);
 
         $payment->setParentTransactionId(null);
-        $this->logger->info('$transaction', []);
     }
 
     /**
