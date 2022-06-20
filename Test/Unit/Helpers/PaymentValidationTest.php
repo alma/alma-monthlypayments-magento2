@@ -135,10 +135,10 @@ class PaymentValidationTest extends TestCase
             ->willReturn($orderId);
 
         $this->orderHelper->expects($this->once())
-            ->method('saveOrderInRepository')
+            ->method('save')
             ->with($orderMock);
         $this->orderHelper->expects($this->once())
-            ->method('cancelOrderById')
+            ->method('cancel')
             ->with($orderId);
 
         $paymentValidation = Mockery::mock(PaymentValidation::class, $this->getConstructorDependency())->makePartial()->shouldAllowMockingProtectedMethods();

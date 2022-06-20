@@ -135,7 +135,7 @@ class PaymentValidation
     {
         // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
         $orderId = $almaPayment->custom_data['order_id'];
-        return $this->orderHelper->getOrderById($orderId);
+        return $this->orderHelper->getOrder($orderId);
     }
 
     /**
@@ -235,7 +235,7 @@ class PaymentValidation
             throw new AlmaPaymentValidationError(__('Your order has been canceled'), 'checkout/onepage/failure/');
         } elseif (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_HOLDED, Order::STATE_PAYMENT_REVIEW])) {
             $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-            $this->orderHelper->saveOrderInRepository($order);
+            $this->orderHelper->save($order);
             return true;
         }
         throw new AlmaPaymentValidationError($errorMessage, 'checkout/cart');
@@ -274,7 +274,7 @@ class PaymentValidation
         $payment = $order->getPayment();
         $this->addTransactionToPayment($payment, $order, $almaPayment);
         $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
-        $this->orderHelper->notifyOrderById($order->getId());
+        $this->orderHelper->notify($order->getId());
 
         // TODO : Paylater / PnX
         $order = $this->addCommentToOrder($order, __('First instalment captured successfully'), $newStatus);
@@ -282,7 +282,7 @@ class PaymentValidation
         foreach ($order->getInvoiceCollection() as $invoice) {
             $invoice->setTransactionId($payment->getLastTransId());
         }
-        $this->orderHelper->saveOrderInRepository($order);
+        $this->orderHelper->save($order);
         $this->inactiveQuoteById($order->getQuoteId());
     }
 
@@ -389,8 +389,8 @@ class PaymentValidation
         $this->logger->error('internal Error', [$internalError->render()]);
         if ($transitionOrder) {
             $order = $this->addCommentToOrder($order, $internalError->render(), Order::STATUS_FRAUD);
-            $this->orderHelper->saveOrderInRepository($order);
-            $this->orderHelper->cancelOrderById($order->getId());
+            $this->orderHelper->save($order);
+            $this->orderHelper->cancel($order->getId());
         }
     }
 }

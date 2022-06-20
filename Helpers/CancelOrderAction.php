@@ -72,9 +72,9 @@ class CancelOrderAction extends Action
         }
 
         try {
-            $order = $this->orderHelper->getOrderById($this->paymentHelper->getOrderIdFromAlmaPayment($this->almaPayment));
+            $order = $this->orderHelper->getOrder($this->paymentHelper->getOrderIdFromAlmaPayment($this->almaPayment));
         } catch (InvalidArgumentException $e) {
-            $this->logger->error('Cancel order - get order error',[$e->getMessage()]);
+            $this->logger->error('Cancel order - get order error', [$e->getMessage()]);
             return $this->redirectToCart();
         }
         try {

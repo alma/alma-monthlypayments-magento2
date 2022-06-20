@@ -38,41 +38,45 @@ class OrderHelper extends AbstractHelper
     }
 
     /**
+     * Load a specified order.
      * @param string $orderId
      * @return OrderInterface
      */
-    public function getOrderById(string $orderId): OrderInterface
+    public function getOrder(string $orderId): OrderInterface
     {
         $orderModel = $this->orderFactory->create();
         return $orderModel->loadByIncrementId($orderId);
     }
 
     /**
+     * Cancels a specified order.
      * @param string $orderId
      *
      * @return void
      */
-    public function cancelOrderById(string $orderId): void
+    public function cancel(string $orderId): void
     {
         $this->orderManagement->cancel($orderId);
     }
 
     /**
+     * Emails a user a specified order.
      * @param string $orderId
      *
      * @return void
      */
-    public function notifyOrderById(string $orderId): void
+    public function notify(string $orderId): void
     {
         $this->orderManagement->notify($orderId);
     }
 
     /**
+     * Performs persist operations for a specified order.
      * @param Order $order
      *
      * @return void
      */
-    public function saveOrderInRepository(Order $order): void
+    public function save(Order $order): void
     {
         $this->orderRepository->save($order);
     }

@@ -50,7 +50,7 @@ class OrderHelperTest extends TestCase
             ->method('cancel')
             ->with($mockOrderId);
         $orderHelper = $this->createNewOrderHelper();
-        $orderHelper->cancelOrderById($mockOrderId);
+        $orderHelper->cancel($mockOrderId);
     }
     public function testNotifyOrderUseOrderId()
     {
@@ -59,7 +59,7 @@ class OrderHelperTest extends TestCase
             ->method('notify')
             ->with($mockOrderId);
         $orderHelper = $this->createNewOrderHelper();
-        $orderHelper->notifyOrderById($mockOrderId);
+        $orderHelper->notify($mockOrderId);
     }
 
     public function testSaveMethodStructure(): void
@@ -69,7 +69,7 @@ class OrderHelperTest extends TestCase
             ->method('save')
             ->with($mockOrder);
         $orderHelper = $this->createNewOrderHelper();
-        $orderHelper->saveOrderInRepository($mockOrder);
+        $orderHelper->save($mockOrder);
     }
 
     private function createNewOrderHelper(): OrderHelper
