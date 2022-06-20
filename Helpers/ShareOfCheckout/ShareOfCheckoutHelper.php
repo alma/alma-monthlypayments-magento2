@@ -135,8 +135,8 @@ class ShareOfCheckoutHelper extends AbstractHelper
             ScopeInterface::SCOPE_STORE
         );
         if (empty($shareOfCheckoutEnabledDate)) {
-            $this->logger->info('No enable date in config', []);
-            throw new InvalidArgumentException('No enable date in config');
+            $this->logger->info('Share of checkout feature was never activated', []);
+            throw new InvalidArgumentException('Share of checkout feature was never activated');
         }
         return $shareOfCheckoutEnabledDate;
     }
