@@ -67,7 +67,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
         $this->logger = $logger;
         $this->almaClient = $almaClient->getDefaultClient();
         if (!$this->almaClient) {
-            throw new InvalidArgumentException('Alma client is not define');
+            throw new InvalidArgumentException('Alma client is not defined');
         }
         $this->configWriter = $configWriter;
         $this->payloadBuilder = $payloadBuilder;
