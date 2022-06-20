@@ -26,6 +26,7 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Model\Data\Address;
@@ -34,7 +35,6 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentDataBuilder implements BuilderInterface
 {
@@ -56,61 +56,57 @@ class PaymentDataBuilder implements BuilderInterface
      * @var ConfigHelper
      */
     private $configHelper;
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
      * PaymentDataBuilder constructor.
      *
      * @param CheckoutSession $checkoutSession
-     * @param Config          $config
-     * @param Resolver        $locale
+     * @param Config $config
+     * @param Resolver $locale
+     * @param ConfigHelper $configHelper
      */
     public function __construct(
         CheckoutSession $checkoutSession,
-        Config $config,
-        Resolver $locale ,
-        ConfigHelper $configHelper,
-        Logger $logger
+        Config          $config,
+        Resolver        $locale,
+        ConfigHelper    $configHelper
     )
     {
         $this->checkoutSession = $checkoutSession;
-        $this->config          = $config;
-        $this->locale          = $locale;
-        $this->configHelper    = $configHelper;
-        $this->logger          = $logger;
+        $this->config = $config;
+        $this->locale = $locale;
+        $this->configHelper = $configHelper;
     }
 
     /**
      * Builds ENV request
      *
      * @param array $buildSubject
+     *
      * @return array
      */
     public function build(array $buildSubject): array
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
-        $payment   = $paymentDO->getPayment();
+        $payment = $paymentDO->getPayment();
 
-        $order   = $paymentDO->getOrder();
+        $order = $paymentDO->getOrder();
         $orderId = $order->getOrderIncrementId();
         $quoteId = $this->checkoutSession->getQuoteId();
 
-        $planKey    = $payment->getAdditionalInformation(PaymentDataAssignObserver::SELECTED_PLAN);
+        $planKey = $payment->getAdditionalInformation(PaymentDataAssignObserver::SELECTED_PLAN);
         $planConfig = $this->config->getPaymentPlansConfig()->getPlans()[$planKey];
 
         $configArray = [
-            'return_url'          => $this->config->getReturnUrl(),
-            'ipn_callback_url'    => $this->config->getIpnCallbackUrl(),
+            'return_url' => $this->config->getReturnUrl(),
+            'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
             'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
             'failure_return_url' => $this->config->getFailureReturnUrl(),
-            'purchase_amount'     => Functions::priceToCents((float) $order->getGrandTotalAmount()),
-            'shipping_address'    => Address::dataFromAddress($order->getShippingAddress()),
-            'billing_address'     => Address::dataFromAddress($order->getBillingAddress()),
-            'locale'              => $this->locale->getLocale(),
-            'custom_data'         => [
+            'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
+            'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
+            'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
+            'locale' => $this->locale->getLocale(),
+            'custom_data' => [
                 'order_id' => $orderId,
                 'quote_id' => $quoteId,
             ],
@@ -119,7 +115,15 @@ class PaymentDataBuilder implements BuilderInterface
         return ['payment' => array_merge($planConfig->getPaymentData(), $configArray)];
     }
 
-    private function trigger($configArray, $planConfig): array
+    /**
+     * Add trigger info in payment payload
+     *
+     * @param array $configArray
+     * @param paymentPlanConfigInterface $planConfig
+     *
+     * @return array
+     */
+    private function trigger(array $configArray, paymentPlanConfigInterface $planConfig): array
     {
         if ($this->configHelper->triggerIsEnabled() && $planConfig->hasDeferredTrigger()) {
             $configArray['deferred'] = 'trigger';

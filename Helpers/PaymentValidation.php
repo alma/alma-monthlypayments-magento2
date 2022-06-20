@@ -28,8 +28,7 @@ namespace Alma\MonthlyPayments\Helpers;
 use Alma\API\Entities\Instalment;
 use Alma\API\Entities\Payment as AlmaPayment;
 use Alma\API\RequestError;
-use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationError;
-use Exception;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
@@ -140,8 +139,9 @@ class PaymentValidation
 
     /**
      * @param string $paymentId
+     *
      * @return bool `true` if payment is valid
-     * @throws AlmaPaymentValidationError
+     * @throws AlmaPaymentValidationException|NoSuchEntityException
      */
     public function completeOrderIfValid(string $paymentId): bool
     {
@@ -157,18 +157,18 @@ class PaymentValidation
                 $almaPayment = $this->getAlmaPayment($paymentId);
                 $order = $this->findOrderForPayment($almaPayment);
             } catch (RequestError $e) {
-                throw new AlmaPaymentValidationError($errorMessage);
+                throw new AlmaPaymentValidationException($errorMessage);
             }
 
             if (!$order) {
                 $this->logger->error("Error: cannot get order details back for payment {$paymentId}");
-                throw new AlmaPaymentValidationError($errorMessage);
+                throw new AlmaPaymentValidationException($errorMessage);
             }
 
             return $this->validateOrderPayment($order, $almaPayment, true);
-        } catch (Exception $e) {
+        } catch (AlmaPaymentValidationException $e) {
             $this->logger->critical($e->getMessage());
-            throw new AlmaPaymentValidationError($errorMessage);
+            throw new AlmaPaymentValidationException($errorMessage);
         }
     }
 
@@ -176,8 +176,9 @@ class PaymentValidation
      * @param Order $order
      * @param AlmaPayment $almaPayment
      * @param bool $transitionOrder
+     *
      * @return bool
-     * @throws AlmaPaymentValidationError
+     * @throws AlmaPaymentValidationException
      * @throws NoSuchEntityException
      */
     public function validateOrderPayment(Order $order, AlmaPayment $almaPayment, bool $transitionOrder): bool
@@ -191,7 +192,7 @@ class PaymentValidation
             $this->logger->error($internalError->render());
             $this->addCommentToOrder($order, $internalError);
 
-            throw new AlmaPaymentValidationError($errorMessage);
+            throw new AlmaPaymentValidationException($errorMessage);
         }
 
         // Check that there's no price mismatch between the order amount and what's been paid
@@ -203,10 +204,10 @@ class PaymentValidation
                 $order->getIncrementId()
             );
 
-            $this->cancelOrderWithComment($internalError, $transitionOrder, $order);
+            $this->cancelOrder($internalError, $transitionOrder, $order);
 
             $this->flagAsPotentialFraud($almaPayment, AlmaPayment::FRAUD_AMOUNT_MISMATCH);
-            throw new AlmaPaymentValidationError($errorMessage);
+            throw new AlmaPaymentValidationException($errorMessage);
         }
 
         // Check that the Alma API has correctly registered the first installment as paid
@@ -219,10 +220,10 @@ class PaymentValidation
                 $order->getIncrementId()
             );
 
-            $this->cancelOrderWithComment($internalError, $transitionOrder, $order);
+            $this->cancelOrder($internalError, $transitionOrder, $order);
 
             $this->flagAsPotentialFraud($almaPayment, AlmaPayment::FRAUD_STATE_ERROR . ": " . $internalError->render());
-            throw new AlmaPaymentValidationError($errorMessage);
+            throw new AlmaPaymentValidationException($errorMessage);
         }
 
         if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
@@ -232,13 +233,13 @@ class PaymentValidation
 
             return true;
         } elseif ($order->getState() == Order::STATE_CANCELED) {
-            throw new AlmaPaymentValidationError(__('Your order has been canceled'), 'checkout/onepage/failure/');
+            throw new AlmaPaymentValidationException(__('Your order has been canceled'), 'checkout/onepage/failure/');
         } elseif (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_HOLDED, Order::STATE_PAYMENT_REVIEW])) {
             $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
             $this->orderHelper->save($order);
             return true;
         }
-        throw new AlmaPaymentValidationError($errorMessage, 'checkout/cart');
+        throw new AlmaPaymentValidationException($errorMessage, 'checkout/cart');
     }
 
     /**
@@ -251,7 +252,7 @@ class PaymentValidation
     {
         try {
             $this->alma->payments->flagAsPotentialFraud($almaPayment->id, $reason);
-        } catch (Exception $e) {
+        } catch (RequestError $e) {
             $this->logger->info("Error flagging payment {$almaPayment->id} as fraudulent");
         }
     }
@@ -378,13 +379,15 @@ class PaymentValidation
     }
 
     /**
+     * Cancel order and add a comment
+     *
      * @param Phrase $internalError
      * @param bool $transitionOrder
      * @param Order $order
      *
      * @return void
      */
-    public function cancelOrderWithComment(Phrase $internalError, bool $transitionOrder, Order $order): void
+    public function cancelOrder(Phrase $internalError, bool $transitionOrder, Order $order): void
     {
         $this->logger->error('internal Error', [$internalError->render()]);
         if ($transitionOrder) {

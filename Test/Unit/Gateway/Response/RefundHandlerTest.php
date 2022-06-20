@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 class RefundHandlerTest extends TestCase
 {
 
-    const CREATED_TIMESTAMP = '1654472730';
+    const FIXED_TIMESTAMP = '1654472730';
 
     public function testRefundHandlerIsInstanceOffHandlerInterface(): void
     {
@@ -25,7 +25,7 @@ class RefundHandlerTest extends TestCase
 
     private function createNewRefundHandler(): RefundHandler
     {
-        return new RefundHandler(...$this->getConstructorDependency());
+        return new RefundHandler();
     }
 
     /**
@@ -74,7 +74,7 @@ class RefundHandlerTest extends TestCase
                         'formatPriceReturn' => ['€22', '€48', '€48'],
                         'lastRefundId' => 'refund_3333333333',
                         'lastRefundData' => [
-                            'created' => self::CREATED_TIMESTAMP,
+                            'created' => self::FIXED_TIMESTAMP,
                             'amount' => '€48'
                         ]
                     ]
@@ -87,7 +87,7 @@ class RefundHandlerTest extends TestCase
                         'formatPriceReturn' => ['€22', '€48', '€48', '€16', '€48'],
                         'lastRefundId' => 'refund_3333333333',
                         'lastRefundData' => [
-                            'created' => self::CREATED_TIMESTAMP,
+                            'created' => self::FIXED_TIMESTAMP,
                             'amount' => '€48',
                             'customer_fee' => '€16',
                             'magento_refund' => '€48'
@@ -100,16 +100,9 @@ class RefundHandlerTest extends TestCase
     private function getAlmaRefunds(): array
     {
         return [
-            new Refund(['id' => 'refund_1111111111','created' => '1654472700','amount' => '2200']),
-            new Refund(['id' => 'refund_2222222222','created' => '1654472720','amount' => '4800']),
-            new Refund(['id' => 'refund_3333333333','created' => self::CREATED_TIMESTAMP,'amount' => '4800']),
-        ];
-    }
-
-    private function getConstructorDependency(): array
-    {
-        return [
-
+            new Refund(['id' => 'refund_1111111111','created' => self::FIXED_TIMESTAMP,'amount' => '2200']),
+            new Refund(['id' => 'refund_2222222222','created' => self::FIXED_TIMESTAMP,'amount' => '4800']),
+            new Refund(['id' => 'refund_3333333333','created' => self::FIXED_TIMESTAMP,'amount' => '4800']),
         ];
     }
 }

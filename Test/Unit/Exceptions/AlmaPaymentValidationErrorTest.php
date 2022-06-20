@@ -9,7 +9,7 @@ class AlmaPaymentValidationErrorTest extends TestCase
 {
     public function setUp(): void
     {
-        $this->paymentValidationError = new AlmaPaymentValidationError();
+        $this->paymentValidationError = new AlmaPaymentValidationException();
     }
 
     public function tearDown(): void
@@ -30,19 +30,19 @@ class AlmaPaymentValidationErrorTest extends TestCase
     public function testCustomMessage(): void
     {
         $customMessage = 'Custom Message';
-        $paymentValidationError = new AlmaPaymentValidationError($customMessage);
+        $paymentValidationError = new AlmaPaymentValidationException($customMessage);
         $this->assertEquals($customMessage, $paymentValidationError->getMessage());
     }
 
     public function testDefaultFailureUrl(): void
     {
-        $this->assertEquals(AlmaPaymentValidationError::RETURN_PATH, $this->paymentValidationError->getReturnPath());
+        $this->assertEquals(AlmaPaymentValidationException::RETURN_PATH, $this->paymentValidationError->getReturnPath());
     }
 
     public function testCustomFailureUrl(): void
     {
         $customFailureUrl = 'custom/failure/url';
-        $paymentValidationError = new AlmaPaymentValidationError('', $customFailureUrl);
+        $paymentValidationError = new AlmaPaymentValidationException('', $customFailureUrl);
         $this->assertEquals($customFailureUrl, $paymentValidationError->getReturnPath());
     }
 }

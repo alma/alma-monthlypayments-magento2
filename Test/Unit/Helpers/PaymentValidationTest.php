@@ -22,8 +22,8 @@ use PHPUnit\Framework\TestCase;
 class PaymentValidationTest extends TestCase
 {
     const TXT_PRICE = '1 012,20 €';
-    const CREATED_DATE = '1654114331';
-    const BASE_DEFFERED_DAYS = '30';
+    const FIXED_TIMESTAMP = '1654114331';
+    const DEFFERED_DAYS_30 = '30';
 
 
     public function setUp(): void
@@ -151,7 +151,7 @@ class PaymentValidationTest extends TestCase
         $phraseMock->expects($this->exactly(2))
             ->method('render')
             ->willReturn('internal error render');
-        $paymentValidation->cancelOrderWithComment($phraseMock, true, $orderMock);
+        $paymentValidation->cancelOrder($phraseMock, true, $orderMock);
     }
 
     private function createNewPaymentValidation(): PaymentValidation
@@ -177,15 +177,15 @@ class PaymentValidationTest extends TestCase
             'Check with deferred Trigger True' =>
                 [
                     [
-                        'created' => self::CREATED_DATE,
-                        'deferred_days' => self::BASE_DEFFERED_DAYS,
+                        'created' => self::FIXED_TIMESTAMP,
+                        'deferred_days' => self::DEFFERED_DAYS_30,
                         'deferred_trigger' => true,
                         'deferred_trigger_description' => 'At shipping'
                     ],
                     [
                         'total' => self::TXT_PRICE,
-                        'created' => self::CREATED_DATE,
-                        'deferred_days' => self::BASE_DEFFERED_DAYS,
+                        'created' => self::FIXED_TIMESTAMP,
+                        'deferred_days' => self::DEFFERED_DAYS_30,
                         'installments_count' => '0',
                         'deferred_months' => '0',
                         'deferred_trigger' => 'yes',
@@ -194,15 +194,15 @@ class PaymentValidationTest extends TestCase
                 ],
             'Check with deferred Trigger False' => [
                 [
-                    'created' => self::CREATED_DATE,
-                    'deferred_days' => self::BASE_DEFFERED_DAYS,
+                    'created' => self::FIXED_TIMESTAMP,
+                    'deferred_days' => self::DEFFERED_DAYS_30,
                     'deferred_trigger' => false,
                     'deferred_trigger_description' => ''
                 ],
                 [
                     'total' => self::TXT_PRICE,
-                    'created' => self::CREATED_DATE,
-                    'deferred_days' => self::BASE_DEFFERED_DAYS,
+                    'created' => self::FIXED_TIMESTAMP,
+                    'deferred_days' => self::DEFFERED_DAYS_30,
                     'installments_count' => '0',
                     'deferred_months' => '0',
                     'deferred_trigger' => 'no',

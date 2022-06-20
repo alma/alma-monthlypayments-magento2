@@ -4,7 +4,7 @@ namespace Alma\MonthlyPayments\Model\Exceptions;
 
 use Exception;
 
-class AlmaPaymentValidationError extends Exception
+class AlmaPaymentValidationException extends Exception
 {
     const RETURN_PATH = 'checkout/onepage/failure';
     private $returnPath;

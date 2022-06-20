@@ -26,7 +26,7 @@
 namespace Alma\MonthlyPayments\Controller\Payment;
 
 use Alma\MonthlyPayments\Helpers\PaymentValidation;
-use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationError;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 
@@ -60,7 +60,7 @@ class ReturnAction extends Action
             $paymentId = $this->getRequest()->getParam('pid');
             $this->paymentValidationHelper->completeOrderIfValid($paymentId);
             $redirectTo = 'checkout/onepage/success';
-        } catch (AlmaPaymentValidationError $e) {
+        } catch (AlmaPaymentValidationException $e) {
             $this->addError($e->getMessage());
             $redirectTo = $e->getReturnPath();
         }

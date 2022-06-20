@@ -27,6 +27,10 @@ class FunctionsTest extends TestCase
                 'price' => '42',
                 'result' => 4200
             ],
+            'Test with float price 3 deci' => [
+                'price' => 12.133,
+                'result' => 1213
+            ],
             'Test with negative price' => [
                 'price' => -55,
                 'result' => -5500

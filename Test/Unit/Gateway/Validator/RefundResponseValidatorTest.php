@@ -104,7 +104,6 @@ class RefundResponseValidatorTest extends TestCase
     private function getConstructorDependency(): array
     {
         return [
-            $this->logger,
             $this->resultInterface
         ];
     }

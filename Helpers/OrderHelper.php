@@ -40,6 +40,7 @@ class OrderHelper extends AbstractHelper
     /**
      * Load a specified order.
      * @param string $orderId
+     *
      * @return OrderInterface
      */
     public function getOrder(string $orderId): OrderInterface

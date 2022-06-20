@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Gateway\Validator;
 
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
@@ -11,16 +10,12 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 class RefundResponseValidator extends AbstractValidator
 {
     /**
-     * @var Logger
+     * @param ResultInterfaceFactory $resultFactory
      */
-    private $logger;
-
     public function __construct(
-        Logger $logger,
         ResultInterfaceFactory $resultFactory
     ) {
         parent::__construct($resultFactory);
-        $this->logger = $logger;
     }
 
     /**
