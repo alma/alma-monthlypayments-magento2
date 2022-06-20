@@ -29,6 +29,7 @@
         "magento/module-payment": ">=100.0.2",
         "magento/framework": ">=100.0.2",
         "magento/magento-composer-installer": "*",
-        "magento/module-sample-data": "^100.4"
+        "magento/module-sample-data": "^100.4",
+        "phpunit/phpunit": "*"
     }
 }

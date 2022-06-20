@@ -1,10 +1,12 @@
 <?php
 namespace Alma\MonthlyPayments\Helpers;
 
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 
-class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
+class ConfigHelper extends AbstractHelper
 {
     const XML_PATH_PAYMENT = 'payment';
     const XML_PATH_METHODE = Config::CODE;

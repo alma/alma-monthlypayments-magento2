@@ -2,34 +2,29 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\OrderFactory;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 
-class OrderHelper extends AbstractHelper
+class OrderHelper
 {
     /**
-     * @var OrderFactory
+     * @param OrderInterface $order
+     *
+     * @return string
      */
-    private $orderFactory;
-
-    public function __construct(
-        Context $context,
-        OrderFactory $orderFactory
-    )
+    public function getOrderCurrency(OrderInterface $order): string
     {
-        parent::__construct($context);
-        $this->orderFactory = $orderFactory;
+        return $order->getOrderCurrencyCode();
     }
 
     /**
-     * @param int $orderId
-     * @return OrderInterface
+     * @param OrderInterface $order
+     *
+     * @return string
      */
-    public function getOrderById($orderId):OrderInterface
+    public function getOrderPaymentMethodCode(OrderInterface $order): string
     {
-        $orderModel = $this->orderFactory->create();
-        return $orderModel->loadByIncrementId($orderId);
+        /** @var OrderPaymentInterface $payment */
+        return $order->getPayment()->getMethod();
     }
 }

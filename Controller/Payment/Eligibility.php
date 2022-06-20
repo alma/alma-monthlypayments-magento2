@@ -60,7 +60,6 @@ class Eligibility extends Action
      */
     public function execute()
     {
-        $this->logger->info('execute Controller Payment Action',[]);
         try {
             $this->eligibilityHelper->checkEligibility();
         } catch (\Exception $e) {
