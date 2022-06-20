@@ -1,7 +1,6 @@
-<?xml version="1.0"?>
-<!--
+<?php
 /**
- * 2018 Alma / Nabla SAS
+ * 2018-2020 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -18,20 +17,14 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @author    Alma / Nabla SAS <contact@getalma.eu>
- * @copyright 2018 Alma / Nabla SAS
+ * @author    Alma SAS <contact@getalma.eu>
+ * @copyright 2018-2020 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
- *
  */
--->
 
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Alma_MonthlyPayments" setup_version="2.6.2">
-        <sequence>
-            <module name="Magento_Sales"/>
-            <module name="Magento_Payment"/>
-            <module name="Magento_Checkout"/>
-        </sequence>
-    </module>
-</config>
+namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl;
+
+class FailureReturnUrl extends ApiUrlValue
+{
+    protected $urlPath = 'alma/payment/failure';
+}

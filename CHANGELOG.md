@@ -1,6 +1,21 @@
 Changelog
 =========
 
+v2.6.2
+------
+* Fix virtual cart compatibility
+
+v2.6.1
+------
+* Fix CDN version 2.8.0
+
+v2.6.0
+------
+* Add rejected payment url in config back office.
+* Add failure_return_url in payment payload.
+* Add failre return controler page.
+* Add languages : de_AT,en_GB,EN_IE,fr_BE,fr_LU,nl_BE
+
 v2.5.0
 ------
 * Change badge price for configurable product

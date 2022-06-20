@@ -2,9 +2,11 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
+
+
 use Alma\MonthlyPayments\Helpers\CancelOrderAction;
 
-class Cancel extends CancelOrderAction
+class Failure extends CancelOrderAction
 {
-    CONST CANCEL_MESSAGE = "Order canceled by customer";
+    CONST CANCEL_MESSAGE = 'Rejected payment';
 }
