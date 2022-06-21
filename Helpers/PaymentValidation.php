@@ -132,10 +132,10 @@ class PaymentValidation
     public function findOrderForPayment(AlmaPayment $almaPayment): Order
     {
         // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
-        $errorMessage = __('Error: cannot get order details back for payment %s', $almaPayment['id'])->render();
+        $errorMessage = __('Error: cannot get order details back for payment %s', $almaPayment->id)->render();
         $orderId = $almaPayment->custom_data['order_id'];
         $order = $this->orderHelper->getOrder($orderId);
-        if (!$order) {
+        if (!$order->getIncrementId()) {
             $this->logger->error($errorMessage);
             throw new AlmaPaymentValidationException($errorMessage);
         }
