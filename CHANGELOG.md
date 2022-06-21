@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.7.0
+------
+* Add share of checkout
+* Add online invoice refund
+
 v2.6.2
 ------
 * Fix virtual cart compatibility
