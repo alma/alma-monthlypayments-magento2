@@ -225,6 +225,7 @@ class PaymentValidation
 
             return true;
         } elseif ($order->getState() == Order::STATE_CANCELED) {
+            $this->logger->info('Your order has been canceled', [$order->getIncrementId()]);
             throw new AlmaPaymentValidationException(__('Your order has been canceled'), 'checkout/onepage/failure/');
         } elseif (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_HOLDED, Order::STATE_PAYMENT_REVIEW])) {
             $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
