@@ -105,23 +105,21 @@ class PaymentValidation
      * @param string $paymentId ID of Alma payment to fetch
      *
      * @return AlmaPayment
-     * @throws RequestError
+     * @throws AlmaPaymentValidationException
      */
     public function getAlmaPayment(string $paymentId): AlmaPayment
     {
         try {
             $almaPayment = $this->alma->payments->fetch($paymentId);
         } catch (RequestError $e) {
-            $internalError = __(
+            $requestError = __(
                 "Error fetching payment information from Alma for payment %s: %s",
                 $paymentId,
                 $e->getMessage()
             );
-
-            $this->logger->error($internalError->render());
-            throw $e;
+            $this->logger->error($requestError->render());
+            throw new AlmaPaymentValidationException($requestError->render());
         }
-
         return $almaPayment;
     }
 
@@ -129,19 +127,27 @@ class PaymentValidation
      * @param AlmaPayment $almaPayment
      *
      * @return Order
+     * @throws AlmaPaymentValidationException
      */
     public function findOrderForPayment(AlmaPayment $almaPayment): Order
     {
         // The stored Order ID is an increment ID, so we need to get the order with a search in all orders
+        $errorMessage = __('Error: cannot get order details back for payment %s', $almaPayment['id'])->render();
         $orderId = $almaPayment->custom_data['order_id'];
-        return $this->orderHelper->getOrder($orderId);
+        $order = $this->orderHelper->getOrder($orderId);
+        if (!$order) {
+            $this->logger->error($errorMessage);
+            throw new AlmaPaymentValidationException($errorMessage);
+        }
+        return $order;
     }
+
 
     /**
      * @param string $paymentId
      *
      * @return bool `true` if payment is valid
-     * @throws AlmaPaymentValidationException|NoSuchEntityException
+     * @throws AlmaPaymentValidationException
      */
     public function completeOrderIfValid(string $paymentId): bool
     {
@@ -152,19 +158,8 @@ class PaymentValidation
             $order = null;
             /** @var AlmaPayment $almaPayment */
             $almaPayment = null;
-
-            try {
-                $almaPayment = $this->getAlmaPayment($paymentId);
-                $order = $this->findOrderForPayment($almaPayment);
-            } catch (RequestError $e) {
-                throw new AlmaPaymentValidationException($errorMessage);
-            }
-
-            if (!$order) {
-                $this->logger->error("Error: cannot get order details back for payment {$paymentId}");
-                throw new AlmaPaymentValidationException($errorMessage);
-            }
-
+            $almaPayment = $this->getAlmaPayment($paymentId);
+            $order = $this->findOrderForPayment($almaPayment);
             return $this->validateOrderPayment($order, $almaPayment, true);
         } catch (AlmaPaymentValidationException $e) {
             $this->logger->critical($e->getMessage());
@@ -179,7 +174,6 @@ class PaymentValidation
      *
      * @return bool
      * @throws AlmaPaymentValidationException
-     * @throws NoSuchEntityException
      */
     public function validateOrderPayment(Order $order, AlmaPayment $almaPayment, bool $transitionOrder): bool
     {
@@ -191,7 +185,6 @@ class PaymentValidation
 
             $this->logger->error($internalError->render());
             $this->addCommentToOrder($order, $internalError);
-
             throw new AlmaPaymentValidationException($errorMessage);
         }
 
@@ -221,14 +214,13 @@ class PaymentValidation
             );
 
             $this->cancelOrder($internalError, $transitionOrder, $order);
-
             $this->flagAsPotentialFraud($almaPayment, AlmaPayment::FRAUD_STATE_ERROR . ": " . $internalError->render());
             throw new AlmaPaymentValidationException($errorMessage);
         }
 
         if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
             if ($transitionOrder) {
-                $this->transitionOrder($order, $almaPayment);
+                $this->processOrder($order, $almaPayment);
             }
 
             return true;
@@ -253,7 +245,7 @@ class PaymentValidation
         try {
             $this->alma->payments->flagAsPotentialFraud($almaPayment->id, $reason);
         } catch (RequestError $e) {
-            $this->logger->info("Error flagging payment {$almaPayment->id} as fraudulent");
+            $this->logger->error("Error flagging payment {$almaPayment->id} as fraudulent");
         }
     }
 
@@ -262,9 +254,9 @@ class PaymentValidation
      * @param AlmaPayment $almaPayment
      *
      * @return void
-     * @throws NoSuchEntityException
+     * @throws AlmaPaymentValidationException
      */
-    public function transitionOrder(Order $order, AlmaPayment $almaPayment): void
+    public function processOrder(Order $order, AlmaPayment $almaPayment): void
     {
         $order->setCanSendNewEmailFlag(true);
         $order->setState(Order::STATE_PROCESSING);
@@ -369,11 +361,15 @@ class PaymentValidation
      * @param string $orderId
      *
      * @return void
-     * @throws NoSuchEntityException
+     * @throws AlmaPaymentValidationException
      */
     public function inactiveQuoteById(string $orderId): void
     {
-        $quote = $this->quoteRepository->get($orderId);
+        try {
+            $quote = $this->quoteRepository->get($orderId);
+        } catch (NoSuchEntityException $e) {
+            throw new AlmaPaymentValidationException($e->getMessage());
+        }
         $quote->setIsActive(false);
         $this->quoteRepository->save($quote);
     }
