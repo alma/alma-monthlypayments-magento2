@@ -51,6 +51,7 @@ class ResponseHandler implements HandlerInterface
         $almaPayment = $response['almaPayment'];
 
         $payment->setTransactionId($almaPayment->id);
+        $payment->setAdditionalInformation(Config::ORDER_PAYMENT_ID, $almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_URL, $almaPayment->url);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_TRIGGER, $almaPayment->deferred_trigger);
         $payment->setIsTransactionClosed(false);

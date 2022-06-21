@@ -3,7 +3,10 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\OrderFactory;
 
 class OrderHelper
 {
@@ -12,19 +15,72 @@ class OrderHelper
      *
      * @return string
      */
-    public function getOrderCurrency(OrderInterface $order): string
-    {
-        return $order->getOrderCurrencyCode();
+    private $orderFactory;
+    /**
+     * @var OrderManagementInterface
+     */
+    private $orderManagement;
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+
+    public function __construct(
+        Context $context,
+        OrderFactory $orderFactory,
+        OrderRepositoryInterface $orderRepository,
+        OrderManagementInterface $orderManagement
+    ) {
+        parent::__construct($context);
+        $this->orderFactory = $orderFactory;
+        $this->orderManagement = $orderManagement;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
-     * @param OrderInterface $order
+     * Load a specified order.
+     * @param string $orderId
      *
-     * @return string
+     * @return OrderInterface
      */
-    public function getOrderPaymentMethodCode(OrderInterface $order): string
+    public function getOrder(string $orderId): OrderInterface
     {
         /** @var OrderPaymentInterface $payment */
         return $order->getPayment()->getMethod();
     }
+
+    /**
+     * Cancels a specified order.
+     * @param string $orderId
+     *
+     * @return void
+     */
+    public function cancel(string $orderId): void
+    {
+        $this->orderManagement->cancel($orderId);
+    }
+
+    /**
+     * Emails a user a specified order.
+     * @param string $orderId
+     *
+     * @return void
+     */
+    public function notify(string $orderId): void
+    {
+        $this->orderManagement->notify($orderId);
+    }
+
+    /**
+     * Performs persist operations for a specified order.
+     * @param Order $order
+     *
+     * @return void
+     */
+    public function save(Order $order): void
+    {
+        $this->orderRepository->save($order);
+    }
+
+
 }

@@ -45,9 +45,10 @@
                 <can_authorize>0</can_authorize>
                 <can_capture>0</can_capture>
                 <can_void>0</can_void>
-                <can_refund>0</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
                 <can_use_checkout>1</can_use_checkout>
-                <is_gateway>0</is_gateway>
+                <is_gateway>1</is_gateway>
 
                 <excluded_product_types>virtual,downloadable</excluded_product_types>
                 <excluded_products_message>Virtual and downloadable products aren't eligible</excluded_products_message>

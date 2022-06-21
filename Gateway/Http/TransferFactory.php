@@ -48,8 +48,7 @@ class TransferFactory implements TransferFactoryInterface
     public function __construct(
         TransferBuilder $transferBuilder,
         Config $config
-    )
-    {
+    ) {
         $this->transferBuilder = $transferBuilder;
         $this->config = $config;
     }
@@ -60,7 +59,7 @@ class TransferFactory implements TransferFactoryInterface
      * @param array $request
      * @return TransferInterface
      */
-    public function create(array $request)
+    public function create(array $request): TransferInterface
     {
         return $this->transferBuilder
             ->setBody($request)

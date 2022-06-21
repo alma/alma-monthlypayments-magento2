@@ -25,8 +25,8 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
-use Alma\MonthlyPayments\Helpers\AlmaPaymentValidationError;
 use Alma\MonthlyPayments\Helpers\PaymentValidation;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
@@ -65,7 +65,7 @@ class Ipn extends Action
         try {
             $paymentId = $this->getRequest()->getParam('pid');
             $this->paymentValidationHelper->completeOrderIfValid($paymentId);
-        } catch (AlmaPaymentValidationError $e) {
+        } catch (AlmaPaymentValidationException $e) {
             return $json->setData(["error" => $e->getMessage()])->setHttpResponseCode(500);
         }
 

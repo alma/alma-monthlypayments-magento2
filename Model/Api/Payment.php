@@ -29,8 +29,8 @@ use Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface;
 use Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterfaceFactory;
 use Alma\MonthlyPayments\Api\PaymentInterface;
 use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Helpers\AlmaPaymentValidationError;
 use Alma\MonthlyPayments\Helpers\PaymentValidation;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -95,7 +95,7 @@ class Payment implements PaymentInterface
 
         try {
             $this->paymentValidation->validateOrderPayment($order, $almaPayment, false);
-        } catch (AlmaPaymentValidationError $e) {
+        } catch (AlmaPaymentValidationException $e) {
             $validationResult->setReason($e->getMessage());
             return $validationResult;
         }
