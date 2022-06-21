@@ -339,6 +339,7 @@
                         <config_path>payment/alma_monthly_payments/share_checkout_enable</config_path>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ShareOfCheckoutDate</backend_model>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
                     <field id="failure_return_url" translate="label comment" type="text" sortOrder="16"
                            showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Failure return url</label>
