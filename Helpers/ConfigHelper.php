@@ -1,10 +1,9 @@
 <?php
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Store\Model\ScopeInterface;
 
 class ConfigHelper extends AbstractHelper
 {
@@ -15,6 +14,7 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
+    const PAYMENT_EXPIRATION_TIME = 'expiration_time';
 
     /**
      * @return bool
@@ -55,8 +55,16 @@ class ConfigHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getTranslatedTrigger():string
+    public function getTranslatedTrigger(): string
     {
         return __($this->getTrigger());
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentExpirationTime(): string
+    {
+        return $this->getConfigByCode(self::PAYMENT_EXPIRATION_TIME);
     }
 }
