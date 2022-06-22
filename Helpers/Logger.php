@@ -71,12 +71,12 @@ class Logger extends Monolog
      * @param array $context
      * @return bool
      */
-    public function addRecord($level, $message, array $context = []): bool
+    public function addRecord($level, $message, array $context = [], ?\Monolog\DateTimeImmutable $datetime = null): bool
     {
         if (!$this->configHelper->canLog()) {
             return true;
         }
 
-        return parent::addRecord($level, $message, $context);
+        return parent::addRecord($level, $message, $context, $datetime);
     }
 }
