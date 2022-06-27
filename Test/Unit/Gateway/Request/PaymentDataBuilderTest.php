@@ -7,7 +7,6 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
