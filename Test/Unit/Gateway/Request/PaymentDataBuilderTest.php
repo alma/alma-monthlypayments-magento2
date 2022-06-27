@@ -41,24 +41,24 @@ class PaymentDataBuilderTest extends TestCase
      *
      * @return void
      */
-    public function testNonTriggerPaymentPayload($order, $payment, $response): void
+    public function testNonTriggerPaymentPayload($order, $response): void
     {
         $infoInterfaceMock = $this->createMock(InfoInterface::class);
-        $infoInterfaceMock->expects($this->once())->method('getAdditionalInformation')->willReturn($order['plan_key']);
+        $infoInterfaceMock->expects($this->once())->method('getAdditionalInformation')->willReturn(self::PLAN_KEY);
 
         $orderInterfaceMock = $this->createMock(OrderAdapterInterface::class);
-        $orderInterfaceMock->expects($this->once())->method('getOrderIncrementId')->willReturn($order['increment_id']);
-        $orderInterfaceMock->expects($this->once())->method('getGrandTotalAmount')->willReturn($order['grand_total_amount']);
+        $orderInterfaceMock->expects($this->once())->method('getOrderIncrementId')->willReturn(self::INCREMENT_ID);
+        $orderInterfaceMock->expects($this->once())->method('getGrandTotalAmount')->willReturn(100.00);
 
         $paymentDataObjectMock = $this->createMock(PaymentDataObject::class);
         $paymentDataObjectMock->expects($this->once())->method('getPayment')->willReturn($infoInterfaceMock);
         $paymentDataObjectMock->expects($this->once())->method('getOrder')->willReturn($orderInterfaceMock);
 
-        $this->checkoutSession->expects($this->once())->method('getQuoteId')->willReturn($order['quote_id']);
+        $this->checkoutSession->expects($this->once())->method('getQuoteId')->willReturn(self::QUOTE_ID);
 
         $paymentPlanConfigMock = $this->createMock(PaymentPlanConfigInterface::class);
-        $plansMock = [$order['plan_key'] => $paymentPlanConfigMock ];
-        $paymentPlanConfigMock->expects($this->once())->method('getPaymentData')->willReturn($payment);
+        $plansMock = [self::PLAN_KEY => $paymentPlanConfigMock];
+        $paymentPlanConfigMock->expects($this->once())->method('getPaymentData')->willReturn(['installments_count' => self::INSTALLMENT_COUNT]);
         $paymentPlanConfigMock->expects($this->any())->method('hasDeferredTrigger')->willReturn($order['plan_has_trigger']);
 
         $paymentPlansConfigMock = $this->createMock(PaymentPlansConfigInterface::class);
@@ -81,100 +81,55 @@ class PaymentDataBuilderTest extends TestCase
 
     public function paymentPayloadDataProvider(): array
     {
+        $paymentBase = [
+            'installments_count' => self::INSTALLMENT_COUNT,
+            'return_url' => self::RETURN_URL,
+            'ipn_callback_url' => self::IPN_URL,
+            'customer_cancel_url' => self::CANCEL_URL,
+            'failure_return_url' => self::FAILURE_URL,
+            'purchase_amount' => 10000,
+            'shipping_address' => [],
+            'billing_address' => [],
+            'locale' => self::LOCALE,
+            'expires_after' => 0,
+            'custom_data' => [
+                'order_id' => self::INCREMENT_ID,
+                'quote_id' => self::QUOTE_ID,
+            ]
+        ];
+
         return [
             'Non trigger Payload' => [
                 'order' => [
-                    'increment_id' => self::INCREMENT_ID,
-                    'grand_total_amount' => 100.00,
-                    'quote_id' => self::QUOTE_ID,
-                    'plan_key' => self::PLAN_KEY,
                     'is_trigger' => false,
                     'plan_has_trigger' => false,
                 ],
-                'payment' => [
-                    'installments_count' => self::INSTALLMENT_COUNT,
-                ],
                 'final_payload' => [
-                    'payment' => [
-                        'installments_count' => self::INSTALLMENT_COUNT,
-                        'return_url' => self::RETURN_URL,
-                        'ipn_callback_url' => self::IPN_URL,
-                        'customer_cancel_url' => self::CANCEL_URL,
-                        'failure_return_url' => self::FAILURE_URL,
-                        'purchase_amount' => 10000,
-                        'shipping_address' => [],
-                        'billing_address' => [],
-                        'locale' => self::LOCALE,
-                        'expires_after' => 0,
-                        'custom_data' => [
-                            'order_id' => self::INCREMENT_ID,
-                            'quote_id' => self::QUOTE_ID,
-                        ],
-                    ]
+                    'payment' => $paymentBase
                 ]
             ],
             'Trigger is enable but plan is not trigger' => [
                 'order' => [
-                    'increment_id' => self::INCREMENT_ID,
-                    'grand_total_amount' => 100.00,
-                    'quote_id' => self::QUOTE_ID,
-                    'plan_key' => self::PLAN_KEY,
                     'is_trigger' => true,
                     'plan_has_trigger' => false,
                 ],
-                'payment' => [
-                    'installments_count' => self::INSTALLMENT_COUNT
-                ],
                 'final_payload' => [
-                    'payment' => [
-                        'installments_count' => self::INSTALLMENT_COUNT,
-                        'return_url' => self::RETURN_URL,
-                        'ipn_callback_url' => self::IPN_URL,
-                        'customer_cancel_url' => self::CANCEL_URL,
-                        'failure_return_url' => self::FAILURE_URL,
-                        'purchase_amount' => 10000,
-                        'shipping_address' => [],
-                        'billing_address' => [],
-                        'locale' => self::LOCALE,
-                        'expires_after' => 0,
-                        'custom_data' => [
-                            'order_id' => self::INCREMENT_ID,
-                            'quote_id' => self::QUOTE_ID,
-                        ],
-                    ]
+                    'payment' => $paymentBase
                 ]
             ],
             'Trigger is enable and plan is trigger' => [
                 'order' => [
-                    'increment_id' => self::INCREMENT_ID,
-                    'grand_total_amount' => 100.00,
-                    'quote_id' => self::QUOTE_ID,
-                    'plan_key' => self::PLAN_KEY,
                     'is_trigger' => true,
                     'plan_has_trigger' => true,
                 ],
-                'payment' => [
-                    'installments_count' => self::INSTALLMENT_COUNT
-                ],
                 'final_payload' => [
-                    'payment' => [
-                        'installments_count' => self::INSTALLMENT_COUNT,
-                        'return_url' => self::RETURN_URL,
-                        'ipn_callback_url' => self::IPN_URL,
-                        'customer_cancel_url' => self::CANCEL_URL,
-                        'failure_return_url' => self::FAILURE_URL,
-                        'purchase_amount' => 10000,
-                        'shipping_address' => [],
-                        'billing_address' => [],
-                        'locale' => self::LOCALE,
-                        'expires_after' => 0,
-                        'custom_data' => [
-                            'order_id' => self::INCREMENT_ID,
-                            'quote_id' => self::QUOTE_ID,
-                        ],
-                        'deferred' => 'trigger',
-                        'deferred_description' => '',
-                    ]
+                    'payment' => array_merge(
+                        $paymentBase,
+                        [
+                            'deferred' => 'trigger',
+                            'deferred_description' => '',
+                        ]
+                    )
                 ]
             ]
         ];
