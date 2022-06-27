@@ -117,9 +117,9 @@ class Customer
      */
     private function customerIsB2B(array $addresses): bool
     {
-        foreach ($addresses as $address) {
+        foreach ($addresses as $addressType => $address) {
             /** @var AddressAdapterInterface|null $address */
-            if (isset($address) && !empty($address->getCompany())) {
+            if ($addressType == 'billing_address' && isset($address) && !empty($address->getCompany())) {
                 return true;
             }
         }
