@@ -14,7 +14,7 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
-    const PAYMENT_EXPIRATION_TIME = 'expiration_time';
+    const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
 
     /**
      * @return bool
@@ -63,10 +63,10 @@ class ConfigHelper extends AbstractHelper
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getPaymentExpirationTime(): string
+    public function getPaymentExpirationTime(): int
     {
-        return $this->getConfigByCode(self::PAYMENT_EXPIRATION_TIME);
+        return (int)$this->getConfigByCode(self::PAYMENT_EXPIRATION_TIME);
     }
 }
