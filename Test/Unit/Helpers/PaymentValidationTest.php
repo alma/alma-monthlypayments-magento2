@@ -4,13 +4,16 @@ namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
 use Alma\API\Entities\Payment;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\OrderHelper;
 use Alma\MonthlyPayments\Helpers\PaymentValidation;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
 use Magento\Checkout\Model\Session;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Phrase;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment as OrderPayment;
@@ -35,6 +38,7 @@ class PaymentValidationTest extends TestCase
         $this->quoteRepository = $this->createMock(QuoteRepository::class);
         $this->builderInterface = Mockery::mock(BuilderInterface::class);
         $this->orderHelper = $this->createMock(OrderHelper::class);
+        $this->configHelper = $this->createMock(ConfigHelper::class);
     }
 
     /**
@@ -97,7 +101,7 @@ class PaymentValidationTest extends TestCase
             ->once()
             ->with(TransactionInterface::TYPE_PAYMENT)
             ->andReturn($this->createMock(TransactionInterface::class));
-        $paymentValidation = Mockery::mock(PaymentValidation::class, $this->getConstructorDependency())->makePartial()->shouldAllowMockingProtectedMethods();
+        $paymentValidation = $this->getPaymentValidationMockPartial();
         $paymentValidation->shouldReceive('createPaymentData')->once();
         $paymentValidation->shouldReceive('addTransactionComment')
              ->once()
@@ -141,7 +145,7 @@ class PaymentValidationTest extends TestCase
             ->method('cancel')
             ->with($orderId);
 
-        $paymentValidation = Mockery::mock(PaymentValidation::class, $this->getConstructorDependency())->makePartial()->shouldAllowMockingProtectedMethods();
+        $paymentValidation = $this->getPaymentValidationMockPartial();
         $paymentValidation->shouldReceive('addCommentToOrder')
             ->once()
             ->with($orderMock, 'internal error render', Order::STATUS_FRAUD)
@@ -152,6 +156,32 @@ class PaymentValidationTest extends TestCase
             ->method('render')
             ->willReturn('internal error render');
         $paymentValidation->cancelOrder($phraseMock, true, $orderMock);
+    }
+
+    /**
+     * @throws AlmaPaymentValidationException
+     */
+    public function testGetPaymentReturnPayment(): void
+    {
+        $paymentMock = Mockery::mock(OrderPaymentInterface::class);
+        $orderMock = Mockery::mock(Order::class);
+        $orderMock->shouldReceive('getPayment')->andReturn($paymentMock);
+        $paymentValidationMock = $this->getPaymentValidationMockPartial();
+        $this->assertEquals($paymentMock, $paymentValidationMock->getPayment($orderMock));
+    }
+
+    /**
+     * @throws AlmaPaymentValidationException
+     */
+    public function testGetPaymentThrowAlmaPaymentValidationException(): void
+    {
+        $orderMock = Mockery::mock(Order::class);
+        $orderMock->shouldReceive('getPayment')->andReturn(null);
+        $orderMock->shouldReceive('getIncrementId')->andReturn('0000001');
+        $paymentValidationMock = $this->getPaymentValidationMockPartial();
+        $orderMock->shouldReceive('addCommentToStatusHistory');
+        $this->expectException(AlmaPaymentValidationException::class);
+        $paymentValidationMock->getPayment($orderMock);
     }
 
     private function createNewPaymentValidation(): PaymentValidation
@@ -167,7 +197,8 @@ class PaymentValidationTest extends TestCase
             $this->paymentProcessor,
             $this->quoteRepository,
             $this->builderInterface,
-            $this->orderHelper
+            $this->orderHelper,
+            $this->configHelper
         ];
     }
 
@@ -210,5 +241,13 @@ class PaymentValidationTest extends TestCase
                 ]
             ]
         ];
+    }
+
+    /**
+     * @return Mockery\Mock | PaymentValidation
+     */
+    protected function getPaymentValidationMockPartial()
+    {
+        return Mockery::mock(PaymentValidation::class, $this->getConstructorDependency())->makePartial()->shouldAllowMockingProtectedMethods();
     }
 }
