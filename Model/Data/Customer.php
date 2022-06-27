@@ -25,25 +25,13 @@
 
 namespace Alma\MonthlyPayments\Model\Data;
 
-use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Checkout\Model\Session;
-use \Magento\Customer\Api\Data\CustomerInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SortOrder;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Sales\Model\Order;
 
 class Customer
 {
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
+
     /**
      * @var Session
      */
@@ -51,18 +39,11 @@ class Customer
 
     /**
      * Customer constructor.
-     * @param OrderRepositoryInterface $orderRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Session $checkoutSession
      */
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
         Session $checkoutSession
-    )
-    {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+    ) {
         $this->checkoutSession = $checkoutSession;
     }
 
@@ -70,9 +51,8 @@ class Customer
      * @param CustomerInterface|null $customer
      * @param AddressAdapterInterface[] $addresses
      * @return array
-     * @throws \Magento\Framework\Exception\InputException
      */
-    public function dataFromCustomer($customer, $addresses)
+    public function dataFromCustomer(?CustomerInterface $customer, array $addresses): array
     {
         if ($customer) {
             $customerData = [
@@ -80,6 +60,7 @@ class Customer
                 'last_name' => $customer->getLastname(),
                 'email' => $customer->getEmail(),
                 'birth_date' => $customer->getDob(),
+                'is_business' => $this->customerIsB2B($addresses),
                 'addresses' => [],
                 'phone' => null,
                 'metadata' => [],
@@ -90,6 +71,7 @@ class Customer
                 'last_name' => null,
                 'email' => null,
                 'birth_date' => null,
+                'is_business' => $this->customerIsB2B($addresses),
                 'addresses' => [],
                 'phone' => null,
                 'metadata' => [],
@@ -125,7 +107,22 @@ class Customer
                 // just ignore
             }
         }
-        
         return $customerData;
+    }
+
+    /**
+     * @param array $addresses
+     *
+     * @return bool
+     */
+    private function customerIsB2B(array $addresses): bool
+    {
+        foreach ($addresses as $address) {
+            /** @var AddressAdapterInterface|null $address */
+            if (isset($address) && !empty($address->getCompany())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
