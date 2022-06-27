@@ -70,8 +70,7 @@ class PaymentDataBuilder implements BuilderInterface
         Config          $config,
         Resolver        $locale,
         ConfigHelper    $configHelper
-    )
-    {
+    ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
         $this->locale = $locale;
