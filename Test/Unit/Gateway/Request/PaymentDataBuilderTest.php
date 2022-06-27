@@ -71,7 +71,7 @@ class PaymentDataBuilderTest extends TestCase
 
         $this->locale->expects($this->once())->method('getLocale')->willReturn(self::LOCALE);
 
-        $this->configHelper->expects($this->once())->method('triggerIsEnabled')->willReturn($order['is_trigger']);
+        $this->configHelper->expects($this->once())->method('triggerIsEnabled')->willReturn($order['has_trigger']);
 
         $buildSubjectMock = ['payment' => $paymentDataObjectMock];
         $paymentDataBuilder = $this->createPaymentDataBuilderTest();
@@ -98,27 +98,27 @@ class PaymentDataBuilderTest extends TestCase
         ];
 
         return [
-            'Non trigger Payload' => [
+            'Payload without trigger' => [
                 'order' => [
-                    'is_trigger' => false,
+                    'has_trigger' => false,
                     'plan_has_trigger' => false,
                 ],
                 'final_payload' => [
                     'payment' => $paymentBase
                 ]
             ],
-            'Trigger is enable but plan is not trigger' => [
+            'Trigger option is enable but plan do not have trigger option' => [
                 'order' => [
-                    'is_trigger' => true,
+                    'has_trigger' => true,
                     'plan_has_trigger' => false,
                 ],
                 'final_payload' => [
                     'payment' => $paymentBase
                 ]
             ],
-            'Trigger is enable and plan is trigger' => [
+            'Trigger option is enable but plan has trigger option' => [
                 'order' => [
-                    'is_trigger' => true,
+                    'has_trigger' => true,
                     'plan_has_trigger' => true,
                 ],
                 'final_payload' => [
