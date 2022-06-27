@@ -26,20 +26,22 @@ class ConfigHelper extends AbstractHelper
 
     public function getConfigByCode($code, $storeId = null)
     {
-        return $this->getConfigValue(self::XML_PATH_PAYMENT.'/'.self::XML_PATH_METHODE.'/'.$code, $storeId);
+        return $this->getConfigValue(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $code, $storeId);
     }
 
     private function getConfigValue($code, $storeId = null)
     {
         return $this->scopeConfig->getValue(
-            $code, ScopeInterface::SCOPE_STORE, $storeId
+            $code,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 
     /**
      * @return bool
      */
-    public function triggerIsEnabled():bool
+    public function triggerIsEnabled(): bool
     {
         return ($this->getConfigByCode(self::TRIGGER_IS_ALLOWED) && $this->getConfigByCode(self::TRIGGER_IS_ENABLED));
     }
@@ -47,7 +49,7 @@ class ConfigHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getTrigger():string
+    public function getTrigger(): string
     {
         return $this->getConfigByCode(self::TRIGGER_TYPOLOGY);
     }
