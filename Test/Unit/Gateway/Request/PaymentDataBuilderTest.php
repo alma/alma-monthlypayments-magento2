@@ -17,10 +17,10 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentDataBuilderTest extends TestCase
 {
-    const RETURN_URL =  'http://mywebsite/alma/payment/return/';
-    const IPN_URL =  'http://mywebsite/alma/payment/ipn/';
-    const CANCEL_URL =  'http://mywebsite/alma/payment/cancel/';
-    const FAILURE_URL =  'http://mywebsite/alma/payment/failure/';
+    const RETURN_URL =  'https://mywebsite/alma/payment/return/';
+    const IPN_URL =  'https://mywebsite/alma/payment/ipn/';
+    const CANCEL_URL =  'https://mywebsite/alma/payment/cancel/';
+    const FAILURE_URL =  'https://mywebsite/alma/payment/failure/';
     const EXPIRATION_TIME =  '2';
     const INCREMENT_ID =  '100001';
     const QUOTE_ID =  '454';
