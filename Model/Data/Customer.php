@@ -54,17 +54,13 @@ class Customer
      */
     public function dataFromCustomer(?CustomerInterface $customer, array $addresses): array
     {
-        $isB2B = false;
-        if (isset($addresses['billing_address'])) {
-            $isB2B = $this->isB2B($addresses['billing_address']);
-        }
+
         if ($customer) {
             $customerData = [
                 'first_name' => $customer->getFirstname(),
                 'last_name' => $customer->getLastname(),
                 'email' => $customer->getEmail(),
                 'birth_date' => $customer->getDob(),
-                'is_business' => $isB2B,
                 'addresses' => [],
                 'phone' => null,
                 'metadata' => [],
@@ -75,11 +71,16 @@ class Customer
                 'last_name' => null,
                 'email' => null,
                 'birth_date' => null,
-                'is_business' => $isB2B,
                 'addresses' => [],
                 'phone' => null,
                 'metadata' => [],
             ];
+        }
+
+        if (isset($addresses['billing_address'])) {
+            $isB2B = $this->isB2B($addresses['billing_address']);
+            $customerData['is_business'] = $isB2B;
+            $customerData['business_name'] = $addresses['billing_address']->getCompany();
         }
 
         foreach ($addresses as $address) {
