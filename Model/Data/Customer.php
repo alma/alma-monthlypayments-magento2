@@ -78,8 +78,7 @@ class Customer
         }
 
         if (isset($addresses['billing_address'])) {
-            $isB2B = $this->isB2B($addresses['billing_address']);
-            $customerData['is_business'] = $isB2B;
+            $customerData['is_business'] = !empty($addresses['billing_address']->getCompany());
             $customerData['business_name'] = $addresses['billing_address']->getCompany();
         }
 
@@ -113,18 +112,5 @@ class Customer
             }
         }
         return $customerData;
-    }
-
-    /**
-     * @param AddressAdapterInterface $address
-     *
-     * @return bool
-     */
-    private function isB2B(AddressAdapterInterface $address): bool
-    {
-        if (!empty($address->getCompany())) {
-            return true;
-        }
-        return false;
     }
 }
