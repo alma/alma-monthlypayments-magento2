@@ -54,7 +54,10 @@ class Customer
      */
     public function dataFromCustomer(?CustomerInterface $customer, array $addresses): array
     {
-        $isB2B = $this->isB2B($addresses['billing_address']);
+        $isB2B = false;
+        if (isset($addresses['billing_address'])) {
+            $isB2B = $this->isB2B($addresses['billing_address']);
+        }
         if ($customer) {
             $customerData = [
                 'first_name' => $customer->getFirstname(),
@@ -112,14 +115,13 @@ class Customer
     }
 
     /**
-     * @param AddressAdapterInterface|null $address
+     * @param AddressAdapterInterface $address
      *
      * @return bool
      */
-    private function isB2B(?AddressAdapterInterface $address): bool
+    private function isB2B(AddressAdapterInterface $address): bool
     {
-        /** @var AddressAdapterInterface|null $address */
-        if (isset($address) && !empty($address->getCompany())) {
+        if (!empty($address->getCompany())) {
             return true;
         }
         return false;
