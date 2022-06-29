@@ -74,10 +74,10 @@ class CustomerDataBuilder implements BuilderInterface
 
         $addressArray = [];
         if ($order->getBillingAddress()) {
-            $addressArray[] = $order->getBillingAddress();
+            $addressArray['billing_address'] = $order->getBillingAddress();
         }
         if ($order->getShippingAddress()) {
-            $addressArray[] = $order->getShippingAddress();
+            $addressArray['shipping_address'] = $order->getShippingAddress();
         }
         return [
             'customer' => $this->customerData->dataFromCustomer(
