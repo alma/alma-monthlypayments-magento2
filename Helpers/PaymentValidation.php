@@ -33,6 +33,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment as OrderPayment;
@@ -160,6 +161,9 @@ class PaymentValidation
             $almaPayment = null;
             $almaPayment = $this->getAlmaPayment($paymentId);
             $order = $this->findOrderForPayment($almaPayment);
+            if ($this->paymentIsExpired($almaPayment)) {
+                return $this->expireOrder($order);
+            }
             return $this->validateOrderPayment($order, $almaPayment, true);
         } catch (AlmaPaymentValidationException $e) {
             $this->logger->critical($e->getMessage());
@@ -179,14 +183,7 @@ class PaymentValidation
     {
         $errorMessage = __('There was an error when validating your payment. Please try again or contact us if the problem persists.')->render();
 
-        $payment = $order->getPayment();
-        if (!$payment) {
-            $internalError = __("Cannot get payment information from order %s", $order->getIncrementId());
-
-            $this->logger->error($internalError->render());
-            $this->addCommentToOrder($order, $internalError);
-            throw new AlmaPaymentValidationException($errorMessage);
-        }
+        $payment = $this->getPayment($order);
 
         // Check that there's no price mismatch between the order amount and what's been paid
         if (Functions::priceToCents($order->getGrandTotal()) !== $almaPayment->purchase_amount) {
@@ -392,5 +389,48 @@ class PaymentValidation
             $this->orderHelper->save($order);
             $this->orderHelper->cancel($order->getId());
         }
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return bool
+     */
+    protected function expireOrder(Order $order): bool
+    {
+        $order = $this->addCommentToOrder($order, __('Alma Payment is expired'));
+        $this->orderHelper->save($order);
+        $this->orderHelper->cancel($order->getId());
+        $this->logger->info('Payment is expired cancel Order :', [$order->getIncrementId()]);
+        return true;
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return OrderPaymentInterface
+     * @throws AlmaPaymentValidationException
+     */
+    public function getPayment(Order $order): OrderPaymentInterface
+    {
+        $payment = $order->getPayment();
+        if (!$payment) {
+            $internalError = __("Cannot get payment information from order %s", $order->getIncrementId());
+
+            $this->logger->error($internalError->render());
+            $this->addCommentToOrder($order, $internalError);
+            throw new AlmaPaymentValidationException($internalError->render());
+        }
+        return $payment;
+    }
+
+    /**
+     * @param AlmaPayment $almaPayment
+     *
+     * @return bool
+     */
+    private function paymentIsExpired(AlmaPayment $almaPayment): bool
+    {
+        return (bool)$almaPayment->expired_at;
     }
 }

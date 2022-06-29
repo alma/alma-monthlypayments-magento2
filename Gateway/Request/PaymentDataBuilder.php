@@ -70,8 +70,7 @@ class PaymentDataBuilder implements BuilderInterface
         Config          $config,
         Resolver        $locale,
         ConfigHelper    $configHelper
-    )
-    {
+    ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
         $this->locale = $locale;
@@ -106,6 +105,7 @@ class PaymentDataBuilder implements BuilderInterface
             'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
             'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
             'locale' => $this->locale->getLocale(),
+            'expires_after' => $this->configHelper->getPaymentExpirationTime(),
             'custom_data' => [
                 'order_id' => $orderId,
                 'quote_id' => $quoteId,

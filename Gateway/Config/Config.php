@@ -228,10 +228,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             try {
                 $plansConfig->updateFromApi();
             } catch (RequestError $e) {
-                $this->logger->error('getPaymentPlansConfig Error : ',[$e->getMessage()]);
+                $this->logger->error('getPaymentPlansConfig Error : ', [$e->getMessage()]);
             }
         }
-
         return $plansConfig;
     }
-    }
+}

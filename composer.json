@@ -30,6 +30,7 @@
         "magento/framework": ">=100.0.2",
         "magento/magento-composer-installer": "*",
         "magento/module-sample-data": "^100.4",
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "mockery/mockery": "^1.3"
     }
 }
