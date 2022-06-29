@@ -2,6 +2,8 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
+use Alma\API\Client;
+use Alma\API\Endpoints\Payments;
 use Alma\API\Entities\Payment;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
@@ -27,6 +29,9 @@ class PaymentValidationTest extends TestCase
     const TXT_PRICE = '1 012,20 €';
     const FIXED_TIMESTAMP = '1654114331';
     const DEFFERED_DAYS_30 = '30';
+    const PAYMENT_ID = 'payment_11upE7m4owxuD78NBymjsYGD6xzxL3KKpZ';
+    const INCREMENT_ID = '0000000001';
+    const ORDER_ID = '23';
 
 
     public function setUp(): void
@@ -182,6 +187,53 @@ class PaymentValidationTest extends TestCase
         $orderMock->shouldReceive('addCommentToStatusHistory');
         $this->expectException(AlmaPaymentValidationException::class);
         $paymentValidationMock->getPayment($orderMock);
+    }
+
+    public function testIpnWithExpiredAtPropertyCancelOrder()
+    {
+        $this->createAlmaPaymentMock('123345');
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getIncrementId')->willReturn(self::INCREMENT_ID);
+        $orderMock->method('getId')->willReturn(self::ORDER_ID);
+        $this->orderHelper->method('getOrder')->willReturn($orderMock);
+
+        $this->orderHelper->expects($this->once())->method('cancel')->with(self::ORDER_ID);
+
+        $paymentValidation = $this->createNewPaymentValidation();
+        $this->assertTrue($paymentValidation->completeOrderIfValid(self::PAYMENT_ID));
+    }
+
+    public function testIpnWithExpiredAtPropertyNullWithBadOrderThrowException(): void
+    {
+        $this->createAlmaPaymentMock(null);
+
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getIncrementId')->willReturn(self::INCREMENT_ID);
+        $orderMock->method('getId')->willReturn(self::ORDER_ID);
+        $this->orderHelper->method('getOrder')->willReturn($orderMock);
+
+        $this->expectException(AlmaPaymentValidationException::class);
+        $paymentValidation = $this->createNewPaymentValidation();
+        $paymentValidation->completeOrderIfValid(self::PAYMENT_ID);
+    }
+
+    /**
+     * @param string|null $expireAt
+     *
+     * @return void
+     */
+    private function createAlmaPaymentMock(?string $expireAt): void
+    {
+        $paymentMock = $this->createMock(Payment::class);
+        $paymentMock->expired_at = $expireAt;
+        $paymentMock->custom_data['order_id'] = self::INCREMENT_ID;
+
+        $paymentsEndpointMock = $this->createMock(Payments::class);
+        $paymentsEndpointMock->method('fetch')->willReturn($paymentMock);
+
+        $almaClientMock = $this->createMock(Client::class);
+        $almaClientMock->payments = $paymentsEndpointMock;
+        $this->almaClient->method('getDefaultClient')->willReturn($almaClientMock);
     }
 
     private function createNewPaymentValidation(): PaymentValidation

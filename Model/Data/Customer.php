@@ -25,25 +25,13 @@
 
 namespace Alma\MonthlyPayments\Model\Data;
 
-use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Checkout\Model\Session;
-use \Magento\Customer\Api\Data\CustomerInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SortOrder;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Sales\Model\Order;
 
 class Customer
 {
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
+
     /**
      * @var Session
      */
@@ -51,18 +39,11 @@ class Customer
 
     /**
      * Customer constructor.
-     * @param OrderRepositoryInterface $orderRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Session $checkoutSession
      */
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
         Session $checkoutSession
-    )
-    {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+    ) {
         $this->checkoutSession = $checkoutSession;
     }
 
@@ -70,10 +51,10 @@ class Customer
      * @param CustomerInterface|null $customer
      * @param AddressAdapterInterface[] $addresses
      * @return array
-     * @throws \Magento\Framework\Exception\InputException
      */
-    public function dataFromCustomer($customer, $addresses)
+    public function dataFromCustomer(?CustomerInterface $customer, array $addresses): array
     {
+
         if ($customer) {
             $customerData = [
                 'first_name' => $customer->getFirstname(),
@@ -94,6 +75,11 @@ class Customer
                 'phone' => null,
                 'metadata' => [],
             ];
+        }
+
+        if (isset($addresses['billing_address'])) {
+            $customerData['is_business'] = !empty($addresses['billing_address']->getCompany());
+            $customerData['business_name'] = $addresses['billing_address']->getCompany();
         }
 
         foreach ($addresses as $address) {
@@ -125,7 +111,6 @@ class Customer
                 // just ignore
             }
         }
-        
         return $customerData;
     }
 }

@@ -40,7 +40,7 @@ class PaymentDataBuilderTest extends TestCase
      *
      * @return void
      */
-    public function testNonTriggerPaymentPayload($order, $response): void
+    public function testTriggerPaymentPayload($order, $response): void
     {
         $infoInterfaceMock = $this->createMock(InfoInterface::class);
         $infoInterfaceMock->expects($this->once())->method('getAdditionalInformation')->willReturn(self::PLAN_KEY);
