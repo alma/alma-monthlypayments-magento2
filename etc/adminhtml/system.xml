@@ -131,7 +131,12 @@
                         <field id="active">1</field>
                     </depends>
                     <label>Payment method configuration</label>
-                    <field id="payment_plans" translate="label" sortOrder="23" showInDefault="23" showInWebsite="1"
+                    <field id="payment_expiration" translate="label" sortOrder="20" showInDefault="1">
+                        <label>Payment expiration time</label>
+                        <config_path>payment/alma_monthly_payments/payment_expiration</config_path>
+                        <frontend_class>validate-number</frontend_class>
+                    </field>
+                    <field id="payment_plans" translate="label" sortOrder="23" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <label>Payment plans</label>
                         <config_path>payment/alma_monthly_payments/payment_plans</config_path>

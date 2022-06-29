@@ -1,10 +1,9 @@
 <?php
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Store\Model\ScopeInterface;
 
 class ConfigHelper extends AbstractHelper
 {
@@ -15,6 +14,7 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
+    const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
 
     /**
      * @return bool
@@ -26,20 +26,22 @@ class ConfigHelper extends AbstractHelper
 
     public function getConfigByCode($code, $storeId = null)
     {
-        return $this->getConfigValue(self::XML_PATH_PAYMENT.'/'.self::XML_PATH_METHODE.'/'.$code, $storeId);
+        return $this->getConfigValue(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $code, $storeId);
     }
 
     private function getConfigValue($code, $storeId = null)
     {
         return $this->scopeConfig->getValue(
-            $code, ScopeInterface::SCOPE_STORE, $storeId
+            $code,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 
     /**
      * @return bool
      */
-    public function triggerIsEnabled():bool
+    public function triggerIsEnabled(): bool
     {
         return ($this->getConfigByCode(self::TRIGGER_IS_ALLOWED) && $this->getConfigByCode(self::TRIGGER_IS_ENABLED));
     }
@@ -47,7 +49,7 @@ class ConfigHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getTrigger():string
+    public function getTrigger(): string
     {
         return $this->getConfigByCode(self::TRIGGER_TYPOLOGY);
     }
@@ -55,8 +57,16 @@ class ConfigHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getTranslatedTrigger():string
+    public function getTranslatedTrigger(): string
     {
         return __($this->getTrigger());
+    }
+
+    /**
+     * @return int
+     */
+    public function getPaymentExpirationTime(): int
+    {
+        return (int)$this->getConfigByCode(self::PAYMENT_EXPIRATION_TIME);
     }
 }

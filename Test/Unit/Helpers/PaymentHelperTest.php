@@ -3,12 +3,11 @@
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
 use Alma\API\Entities\Payment;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentHelper;
 use InvalidArgumentException;
 use Magento\Framework\App\Helper\AbstractHelper;
-use PHPUnit\Framework\TestCase;
 use Magento\Framework\App\Helper\Context;
+use PHPUnit\Framework\TestCase;
 
 class PaymentHelperTest extends TestCase
 {
@@ -25,12 +24,12 @@ class PaymentHelperTest extends TestCase
 
     public function testInstanceConfigHelper()
     {
-        $this->assertInstanceOf(PaymentHelper::class,$this->paymentHelper);
+        $this->assertInstanceOf(PaymentHelper::class, $this->paymentHelper);
     }
 
     public function testImplementAbstractHelper()
     {
-        $this->assertInstanceOf(AbstractHelper::class,$this->paymentHelper);
+        $this->assertInstanceOf(AbstractHelper::class, $this->paymentHelper);
     }
 
     public function testIfGettingOrderIdThrowExceptionWithBadPayment(): void
@@ -46,9 +45,9 @@ class PaymentHelperTest extends TestCase
     {
         $testOrderId = '1000001';
         $almaPaymentMock = $this->createMock(Payment::class);
-        $almaPaymentMock->custom_data[PaymentHelper::PAYMENT_ORDER_ID_KEY]=$testOrderId;
+        $almaPaymentMock->custom_data[PaymentHelper::PAYMENT_ORDER_ID_KEY] = $testOrderId;
         $result = $this->paymentHelper->getOrderIdFromAlmaPayment($almaPaymentMock);
-        $this->assertSame($testOrderId,$result);
+        $this->assertSame($testOrderId, $result);
     }
 
 }
