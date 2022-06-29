@@ -339,8 +339,9 @@
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>customer_cancel_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/customer_cancel_url</config_path>
                     </field>
-                    <field id="share_checkout_enable" translate="label" type="select" sortOrder="17" showInDefault="1">
-                        <label>Enabled Share of Checkout</label>
+                    <field id="share_checkout_enable" translate="label comment" type="select" sortOrder="17" showInDefault="1">
+                        <label>Merchant data sharing</label>
+                        <comment>We enable Alma to anonymously retrieve, analyse the usage of our payment methods and share with me insights in order to increase my overall performance.</comment>
                         <config_path>payment/alma_monthly_payments/share_checkout_enable</config_path>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ShareOfCheckoutDate</backend_model>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
