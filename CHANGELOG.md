@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.8.0
+------
+* Add B2B compatibility
+* Add cancel order by ipn ( need configuration in alma dashboard )
+* i18n add share of checkout translations
+
 v2.7.0
 ------
 * Add share of checkout
