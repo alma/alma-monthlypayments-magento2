@@ -80,14 +80,14 @@ class ConfigObserver implements ObserverInterface
     {
         /** @var Merchant $merchant */
         $merchant = null;
-        $fully_configured = (int)$this->availabilityHelper->canConnectToAlma(null, null, $merchant);
+        $fully_configured = $this->availabilityHelper->canConnectToAlma(null, null, $merchant);
 
         if ($fully_configured && $merchant) {
             $configPath = $this->config->getFieldPath(Config::CONFIG_MERCHANT_ID);
             $this->resourceConfig->saveConfig($configPath, $merchant->id, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
         }
 
-        if ($this->apiConfigHelper->isFullyConfigured() !== $fully_configured) {
+        if ((int) $this->apiConfigHelper->isFullyConfigured() !== (int) $fully_configured) {
             $configPath = $this->config->getFieldPath(ApiConfigHelper::CONFIG_FULLY_CONFIGURED);
             $this->resourceConfig->saveConfig($configPath, $fully_configured, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
 
