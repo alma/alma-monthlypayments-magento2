@@ -220,8 +220,7 @@ class Eligibility
         $nonEligibilityMessage = $this->config->getNonEligibilityMessage();
         $excludedProductsMessage = $this->config->getExcludedProductsMessage();
 
-        $this->message = $nonEligibilityMessage;
-
+        $this->message = __($nonEligibilityMessage);
         if (!$this->checkItemsTypes()) {
             $this->message .='<br>' . $excludedProductsMessage;
             return false;
