@@ -14,11 +14,9 @@ use Magento\Store\Model\ScopeInterface;
 
 class ShareOfCheckoutHelper extends AbstractHelper
 {
-
     const SHARED_ORDER_STATES = ['processing', 'complete'];
     const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
     const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
-
 
     /**
      * @var Logger
@@ -66,9 +64,6 @@ class ShareOfCheckoutHelper extends AbstractHelper
         parent::__construct($context);
         $this->logger = $logger;
         $this->almaClient = $almaClient->getDefaultClient();
-        if (!$this->almaClient) {
-            throw new InvalidArgumentException('Alma client is not defined');
-        }
         $this->configWriter = $configWriter;
         $this->payloadBuilder = $payloadBuilder;
         $this->orderHelper = $orderHelper;
@@ -94,10 +89,10 @@ class ShareOfCheckoutHelper extends AbstractHelper
     public function shareDay(string $date): void
     {
         $res = null;
+        $this->checkAlmaClient();
         try {
             $this->dateHelper->setShareDates($date);
             $payload = $this->payloadBuilder->getPayload();
-            $this->logger->info('Payload', [ $payload]);
             $this->almaClient->shareOfCheckout->share($payload);
         } catch (RequestError $e) {
             $this->logger->error('Share Day request error message', [$e->getMessage()]);
@@ -114,6 +109,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
      */
     public function getLastUpdateDate(): string
     {
+        $this->checkAlmaClient();
         try {
             $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
             return date('Y-m-d', $lastUpdateByApi['end_time']);
@@ -173,5 +169,17 @@ class ShareOfCheckoutHelper extends AbstractHelper
     private function getShareOfCheckoutDateKey(): string
     {
         return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_DATE_KEY;
+    }
+
+    /**
+     * @return void
+     */
+    private function checkAlmaClient(): void
+    {
+        if (!$this->almaClient) {
+            $errorMessage = 'Share of checkout - Alma client is not defined';
+            $this->logger->error('checkAlmaClient', [$errorMessage]);
+            throw new InvalidArgumentException($errorMessage);
+        }
     }
 }
