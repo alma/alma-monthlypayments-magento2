@@ -32,7 +32,6 @@ interface PaymentPlansConfigInterface
     /**
      * Update instance's default data with fresh fee plans fetched from Alma API
      *
-     * @throws RequestError
      */
     public function updateFromApi();
 

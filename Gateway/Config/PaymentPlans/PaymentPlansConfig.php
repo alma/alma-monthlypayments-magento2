@@ -25,7 +25,10 @@
 namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
 use Alma\API\Entities\FeePlan;
+use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
+use InvalidArgumentException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Alma\MonthlyPayments\Helpers\Logger;
 
@@ -63,8 +66,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
         Logger $logger,
         $data = []
-    )
-    {
+    ) {
         $this->serializer = new Json();
 
         if (is_string($data)) {
@@ -82,13 +84,13 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
      */
     public function updateFromApi()
     {
-        $alma = $this->almaClient->getDefaultClient();
-        if (!$alma) {
-            $this->logger->info('Default client is not set - Impossible to update from Api',[]);
+        try {
+            $feePlans = $this->almaClient->getDefaultClient()->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
+        } catch (RequestError | AlmaClientException $e) {
+            $this->logger->error('Update From Api', [$e->getMessage()]);
             return;
         }
 
-        $feePlans = $alma->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
         foreach ($feePlans as $plan) {
             $key = PaymentPlanConfig::keyForFeePlan($plan);
             $this->setPlanAllowed($key, $plan->allowed);

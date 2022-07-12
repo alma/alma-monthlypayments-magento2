@@ -30,6 +30,7 @@ use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
 use Magento\Framework\Exception\InputException;
@@ -105,7 +106,7 @@ class Eligibility
     )
     {
         $this->pricingHelper = $pricingHelper;
-        $this->alma = $almaClient->getDefaultClient();
+        $this->alma = $almaClient;
         $this->logger = $logger;
         $this->config = $config;
         $this->quoteData = $quoteData;
@@ -117,6 +118,7 @@ class Eligibility
 
     /**
      * Get eligibility plans
+     *
      * @return PaymentPlanEligibility[]
      *
      * @throws InputException
@@ -124,6 +126,7 @@ class Eligibility
      * @throws NoSuchEntityException
      * @throws RequestError
      * @throws InvalidArgumentException
+     *@throws Exceptions\AlmaClientException
      */
     private function getPlansEligibility(): array
     {
@@ -133,14 +136,11 @@ class Eligibility
             throw new InvalidArgumentException($e->getMessage());
         }
 
-        if (!$this->alma){
-            throw new InvalidArgumentException('Alma client is not define');
-        }
-        if (!$this->checkItemsTypes()){
+        if (!$this->checkItemsTypes()) {
             throw new InvalidArgumentException($this->config->getExcludedProductsMessage());
         }
 
-        if ($this->isAlreadyLoaded()){
+        if ($this->isAlreadyLoaded()) {
             return $this->getCurrentsFeePlans();
         }
 
@@ -172,10 +172,15 @@ class Eligibility
             return [];
         }
 
-        $eligibilities = $this->alma->payments->eligibility(
-            $this->quoteData->eligibilityDataFromQuote($quote,$installmentsQuery),
-            true
-        );
+        try {
+            $eligibilities = $this->alma->getDefaultClient()->payments->eligibility(
+                $this->quoteData->eligibilityDataFromQuote($quote, $installmentsQuery),
+                true
+            );
+        } catch (RequestError | AlmaClientException $e) {
+            $this->logger->error('Get plan eligibility exception', [$e->getMessage()]);
+            return [];
+        }
 
         $eligibilities = $this->formatResultEligibility($eligibilities);
 
@@ -184,12 +189,12 @@ class Eligibility
             $planConfig  = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
 
             if (!$planConfig) {
-                $this->logger->info('No Plan Config' ,['planKey' => $planKey]);
+                $this->logger->info('No Plan Config', ['planKey' => $planKey]);
                 continue;
             }
             // Check if bo plan is in eligibility list
             if (!array_key_exists($planConfig->almaPlanKey(), $eligibilities)) {
-                $this->logger->info('Configured plan is not eligible : ' ,['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
+                $this->logger->info('Configured plan is not eligible : ', ['planKey' => $planKey, 'country' => $quote->getBillingAddress()->getCountryId()]);
                 continue;
             }
             $eligibility = $eligibilities[$planConfig->almaPlanKey()];

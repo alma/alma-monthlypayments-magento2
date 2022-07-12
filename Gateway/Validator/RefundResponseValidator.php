@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Gateway\Validator;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 
 class RefundResponseValidator extends AbstractValidator
 {
@@ -26,6 +27,9 @@ class RefundResponseValidator extends AbstractValidator
             }
             if ($apiResponse->responseCode == '400') {
                 $fails[] = $apiResponse->json['error_code'] . ' : ' . $apiResponse->json['errors'][0]['message'];
+            }
+            if ($apiResponse->responseCode == '460') {
+                $fails[] = $apiResponse->responseCode . ' : ' . $apiResponse->message;
             }
         }
         return $this->createResult($response['resultCode'], $fails, $errorCodes);

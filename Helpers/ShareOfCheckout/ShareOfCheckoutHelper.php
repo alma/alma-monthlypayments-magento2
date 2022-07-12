@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Helpers\ShareOfCheckout;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
 use InvalidArgumentException;
 use Magento\Framework\App\Config\Storage\WriterInterface;
@@ -63,7 +64,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
     ) {
         parent::__construct($context);
         $this->logger = $logger;
-        $this->almaClient = $almaClient->getDefaultClient();
+        $this->almaClient = $almaClient;
         $this->configWriter = $configWriter;
         $this->payloadBuilder = $payloadBuilder;
         $this->orderHelper = $orderHelper;
@@ -89,12 +90,11 @@ class ShareOfCheckoutHelper extends AbstractHelper
     public function shareDay(string $date): void
     {
         $res = null;
-        $this->checkAlmaClient();
         try {
             $this->dateHelper->setShareDates($date);
             $payload = $this->payloadBuilder->getPayload();
-            $this->almaClient->shareOfCheckout->share($payload);
-        } catch (RequestError $e) {
+            $this->almaClient->getDefaultClient()->shareOfCheckout->share($payload);
+        } catch (RequestError | AlmaClientException $e) {
             $this->logger->error('Share Day request error message', [$e->getMessage()]);
             throw new RequestError($e->getMessage(), null, $res);
         } finally {
@@ -109,11 +109,10 @@ class ShareOfCheckoutHelper extends AbstractHelper
      */
     public function getLastUpdateDate(): string
     {
-        $this->checkAlmaClient();
         try {
-            $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
+            $lastUpdateByApi = $this->almaClient->getDefaultClient()->shareOfCheckout->getLastUpdateDates();
             return date('Y-m-d', $lastUpdateByApi['end_time']);
-        } catch (RequestError $e) {
+        } catch (RequestError | AlmaClientException $e) {
             if ($e->response->responseCode == '404') {
                 return date('Y-m-d', strtotime('-1 day'));
             }
@@ -169,17 +168,5 @@ class ShareOfCheckoutHelper extends AbstractHelper
     private function getShareOfCheckoutDateKey(): string
     {
         return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_DATE_KEY;
-    }
-
-    /**
-     * @return void
-     */
-    private function checkAlmaClient(): void
-    {
-        if (!$this->almaClient) {
-            $errorMessage = 'Share of checkout - Alma client is not defined';
-            $this->logger->error('checkAlmaClient', [$errorMessage]);
-            throw new InvalidArgumentException($errorMessage);
-        }
     }
 }

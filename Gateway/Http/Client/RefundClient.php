@@ -28,10 +28,12 @@ namespace Alma\MonthlyPayments\Gateway\Http\Client;
 use Alma\API\Entities\Payment;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
+use stdClass;
 
 class RefundClient implements ClientInterface
 {
@@ -53,7 +55,7 @@ class RefundClient implements ClientInterface
         AlmaClient $almaClient
     ) {
         $this->logger = $logger;
-        $this->alma = $almaClient->getDefaultClient();
+        $this->alma = $almaClient;
     }
 
     /**
@@ -68,8 +70,16 @@ class RefundClient implements ClientInterface
             $payloadData = $transferObject->getBody();
             $isFullRefund = $this->isFullRefund($payloadData);
             $refund = $this->refund($payloadData, $isFullRefund);
+        } catch (AlmaClientException $e) {
+            $fails = new stdClass();
+            $fails->responseCode = 460;
+            $fails->message = $e->getMessage();
+            return [
+                'resultCode' => 0,
+                'fails' => $fails,
+            ];
         } catch (RequestError $e) {
-            $this->logger->error("Error creating refund:", [$e]);
+            $this->logger->error("Error creating refund:", [$e->getMessage()]);
             return [
                 'resultCode' => 0,
                 'fails' => $e->response,
@@ -88,13 +98,14 @@ class RefundClient implements ClientInterface
      *
      * @return Payment
      * @throws RequestError
+     * @throws AlmaClientException
      */
     private function refund(array $payloadData, bool $isFullRefund): Payment
     {
         if ($isFullRefund) {
-            $refund = $this->alma->payments->fullRefund($payloadData['payment_id'], $payloadData['merchant_id'], 'Full refund with Magento 2 module');
+            $refund = $this->alma->getDefaultClient()->payments->fullRefund($payloadData['payment_id'], $payloadData['merchant_id'], 'Full refund with Magento 2 module');
         } else {
-            $refund = $this->alma->payments->partialRefund($payloadData['payment_id'], Functions::PriceToCents($payloadData['amount']), $payloadData['merchant_id'], 'Partial refund with Magento 2 module');
+            $refund = $this->alma->getDefaultClient()->payments->partialRefund($payloadData['payment_id'], Functions::PriceToCents($payloadData['amount']), $payloadData['merchant_id'], 'Partial refund with Magento 2 module');
         }
         return $refund;
     }
