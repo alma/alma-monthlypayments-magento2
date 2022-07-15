@@ -36,7 +36,7 @@ class AlmaClient
     /** @var Client */
     private $alma;
     /**
-     * @var \Alma\MonthlyPayments\Helpers\Logger
+     * @var Logger
      */
     private $logger;
     /**
