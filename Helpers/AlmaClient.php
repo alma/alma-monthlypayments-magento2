@@ -99,7 +99,9 @@ class AlmaClient
     public function createInstance($apiKey, $mode): Client
     {
         $alma = null;
-
+        if (empty($apiKey)) {
+            throw new AlmaClientException("No Api Key in {$mode} mode");
+        }
         try {
             $alma = new Client($apiKey, ['mode' => $mode, 'logger' => $this->logger]);
 
