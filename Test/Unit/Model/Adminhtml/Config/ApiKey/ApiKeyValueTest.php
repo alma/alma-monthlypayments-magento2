@@ -67,6 +67,8 @@ class ApiKeyValueTest extends TestCase
         $this->availability->expects($this->once())
             ->method('getMerchant')
             ->willReturn($merchantMock);
+        $this->configHelper->expects($this->once())
+            ->method('saveMerchantId');
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
         $ApiKeyObject->expects('hasDataChanges')->andReturn(true);
         $ApiKeyObject->expects('getValue')->andReturn('');

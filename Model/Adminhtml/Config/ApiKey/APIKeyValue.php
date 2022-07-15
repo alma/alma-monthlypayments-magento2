@@ -27,7 +27,6 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -48,11 +47,6 @@ class APIKeyValue extends Encrypted
      * @var Availability
      */
     private $availabilityHelper;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
      * @var MessageManager
@@ -78,7 +72,7 @@ class APIKeyValue extends Encrypted
      * @param EncryptorInterface $encryptor
      * @param Availability $availabilityHelper
      * @param MessageManager $messageManager
-     * @param Logger $logger
+     * @param ConfigHelper $configHelper
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -91,7 +85,6 @@ class APIKeyValue extends Encrypted
         EncryptorInterface $encryptor,
         Availability $availabilityHelper,
         MessageManager $messageManager,
-        Logger $logger,
         ConfigHelper $configHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
@@ -111,7 +104,6 @@ class APIKeyValue extends Encrypted
         $this->availabilityHelper = $availabilityHelper;
         $this->messageManager = $messageManager;
         $this->hasError = false;
-        $this->logger = $logger;
         $this->configHelper = $configHelper;
     }
 
@@ -140,7 +132,7 @@ class APIKeyValue extends Encrypted
         $merchant = $this->availabilityHelper->getMerchant($this->apiKeyType, $value);
         if (empty($value) || $merchant) {
             $this->saveAndEncryptValue();
-            $this->configHelper->saveMerchantId($this->merchantIdPath, $merchant);
+            $this->configHelper->saveMerchantId($this->merchantIdPath, $merchant, $this->getScope(), $this->getScopeId());
         } else {
             $this->disallowDataSave();
             $this->messageManager->addErrorMessage(

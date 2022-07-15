@@ -1,4 +1,5 @@
 <?php
+
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Entities\Merchant;
@@ -92,9 +93,9 @@ class ConfigHelper extends AbstractHelper
      *
      * @return void
      */
-    public function saveConfig($path, $value): void
+    public function saveConfig($path, $value, $scope, $storeId): void
     {
-        $this->writerInterface->save(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $path, $value);
+        $this->writerInterface->save(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $path, $value, $scope, $storeId);
     }
 
     /**
@@ -103,10 +104,10 @@ class ConfigHelper extends AbstractHelper
      *
      * @return void
      */
-    public function saveMerchantId(string $path, $merchant): void
+    public function saveMerchantId(string $path, $merchant, $scope, $storeId): void
     {
         if ($merchant) {
-            $this->saveConfig($path, $merchant->id);
+            $this->saveConfig($path, $merchant->id, $scope, $storeId);
         }
     }
 }
