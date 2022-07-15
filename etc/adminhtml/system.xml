@@ -302,14 +302,12 @@
                         <label>Live API key</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\LiveAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/live_api_key</config_path>
-                        <validate>required-entry</validate>
                     </field>
                     <field id="test_api_key" translate="label" type="obscure" sortOrder="12" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                         <label>Test API key</label>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\TestAPIKeyValue</backend_model>
                         <config_path>payment/alma_monthly_payments/test_api_key</config_path>
-                        <validate>required-entry</validate>
                     </field>
                     <field id="api_mode" translate="label comment" type="select" sortOrder="13" showInDefault="1"
                            showInWebsite="1" showInStore="1">

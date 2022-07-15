@@ -25,14 +25,17 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
+use Magento\Framework\Phrase;
+
 class TestAPIKeyValue extends APIKeyValue
 {
     protected $apiKeyType = 'test';
+    protected $merchantIdPath = 'test_merchant_id';
 
     /**
-     * @return \Magento\Framework\Phrase
+     * @return Phrase
      */
-    public function getApiKeyName()
+    public function getApiKeyName(): Phrase
     {
         return __('Test API key');
     }

@@ -25,14 +25,17 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
+use Magento\Framework\Phrase;
+
 class LiveAPIKeyValue extends APIKeyValue
 {
     protected $apiKeyType = 'live';
+    protected $merchantIdPath = 'live_merchant_id';
 
     /**
-     * @return \Magento\Framework\Phrase
+     * @return Phrase
      */
-    public function getApiKeyName()
+    public function getApiKeyName(): Phrase
     {
         return __('Live API key');
     }

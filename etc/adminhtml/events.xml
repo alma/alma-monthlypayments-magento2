@@ -26,9 +26,6 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="admin_system_config_changed_section_payment">
-        <observer name="alma_check_config" instance="Alma\MonthlyPayments\Observer\Admin\ConfigObserver"/>
-    </event>
     <event name="sales_order_shipment_save_after">
         <observer name="alma_track_shipment" instance="Alma\MonthlyPayments\Observer\Admin\ShipmentObserver" />
     </event>
