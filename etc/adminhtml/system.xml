@@ -284,7 +284,6 @@
                 <!-- API CONFIGURATION -->
                 <group id="alma_api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\ApiFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>

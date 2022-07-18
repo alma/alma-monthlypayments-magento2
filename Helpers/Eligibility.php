@@ -103,8 +103,7 @@ class Eligibility
         Config $config,
         AlmaQuote $quoteData,
         QuoteHelper $quoteHelper
-    )
-    {
+    ) {
         $this->pricingHelper = $pricingHelper;
         $this->alma = $almaClient;
         $this->logger = $logger;
@@ -227,7 +226,7 @@ class Eligibility
 
         $this->message = __($nonEligibilityMessage);
         if (!$this->checkItemsTypes()) {
-            $this->message .='<br>' . $excludedProductsMessage;
+            $this->message .= '<br>' . $excludedProductsMessage;
             return false;
         }
 
@@ -278,7 +277,7 @@ class Eligibility
             });
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage(), [$e->getTrace()]);
-        return [];
+            return [];
         }
     }
 

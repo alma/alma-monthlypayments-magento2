@@ -77,8 +77,7 @@ class Availability
         $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
         // $countryCode = ??
 
-        return $this->isFullyConfigured() &&
-            $this->isAvailableForCurrency($currencyCode);
+        return $this->isAvailableForCurrency($currencyCode);
     }
 
     /**
@@ -89,14 +88,6 @@ class Availability
     {
         // We only support Euros at the moment
         return $currencyCode === 'EUR';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFullyConfigured()
-    {
-        return $this->apiConfigHelper->isFullyConfigured();
     }
 
     /**

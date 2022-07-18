@@ -50,13 +50,6 @@ class ApiConfigHelper extends ConfigHelper
     {
         return empty(trim($this->getLiveKey())) || empty(trim($this->getTestKey()));
     }
-    /**
-     * @return bool
-     */
-    public function isFullyConfigured(): bool
-    {
-        return !$this->needsAPIKeys() && (bool)(int)$this->getConfigByCode(self::CONFIG_FULLY_CONFIGURED);
-    }
 
     /**
      * @param int | null $storeId
