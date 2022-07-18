@@ -25,19 +25,70 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Option\ArrayInterface;
+use Magento\Store\Model\ScopeInterface;
+
 /**
  * Class APIModes
  */
-class APIModes implements \Magento\Framework\Option\ArrayInterface
+class APIModes implements ArrayInterface
 {
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @param Logger $logger
+     * @param ApiConfigHelper $apiConfigHelper
+     */
+    public function __construct(
+        Logger $logger,
+        RequestInterface $request,
+        ApiConfigHelper $apiConfigHelper
+    ) {
+        $this->logger = $logger;
+        $this->apiConfigHelper = $apiConfigHelper;
+        $this->request = $request;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
-        return [
-            ['value' => 'live', 'label' => __('Live')],
-            ['value' => 'test', 'label' => __('Test')],
-        ];
+        $arrayResult = [];
+        $arrayResult[] = ['value' => 'test', 'label' => __('Test')];
+
+        $type = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        $id = 0;
+        $store = $this->request->getParam('store');
+        $website = $this->request->getParam('website');
+
+        if ($store) {
+            $type = ScopeInterface::SCOPE_STORES;
+            $id = $store;
+        } elseif ($website) {
+            $type = ScopeInterface::SCOPE_WEBSITES;
+            $id = $website;
+        }
+
+        if ($this->apiConfigHelper->getLiveKey($type, $id)) {
+            $arrayResult[] = ['value' => 'live', 'label' => __('Live')];
+        }
+        return $arrayResult;
     }
 }

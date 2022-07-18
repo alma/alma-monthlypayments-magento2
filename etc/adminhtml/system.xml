@@ -126,7 +126,6 @@
                 <!-- PAYMENT METHOD CONFIGURATION -->
                 <group id="alma_general_config" translate="label" type="text" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -150,7 +149,6 @@
                         <field id="active">1</field>
                     </depends>
                     <label>Payment upon trigger</label>
-                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <comment>This option is available only for Alma payment in 2x, 3x and 4x. When it's turned on, your clients will pay the first installment at the order status change. When your client order on your website, Alma will only ask for a payment authorization. Only status handled by Alma are available in the menu below. Please contact Alma if you need us to add another status.</comment>
                     <field id="trigger_is_allowed" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Payment on trigger allowed on alma dashboard</label>
@@ -181,7 +179,6 @@
                 <!-- CART DISPLAY CONFIGURATION -->
                 <group id="alma_cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -209,7 +206,6 @@
                 <!-- PRODUCT PAGE DISPLAY CONFIGURATION -->
                 <group id="alma_product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -262,7 +258,6 @@
                 <!-- EXCLUDED PRODUCTS CONFIGURATION -->
                 <group id="alma_excluded_products_config" translate="label comment" type="text" sortOrder="30"
                        showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\SecondaryFieldset</frontend_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>

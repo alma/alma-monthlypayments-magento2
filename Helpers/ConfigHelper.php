@@ -4,10 +4,10 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
 
 class ConfigHelper extends AbstractHelper
 {
@@ -41,16 +41,16 @@ class ConfigHelper extends AbstractHelper
         return (bool)(int)$this->getConfigByCode(self::CONFIG_DEBUG);
     }
 
-    public function getConfigByCode($code, $storeId = null)
+    public function getConfigByCode($code, $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $storeId = null)
     {
-        return $this->getConfigValue(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $code, $storeId);
+        return $this->getConfigValue(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $code, $scope, $storeId);
     }
 
-    private function getConfigValue($code, $storeId = null)
+    private function getConfigValue($code, $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $storeId = null)
     {
         return $this->scopeConfig->getValue(
             $code,
-            ScopeInterface::SCOPE_STORE,
+            $scope,
             $storeId
         );
     }
@@ -90,6 +90,8 @@ class ConfigHelper extends AbstractHelper
     /**
      * @param $path
      * @param $value
+     * @param $scope
+     * @param $storeId
      *
      * @return void
      */
@@ -101,6 +103,8 @@ class ConfigHelper extends AbstractHelper
     /**
      * @param string $path
      * @param Merchant|bool $merchant
+     * @param $scope
+     * @param $storeId
      *
      * @return void
      */
@@ -109,5 +113,16 @@ class ConfigHelper extends AbstractHelper
         if ($merchant) {
             $this->saveConfig($path, $merchant->id, $scope, $storeId);
         }
+    }
+
+    /**
+     * @param $scope
+     * @param $storeId
+     *
+     * @return void
+     */
+    public function apiTestMode($scope, $storeId): void
+    {
+        $this->writerInterface->delete(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/api_mode', $scope, $storeId);
     }
 }

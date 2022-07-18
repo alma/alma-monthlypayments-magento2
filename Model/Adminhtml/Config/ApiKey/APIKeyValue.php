@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -61,6 +62,10 @@ class APIKeyValue extends Encrypted
      * @var ConfigHelper
      */
     private $configHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * APIKeyValue constructor.
@@ -73,6 +78,7 @@ class APIKeyValue extends Encrypted
      * @param Availability $availabilityHelper
      * @param MessageManager $messageManager
      * @param ConfigHelper $configHelper
+     * @param Logger $logger
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -86,6 +92,7 @@ class APIKeyValue extends Encrypted
         Availability $availabilityHelper,
         MessageManager $messageManager,
         ConfigHelper $configHelper,
+        Logger $logger,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -105,6 +112,7 @@ class APIKeyValue extends Encrypted
         $this->messageManager = $messageManager;
         $this->hasError = false;
         $this->configHelper = $configHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -133,6 +141,7 @@ class APIKeyValue extends Encrypted
         if (empty($value) || $merchant) {
             $this->saveAndEncryptValue();
             $this->configHelper->saveMerchantId($this->merchantIdPath, $merchant, $this->getScope(), $this->getScopeId());
+            $this->changeApiModeToTest($value);
         } else {
             $this->disallowDataSave();
             $this->messageManager->addErrorMessage(
@@ -141,6 +150,17 @@ class APIKeyValue extends Encrypted
                     __($this->getApiKeyName())
                 )
             );
+        }
+    }
+
+    /**
+     * @param string $value
+     *
+     */
+    public function changeApiModeToTest(string $value): void
+    {
+        if ($this->isValueChanged() && empty($value) && $this->apiKeyType == 'live') {
+            $this->configHelper->apiTestMode($this->getScope(), $this->getScopeId());
         }
     }
 
