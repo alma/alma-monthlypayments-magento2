@@ -19,6 +19,7 @@
     <message_list>
         <message code="40O" translate="true">Une erreur est survenue </message>
         <message code="validation_error : Impossible de rembourser plus que le montant de l'achat" translate="true">Impossible de rembourser plus que le montant de l'achat </message>
+        <message code="460 : Impossible to create Alma client" translate="true">Error with Alma Client</message>
         <message code="404" translate="true">Alma Payment not found </message>
     </message_list>
 </mapping>

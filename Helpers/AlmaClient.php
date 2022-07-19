@@ -26,6 +26,8 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
+use Exception;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
 
@@ -52,8 +54,10 @@ class AlmaClient
 
     /**
      * AlmaClient constructor.
+     *
      * @param Logger $logger
      * @param ProductMetadataInterface $productMetadata
+     * @param ApiConfigHelper $apiConfigHelper
      * @param ModuleListInterface $moduleList
      */
     public function __construct(
@@ -61,8 +65,7 @@ class AlmaClient
         ProductMetadataInterface $productMetadata,
         ApiConfigHelper $apiConfigHelper,
         ModuleListInterface $moduleList
-    )
-    {
+    ) {
         $this->alma = null;
         $this->logger = $logger;
         $this->productMetadata = $productMetadata;
@@ -71,9 +74,12 @@ class AlmaClient
     }
 
     /**
-     * @return Client|null
+     *
+     * @return Client
+     *
+     * @throws AlmaClientException
      */
-    public function getDefaultClient()
+    public function getDefaultClient(): Client
     {
         if ($this->alma === null) {
             $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey(), $this->apiConfigHelper->getActiveMode());
@@ -85,9 +91,12 @@ class AlmaClient
     /**
      * @param $apiKey
      * @param $mode
-     * @return Client|null
+     *
+     * @throws AlmaClientException
+     *
+     * @return Client
      */
-    public function createInstance($apiKey, $mode)
+    public function createInstance($apiKey, $mode): Client
     {
         $alma = null;
 
@@ -98,10 +107,14 @@ class AlmaClient
             $version = $this->productMetadata->getVersion();
             $alma->addUserAgentComponent('Magento', "$version ($edition)");
             $alma->addUserAgentComponent("Alma for Magento 2", $this->getModuleVersion());
-        } catch (\Exception $e) {
-            $this->logger->error("Error creating Alma API client {$e->getMessage()}");
+        } catch (Exception $e) {
+            $this->logger->error("Error creating Alma API client", [$e->getMessage()]);
         }
-
+        if (!$alma) {
+            $errorMessage = 'Impossible to create Alma client';
+            $this->logger->error($errorMessage, []);
+            throw new AlmaClientException($errorMessage);
+        }
         return $alma;
     }
 

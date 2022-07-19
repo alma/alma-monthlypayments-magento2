@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Helpers\Refund;
 use Alma\API\Entities\Payment;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -26,7 +27,7 @@ class RefundHelper extends AbstractHelper
         AlmaClient $almaClient
     ) {
         parent::__construct($context);
-        $this->almaClient = $almaClient->getDefaultClient();
+        $this->almaClient = $almaClient;
         $this->logger = $logger;
     }
 
@@ -40,8 +41,8 @@ class RefundHelper extends AbstractHelper
     public function makePartialRefund($paymentId, $price): Payment
     {
         try {
-            $payment = $this->almaClient->payments->partialRefund($paymentId, $price);
-        } catch (RequestError $e) {
+            $payment = $this->almaClient->getDefaultClient()->payments->partialRefund($paymentId, $price);
+        } catch (RequestError | AlmaClientException $e) {
             $this->logger->error('Make partial refund exception', [$e->getMessage()]);
             throw new RequestError($e->getMessage());
         }

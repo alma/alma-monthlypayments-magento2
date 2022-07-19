@@ -28,7 +28,9 @@ namespace Alma\MonthlyPayments\Helpers;
 use Alma\API\Entities\Instalment;
 use Alma\API\Entities\Payment as AlmaPayment;
 use Alma\API\RequestError;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
+use InvalidArgumentException;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
@@ -95,7 +97,7 @@ class PaymentValidation
     ) {
         $this->logger = $logger;
         $this->checkoutSession = $checkoutSession;
-        $this->alma = $almaClient->getDefaultClient();
+        $this->alma = $almaClient;
         $this->paymentProcessor = $paymentProcessor;
         $this->quoteRepository = $quoteRepository;
         $this->transactionBuilder = $transactionBuilder;
@@ -111,8 +113,8 @@ class PaymentValidation
     public function getAlmaPayment(string $paymentId): AlmaPayment
     {
         try {
-            $almaPayment = $this->alma->payments->fetch($paymentId);
-        } catch (RequestError $e) {
+            $almaPayment = $this->alma->getDefaultClient()->payments->fetch($paymentId);
+        } catch (RequestError | AlmaClientException $e) {
             $requestError = __(
                 "Error fetching payment information from Alma for payment %s: %s",
                 $paymentId,
@@ -241,8 +243,8 @@ class PaymentValidation
     private function flagAsPotentialFraud(AlmaPayment $almaPayment, string $reason): void
     {
         try {
-            $this->alma->payments->flagAsPotentialFraud($almaPayment->id, $reason);
-        } catch (RequestError $e) {
+            $this->alma->getDefaultClient()->payments->flagAsPotentialFraud($almaPayment->id, $reason);
+        } catch (RequestError | AlmaClientException $e) {
             $this->logger->error("Error flagging payment {$almaPayment->id} as fraudulent");
         }
     }

@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Helpers\ShareOfCheckout;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
 use InvalidArgumentException;
 use Magento\Framework\App\Config\Storage\WriterInterface;
@@ -14,11 +15,9 @@ use Magento\Store\Model\ScopeInterface;
 
 class ShareOfCheckoutHelper extends AbstractHelper
 {
-
     const SHARED_ORDER_STATES = ['processing', 'complete'];
     const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
     const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
-
 
     /**
      * @var Logger
@@ -65,10 +64,7 @@ class ShareOfCheckoutHelper extends AbstractHelper
     ) {
         parent::__construct($context);
         $this->logger = $logger;
-        $this->almaClient = $almaClient->getDefaultClient();
-        if (!$this->almaClient) {
-            throw new InvalidArgumentException('Alma client is not defined');
-        }
+        $this->almaClient = $almaClient;
         $this->configWriter = $configWriter;
         $this->payloadBuilder = $payloadBuilder;
         $this->orderHelper = $orderHelper;
@@ -97,9 +93,8 @@ class ShareOfCheckoutHelper extends AbstractHelper
         try {
             $this->dateHelper->setShareDates($date);
             $payload = $this->payloadBuilder->getPayload();
-            $this->logger->info('Payload', [ $payload]);
-            $this->almaClient->shareOfCheckout->share($payload);
-        } catch (RequestError $e) {
+            $this->almaClient->getDefaultClient()->shareOfCheckout->share($payload);
+        } catch (RequestError | AlmaClientException $e) {
             $this->logger->error('Share Day request error message', [$e->getMessage()]);
             throw new RequestError($e->getMessage(), null, $res);
         } finally {
@@ -115,9 +110,9 @@ class ShareOfCheckoutHelper extends AbstractHelper
     public function getLastUpdateDate(): string
     {
         try {
-            $lastUpdateByApi = $this->almaClient->shareOfCheckout->getLastUpdateDates();
+            $lastUpdateByApi = $this->almaClient->getDefaultClient()->shareOfCheckout->getLastUpdateDates();
             return date('Y-m-d', $lastUpdateByApi['end_time']);
-        } catch (RequestError $e) {
+        } catch (RequestError | AlmaClientException $e) {
             if ($e->response->responseCode == '404') {
                 return date('Y-m-d', strtotime('-1 day'));
             }
