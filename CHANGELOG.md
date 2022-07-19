@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.8.1
+------
+* Fix Alma is not defined in back office
+* Change widget version 2.11.1
+
 v2.8.0
 ------
 * Add B2B compatibility
