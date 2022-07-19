@@ -33,7 +33,7 @@ class APIModesTest extends TestCase
     public function testStoreViewWithLiveKey(): void
     {
         $this->request->expects($this->exactly(2))->method('getParam')->willReturnOnConsecutiveCalls(2, null);
-        $this->apiConfig->method('getLiveKey')->with(ScopeInterface::SCOPE_STORE, 2)->willReturn('live_1234567');
+        $this->apiConfig->method('getLiveKey')->with(ScopeInterface::SCOPE_STORES, 2)->willReturn('live_1234567');
         $apiObject = $this->createApiModeObject();
         $this->assertEquals($this->getLiveResponseArray(), $apiObject->toOptionArray());
     }

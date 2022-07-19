@@ -4,23 +4,52 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\StoreResolver;
 
 class ApiConfigHelper extends ConfigHelper
 {
     const CONFIG_LIVE_API_KEY = 'live_api_key';
     const CONFIG_TEST_API_KEY = 'test_api_key';
-    const CONFIG_FULLY_CONFIGURED = 'fully_configured';
     const CONFIG_API_MODE = 'api_mode';
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var StoreResolver
+     */
+    private $storeResolver;
+
+
+    public function __construct(
+        StoreResolver $storeResolver,
+        Logger $logger,
+        Context $context,
+        WriterInterface $writerInterface
+    ) {
+        parent::__construct($storeResolver, $context, $writerInterface);
+        $this->logger = $logger;
+        $this->storeResolver = $storeResolver;
+    }
 
     /**
      * @return mixed|null
      */
     public function getActiveAPIKey()
     {
-        $mode = $this->getActiveMode();
+        $this->logger->info('getActiveAPIKey',[]);
+        $storeId = $this->storeResolver->getCurrentStoreId();
+        $scope = $this->getScope($storeId);
+        $mode = $this->getActiveMode($scope, $storeId);
+        $this->logger->info('$mode', [$mode]);
         $apiKeyType = ($mode == Client::LIVE_MODE) ?
             self::CONFIG_LIVE_API_KEY :
             self::CONFIG_TEST_API_KEY ;
+        $this->logger->info('$apiKeyType', [$apiKeyType]);
+        $this->logger->info('$this->getConfigByCode($apiKeyType)',[$this->getConfigByCode($apiKeyType)]);
+
         return $this->getConfigByCode($apiKeyType);
     }
 
@@ -56,8 +85,8 @@ class ApiConfigHelper extends ConfigHelper
      *
      * @return mixed|null
      */
-    public function getActiveMode(int $storeId = null)
+    public function getActiveMode(string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $storeId = null)
     {
-        return $this->getConfigByCode(self::CONFIG_API_MODE);
+        return $this->getConfigByCode(self::CONFIG_API_MODE, $scope, $storeId);
     }
 }

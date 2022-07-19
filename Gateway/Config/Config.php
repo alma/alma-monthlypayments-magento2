@@ -93,10 +93,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->apiConfigHelper = $apiConfigHelper;
     }
 
-     /**
-     * @param string $field
-     * @return string
-     */
+    /**
+    * @param string $field
+    *
+    * @return string
+    */
     public function getFieldPath(string $field): string
     {
         return sprintf($this->pathPattern, $this->methodCode, $field);
@@ -222,7 +223,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
         /** @var PaymentPlansConfigInterface $plansConfig */
         $plansConfig = $this->plansConfigFactory->create(["data" => $data]);
-        $this->logger->info('$plansConfig', [$plansConfig->getPlans()]);
         if (empty($data)) {
             // No plans config data has ever been saved – fetch what we need
             try {
@@ -234,3 +234,4 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $plansConfig;
     }
 }
+

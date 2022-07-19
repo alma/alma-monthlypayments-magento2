@@ -8,6 +8,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreResolver;
 
 class ConfigHelper extends AbstractHelper
 {
@@ -25,12 +27,19 @@ class ConfigHelper extends AbstractHelper
      */
     private $writerInterface;
 
+    /**
+     * @var StoreResolver
+     */
+    private $storeResolver;
+
     public function __construct(
+        StoreResolver $storeResolver,
         Context $context,
         WriterInterface $writerInterface
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
+        $this->storeResolver = $storeResolver;
     }
 
     /**
@@ -41,8 +50,19 @@ class ConfigHelper extends AbstractHelper
         return (bool)(int)$this->getConfigByCode(self::CONFIG_DEBUG);
     }
 
-    public function getConfigByCode($code, $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $storeId = null)
+    public function getConfigByCode($code)
     {
+        $storeId = $this->storeResolver->getCurrentStoreId();
+        $scope = $this->getScope($storeId);
+
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/alma.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $logger->info('getConfigByCode StoreId');
+        $logger->info($storeId);
+        $logger->info('getConfigByCode Scope');
+        $logger->info($scope);
+
         return $this->getConfigValue(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $code, $scope, $storeId);
     }
 
@@ -124,5 +144,19 @@ class ConfigHelper extends AbstractHelper
     public function apiTestMode($scope, $storeId): void
     {
         $this->writerInterface->delete(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/api_mode', $scope, $storeId);
+    }
+
+    /**
+     * @param $storeId
+     *
+     * @return string
+     */
+    protected function getScope($storeId): string
+    {
+        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        if ($storeId) {
+            $scope = ScopeInterface::SCOPE_STORES;
+        }
+        return $scope;
     }
 }

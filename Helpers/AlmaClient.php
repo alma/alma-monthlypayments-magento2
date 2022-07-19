@@ -81,6 +81,8 @@ class AlmaClient
      */
     public function getDefaultClient(): Client
     {
+        $this->logger->info('Get Active API KEY ', [$this->apiConfigHelper->getActiveAPIKey()]);
+        $this->logger->info('Get Active Mode ', [$this->apiConfigHelper->getActiveMode()]);
         if ($this->alma === null) {
             $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey(), $this->apiConfigHelper->getActiveMode());
         }

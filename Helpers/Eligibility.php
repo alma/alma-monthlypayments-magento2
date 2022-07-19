@@ -129,6 +129,7 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
+        $this->logger->info('getPlansEligibility', []);
         try {
             $quote = $this->getEligibilityQuote();
         } catch (InvalidArgumentException $e) {
@@ -172,6 +173,7 @@ class Eligibility
         }
 
         try {
+            $this->logger->info('getDefaultClient', []);
             $eligibilities = $this->alma->getDefaultClient()->payments->eligibility(
                 $this->quoteData->eligibilityDataFromQuote($quote, $installmentsQuery),
                 true
@@ -271,6 +273,7 @@ class Eligibility
      */
     public function getEligiblePlans(): array
     {
+        $this->logger->info('getEligiblePlans', []);
         try {
             return array_filter($this->getPlansEligibility(), function ($planEligibility) {
                 return $planEligibility->getEligibility()->isEligible();

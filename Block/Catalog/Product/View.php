@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2018 Alma / Nabla SAS
  *
@@ -25,6 +26,7 @@
 
 namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Catalog\Block\Product\Context;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Framework\View\Element\Template;
@@ -34,7 +36,7 @@ use Magento\Framework\Registry;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Framework\Locale\Resolver;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
-Use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
+use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
 
 class View extends Template
 {
@@ -71,6 +73,11 @@ class View extends Template
      */
     private $widgetConfigHelper;
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @param Context $context
      * @param Registry $registry
      * @param ApiConfigHelper $apiConfigHelper
@@ -87,9 +94,9 @@ class View extends Template
         WidgetConfigHelper $widgetConfigHelper,
         Config $config,
         Resolver $localeResolver,
+        Logger $logger,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->config = $config;
         $this->registry = $registry;
@@ -98,6 +105,7 @@ class View extends Template
         $this->getPlans();
         $this->apiConfigHelper = $apiConfigHelper;
         $this->widgetConfigHelper = $widgetConfigHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -142,6 +150,7 @@ class View extends Template
      */
     public function getConfig()
     {
+        $this->logger->info('$this->config', [$this->config]);
         return $this->config;
     }
 

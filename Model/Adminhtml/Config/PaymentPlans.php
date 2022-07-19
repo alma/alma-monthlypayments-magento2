@@ -161,7 +161,7 @@ class PaymentPlans extends Serialized
     private function forceMinMaxLimit(array $plans):array
     {
         foreach ($plans as &$plan) {
-            if($plan[PaymentPlanConfig::KEY_MIN_AMOUNT]<$plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MIN_AMOUNT]>$plan[PaymentPlanConfig::KEY_MAX_AMOUNT]){
+            if ($plan[PaymentPlanConfig::KEY_MIN_AMOUNT]<$plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MIN_AMOUNT]>$plan[PaymentPlanConfig::KEY_MAX_AMOUNT]) {
                 $this->logger->info('Change min Amount: '.$plan[PaymentPlanConfig::KEY_MAX_AMOUNT].' - Min allowed Amount: '.$plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]. '- Max Amount: '.$plan[PaymentPlanConfig::KEY_MAX_AMOUNT],[]);
                 $this->messageManager->addErrorMessage(
                     sprintf(__("Minimum amount is %s€ for plan %s"),($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]/100),$plan["key"])
