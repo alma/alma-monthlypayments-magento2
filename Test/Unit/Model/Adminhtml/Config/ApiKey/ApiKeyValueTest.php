@@ -59,6 +59,8 @@ class ApiKeyValueTest extends TestCase
         $ApiKeyObject->expects('getValue')->andReturn('******');
         $this->assertNull($ApiKeyObject->beforeSave());
         $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
+        $ApiKeyObject->shouldNotHaveReceived('saveAndEncryptValue');
+
     }
     public function testEmptyValueSave(): void
     {

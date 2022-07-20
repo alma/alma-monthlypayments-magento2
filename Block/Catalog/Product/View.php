@@ -150,7 +150,6 @@ class View extends Template
      */
     public function getConfig()
     {
-        $this->logger->info('$this->config', [$this->config]);
         return $this->config;
     }
 
@@ -172,6 +171,7 @@ class View extends Template
 
     /**
      * @return string
+     * @throws LocalizedException
      */
     public function _toHtml()
     {
