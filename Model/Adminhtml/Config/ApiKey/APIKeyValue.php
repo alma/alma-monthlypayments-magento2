@@ -160,7 +160,7 @@ class APIKeyValue extends Encrypted
     public function changeApiModeToTest(string $value): void
     {
         if ($this->isValueChanged() && empty($value) && $this->apiKeyType == 'live') {
-            $this->configHelper->apiTestMode($this->getScope(), $this->getScopeId());
+            $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
         }
     }
 

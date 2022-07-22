@@ -53,6 +53,7 @@ class APIModes implements ArrayInterface
 
     /**
      * @param Logger $logger
+     * @param RequestInterface $request
      * @param ApiConfigHelper $apiConfigHelper
      */
     public function __construct(
@@ -85,6 +86,8 @@ class APIModes implements ArrayInterface
             $type = ScopeInterface::SCOPE_WEBSITES;
             $id = $website;
         }
+        $this->logger->info('toOptionArray ',[$type]);
+        $this->logger->info('toOptionArray ',[$id]);
 
         if ($this->apiConfigHelper->getLiveKey($type, $id)) {
             $arrayResult[] = ['value' => 'live', 'label' => __('Live')];

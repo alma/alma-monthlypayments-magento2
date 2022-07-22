@@ -8,6 +8,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\State;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreResolver;
 
@@ -31,15 +33,27 @@ class ConfigHelper extends AbstractHelper
      * @var StoreResolver
      */
     private $storeResolver;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+    /**
+     * @var State
+     */
+    private $state;
 
     public function __construct(
         StoreResolver $storeResolver,
         Context $context,
+        RequestInterface $request,
+        State $state,
         WriterInterface $writerInterface
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeResolver = $storeResolver;
+        $this->request = $request;
+        $this->state = $state;
     }
 
     /**
@@ -50,23 +64,58 @@ class ConfigHelper extends AbstractHelper
         return (bool)(int)$this->getConfigByCode(self::CONFIG_DEBUG);
     }
 
-    public function getConfigByCode($code)
+    /**
+     * @param $code
+     * @param $scope
+     * @param $storeId
+     *
+     * @return string
+     */
+    public function getConfigByCode($code, $scope = null, $storeId = null): string
     {
-        $storeId = $this->storeResolver->getCurrentStoreId();
-        $scope = $this->getScope($storeId);
 
+        $store = $this->request->getParam('store');
+        $website = $this->request->getParam('website');
+        /**
         $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/alma.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->info('getConfigByCode StoreId');
-        $logger->info($storeId);
-        $logger->info('getConfigByCode Scope');
-        $logger->info($scope);
 
-        return $this->getConfigValue(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $code, $scope, $storeId);
+        $logger->info('$store');
+        $logger->info($store);
+        $logger->info('$website');
+        $logger->info($website);
+        $logger->info($this->state->getAreaCode());
+        */
+        if ($store) {
+            $id = $store;
+            $type = ScopeInterface::SCOPE_STORES;
+        } elseif ($website) {
+            $id = $website;
+            $type = ScopeInterface::SCOPE_WEBSITES;
+        } else {
+            $id = $this->storeResolver->getCurrentStoreId();
+            $type = ScopeInterface::SCOPE_STORES;
+        }
+        if ($storeId) {
+            $id = $storeId;
+        }
+        if ($scope) {
+            $type = $scope;
+        }
+
+
+        return $this->getConfigValue($this->getConfigPath($code), $type, $id);
     }
 
-    private function getConfigValue($code, $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $storeId = null)
+    /**
+     * @param string $code
+     * @param string $scope
+     * @param null|int|string $storeId
+     *
+     * @return mixed
+     */
+    private function getConfigValue(string $code, string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $storeId = null)
     {
         return $this->scopeConfig->getValue(
             $code,
@@ -117,7 +166,7 @@ class ConfigHelper extends AbstractHelper
      */
     public function saveConfig($path, $value, $scope, $storeId): void
     {
-        $this->writerInterface->save(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $path, $value, $scope, $storeId);
+        $this->writerInterface->save($this->getConfigPath($path), $value, $scope, $storeId);
     }
 
     /**
@@ -141,9 +190,9 @@ class ConfigHelper extends AbstractHelper
      *
      * @return void
      */
-    public function apiTestMode($scope, $storeId): void
+    public function changeApiModeToTest($scope, $storeId): void
     {
-        $this->writerInterface->delete(self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/api_mode', $scope, $storeId);
+        $this->writerInterface->delete($this->getConfigPath('api_mode'), $scope, $storeId);
     }
 
     /**
@@ -153,10 +202,15 @@ class ConfigHelper extends AbstractHelper
      */
     protected function getScope($storeId): string
     {
-        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
         if ($storeId) {
             $scope = ScopeInterface::SCOPE_STORES;
         }
         return $scope;
     }
+
+    protected function getConfigPath($configCode): string
+    {
+        return self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $configCode;
+    }
+
 }

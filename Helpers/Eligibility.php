@@ -279,7 +279,8 @@ class Eligibility
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
-            $this->logger->info($e->getMessage(), [$e->getTrace()]);
+            // TODO remove
+            //$this->logger->info($e->getMessage(), [$e->getTrace()]);
             return [];
         }
     }
