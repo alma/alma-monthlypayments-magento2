@@ -156,18 +156,10 @@ class ConfigHelper extends AbstractHelper
     }
 
     /**
-     * @param $storeId
+     * @param $configCode
      *
      * @return string
      */
-    protected function getScope($storeId): string
-    {
-        if ($storeId) {
-            $scope = ScopeInterface::SCOPE_STORES;
-        }
-        return $scope;
-    }
-
     protected function getConfigPath($configCode): string
     {
         return self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $configCode;
