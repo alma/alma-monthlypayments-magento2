@@ -48,8 +48,7 @@
                     <frontend_class>validate-number</frontend_class>
                 </field>
 
-                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
+                <field id="debug" translate="label comment" type="select" sortOrder="3" showInDefault="1">
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Enable logging info and errors to help debug any issue with the module.</comment>

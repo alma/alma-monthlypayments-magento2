@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Option\ArrayInterface;
@@ -50,20 +51,27 @@ class APIModes implements ArrayInterface
      * @var RequestInterface
      */
     private $request;
+    /**
+     * @var StoreHelper
+     */
+    private $storeHelper;
 
     /**
      * @param Logger $logger
      * @param RequestInterface $request
      * @param ApiConfigHelper $apiConfigHelper
+     * @param StoreHelper $storeHelper
      */
     public function __construct(
         Logger $logger,
         RequestInterface $request,
-        ApiConfigHelper $apiConfigHelper
+        ApiConfigHelper $apiConfigHelper,
+        StoreHelper $storeHelper
     ) {
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
         $this->request = $request;
+        $this->storeHelper = $storeHelper;
     }
 
     /**

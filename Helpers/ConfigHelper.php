@@ -8,17 +8,13 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\State;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreResolver;
 
 class ConfigHelper extends AbstractHelper
 {
     const XML_PATH_PAYMENT = 'payment';
     const XML_PATH_METHODE = Config::CODE;
     const XML_PATH_CANLOG = 'duration';
-    const CONFIG_DEBUG = 'debug';
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
@@ -28,40 +24,24 @@ class ConfigHelper extends AbstractHelper
      * @var WriterInterface
      */
     private $writerInterface;
+    /**
+     * @var StoreHelper
+     */
+    private $storeHelper;
 
     /**
-     * @var StoreResolver
+     * @param Context $context
+     * @param StoreHelper $storeHelper
+     * @param WriterInterface $writerInterface
      */
-    private $storeResolver;
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var State
-     */
-    private $state;
-
     public function __construct(
-        StoreResolver $storeResolver,
         Context $context,
-        RequestInterface $request,
-        State $state,
+        StoreHelper $storeHelper,
         WriterInterface $writerInterface
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
-        $this->storeResolver = $storeResolver;
-        $this->request = $request;
-        $this->state = $state;
-    }
-
-    /**
-     * @return bool
-     */
-    public function canLog(): bool
-    {
-        return (bool)(int)$this->getConfigByCode(self::CONFIG_DEBUG);
+        $this->storeHelper = $storeHelper;
     }
 
     /**
@@ -71,39 +51,9 @@ class ConfigHelper extends AbstractHelper
      *
      * @return string
      */
-    public function getConfigByCode($code, $scope = null, $storeId = null): string
+    public function getConfigByCode($code): string
     {
-        $store = $this->request->getParam('store');
-        $website = $this->request->getParam('website');
-        /**
-        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/alma.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-
-        $logger->info('$store');
-        $logger->info($store);
-        $logger->info('$website');
-        $logger->info($website);
-        $logger->info($this->state->getAreaCode());
-        */
-        if ($store) {
-            $id = $store;
-            $type = ScopeInterface::SCOPE_STORES;
-        } elseif ($website) {
-            $id = $website;
-            $type = ScopeInterface::SCOPE_WEBSITES;
-        } else {
-            $id = $this->storeResolver->getCurrentStoreId();
-            $type = ScopeInterface::SCOPE_STORES;
-        }
-        if ($storeId) {
-            $id = $storeId;
-        }
-        if ($scope) {
-            $type = $scope;
-        }
-
-        return $this->getConfigValue($this->getConfigPath($code), $type, $id);
+        return $this->getConfigValue($this->getConfigPath($code), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
     }
 
     /**

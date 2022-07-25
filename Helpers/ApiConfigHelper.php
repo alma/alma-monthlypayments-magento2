@@ -3,12 +3,8 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\State;
-use Magento\Store\Model\StoreResolver;
 
 class ApiConfigHelper extends ConfigHelper
 {
@@ -19,57 +15,46 @@ class ApiConfigHelper extends ConfigHelper
      * @var Logger
      */
     private $logger;
-    /**
-     * @var StoreResolver
-     */
-    private $storeResolver;
 
 
     public function __construct(
-        StoreResolver $storeResolver,
         Logger $logger,
         Context $context,
-        RequestInterface $request,
-        State $state,
+        StoreHelper $storeHelper,
         WriterInterface $writerInterface
     ) {
-        parent::__construct($storeResolver, $context, $request, $state, $writerInterface);
+        parent::__construct($context, $storeHelper, $writerInterface);
         $this->logger = $logger;
-        $this->storeResolver = $storeResolver;
     }
 
     /**
-     * @return mixed|null
+     * @return string
      */
-    public function getActiveAPIKey()
+    public function getActiveAPIKey(): string
     {
-        $storeId = $this->storeResolver->getCurrentStoreId();
-        $scope = $this->getScope($storeId);
-        $mode = $this->getActiveMode($scope, $storeId);
+        $mode = $this->getActiveMode();
         $apiKeyType = ($mode == Client::LIVE_MODE) ?
             self::CONFIG_LIVE_API_KEY :
             self::CONFIG_TEST_API_KEY ;
-        return $this->getConfigByCode($apiKeyType, $scope, $storeId);
+        return $this->getConfigByCode($apiKeyType);
     }
 
     /**
-     * @param int | null $storeId
      *
      * @return string
      */
-    public function getLiveKey(string $scopeCode = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $storeId = null): string
+    public function getLiveKey(): string
     {
-        return $this->getConfigByCode(self::CONFIG_LIVE_API_KEY, $scopeCode, $storeId);
+        return $this->getConfigByCode(self::CONFIG_LIVE_API_KEY);
     }
 
     /**
-     * @param int | null $storeId
      *
-     * @return mixed|null
+     * @return string
      */
-    public function getTestKey(string $scopeCode = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $storeId = null)
+    public function getTestKey(): string
     {
-        return $this->getConfigByCode(self::CONFIG_TEST_API_KEY, $scopeCode, $storeId);
+        return $this->getConfigByCode(self::CONFIG_TEST_API_KEY);
     }
     /**
      * @return bool
@@ -80,12 +65,11 @@ class ApiConfigHelper extends ConfigHelper
     }
 
     /**
-     * @param int | null $storeId
      *
-     * @return mixed|null
+     * @return string
      */
-    public function getActiveMode(string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $storeId = null)
+    public function getActiveMode(): string
     {
-        return $this->getConfigByCode(self::CONFIG_API_MODE, $scope, $storeId);
+        return $this->getConfigByCode(self::CONFIG_API_MODE);
     }
 }
