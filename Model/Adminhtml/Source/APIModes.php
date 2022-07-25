@@ -27,7 +27,6 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
