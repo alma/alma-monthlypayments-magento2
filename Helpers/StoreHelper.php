@@ -75,7 +75,7 @@ class StoreHelper extends AbstractHelper
      */
     public function getStoreId(string $storeId = null): string
     {
-        if ($storeId){
+        if ($storeId) {
             return $storeId;
         }
         $storeId = '0';
@@ -109,27 +109,27 @@ class StoreHelper extends AbstractHelper
      */
     public function getScope(string $scope = null): ?string
     {
+        if ($scope) {
+            return $scope;
+        }
+
         $areaCode = $this->getAreaCode();
-        if (!$scope && $areaCode == self::AREA_FRONT || $areaCode == self::AREA_API) {
+        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+
+        if ($areaCode == self::AREA_FRONT || $areaCode == self::AREA_API) {
             $scope = ScopeInterface::SCOPE_STORES;
         }
-        if (!$scope && $areaCode == self::AREA_BACK) {
+
+        if ($areaCode == self::AREA_BACK) {
             $store = $this->request->getParam('store');
             $website = $this->request->getParam('website');
-
-            $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
 
             if ($store) {
                 $scope = ScopeInterface::SCOPE_STORES;
             } elseif ($website) {
                 $scope = ScopeInterface::SCOPE_WEBSITES;
             }
-
         }
-        if (!$scope) {
-            $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-        }
-        //$this->logger->info('getScope', [$scope]);
         return $scope;
     }
 
