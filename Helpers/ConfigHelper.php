@@ -73,7 +73,6 @@ class ConfigHelper extends AbstractHelper
      */
     public function getConfigByCode($code, $scope = null, $storeId = null): string
     {
-
         $store = $this->request->getParam('store');
         $website = $this->request->getParam('website');
         /**
@@ -103,7 +102,6 @@ class ConfigHelper extends AbstractHelper
         if ($scope) {
             $type = $scope;
         }
-
 
         return $this->getConfigValue($this->getConfigPath($code), $type, $id);
     }
@@ -182,6 +180,18 @@ class ConfigHelper extends AbstractHelper
         if ($merchant) {
             $this->saveConfig($path, $merchant->id, $scope, $storeId);
         }
+    }
+
+    /**
+     * @param string $path
+     * @param $scope
+     * @param $storeId
+     *
+     * @return void
+     */
+    public function deleteMerchantId(string $path, $scope, $storeId): void
+    {
+        $this->writerInterface->delete($this->getConfigPath($path), $scope, $storeId);
     }
 
     /**
