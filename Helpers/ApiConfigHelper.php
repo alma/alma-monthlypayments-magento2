@@ -65,7 +65,6 @@ class ApiConfigHelper extends ConfigHelper
     }
 
     /**
-     *
      * @return string
      */
     public function getActiveMode(): string

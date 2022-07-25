@@ -51,6 +51,10 @@ class AlmaClient
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+    /**
+     * @var StoreHelper
+     */
+    private $storeHelper;
 
     /**
      * AlmaClient constructor.
@@ -64,13 +68,15 @@ class AlmaClient
         Logger $logger,
         ProductMetadataInterface $productMetadata,
         ApiConfigHelper $apiConfigHelper,
-        ModuleListInterface $moduleList
+        ModuleListInterface $moduleList,
+        StoreHelper $storeHelper
     ) {
         $this->alma = null;
         $this->logger = $logger;
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
         $this->apiConfigHelper = $apiConfigHelper;
+        $this->storeHelper = $storeHelper;
     }
 
     /**
@@ -81,7 +87,12 @@ class AlmaClient
      */
     public function getDefaultClient(): Client
     {
+        $storeId = $this->storeHelper->getStoreId();
+        $scope = $this->storeHelper->getScope();
+        $this->logger->info('Client storeId', [$storeId]);
+        $this->logger->info('Client scope', [$scope]);
         if ($this->alma === null) {
+            $this->logger->info('Used API Key for client', [$this->apiConfigHelper->getActiveAPIKey()]);
             $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey(), $this->apiConfigHelper->getActiveMode());
         }
 

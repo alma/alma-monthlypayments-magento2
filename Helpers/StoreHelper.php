@@ -15,6 +15,7 @@ class StoreHelper extends AbstractHelper
 {
     const AREA_FRONT = 'frontend';
     const AREA_BACK = 'adminhtml';
+    const AREA_API = 'webapi_rest';
 
     /**
      * @var Logger
@@ -74,22 +75,28 @@ class StoreHelper extends AbstractHelper
      */
     public function getStoreId(string $storeId = null): string
     {
+        if ($storeId){
+            return $storeId;
+        }
+        $storeId = '0';
         $areaCode = $this->getAreaCode();
 
-        if (!$storeId && $areaCode == self::AREA_FRONT) {
+        if ($areaCode == self::AREA_FRONT || $areaCode == self::AREA_API) {
             $storeId = $this->storeResolver->getCurrentStoreId();
         }
 
-        if (!$storeId && $areaCode == self::AREA_BACK) {
+        if ($areaCode == self::AREA_BACK) {
             $store = $this->request->getParam('store');
             $website = $this->request->getParam('website');
             if ($store) {
                 $storeId = $store;
             } elseif ($website) {
                 $storeId = $website;
-            } else {
-                $storeId = '0';
             }
+        }
+
+        if ($areaCode != self::AREA_BACK && $areaCode != self::AREA_FRONT && $areaCode != self::AREA_API) {
+            $this->logger->error('Error in Area Code', [$areaCode]);
         }
 
         return $storeId;
@@ -100,10 +107,10 @@ class StoreHelper extends AbstractHelper
      *
      * @return string
      */
-    public function getScope(string $scope = null): string
+    public function getScope(string $scope = null): ?string
     {
         $areaCode = $this->getAreaCode();
-        if (!$scope && $areaCode == self::AREA_FRONT) {
+        if (!$scope && $areaCode == self::AREA_FRONT || $areaCode == self::AREA_API) {
             $scope = ScopeInterface::SCOPE_STORES;
         }
         if (!$scope && $areaCode == self::AREA_BACK) {
@@ -119,6 +126,10 @@ class StoreHelper extends AbstractHelper
             }
 
         }
+        if (!$scope) {
+            $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        }
+        //$this->logger->info('getScope', [$scope]);
         return $scope;
     }
 

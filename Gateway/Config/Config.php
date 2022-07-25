@@ -29,9 +29,9 @@ use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Store\Model\StoreResolver;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
@@ -64,18 +64,23 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
-
     /**
-     * @var string
+     * @var StoreHelper
      */
-    private $storeId;
+    private $storeHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Config constructor.
+     *
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
      * @param ApiConfigHelper $apiConfigHelper
      * @param Logger $logger
+     * @param StoreHelper $storeHelper
      * @param null $methodCode
      * @param string $pathPattern
      */
@@ -84,7 +89,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         ApiConfigHelper $apiConfigHelper,
         Logger $logger,
-        StoreResolver $storeResolver,
+        StoreHelper $storeHelper,
         $methodCode = null,
         $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
@@ -94,8 +99,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->plansConfigFactory = $plansConfigFactory;
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
-        $this->storeId = $storeResolver->getCurrentStoreId();
+        $this->storeHelper = $storeHelper;
     }
+
     /**
     * @param string $field
     *
@@ -114,7 +120,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function get($field, $default = null)
     {
-        $value = parent::getValue($field, $this->storeId);
+        $value = parent::getValue($field, $this->storeHelper->getStoreId());
         if ($value === null) {
             $value = $default;
         }
@@ -215,6 +221,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getMerchantId()
     {
         $merchantIdPath = $this->apiConfigHelper->getActiveMode() . '_merchant_id';
+        $this->logger->info('get Merchant Id Path', [$this->get($merchantIdPath)]);
         return $this->get($merchantIdPath);
     }
 

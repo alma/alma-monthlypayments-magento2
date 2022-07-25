@@ -127,6 +127,18 @@ class StoreHelperTest extends TestCase
                     'expectedScope' => ScopeInterface::SCOPE_WEBSITES
                 ]
             ],
+            'In rest API' => [
+                [
+                    'storeId' => null,
+                    'scope' => ScopeInterface::SCOPE_STORES,
+                    'area' => StoreHelper::AREA_API,
+                    'currentStoreId' => '3',
+                    'store' => null,
+                    'website' => null,
+                    'expectedStoreId' => '3',
+                    'expectedScope' => ScopeInterface::SCOPE_STORES
+                ]
+            ],
         ];
     }
 

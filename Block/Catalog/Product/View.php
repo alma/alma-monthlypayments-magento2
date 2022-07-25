@@ -84,7 +84,9 @@ class View extends Template
      * @param WidgetConfigHelper $widgetConfigHelper
      * @param Config $config
      * @param Resolver $localeResolver
+     * @param Logger $logger
      * @param array $data
+     *
      * @throws LocalizedException
      */
     public function __construct(

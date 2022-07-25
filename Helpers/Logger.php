@@ -37,10 +37,6 @@ class Logger extends Monolog
     const CONFIG_DEBUG = 'debug';
 
     /**
-     * @var DirectoryList
-     */
-    private $directoryList;
-    /**
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
@@ -59,7 +55,6 @@ class Logger extends Monolog
         $handlers = [],
         $processors = []
     ) {
-        $this->directoryList = $directoryList;
 
         try {
             $handlers[] = new StreamHandler($directoryList->getPath('log') . '/alma.log', self::INFO);
@@ -82,14 +77,16 @@ class Logger extends Monolog
         if (!$this->canLog()) {
             return true;
         }
-
         return parent::addRecord($level, $message, $context);
     }
 
-    private function canLog(): string
+    /**
+     * @return string|null
+     */
+    private function canLog(): ?string
     {
         return $this->scopeConfig->getValue(
-            self::CONFIG_DEBUG
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::CONFIG_DEBUG
         );
     }
 }

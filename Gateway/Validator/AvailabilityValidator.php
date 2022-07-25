@@ -45,7 +45,9 @@ class AvailabilityValidator extends AbstractValidator
 
     /**
      * AvailabilityValidator constructor.
+     *
      * @param ResultInterfaceFactory $resultFactory
+     * @param Logger $logger
      * @param Availability $availabilityHelper
      * @param Eligibility $eligibilityHelper
      */
@@ -54,8 +56,7 @@ class AvailabilityValidator extends AbstractValidator
         Logger $logger,
         Availability $availabilityHelper,
         Eligibility $eligibilityHelper
-    )
-    {
+    ) {
         parent::__construct($resultFactory);
         $this->logger = $logger;
         $this->availabilityHelper = $availabilityHelper;
@@ -66,7 +67,11 @@ class AvailabilityValidator extends AbstractValidator
      * Performs domain-related validation for business object
      *
      * @param array $validationSubject
+     *
      * @return ResultInterface
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function validate(array $validationSubject)
     {

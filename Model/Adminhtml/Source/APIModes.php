@@ -28,10 +28,7 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Option\ArrayInterface;
-use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class APIModes
@@ -48,29 +45,22 @@ class APIModes implements ArrayInterface
      */
     private $apiConfigHelper;
     /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
      * @var StoreHelper
      */
     private $storeHelper;
 
     /**
      * @param Logger $logger
-     * @param RequestInterface $request
      * @param ApiConfigHelper $apiConfigHelper
      * @param StoreHelper $storeHelper
      */
     public function __construct(
         Logger $logger,
-        RequestInterface $request,
         ApiConfigHelper $apiConfigHelper,
         StoreHelper $storeHelper
     ) {
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
-        $this->request = $request;
         $this->storeHelper = $storeHelper;
     }
 
@@ -82,22 +72,12 @@ class APIModes implements ArrayInterface
         $arrayResult = [];
         $arrayResult[] = ['value' => 'test', 'label' => __('Test')];
 
-        $type = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-        $id = 0;
-        $store = $this->request->getParam('store');
-        $website = $this->request->getParam('website');
+        $type = $this->storeHelper->getScope();
+        $id = $this->storeHelper->getStoreId();
+        $this->logger->info('toOptionArray ', [$type]);
+        $this->logger->info('toOptionArray ', [$id]);
 
-        if ($store) {
-            $type = ScopeInterface::SCOPE_STORES;
-            $id = $store;
-        } elseif ($website) {
-            $type = ScopeInterface::SCOPE_WEBSITES;
-            $id = $website;
-        }
-        $this->logger->info('toOptionArray ',[$type]);
-        $this->logger->info('toOptionArray ',[$id]);
-
-        if ($this->apiConfigHelper->getLiveKey($type, $id)) {
+        if ($this->apiConfigHelper->getLiveKey()) {
             $arrayResult[] = ['value' => 'live', 'label' => __('Live')];
         }
         return $arrayResult;
