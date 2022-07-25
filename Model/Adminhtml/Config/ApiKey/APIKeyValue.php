@@ -126,7 +126,7 @@ class APIKeyValue extends Encrypted
     /**
      * @return void
      */
-    public function beforeSave()
+    public function beforeSave(): void
     {
         $value = (string)$this->getValue();
         if (
@@ -154,6 +154,19 @@ class APIKeyValue extends Encrypted
     }
 
     /**
+     * {@inheritdoc}. Delete merchant ID with the API_KEY.
+     *
+     * @return APIKeyValue
+     */
+    public function afterDelete(): APIKeyValue
+    {
+        $this->configHelper->deleteMerchantId($this->merchantIdPath, $this->getScope(), $this->getScopeId());
+        return parent::afterDelete();
+    }
+
+    /**
+     * Change API mode to test when Live api Key is empty.
+     *
      * @param string $value
      *
      */
@@ -172,6 +185,11 @@ class APIKeyValue extends Encrypted
         parent::beforeSave();
     }
 
+    /**
+     * Change $this->_dataSaveAllowed flag to "false" for disallow save
+     *
+     * @return void
+     */
     protected function disallowDataSave(): void
     {
         $this->_dataSaveAllowed = false;
