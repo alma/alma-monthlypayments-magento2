@@ -44,24 +44,17 @@ class APIModes implements ArrayInterface
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
-    /**
-     * @var StoreHelper
-     */
-    private $storeHelper;
 
     /**
      * @param Logger $logger
      * @param ApiConfigHelper $apiConfigHelper
-     * @param StoreHelper $storeHelper
      */
     public function __construct(
         Logger $logger,
-        ApiConfigHelper $apiConfigHelper,
-        StoreHelper $storeHelper
+        ApiConfigHelper $apiConfigHelper
     ) {
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
-        $this->storeHelper = $storeHelper;
     }
 
     /**
@@ -71,12 +64,6 @@ class APIModes implements ArrayInterface
     {
         $arrayResult = [];
         $arrayResult[] = ['value' => 'test', 'label' => __('Test')];
-
-        $type = $this->storeHelper->getScope();
-        $id = $this->storeHelper->getStoreId();
-        $this->logger->info('toOptionArray ', [$type]);
-        $this->logger->info('toOptionArray ', [$id]);
-
         if ($this->apiConfigHelper->getLiveKey()) {
             $arrayResult[] = ['value' => 'live', 'label' => __('Live')];
         }
