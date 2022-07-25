@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v2.8.2
+------
+* Wait for share of checkout legal
+
 v2.8.1
 ------
 * Fix Alma is not defined in back office
