@@ -129,7 +129,6 @@ class Eligibility
      */
     private function getPlansEligibility(): array
     {
-        $this->logger->info('getPlansEligibility', []);
         try {
             $quote = $this->getEligibilityQuote();
         } catch (InvalidArgumentException $e) {
