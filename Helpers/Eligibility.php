@@ -281,8 +281,7 @@ class Eligibility extends AbstractHelper
                 return $planEligibility->getEligibility()->isEligible();
             });
         } catch (\Exception $e) {
-            // TODO remove
-            //$this->logger->info($e->getMessage(), [$e->getTrace()]);
+            $this->logger->error('Get eligible plans error ', [$e->getMessage()]);
             return [];
         }
     }
@@ -364,7 +363,7 @@ class Eligibility extends AbstractHelper
      */
     public function getCurrentsFeePlans(): array
     {
-        if (!$this->isAlreadyLoaded()){
+        if (!$this->isAlreadyLoaded()) {
             $this->getEligiblePlans();
         }
         return $this->currentFeePlans;
@@ -374,17 +373,15 @@ class Eligibility extends AbstractHelper
      * Set Currents FeePlans
      *
      * @param PaymentPlanEligibility[]
-     * @return bool
      */
-    private function setCurrentsFeePlans($feePlans): bool
+    private function setCurrentsFeePlans($feePlans): void
     {
         $hasFeePlans = false;
         if (count($feePlans) > 0) {
             $this->currentFeePlans = $feePlans;
             $hasFeePlans  = true;
-            $this->setIsAlreadyLoaded($hasFeePlans);
         }
-        return $hasFeePlans;
+        $this->setIsAlreadyLoaded($hasFeePlans);
     }
 
     /**
