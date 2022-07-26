@@ -26,7 +26,6 @@
 
 namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Catalog\Block\Product\Context;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Framework\View\Element\Template;
@@ -72,10 +71,6 @@ class View extends Template
      * @var WidgetConfigHelper
      */
     private $widgetConfigHelper;
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
      * @param Context $context
@@ -84,7 +79,6 @@ class View extends Template
      * @param WidgetConfigHelper $widgetConfigHelper
      * @param Config $config
      * @param Resolver $localeResolver
-     * @param Logger $logger
      * @param array $data
      *
      * @throws LocalizedException
@@ -96,7 +90,6 @@ class View extends Template
         WidgetConfigHelper $widgetConfigHelper,
         Config $config,
         Resolver $localeResolver,
-        Logger $logger,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -107,7 +100,6 @@ class View extends Template
         $this->getPlans();
         $this->apiConfigHelper = $apiConfigHelper;
         $this->widgetConfigHelper = $widgetConfigHelper;
-        $this->logger = $logger;
     }
 
     /**
