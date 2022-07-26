@@ -124,6 +124,7 @@ class RefundClientTest extends TestCase
                     'amount' => $amount,
                     'order_total' => $orderTotal,
                     'total_refund' => $totalRefund,
+                    'store_id' => '2',
                 ]
             );
         return $transferObject;

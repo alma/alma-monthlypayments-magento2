@@ -30,6 +30,7 @@ use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Exception;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class AlmaClient
 {
@@ -63,6 +64,7 @@ class AlmaClient
      * @param ProductMetadataInterface $productMetadata
      * @param ApiConfigHelper $apiConfigHelper
      * @param ModuleListInterface $moduleList
+     * @param StoreHelper $storeHelper
      */
     public function __construct(
         Logger $logger,
@@ -81,19 +83,23 @@ class AlmaClient
 
     /**
      *
+     * @param null $storeId
+     *
      * @return Client
      *
      * @throws AlmaClientException
      */
-    public function getDefaultClient(): Client
+    public function getDefaultClient($storeId = null): Client
     {
-        $storeId = $this->storeHelper->getStoreId();
-        $scope = $this->storeHelper->getScope();
-        $this->logger->info('Client storeId', [$storeId]);
-        $this->logger->info('Client scope', [$scope]);
+        $scope = ScopeInterface::SCOPE_STORES;
+
+        if (!$storeId) {
+            $storeId = $this->storeHelper->getStoreId();
+            $scope = $this->storeHelper->getScope();
+        }
         if ($this->alma === null) {
-            $this->logger->info('Used API Key for client', [$this->apiConfigHelper->getActiveAPIKey()]);
-            $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey(), $this->apiConfigHelper->getActiveMode());
+            $this->logger->info('Used API Key for client', [$this->apiConfigHelper->getActiveAPIKey($scope, $storeId)]);
+            $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey($scope, $storeId), $this->apiConfigHelper->getActiveMode($scope, $storeId));
         }
 
         return $this->alma;

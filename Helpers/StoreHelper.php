@@ -114,20 +114,17 @@ class StoreHelper extends AbstractHelper
         }
 
         $areaCode = $this->getAreaCode();
-        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-
-        if ($areaCode == self::AREA_FRONT || $areaCode == self::AREA_API) {
-            $scope = ScopeInterface::SCOPE_STORES;
-        }
+        $scope = ScopeInterface::SCOPE_STORES;
 
         if ($areaCode == self::AREA_BACK) {
             $store = $this->request->getParam('store');
             $website = $this->request->getParam('website');
 
-            if ($store) {
-                $scope = ScopeInterface::SCOPE_STORES;
-            } elseif ($website) {
+            if ($website) {
                 $scope = ScopeInterface::SCOPE_WEBSITES;
+            }
+            if (!$store && !$website) {
+                $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
             }
         }
         return $scope;

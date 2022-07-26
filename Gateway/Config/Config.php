@@ -114,13 +114,17 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * @param $field
-     * @param null $default
-     * @param null $storeId
+     * @param mixed|null $default
+     * @param string|null $storeId
+     *
      * @return mixed|null
      */
-    public function get($field, $default = null)
+    public function get($field, $default = null, ?string $storeId = null)
     {
-        $value = parent::getValue($field, $this->storeHelper->getStoreId());
+        if (!$storeId) {
+            $storeId = $this->storeHelper->getStoreId();
+        }
+        $value = parent::getValue($field, $storeId);
         if ($value === null) {
             $value = $default;
         }
@@ -216,13 +220,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
-     * @return mixed|null
+     * @param string|null $storeId
+     *
+     * @return string|null
      */
-    public function getMerchantId()
+    public function getMerchantId(?string $storeId = null): ?string
     {
         $merchantIdPath = $this->apiConfigHelper->getActiveMode() . '_merchant_id';
-        $this->logger->info('get Merchant Id Path', [$this->get($merchantIdPath)]);
-        return $this->get($merchantIdPath);
+        return $this->get($merchantIdPath, '', $storeId);
     }
 
     /**

@@ -28,15 +28,18 @@ class ApiConfigHelper extends ConfigHelper
     }
 
     /**
+     * @param string|null $scope
+     * @param string|null $storeId
+     *
      * @return string
      */
-    public function getActiveAPIKey(): string
+    public function getActiveAPIKey(?string $scope = null, ?string $storeId = null): string
     {
-        $mode = $this->getActiveMode();
+        $mode = $this->getActiveMode($scope, $storeId);
         $apiKeyType = ($mode == Client::LIVE_MODE) ?
             self::CONFIG_LIVE_API_KEY :
             self::CONFIG_TEST_API_KEY ;
-        return $this->getConfigByCode($apiKeyType);
+        return $this->getConfigByCode($apiKeyType, $scope, $storeId);
     }
 
     /**
@@ -67,8 +70,8 @@ class ApiConfigHelper extends ConfigHelper
     /**
      * @return string
      */
-    public function getActiveMode(): string
+    public function getActiveMode(?string $scope = null, ?string $storeId = null): string
     {
-        return $this->getConfigByCode(self::CONFIG_API_MODE);
+        return $this->getConfigByCode(self::CONFIG_API_MODE, $scope, $storeId);
     }
 }
