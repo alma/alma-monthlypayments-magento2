@@ -29,20 +29,6 @@ class APIModesTest extends TestCase
         $this->assertEquals($this->getLiveResponseArray(), $apiObject->toOptionArray());
     }
 
-    public function testStoreViewWithLiveKey(): void
-    {
-        $this->apiConfig->method('getLiveKey')->willReturn('live_1234567');
-        $apiObject = $this->createApiModeObject();
-        $this->assertEquals($this->getLiveResponseArray(), $apiObject->toOptionArray());
-    }
-
-    public function testWebsiteWithLiveKey(): void
-    {
-        $this->apiConfig->method('getLiveKey')->willReturn('live_1234567');
-        $apiObject = $this->createApiModeObject();
-        $this->assertEquals($this->getLiveResponseArray(), $apiObject->toOptionArray());
-    }
-
     private function createApiModeObject(): APIModes
     {
         return new APIModes(...$this->getConstructorDependency());
