@@ -160,7 +160,7 @@ class APIKeyValue extends Encrypted
      */
     public function afterDelete(): APIKeyValue
     {
-        $this->configHelper->deleteMerchantId($this->merchantIdPath, $this->getScope(), $this->getScopeId());
+        $this->configHelper->deleteConfig($this->merchantIdPath, $this->getScope(), $this->getScopeId());
         return parent::afterDelete();
     }
 

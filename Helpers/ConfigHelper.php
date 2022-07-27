@@ -146,7 +146,7 @@ class ConfigHelper extends AbstractHelper
      *
      * @return void
      */
-    public function deleteMerchantId(string $path, $scope, $storeId): void
+    public function deleteConfig(string $path, $scope, $storeId): void
     {
         $this->writerInterface->delete($this->getConfigPath($path), $scope, $storeId);
     }
