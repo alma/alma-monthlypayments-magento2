@@ -129,7 +129,7 @@ class Eligibility extends AbstractHelper
      * @throws NoSuchEntityException
      * @throws RequestError
      * @throws InvalidArgumentException
-     *@throws Exceptions\AlmaClientException
+     * @throws Exceptions\AlmaClientException
      */
     private function getPlansEligibility(): array
     {

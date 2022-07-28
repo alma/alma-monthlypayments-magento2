@@ -131,53 +131,84 @@ class PaymentPlans extends Serialized
         $this->setValue($plansConfig);
     }
 
+    /**
+     * @return PaymentPlans
+     */
     public function beforeSave()
     {
-        $value = $this->getValue();
+        $paymentPlans = $this->getValue();
 
-        if (!is_array($value)) {
-            $value = $this->serializer->unserialize($value);
+        if (!is_array($paymentPlans)) {
+            $paymentPlans = $this->serializer->unserialize($paymentPlans);
         }
-        $value = $this->forceMinMaxLimit($value);
-        // Remove transient values from the serialized data: it should always come fresh from the API
-        foreach (PaymentPlanConfig::transientKeys() as $key) {
-            foreach ($value as $planKey => &$planConfig) {
-                unset($planConfig[$key]);
-            }
+        foreach ($paymentPlans as &$plan) {
+            $this->initAllowedAmountThresholds($plan);
+            $this->forceAmountThresholds($plan);
+            $this->cleanTransientKeys($plan);
         }
 
         // Parent class will serialize the value as JSON again in its beforeSave implementation
-        $this->setValue($value);
+        $this->setValue($paymentPlans);
 
         return parent::beforeSave();
     }
 
     /**
-     * Check if min and max value are in Alma limit for each plan configuration before serialize it in core_config database
+     * Remove transient values from the serialized data: it should always come fresh from the API
+     * @param array $plan
      *
-     * @param array $plans
-     * @return array
+     * @return void
      */
-    private function forceMinMaxLimit(array $plans): array
+    private function cleanTransientKeys(array &$plan)
     {
-        foreach ($plans as &$plan) {
-            if (!isset($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]) || !isset($plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT])) {
-                $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] = $plan[PaymentPlanConfig::KEY_MIN_AMOUNT];
-                $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] = $plan[PaymentPlanConfig::KEY_MAX_AMOUNT];
-            }
-            if ($plan[PaymentPlanConfig::KEY_MIN_AMOUNT] < $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MIN_AMOUNT] > $plan[PaymentPlanConfig::KEY_MAX_AMOUNT]) {
-                $this->messageManager->addErrorMessage(
-                    sprintf(__("Minimum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] / 100), $plan["key"])
-                );
-                $plan[PaymentPlanConfig::KEY_MIN_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT];
-            }
-            if ($plan[PaymentPlanConfig::KEY_MAX_AMOUNT] > $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MAX_AMOUNT] < $plan[PaymentPlanConfig::KEY_MIN_AMOUNT]) {
-                $this->messageManager->addErrorMessage(
-                    sprintf(__("Maximum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] / 100), $plan["key"])
-                );
-                $plan[PaymentPlanConfig::KEY_MAX_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT];
-            }
+        foreach (PaymentPlanConfig::transientKeys() as $key) {
+            unset($plan[$key]);
         }
-        return $plans;
+    }
+
+    /**
+     * Check if min and max value are in Alma limit for the plan configuration before serialize it in core_config database
+     *
+     * @param array $plan
+     *
+     * @return void
+     */
+    private function forceAmountThresholds(array &$plan): void
+    {
+        if ($plan[PaymentPlanConfig::KEY_MIN_AMOUNT] < $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MIN_AMOUNT] > $plan[PaymentPlanConfig::KEY_MAX_AMOUNT]) {
+            $this->messageManager->addErrorMessage(
+                sprintf(__("Minimum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] / 100), $plan["key"])
+            );
+            $plan[PaymentPlanConfig::KEY_MIN_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT];
+        }
+        if ($plan[PaymentPlanConfig::KEY_MAX_AMOUNT] > $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] || $plan[PaymentPlanConfig::KEY_MAX_AMOUNT] < $plan[PaymentPlanConfig::KEY_MIN_AMOUNT]) {
+            $this->messageManager->addErrorMessage(
+                sprintf(__("Maximum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] / 100), $plan["key"])
+            );
+            $plan[PaymentPlanConfig::KEY_MAX_AMOUNT] = $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT];
+        }
+    }
+
+    /**
+     * @param array $plan
+     *
+     * @return bool
+     */
+    private function hasAllowedAmountThresholds(array $plan): bool
+    {
+        return isset($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT]) && isset($plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT]);
+    }
+
+    /**
+     * @param array $plan
+     *
+     * @return void
+     */
+    private function initAllowedAmountThresholds(array &$plan)
+    {
+        if (!$this->hasAllowedAmountThresholds($plan)) {
+            $plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] = $plan[PaymentPlanConfig::KEY_MIN_AMOUNT];
+            $plan[PaymentPlanConfig::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] = $plan[PaymentPlanConfig::KEY_MAX_AMOUNT];
+        }
     }
 }
