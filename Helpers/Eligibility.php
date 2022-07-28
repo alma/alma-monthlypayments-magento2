@@ -46,7 +46,7 @@ class Eligibility extends AbstractHelper
 {
     const INSTALLMENTS_TYPE = 'installments';
     const SPREAD_TYPE = 'spread';
-    const DEFFERED_TYPE = 'deferred';
+    const DEFERRED_TYPE = 'deferred';
     const MERGED_TYPE = 'merged';
     /**
      * @var Data
@@ -535,7 +535,7 @@ class Eligibility extends AbstractHelper
             $type = self::SPREAD_TYPE;
         }
         if ($installmentCount == 1 && $isDeferred) {
-            $type = self::DEFFERED_TYPE;
+            $type = self::DEFERRED_TYPE;
         }
         return $type;
     }
