@@ -19,6 +19,8 @@ use stdClass;
 
 class UpgradeData implements UpgradeDataInterface
 {
+    const PATH_EQUAL = 'path = ?';
+
     /**
      * @var Logger
      */
@@ -81,7 +83,7 @@ class UpgradeData implements UpgradeDataInterface
 
             $tableName = $this->getCoreTable();
             $replace = ['value' => $newProcessedPath];
-            $where = ['path = ?' => $path, 'value = ?' => $oldProcessedPath];
+            $where = [self::PATH_EQUAL => $path, 'value = ?' => $oldProcessedPath];
             try {
                 $this->resourceConnection->getConnection()->update($tableName, $replace, $where);
             } catch (Exception $e) {
@@ -93,15 +95,15 @@ class UpgradeData implements UpgradeDataInterface
 
             $tableName = $this->getCoreTable();
             $oldMerchantIdQuery = $this->resourceConnection->getConnection()->select()
-                ->from($tableName, ['value'])->where('path = ?', $oldMerchantIdPath);
+                ->from($tableName, ['value'])->where(self::PATH_EQUAL, $oldMerchantIdPath);
 
             $oldMerchant = new stdClass();
             $oldMerchant->id = $this->resourceConnection->getConnection()->fetchOne($oldMerchantIdQuery);
 
             $apiQuery = $this->resourceConnection->getConnection()->select()
                 ->from($tableName, ['config_id','scope','scope_id', 'path', 'value'])
-                ->where('path = ?', 'payment/alma_monthly_payments/live_api_key')
-                ->orWhere('path = ?', 'payment/alma_monthly_payments/test_api_key');
+                ->where(self::PATH_EQUAL, 'payment/alma_monthly_payments/live_api_key')
+                ->orWhere(self::PATH_EQUAL, 'payment/alma_monthly_payments/test_api_key');
 
             $apiKeysRows = $this->resourceConnection->getConnection()->fetchAll($apiQuery);
 
