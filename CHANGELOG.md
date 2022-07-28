@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.8.3
+------
+* fix : multi store management
+* feature : use only test or prod api Key
+
 v2.8.2
 ------
 * Wait for share of checkout legal
