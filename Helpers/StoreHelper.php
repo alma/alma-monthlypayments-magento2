@@ -69,65 +69,54 @@ class StoreHelper extends AbstractHelper
     }
 
     /**
-     * @param string | null $storeId
      *
      * @return string
      */
-    public function getStoreId(string $storeId = null): string
+    public function getStoreId(): string
     {
-        if ($storeId) {
-            return $storeId;
-        }
-        $storeId = '0';
         $areaCode = $this->getAreaCode();
-
-        if ($areaCode == self::AREA_FRONT || $areaCode == self::AREA_API) {
-            $storeId = $this->storeResolver->getCurrentStoreId();
+        switch ($areaCode) {
+            case self::AREA_FRONT:
+            case self::AREA_API:
+                return $this->storeResolver->getCurrentStoreId();
+            case self::AREA_BACK:
+                return $this->backStoreId();
+            default:
+                $this->logger->error('Error in Area Code', [$areaCode]);
+                return '0';
         }
-
-        if ($areaCode == self::AREA_BACK) {
-            $store = $this->request->getParam('store');
-            $website = $this->request->getParam('website');
-            if ($store) {
-                $storeId = $store;
-            } elseif ($website) {
-                $storeId = $website;
-            }
-        }
-
-        if ($areaCode != self::AREA_BACK && $areaCode != self::AREA_FRONT && $areaCode != self::AREA_API) {
-            $this->logger->error('Error in Area Code', [$areaCode]);
-        }
-
-        return $storeId;
     }
 
     /**
-     * @param string|null $scope
      *
      * @return string
      */
-    public function getScope(string $scope = null): ?string
+    public function getScope(): string
     {
-        if ($scope) {
-            return $scope;
-        }
-
         $areaCode = $this->getAreaCode();
-        $scope = ScopeInterface::SCOPE_STORES;
-
-        if ($areaCode == self::AREA_BACK) {
-            $store = $this->request->getParam('store');
-            $website = $this->request->getParam('website');
-
-            if ($website) {
-                $scope = ScopeInterface::SCOPE_WEBSITES;
-            }
-            if (!$store && !$website) {
-                $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-            }
+        switch ($areaCode) {
+            case self::AREA_BACK:
+                return $this->backScopdeCode();
+            default:
+                return ScopeInterface::SCOPE_STORES;
         }
-        return $scope;
+
+    }
+
+    /**
+     * @return string
+     */
+    private function backStoreId(): string
+    {
+        $store = $this->request->getParam('store');
+        if ($store) {
+            return $store;
+        }
+        $website = $this->request->getParam('website');
+        if ($website) {
+            return $website;
+        }
+        return '0';
     }
 
 }

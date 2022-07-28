@@ -275,8 +275,7 @@ class Eligibility extends AbstractHelper
      */
     public function getEligiblePlans(): array
     {
-        $this->logger->info('getEligiblePlans', []);
-        try {
+            try {
             return array_filter($this->getPlansEligibility(), function ($planEligibility) {
                 return $planEligibility->getEligibility()->isEligible();
             });

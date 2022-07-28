@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v2.8.3
+v2.9.0
 ------
 * fix : multi store management
 * feature : use only test or prod api Key

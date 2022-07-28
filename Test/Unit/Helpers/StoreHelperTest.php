@@ -55,30 +55,6 @@ class StoreHelperTest extends TestCase
     public function dataProviderForTestStoreIdAndScope(): array
     {
         return [
-            'Front With a given store Id' => [
-                [
-                    'storeId' => '2',
-                    'scope' => ScopeInterface::SCOPE_STORES,
-                    'area' => StoreHelper::AREA_FRONT,
-                    'currentStoreId' => '3',
-                    'store' => null,
-                    'website' => null,
-                    'expectedStoreId' => '2',
-                    'expectedScope' => ScopeInterface::SCOPE_STORES
-                ]
-            ],
-            'Back With a given store Id' => [
-                [
-                    'storeId' => '2',
-                    'scope' => ScopeInterface::SCOPE_WEBSITES,
-                    'area' => StoreHelper::AREA_BACK,
-                    'currentStoreId' => null,
-                    'store' => '3',
-                    'website' => null,
-                    'expectedStoreId' => '2',
-                    'expectedScope' => ScopeInterface::SCOPE_WEBSITES
-                ]
-            ],
             'In Front in default view' => [
                 [
                     'storeId' => null,

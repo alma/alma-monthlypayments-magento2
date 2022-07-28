@@ -142,15 +142,15 @@ class APIKeyValue extends Encrypted
             $this->saveAndEncryptValue();
             $this->configHelper->saveMerchantId($this->merchantIdPath, $merchant, $this->getScope(), $this->getScopeId());
             $this->changeApiModeToTest($value);
-        } else {
-            $this->disallowDataSave();
-            $this->messageManager->addErrorMessage(
-                sprintf(
-                    __("Error checking %s - other configuration has been saved"),
-                    __($this->getApiKeyName())
-                )
-            );
+            return;
         }
+        $this->disallowDataSave();
+        $this->messageManager->addErrorMessage(
+            sprintf(
+                __("Error checking %s - other configuration has been saved"),
+                __($this->getApiKeyName())
+            )
+        );
     }
 
     /**

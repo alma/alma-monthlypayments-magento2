@@ -71,7 +71,7 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
-     * @inheriatDoc
+     * @inheritDoc
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {

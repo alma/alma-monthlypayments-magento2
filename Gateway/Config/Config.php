@@ -103,23 +103,23 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
-    * @param string $field
-    *
-    * @return string
-    */
+     * @param string $field
+     *
+     * @return string
+     */
     public function getFieldPath(string $field): string
     {
         return sprintf($this->pathPattern, $this->methodCode, $field);
     }
 
     /**
-     * @param $field
+     * @param string $field
      * @param mixed|null $default
-     * @param string|null $storeId
+     * @param int|string|null $storeId
      *
      * @return mixed|null
      */
-    public function get($field, $default = null, ?string $storeId = null)
+    public function get(string $field, $default = null, $storeId = null)
     {
         if (!$storeId) {
             $storeId = $this->storeHelper->getStoreId();
