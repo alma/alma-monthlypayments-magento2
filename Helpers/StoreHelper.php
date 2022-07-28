@@ -10,6 +10,7 @@ use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreResolver;
+use Magento\Tests\NamingConvention\true\string;
 
 class StoreHelper extends AbstractHelper
 {
@@ -94,13 +95,26 @@ class StoreHelper extends AbstractHelper
     public function getScope(): string
     {
         $areaCode = $this->getAreaCode();
-        switch ($areaCode) {
-            case self::AREA_BACK:
-                return $this->backScopdeCode();
-            default:
-                return ScopeInterface::SCOPE_STORES;
+        if ($areaCode == self::AREA_BACK) {
+            return $this->backScopeCode();
         }
+        return ScopeInterface::SCOPE_STORES;
+    }
 
+    /**
+     * @return string
+     */
+    private function backScopeCode(): string
+    {
+        $store = $this->request->getParam('store');
+        if ($store) {
+            return ScopeInterface::SCOPE_STORES;
+        }
+        $website = $this->request->getParam('website');
+        if ($website) {
+            return ScopeInterface::SCOPE_WEBSITES;
+        }
+        return ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
     }
 
     /**
