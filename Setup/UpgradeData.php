@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Setup;
 
+use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
@@ -97,8 +98,7 @@ class UpgradeData implements UpgradeDataInterface
             $oldMerchantIdQuery = $this->resourceConnection->getConnection()->select()
                 ->from($tableName, ['value'])->where(self::PATH_EQUAL, $oldMerchantIdPath);
 
-            $oldMerchant = new stdClass();
-            $oldMerchant->id = $this->resourceConnection->getConnection()->fetchOne($oldMerchantIdQuery);
+            $oldMerchant = new Merchant(['id' => $this->resourceConnection->getConnection()->fetchOne($oldMerchantIdQuery)]);
 
             $apiQuery = $this->resourceConnection->getConnection()->select()
                 ->from($tableName, ['config_id','scope','scope_id', 'path', 'value'])
@@ -115,7 +115,7 @@ class UpgradeData implements UpgradeDataInterface
                     $merchant = $this->almaClient->createInstance($apiKey, $apiMode)->merchants->me();
                     $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $merchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
                 } catch (AlmaClientException $e) {
-                    $this->logger->error('e', [$e->getMessage()]);
+                    $this->logger->error('Error in upgrade data', [$e->getMessage()]);
                     $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $oldMerchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
                 }
             }
