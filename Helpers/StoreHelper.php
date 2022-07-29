@@ -10,7 +10,6 @@ use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreResolver;
-use Magento\Tests\NamingConvention\true\string;
 
 class StoreHelper extends AbstractHelper
 {
