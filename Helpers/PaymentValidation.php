@@ -189,14 +189,14 @@ class PaymentValidation
 
         // Check that there's no price mismatch between the order amount and what's been paid
         if (Functions::priceToCents($order->getGrandTotal()) !== $almaPayment->purchase_amount) {
-            $internalError = __(
+            $rejectionReason = __(
                 "Paid amount (%1) does not match due amount (%2) for order %3",
                 Functions::priceFromCents($almaPayment->purchase_amount),
                 $payment->getAmountAuthorized(),
                 $order->getIncrementId()
             );
 
-            $this->cancelOrder($internalError, $transitionOrder, $order);
+            $this->cancelOrder($rejectionReason, $transitionOrder, $order);
 
             $this->flagAsPotentialFraud($almaPayment, AlmaPayment::FRAUD_AMOUNT_MISMATCH);
             throw new AlmaPaymentValidationException($errorMessage);
@@ -205,15 +205,15 @@ class PaymentValidation
         // Check that the Alma API has correctly registered the first installment as paid
         $firstInstalment = $almaPayment->payment_plan[0];
         if (!in_array($almaPayment->state, [AlmaPayment::STATE_IN_PROGRESS, AlmaPayment::STATE_PAID]) || $firstInstalment->state !== Instalment::STATE_PAID) {
-            $internalError = __(
+            $rejectionReason = __(
                 "Payment state incorrect (%1 & %2) for order %3",
                 $almaPayment->state,
                 $firstInstalment->state,
                 $order->getIncrementId()
             );
 
-            $this->cancelOrder($internalError, $transitionOrder, $order);
-            $this->flagAsPotentialFraud($almaPayment, AlmaPayment::FRAUD_STATE_ERROR . ": " . $internalError->render());
+            $this->cancelOrder($rejectionReason, $transitionOrder, $order);
+            $this->flagAsPotentialFraud($almaPayment, AlmaPayment::FRAUD_STATE_ERROR . ": " . $rejectionReason->render());
             throw new AlmaPaymentValidationException($errorMessage);
         }
 
@@ -377,17 +377,17 @@ class PaymentValidation
     /**
      * Cancel order and add a comment
      *
-     * @param Phrase $internalError
+     * @param Phrase $rejectionReason
      * @param bool $transitionOrder
      * @param Order $order
      *
      * @return void
      */
-    public function cancelOrder(Phrase $internalError, bool $transitionOrder, Order $order): void
+    public function cancelOrder(Phrase $rejectionReason, bool $transitionOrder, Order $order): void
     {
-        $this->logger->error('internal Error', [$internalError->render()]);
+        $this->logger->error('internal Error', [$rejectionReason->render()]);
         if ($transitionOrder) {
-            $order = $this->addCommentToOrder($order, $internalError->render(), Order::STATUS_FRAUD);
+            $order = $this->addCommentToOrder($order, $rejectionReason->render(), Order::STATUS_FRAUD);
             $this->orderHelper->save($order);
             $this->orderHelper->cancel($order->getId());
         }
@@ -417,11 +417,11 @@ class PaymentValidation
     {
         $payment = $order->getPayment();
         if (!$payment) {
-            $internalError = __("Cannot get payment information from order %s", $order->getIncrementId());
+            $rejectionReason = __("Cannot get payment information from order %s", $order->getIncrementId());
 
-            $this->logger->error($internalError->render());
-            $this->addCommentToOrder($order, $internalError);
-            throw new AlmaPaymentValidationException($internalError->render());
+            $this->logger->error($rejectionReason->render());
+            $this->addCommentToOrder($order, $rejectionReason);
+            throw new AlmaPaymentValidationException($rejectionReason->render());
         }
         return $payment;
     }
