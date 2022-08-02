@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2018 Alma / Nabla SAS
  *
@@ -34,7 +35,7 @@ use Magento\Framework\Registry;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Framework\Locale\Resolver;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
-Use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
+use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
 
 class View extends Template
 {
@@ -70,6 +71,7 @@ class View extends Template
      * @var WidgetConfigHelper
      */
     private $widgetConfigHelper;
+
     /**
      * @param Context $context
      * @param Registry $registry
@@ -78,6 +80,7 @@ class View extends Template
      * @param Config $config
      * @param Resolver $localeResolver
      * @param array $data
+     *
      * @throws LocalizedException
      */
     public function __construct(
@@ -88,8 +91,7 @@ class View extends Template
         Config $config,
         Resolver $localeResolver,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->config = $config;
         $this->registry = $registry;
@@ -163,6 +165,7 @@ class View extends Template
 
     /**
      * @return string
+     * @throws LocalizedException
      */
     public function _toHtml()
     {

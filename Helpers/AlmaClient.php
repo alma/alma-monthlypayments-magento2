@@ -30,13 +30,14 @@ use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Exception;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class AlmaClient
 {
     /** @var Client */
     private $alma;
     /**
-     * @var \Alma\MonthlyPayments\Helpers\Logger
+     * @var Logger
      */
     private $logger;
     /**
@@ -51,6 +52,10 @@ class AlmaClient
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+    /**
+     * @var StoreHelper
+     */
+    private $storeHelper;
 
     /**
      * AlmaClient constructor.
@@ -59,30 +64,41 @@ class AlmaClient
      * @param ProductMetadataInterface $productMetadata
      * @param ApiConfigHelper $apiConfigHelper
      * @param ModuleListInterface $moduleList
+     * @param StoreHelper $storeHelper
      */
     public function __construct(
         Logger $logger,
         ProductMetadataInterface $productMetadata,
         ApiConfigHelper $apiConfigHelper,
-        ModuleListInterface $moduleList
+        ModuleListInterface $moduleList,
+        StoreHelper $storeHelper
     ) {
         $this->alma = null;
         $this->logger = $logger;
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
         $this->apiConfigHelper = $apiConfigHelper;
+        $this->storeHelper = $storeHelper;
     }
 
     /**
+     *
+     * @param string|int|null $storeId
      *
      * @return Client
      *
      * @throws AlmaClientException
      */
-    public function getDefaultClient(): Client
+    public function getDefaultClient($storeId = null): Client
     {
+        $scope = ScopeInterface::SCOPE_STORES;
+
+        if (!isset($storeId)) {
+            $storeId = $this->storeHelper->getStoreId();
+            $scope = $this->storeHelper->getScope();
+        }
         if ($this->alma === null) {
-            $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey(), $this->apiConfigHelper->getActiveMode());
+            $this->alma = $this->createInstance($this->apiConfigHelper->getActiveAPIKey($scope, $storeId), $this->apiConfigHelper->getActiveMode($scope, $storeId));
         }
 
         return $this->alma;
@@ -99,7 +115,9 @@ class AlmaClient
     public function createInstance($apiKey, $mode): Client
     {
         $alma = null;
-
+        if (empty($apiKey)) {
+            throw new AlmaClientException("No Api Key in {$mode} mode");
+        }
         try {
             $alma = new Client($apiKey, ['mode' => $mode, 'logger' => $this->logger]);
 

@@ -103,11 +103,9 @@ class RefundClient implements ClientInterface
     private function refund(array $payloadData, bool $isFullRefund): Payment
     {
         if ($isFullRefund) {
-            $refund = $this->alma->getDefaultClient()->payments->fullRefund($payloadData['payment_id'], $payloadData['merchant_id'], 'Full refund with Magento 2 module');
-        } else {
-            $refund = $this->alma->getDefaultClient()->payments->partialRefund($payloadData['payment_id'], Functions::PriceToCents($payloadData['amount']), $payloadData['merchant_id'], 'Partial refund with Magento 2 module');
+            return $this->alma->getDefaultClient($payloadData['store_id'])->payments->fullRefund($payloadData['payment_id'], $payloadData['merchant_id'], 'Full refund with Magento 2 module');
         }
-        return $refund;
+        return $this->alma->getDefaultClient($payloadData['store_id'])->payments->partialRefund($payloadData['payment_id'], Functions::PriceToCents($payloadData['amount']), $payloadData['merchant_id'], 'Partial refund with Magento 2 module');
     }
 
     /**

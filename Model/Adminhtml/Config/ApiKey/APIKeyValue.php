@@ -25,12 +25,10 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
-use Alma\MonthlyPayments\Helpers\AlmaClient;
-use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Availability;
+use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Config\Model\Config\Backend\Encrypted;
-use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
@@ -38,28 +36,18 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Message\Manager as MessageManager;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
-use Psr\Log\LoggerInterface;
 
 class APIKeyValue extends Encrypted
 {
-    protected $apiKeyType = null;
-
+    protected $apiKeyType = '';
+    protected $merchantIdPath = '';
 
     /**
      * @var Availability
      */
     private $availabilityHelper;
-
-    /**
-     * @var ResourceConfig
-     */
-    private $resourceConfig;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * @var MessageManager
@@ -70,23 +58,27 @@ class APIKeyValue extends Encrypted
      * @var false
      */
     protected $hasError;
-
     /**
-     * @var Config
+     * @var ConfigHelper
      */
-    private $almaConfig;
+    private $configHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * APIKeyValue constructor.
+     *
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
      * @param EncryptorInterface $encryptor
      * @param Availability $availabilityHelper
-     * @param ResourceConfig $resourceConfig
      * @param MessageManager $messageManager
-     * @param Config $almaConfig
+     * @param ConfigHelper $configHelper
+     * @param Logger $logger
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -98,14 +90,13 @@ class APIKeyValue extends Encrypted
         TypeListInterface $cacheTypeList,
         EncryptorInterface $encryptor,
         Availability $availabilityHelper,
-        ResourceConfig $resourceConfig,
         MessageManager $messageManager,
-        Config $almaConfig,
+        ConfigHelper $configHelper,
+        Logger $logger,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $context,
             $registry,
@@ -118,54 +109,89 @@ class APIKeyValue extends Encrypted
         );
 
         $this->availabilityHelper = $availabilityHelper;
-        $this->resourceConfig = $resourceConfig;
-        $this->almaConfig = $almaConfig;
         $this->messageManager = $messageManager;
-
         $this->hasError = false;
+        $this->configHelper = $configHelper;
+        $this->logger = $logger;
     }
 
     /**
-     * @return \Magento\Framework\Phrase
+     * @return Phrase
      */
-    public function getApiKeyName()
+    public function getApiKeyName(): Phrase
     {
         return __('API key');
     }
 
-    public function beforeSave()
+    /**
+     * @return void
+     */
+    public function beforeSave(): void
     {
-        if (!$this->hasDataChanges()) {
-            return;
-        }
-
-        // Force fully_configured to 0 – it will be switched to 1 by the ConfigObserver if both API keys are correct
-        $configPath = $this->almaConfig->getFieldPath(ApiConfigHelper::CONFIG_FULLY_CONFIGURED);
-        $this->resourceConfig->saveConfig($configPath, 0, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
-
         $value = (string)$this->getValue();
-
-        if (empty($value)) {
-            // If we throw a ValidatorException (or any Exception), the whole DB transaction will be rolled back and
-            // our change to fully_configured above won't be saved, which is a problem; so we use the Message Manager
-            // and prevent save using `_dataSaveAllowed`.
-            $this->_dataSaveAllowed = false;
-            $this->messageManager->addErrorMessage(__('API key is required'));
+        if (
+            !$this->hasDataChanges() ||
+            preg_match('/^\*+$/', $value)
+        ) {
+            $this->disallowDataSave();
             return;
         }
-
-        // don't try value, if an obscured value was received. This indicates that data was not changed.
-        if (!preg_match('/^\*+$/', $value) && !$this->availabilityHelper->canConnectToAlma($this->apiKeyType, $value)) {
-            $this->_dataSaveAllowed = false;
-            $this->messageManager->addErrorMessage(
-                sprintf(
-                    __("Error checking %s - other configuration has been saved"),
-                    __($this->getApiKeyName())
-                )
-            );
+        // Clean api key value by saving empty value
+        $merchant = $this->availabilityHelper->getMerchant($this->apiKeyType, $value);
+        if (empty($value) || $merchant) {
+            $this->saveAndEncryptValue();
+            $this->configHelper->saveMerchantId($this->merchantIdPath, $merchant, $this->getScope(), $this->getScopeId());
+            $this->changeApiModeToTest($value);
             return;
         }
+        $this->disallowDataSave();
+        $this->messageManager->addErrorMessage(
+            sprintf(
+                __("Error checking %s - other configuration has been saved"),
+                __($this->getApiKeyName())
+            )
+        );
+    }
 
+    /**
+     * {@inheritdoc}. Delete merchant ID with the API_KEY.
+     *
+     * @return APIKeyValue
+     */
+    public function afterDelete(): APIKeyValue
+    {
+        $this->configHelper->deleteConfig($this->merchantIdPath, $this->getScope(), $this->getScopeId());
+        return parent::afterDelete();
+    }
+
+    /**
+     * Change API mode to test when Live api Key is empty.
+     *
+     * @param string $value
+     *
+     */
+    public function changeApiModeToTest(string $value): void
+    {
+        if ($this->isValueChanged() && empty($value) && $this->apiKeyType == 'live') {
+            $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function saveAndEncryptValue(): void
+    {
         parent::beforeSave();
+    }
+
+    /**
+     * Change $this->_dataSaveAllowed flag to "false" for disallow save
+     *
+     * @return void
+     */
+    protected function disallowDataSave(): void
+    {
+        $this->_dataSaveAllowed = false;
     }
 }

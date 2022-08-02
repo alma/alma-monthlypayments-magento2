@@ -25,36 +25,36 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\FileSystemException;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Logger\Monolog;
 use Monolog\Handler\StreamHandler;
-use Alma\MonthlyPayments\Helpers\ConfigHelper;
 
 
 class Logger extends Monolog
 {
-    /** @var ConfigHelper */
-    private $configHelper;
+    const CONFIG_DEBUG = 'debug';
 
     /**
-     * @var DirectoryList
+     * @var ScopeConfigInterface
      */
-    private $directoryList;
+    private $scopeConfig;
 
     /**
      * Logger constructor.
-     * @param ConfigHelper $configHelper
      * @param DirectoryList $directoryList
      * @param string $name
      * @param array $handlers
      * @param array $processors
      */
-    public function __construct(ConfigHelper $configHelper, DirectoryList $directoryList, string $name, $handlers = [], $processors = [])
-    {
-        $this->configHelper = $configHelper;
-        $this->directoryList = $directoryList;
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        DirectoryList $directoryList,
+        string $name,
+        $handlers = [],
+        $processors = []
+    ) {
 
         try {
             $handlers[] = new StreamHandler($directoryList->getPath('log') . '/alma.log', self::INFO);
@@ -63,6 +63,7 @@ class Logger extends Monolog
         }
 
         parent::__construct($name, $handlers, $processors);
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -73,10 +74,19 @@ class Logger extends Monolog
      */
     public function addRecord($level, $message, array $context = []): bool
     {
-        if (!$this->configHelper->canLog()) {
+        if (!$this->canLog()) {
             return true;
         }
-
         return parent::addRecord($level, $message, $context);
+    }
+
+    /**
+     * @return string|null
+     */
+    private function canLog(): ?string
+    {
+        return $this->scopeConfig->getValue(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::CONFIG_DEBUG
+        );
     }
 }

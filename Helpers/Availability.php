@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Entities\Merchant;
 use Alma\API\RequestError;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Availability
@@ -60,8 +61,7 @@ class Availability
         AlmaClient $almaClient,
         ApiConfigHelper $apiConfigHelper,
         Logger $logger
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->almaClient = $almaClient;
         $this->logger = $logger;
@@ -77,8 +77,7 @@ class Availability
         $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
         // $countryCode = ??
 
-        return $this->isFullyConfigured() &&
-            $this->isAvailableForCurrency($currencyCode);
+        return $this->isAvailableForCurrency($currencyCode);
     }
 
     /**
@@ -92,64 +91,18 @@ class Availability
     }
 
     /**
-     * @return bool
+     * @param string $mode
+     * @param string $apiKey
+     * @return bool | Merchant
      */
-    public function isFullyConfigured()
+    public function getMerchant(string $mode, string $apiKey)
     {
-        return $this->apiConfigHelper->isFullyConfigured();
-    }
-
-    /**
-     * @param string | null $mode
-     * @param string | null $apiKey
-     * @param Merchant $merchant
-     * @return bool
-     */
-    public function canConnectToAlma($mode = null, $apiKey = null, &$merchant = false): bool
-    {
-        if ($mode) {
-            $modes = [$mode];
-        } else {
-            $modes = ['live', 'test'];
+        try {
+            return $this->almaClient->createInstance($apiKey, $mode)->merchants->me();
+        } catch (AlmaClientException | RequestError $e) {
+            $this->logger->error("Could not create API client to check API key", [$mode]);
+            $this->logger->error("Exception message", [$e->getMessage()]);
+            return false;
         }
-
-        $keys = [
-            'live' => $this->apiConfigHelper->getLiveKey(),
-            'test' => $this->apiConfigHelper->getTestKey(),
-        ];
-
-        if ($apiKey) {
-            if ($mode) {
-                $keys[$mode] = $apiKey;
-            } else {
-                $keys = [
-                    'live' => $apiKey,
-                    'test' => $apiKey,
-                ];
-            }
-        }
-
-        foreach ($modes as $mode) {
-            $key = $keys[$mode];
-
-            $alma = $this->almaClient->createInstance($key, $mode);
-            if (!$alma) {
-                $this->logger->error("Could not create API client to check {$mode} API key");
-                return false;
-            }
-
-            try {
-                $merchant = $alma->merchants->me();
-            } catch (RequestError $e) {
-                if ($e->response && $e->response->responseCode === 401) {
-                    return false;
-                } else {
-                    $this->logger->error("Error while connecting to Alma API: {$e->getMessage()}");
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 }

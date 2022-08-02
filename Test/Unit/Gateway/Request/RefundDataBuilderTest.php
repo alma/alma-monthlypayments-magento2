@@ -34,10 +34,13 @@ class RefundDataBuilderTest extends TestCase
         $mockTotalRefunded = '100.0000';
         $mockGrandTotal = '1000.0000';
         $mockOrderId = 21;
+        $mockStoreId = '2';
         $orderInterfaceMock = $this->createMock(OrderInterface::class);
         $orderInterfaceMock->expects($this->once())
             ->method('getTotalRefunded')
             ->willReturn($mockTotalRefunded);
+        $orderInterfaceMock->method('getStoreId')
+            ->willReturn($mockStoreId);
         $orderInterfaceMock->expects($this->once())
             ->method('getGrandTotal')
             ->willReturn($mockGrandTotal);
@@ -74,7 +77,8 @@ class RefundDataBuilderTest extends TestCase
             'merchant_id' => $mockMerchantId,
             'amount' => $mockAmount,
             'total_refund' => $mockTotalRefunded,
-            'order_total' => $mockGrandTotal
+            'order_total' => $mockGrandTotal,
+            'store_id' => $mockStoreId
         ];
         $this->assertEquals($resultMock, $refundDataBuilder->build($buildSubjectMock));
     }

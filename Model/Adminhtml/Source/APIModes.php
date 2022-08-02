@@ -25,19 +25,47 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Option\ArrayInterface;
+
 /**
  * Class APIModes
  */
-class APIModes implements \Magento\Framework\Option\ArrayInterface
+class APIModes implements ArrayInterface
 {
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
+
+    /**
+     * @param Logger $logger
+     * @param ApiConfigHelper $apiConfigHelper
+     */
+    public function __construct(
+        Logger $logger,
+        ApiConfigHelper $apiConfigHelper
+    ) {
+        $this->logger = $logger;
+        $this->apiConfigHelper = $apiConfigHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
-        return [
-            ['value' => 'live', 'label' => __('Live')],
-            ['value' => 'test', 'label' => __('Test')],
-        ];
+        $arrayResult = [];
+        $arrayResult[] = ['value' => 'test', 'label' => __('Test')];
+        if ($this->apiConfigHelper->getLiveKey()) {
+            $arrayResult[] = ['value' => 'live', 'label' => __('Live')];
+        }
+        return $arrayResult;
     }
 }

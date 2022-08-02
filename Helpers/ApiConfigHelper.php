@@ -3,38 +3,59 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\Helper\Context;
 
 class ApiConfigHelper extends ConfigHelper
 {
     const CONFIG_LIVE_API_KEY = 'live_api_key';
     const CONFIG_TEST_API_KEY = 'test_api_key';
-    const CONFIG_FULLY_CONFIGURED = 'fully_configured';
     const CONFIG_API_MODE = 'api_mode';
-
     /**
-     * @return mixed|null
+     * @var Logger
      */
-    public function getActiveAPIKey()
-    {
-        $mode = $this->getActiveMode();
-        $apiKeyType = ($mode == Client::LIVE_MODE) ?
-            self::CONFIG_LIVE_API_KEY :
-            self::CONFIG_TEST_API_KEY ;
-        return $this->getConfigByCode($apiKeyType);
+    private $logger;
+
+
+    public function __construct(
+        Logger $logger,
+        Context $context,
+        StoreHelper $storeHelper,
+        WriterInterface $writerInterface
+    ) {
+        parent::__construct($context, $storeHelper, $writerInterface);
+        $this->logger = $logger;
     }
 
     /**
-     * @return mixed|null
+     * @param string|null $scope
+     * @param string|null $storeId
+     *
+     * @return string
      */
-    public function getLiveKey()
+    public function getActiveAPIKey(?string $scope = null, ?string $storeId = null): string
+    {
+        $mode = $this->getActiveMode($scope, $storeId);
+        $apiKeyType = ($mode == Client::LIVE_MODE) ?
+            self::CONFIG_LIVE_API_KEY :
+            self::CONFIG_TEST_API_KEY ;
+        return $this->getConfigByCode($apiKeyType, $scope, $storeId);
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getLiveKey(): string
     {
         return $this->getConfigByCode(self::CONFIG_LIVE_API_KEY);
     }
 
     /**
-     * @return mixed|null
+     *
+     * @return string
      */
-    public function getTestKey()
+    public function getTestKey(): string
     {
         return $this->getConfigByCode(self::CONFIG_TEST_API_KEY);
     }
@@ -45,19 +66,12 @@ class ApiConfigHelper extends ConfigHelper
     {
         return empty(trim($this->getLiveKey())) || empty(trim($this->getTestKey()));
     }
-    /**
-     * @return bool
-     */
-    public function isFullyConfigured(): bool
-    {
-        return !$this->needsAPIKeys() && (bool)(int)$this->getConfigByCode(self::CONFIG_FULLY_CONFIGURED);
-    }
 
     /**
-     * @return mixed|null
+     * @return string
      */
-    public function getActiveMode()
+    public function getActiveMode(?string $scope = null, ?string $storeId = null): string
     {
-        return $this->getConfigByCode(self::CONFIG_API_MODE);
+        return $this->getConfigByCode(self::CONFIG_API_MODE, $scope, $storeId);
     }
 }

@@ -40,7 +40,7 @@ class AlmaSection implements SectionSourceInterface
                 'title' => __($this->checkoutConfigHelper->getSpreadPaymentTitle()),
                 'description'  => __($this->checkoutConfigHelper->getSpreadPaymentDesc()),
             ],
-            Eligibility::DEFFERED_TYPE => [
+            Eligibility::DEFERRED_TYPE => [
                 'title' => __($this->checkoutConfigHelper->getDeferredPaymentTitle()),
                 'description'  => __($this->checkoutConfigHelper->getDeferredPaymentDesc()),
             ],
