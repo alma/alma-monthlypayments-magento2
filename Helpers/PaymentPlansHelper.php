@@ -41,39 +41,45 @@ class PaymentPlansHelper
      */
     private $messageManager;
     private $plansConfigFactory;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
 
     /**
      * @param Logger $logger
      * @param PaymentPlansConfigInterfaceFactory $configInterfaceFactory
      * @param MessageManager $messageManager
+     * @param ConfigHelper $configHelper
      */
     public function __construct(
         Logger $logger,
         PaymentPlansConfigInterfaceFactory $configInterfaceFactory,
-        MessageManager $messageManager
-    )
-    {
+        MessageManager $messageManager,
+        ConfigHelper $configHelper
+    ) {
         $this->logger = $logger;
         $this->plansConfigFactory = $configInterfaceFactory;
         $this->messageManager = $messageManager;
+        $this->configHelper = $configHelper;
     }
 
     /**
      * @return bool
      */
-    public function paymentTriggerIsAllowed():bool
+    public function paymentTriggerIsAllowed(): bool
     {
         $triggerIsAllowed = false;
 
         try {
-            $plansConfig =$this->updatePlanConfigFromApi();
+            $plansConfig = $this->updatePlanConfigFromApi();
         } catch (RequestError $e) {
             $this->messageManager->addErrorMessage(__($e->getMessage()));
             return false;
         }
 
         foreach ($plansConfig->getPlans() as $plan) {
-            if ($plan->hasDeferredTrigger()){
+            if ($plan->hasDeferredTrigger()) {
                 $triggerIsAllowed = true;
                 break;
             }
@@ -85,7 +91,7 @@ class PaymentPlansHelper
      * @param array $value
      * @return PaymentPlansConfigInterface
      */
-    public function createPlanConfig(array $value = []):PaymentPlansConfigInterface
+    public function createPlanConfig(array $value = []): PaymentPlansConfigInterface
     {
         return $this->plansConfigFactory->create(["data" => $value]);
     }
@@ -94,16 +100,29 @@ class PaymentPlansHelper
      * @return PaymentPlansConfigInterface
      * @throws RequestError
      */
-    public function updatePlanConfigFromApi():PaymentPlansConfigInterface
+    public function updatePlanConfigFromApi(): PaymentPlansConfigInterface
     {
         $plansConfig = $this->createPlanConfig();
         try {
             $plansConfig->updateFromApi();
         } catch (RequestError $e) {
-            $this->logger->info('Error fetching Alma payment plans : ',[$e->getMessage()]);
+            $this->logger->error('Error fetching Alma payment plans : ', [$e->getMessage()]);
             throw new RequestError("Error fetching Alma payment plans - displayed information might not be accurate");
         }
         return $plansConfig;
     }
 
+    public function saveBaseApiPlanConfig(): void
+    {
+        try {
+            $apiPlans = $this->updatePlanConfigFromApi()->getPlans();
+            $plans = [];
+            foreach ($apiPlans as $planKey => $apiPlan) {
+                $plans[$planKey] = $apiPlan->toArray();
+            }
+            $this->configHelper->saveBasePlansConfig($plans);
+        } catch (RequestError $e) {
+            $this->logger->error('Error in save api base config plans', [$e->getMessage()]);
+        }
+    }
 }

@@ -8,7 +8,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class ConfigHelper extends AbstractHelper
 {
@@ -19,6 +19,8 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
+    const BASE_PLANS_CONFIG = 'base_config_plans';
+    const BASE_PLANS_TIME = 'base_config_plans_time';
 
     /**
      * @var WriterInterface
@@ -28,6 +30,10 @@ class ConfigHelper extends AbstractHelper
      * @var StoreHelper
      */
     private $storeHelper;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     /**
      * @param Context $context
@@ -37,11 +43,13 @@ class ConfigHelper extends AbstractHelper
     public function __construct(
         Context $context,
         StoreHelper $storeHelper,
-        WriterInterface $writerInterface
+        WriterInterface $writerInterface,
+        SerializerInterface $serializer
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeHelper = $storeHelper;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -172,4 +180,9 @@ class ConfigHelper extends AbstractHelper
         return self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $configCode;
     }
 
+    public function saveBasePlansConfig($plans): void
+    {
+        $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
+        $this->saveConfig(self::BASE_PLANS_TIME, time(), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
+    }
 }
