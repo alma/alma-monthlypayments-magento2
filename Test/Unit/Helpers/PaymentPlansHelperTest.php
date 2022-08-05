@@ -25,7 +25,7 @@ class PaymentPlansHelperTest extends TestCase
 
     public function testSaveBaseApiPlanConfigWriteWithParams(): void
     {
-        $arrayPlansKey = ['general:1:0:0','general:2:0:0','general:3:0:0'];
+        $arrayPlansKey = [['general:1:0:0',true,true],['general:2:0:0',false,true],['general:3:0:0',true,true]];
         $paymentPlanConfigInterfaceMock = $this->createMock(PaymentPlansConfigInterface::class);
         $paymentPlanConfigInterfaceMock->method('updateFromApi');
         $paymentPlanConfigInterfaceMock->method('getPlans')->willReturn($this->getApiPlansConfigMock($arrayPlansKey));
@@ -48,28 +48,28 @@ class PaymentPlansHelperTest extends TestCase
             $this->configHelper
         ];
     }
-    private function getApiPlansConfigMock($plans): array
+    private function getApiPlansConfigMock($plansConfig): array
     {
         $apiPlansMock = [];
-        foreach ($plans as $key) {
-            $apiPlansMock[$key] = $this->apiPlanFactory($key);
+        foreach ($plansConfig as $plan) {
+            $apiPlansMock[$plan[0]] = $this->apiPlanFactory($plan);
         }
         return $apiPlansMock;
     }
-    private function getApiPlansConfigResult($plans): array
+    private function getApiPlansConfigResult($plansConfig): array
     {
         $apiPlansResultMock = [];
-        foreach ($plans as $key) {
-            $apiPlansResultMock[$key] = $this->apiPlanFactory($key)->toArray();
+        foreach ($plansConfig as $plan) {
+            $apiPlansResultMock[$plan[0]] = $this->apiPlanFactory($plan)->toArray();
         }
         return $apiPlansResultMock;
     }
 
-    private function apiPlanFactory($key): PaymentPlanConfigInterface
+    private function apiPlanFactory($plan): PaymentPlanConfigInterface
     {
-        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $key, $matches);
+
+        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $plan[0], $matches);
         $planData = [
-                'allowed' => true,
                 'available_in_pos' => true,
                 'capped' => false,
                 'customer_fee_fixed' => 0,
@@ -91,7 +91,9 @@ class PaymentPlansHelperTest extends TestCase
                 'payout_on_acceptance' => false
         ];
         $feePlanData = new FeePlan($planData);
-        $paymentPlanConfig = new PaymentPlanConfig(PaymentPlanConfig::defaultConfigForFeePlan($feePlanData));
-        return $paymentPlanConfig;
+        $feePlanData = PaymentPlanConfig::defaultConfigForFeePlan($feePlanData);
+        $feePlanData['allowed'] =  $plan[1];
+        $feePlanData['enabled'] =  $plan[2];
+        return new PaymentPlanConfig($feePlanData);
     }
 }
