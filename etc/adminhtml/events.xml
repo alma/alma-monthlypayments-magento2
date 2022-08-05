@@ -29,4 +29,7 @@
     <event name="sales_order_shipment_save_after">
         <observer name="alma_track_shipment" instance="Alma\MonthlyPayments\Observer\Admin\ShipmentObserver" />
     </event>
+    <event name="controller_action_predispatch_adminhtml_system_config_edit">
+        <observer name="before_load_alma" instance="Alma\MonthlyPayments\Observer\Admin\LoadConfigObserver" />
+    </event>
 </config>
