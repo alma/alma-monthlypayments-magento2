@@ -112,7 +112,7 @@ class PaymentPlansHelper
         return $plansConfig;
     }
 
-    public function saveBaseApiPlanConfig(): void
+    public function saveBaseApiPlansConfig(): void
     {
         try {
             $apiPlans = $this->updatePlanConfigFromApi()->getPlans();

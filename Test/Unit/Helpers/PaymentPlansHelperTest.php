@@ -31,7 +31,7 @@ class PaymentPlansHelperTest extends TestCase
         $paymentPlanConfigInterfaceMock->method('getPlans')->willReturn($this->getApiPlansConfigMock($arrayPlansKey));
         $this->plansConfigFactory->method('create')->willReturn($paymentPlanConfigInterfaceMock);
         $this->configHelper->expects($this->once())->method('saveBasePlansConfig')->with($this->getApiPlansConfigResult($arrayPlansKey));
-        $this->assertNull($this->createPaymentPlansHelper()->saveBaseApiPlanConfig());
+        $this->assertNull($this->createPaymentPlansHelper()->saveBaseApiPlansConfig());
     }
 
     private function createPaymentPlansHelper() : PaymentPlansHelper

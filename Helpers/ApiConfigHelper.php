@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
+use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -17,9 +18,10 @@ class ApiConfigHelper extends ConfigHelper
         Context $context,
         StoreHelper $storeHelper,
         WriterInterface $writerInterface,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TypeListInterface $typeList
     ) {
-        parent::__construct($context, $storeHelper, $writerInterface, $serializer);
+        parent::__construct($context, $storeHelper, $writerInterface, $serializer, $typeList);
     }
 
     /**

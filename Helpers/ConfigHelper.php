@@ -4,6 +4,8 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Cache\Type\Config as CacheConfig;
+use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -34,6 +36,10 @@ class ConfigHelper extends AbstractHelper
      * @var SerializerInterface
      */
     private $serializer;
+    /**
+     * @var TypeListInterface
+     */
+    private $typeList;
 
     /**
      * @param Context $context
@@ -44,12 +50,14 @@ class ConfigHelper extends AbstractHelper
         Context $context,
         StoreHelper $storeHelper,
         WriterInterface $writerInterface,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TypeListInterface $typeList
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeHelper = $storeHelper;
         $this->serializer = $serializer;
+        $this->typeList = $typeList;
     }
 
     /**
@@ -144,6 +152,7 @@ class ConfigHelper extends AbstractHelper
     {
         if ($merchant) {
             $this->saveConfig($path, $merchant->id, $scope, $storeId);
+            $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
         }
     }
 
@@ -168,6 +177,7 @@ class ConfigHelper extends AbstractHelper
     public function changeApiModeToTest($scope, $storeId): void
     {
         $this->writerInterface->delete($this->getConfigPath('api_mode'), $scope, $storeId);
+        $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
 
     /**
@@ -184,5 +194,15 @@ class ConfigHelper extends AbstractHelper
     {
         $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
         $this->saveConfig(self::BASE_PLANS_TIME, time(), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
+        $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
+    }
+
+    public function getBaseApiPlansConfig(): array
+    {
+        return $this->serializer->unserialize($this->getConfigByCode(self::BASE_PLANS_CONFIG));
+    }
+    private function cleanCache($type): void
+    {
+        $this->typeList->cleanType($type);
     }
 }

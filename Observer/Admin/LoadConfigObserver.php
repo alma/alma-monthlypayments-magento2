@@ -33,7 +33,7 @@ class LoadConfigObserver implements ObserverInterface
     public function execute(Observer $observer): void
     {
         if (preg_match('!section\/payment!', $this->url->getCurrentUrl())) {
-            $this->paymentPlansHelper->saveBaseApiPlanConfig();
+            $this->paymentPlansHelper->saveBaseApiPlansConfig();
         }
     }
 }
