@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\Entities\FeePlan;
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Framework\App\Cache\Type\Config as CacheConfig;
@@ -199,8 +200,14 @@ class ConfigHelper extends AbstractHelper
 
     public function getBaseApiPlansConfig(): array
     {
-        return $this->serializer->unserialize($this->getConfigByCode(self::BASE_PLANS_CONFIG));
+        $baseApiFeePlansInArray = $this->serializer->unserialize($this->getConfigByCode(self::BASE_PLANS_CONFIG));
+        $feePlans = [];
+        foreach ($baseApiFeePlansInArray as $key => $feePlanInArray) {
+            $feePlans[$key] = new FeePlan($feePlanInArray);
+        }
+        return $feePlans;
     }
+
     private function cleanCache($type): void
     {
         $this->typeList->cleanType($type);
