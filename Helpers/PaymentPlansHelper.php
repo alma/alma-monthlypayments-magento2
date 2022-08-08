@@ -26,9 +26,9 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\RequestError;
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
-use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
-use Magento\Framework\Message\Manager as MessageManager;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class PaymentPlansHelper
 {
@@ -37,31 +37,34 @@ class PaymentPlansHelper
      */
     private $logger;
     /**
-     * @var MessageManager
-     */
-    private $messageManager;
-    private $plansConfigFactory;
-    /**
      * @var ConfigHelper
      */
     private $configHelper;
+    /**
+     * @var PaymentPlansConfigInterface
+     */
+    private $paymentPlansConfig;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     /**
      * @param Logger $logger
-     * @param PaymentPlansConfigInterfaceFactory $configInterfaceFactory
-     * @param MessageManager $messageManager
+     * @param PaymentPlansConfigInterface $paymentPlansConfig
+     * @param SerializerInterface $serializer
      * @param ConfigHelper $configHelper
      */
     public function __construct(
         Logger $logger,
-        PaymentPlansConfigInterfaceFactory $configInterfaceFactory,
-        MessageManager $messageManager,
+        PaymentPlansConfigInterface $paymentPlansConfig,
+        SerializerInterface $serializer,
         ConfigHelper $configHelper
     ) {
         $this->logger = $logger;
-        $this->plansConfigFactory = $configInterfaceFactory;
-        $this->messageManager = $messageManager;
         $this->configHelper = $configHelper;
+        $this->paymentPlansConfig = $paymentPlansConfig;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -71,15 +74,11 @@ class PaymentPlansHelper
     {
         $triggerIsAllowed = false;
 
-        try {
-            $plansConfig = $this->updatePlanConfigFromApi();
-        } catch (RequestError $e) {
-            $this->messageManager->addErrorMessage(__($e->getMessage()));
-            return false;
-        }
+        $feePlans = $this->configHelper->getBaseApiPlansConfig();
 
-        foreach ($plansConfig->getPlans() as $plan) {
-            if ($plan->hasDeferredTrigger()) {
+        foreach ($feePlans as $plan) {
+            $deferredLimitDays  = $plan->getDeferredTriggerLimitDays();
+            if (isset($deferredLimitDays)) {
                 $triggerIsAllowed = true;
                 break;
             }
@@ -88,39 +87,19 @@ class PaymentPlansHelper
     }
 
     /**
-     * @param array $value
-     * @return PaymentPlansConfigInterface
+     * @return void
      */
-    public function createPlanConfig(array $value = []): PaymentPlansConfigInterface
-    {
-        return $this->plansConfigFactory->create(["data" => $value]);
-    }
-
-    /**
-     * @return PaymentPlansConfigInterface
-     * @throws RequestError
-     */
-    public function updatePlanConfigFromApi(): PaymentPlansConfigInterface
-    {
-        $plansConfig = $this->createPlanConfig();
-        try {
-            $plansConfig->updateFromApi();
-        } catch (RequestError $e) {
-            $this->logger->error('Error fetching Alma payment plans : ', [$e->getMessage()]);
-            throw new RequestError("Error fetching Alma payment plans - displayed information might not be accurate");
-        }
-        return $plansConfig;
-    }
-
     public function saveBaseApiPlansConfig(): void
     {
         try {
-            $apiPlans = $this->updatePlanConfigFromApi()->getPlans();
-            $plans = [];
-            foreach ($apiPlans as $planKey => $apiPlan) {
-                $plans[$planKey] = $apiPlan->toArray();
+            $apiPlans = $this->paymentPlansConfig->getFeePlansFromApi();
+            $baseFeePlans = [];
+            foreach ($apiPlans as $feePlan) {
+                $planKey = PaymentPlanConfig::keyForFeePlan($feePlan);
+                $this->logger->info('base fee plans', [$this->serializer->serialize($feePlan)]);
+                $baseFeePlans[$planKey] = $feePlan;
             }
-            $this->configHelper->saveBasePlansConfig($plans);
+            $this->configHelper->saveBasePlansConfig($baseFeePlans);
         } catch (RequestError $e) {
             $this->logger->error('Error in save api base config plans', [$e->getMessage()]);
         }

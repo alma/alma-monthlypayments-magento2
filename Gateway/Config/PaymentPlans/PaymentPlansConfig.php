@@ -28,7 +28,6 @@ use Alma\API\Entities\FeePlan;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
-use InvalidArgumentException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Alma\MonthlyPayments\Helpers\Logger;
 
@@ -96,6 +95,21 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
             $this->setPlanAllowed($key, $plan->allowed);
             $this->updatePlanDefaults($key, PaymentPlanConfig::defaultConfigForFeePlan($plan));
         }
+    }
+
+
+    /**
+     * @return FeePlan[]
+     */
+    public function getFeePlansFromApi(): array
+    {
+        $feePlans = [];
+        try {
+            $feePlans = $this->almaClient->getDefaultClient()->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
+        } catch (RequestError | AlmaClientException $e) {
+            $this->logger->error('Error in Get fee plans from Api', [$e->getMessage()]);
+        }
+        return $feePlans;
     }
 
     /**
