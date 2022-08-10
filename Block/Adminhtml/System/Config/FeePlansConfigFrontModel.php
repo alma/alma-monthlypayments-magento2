@@ -88,6 +88,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             [
                 'label' => __('Min display amount'),
                 'style' => self::SMALL_INPUT_COLUMN,
+                'class' => 'validate-number'
             ]
         );
         $this->addColumn(
@@ -95,6 +96,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             [
                 'label' => __('Max display amount'),
                 'style' => self::SMALL_INPUT_COLUMN,
+                'class' => 'validate-number'
             ]
         );
         $this->addColumn(
