@@ -29,6 +29,7 @@ use Alma\API\Entities\FeePlan;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
+use Magento\Framework\Message\Manager as MessageManager;
 
 class PaymentPlansHelper
 {
@@ -49,20 +50,27 @@ class PaymentPlansHelper
      * @var PaymentPlansConfigInterface
      */
     private $paymentPlansConfig;
+    /**
+     * @var MessageManager
+     */
+    private $messageManager;
 
     /**
      * @param Logger $logger
      * @param PaymentPlansConfigInterface $paymentPlansConfig
+     * @param MessageManager $messageManager
      * @param ConfigHelper $configHelper
      */
     public function __construct(
         Logger $logger,
         PaymentPlansConfigInterface $paymentPlansConfig,
+        MessageManager $messageManager,
         ConfigHelper $configHelper
     ) {
         $this->logger = $logger;
         $this->configHelper = $configHelper;
         $this->paymentPlansConfig = $paymentPlansConfig;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -109,12 +117,16 @@ class PaymentPlansHelper
      */
     private function forceAmountThresholds($plan): array
     {
+        $key = $plan['kind'].':'.$plan['installmentsCount'].':'.$plan['deferredDays'].':'.$plan['deferredMonths'];
         if (
             $plan[self::KEY_MIN_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MIN_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MIN_AMOUNT] > $plan[self::KEY_MAX_AMOUNT]
         ) {
             $plan[self::KEY_MIN_AMOUNT] = $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT];
+            $this->messageManager->addErrorMessage(
+                sprintf(__("Minimum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] / 100), $this->planLabelByKey($key))
+            );
         }
         if (
             $plan[self::KEY_MAX_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
@@ -122,6 +134,9 @@ class PaymentPlansHelper
             $plan[self::KEY_MAX_AMOUNT] < $plan[self::KEY_MIN_AMOUNT]
         ) {
             $plan[self::KEY_MAX_AMOUNT] = $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT];
+            $this->messageManager->addErrorMessage(
+                sprintf(__("Maximum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] / 100), $this->planLabelByKey($key))
+            );
         }
         return $plan;
     }

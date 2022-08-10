@@ -8,6 +8,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanConfigFactoryMock;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
+use Magento\Framework\Message\Manager as MessageManager;
 use PHPUnit\Framework\TestCase;
 
 class PaymentPlansHelperTest extends TestCase
@@ -16,6 +17,7 @@ class PaymentPlansHelperTest extends TestCase
     {
         $this->logger = $this->createMock(Logger::class);
         $this->paymentPlansConfig = $this->createMock(PaymentPlansConfigInterface::class);
+        $this->messageManager = $this->createMock(MessageManager::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
     }
     private function getDependency(): array
@@ -23,6 +25,7 @@ class PaymentPlansHelperTest extends TestCase
         return [
             $this->logger,
             $this->paymentPlansConfig,
+            $this->messageManager,
             $this->configHelper
         ];
     }
