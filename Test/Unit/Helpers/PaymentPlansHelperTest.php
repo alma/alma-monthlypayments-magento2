@@ -2,12 +2,12 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
-use Alma\API\Entities\FeePlan;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
-use Magento\Framework\Serialize\SerializerInterface;
+use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanConfigFactoryMock;
+use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
 use PHPUnit\Framework\TestCase;
 
 class PaymentPlansHelperTest extends TestCase
@@ -16,7 +16,6 @@ class PaymentPlansHelperTest extends TestCase
     {
         $this->logger = $this->createMock(Logger::class);
         $this->paymentPlansConfig = $this->createMock(PaymentPlansConfigInterface::class);
-        $this->serializer = $this->createMock(SerializerInterface::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
     }
     private function getDependency(): array
@@ -24,7 +23,6 @@ class PaymentPlansHelperTest extends TestCase
         return [
             $this->logger,
             $this->paymentPlansConfig,
-            $this->serializer,
             $this->configHelper
         ];
     }
@@ -70,7 +68,7 @@ class PaymentPlansHelperTest extends TestCase
     {
         $apiPlansMock = [];
         foreach ($plansConfig as $plan) {
-            $apiPlansMock[] = $this->apiPlanFactory($plan);
+            $apiPlansMock[] = FeePlanFactoryMock::feePlanFactory($plan['key'], $plan['allowed'], $plan['trigger']);
         }
         return $apiPlansMock;
     }
@@ -78,36 +76,130 @@ class PaymentPlansHelperTest extends TestCase
     {
         $apiPlansResultMock = [];
         foreach ($plansConfig as $plan) {
-            $apiPlansResultMock[$plan['key']] = $this->apiPlanFactory($plan);
+            $apiPlansResultMock[$plan['key']] = FeePlanFactoryMock::feePlanFactory($plan['key'], $plan['allowed'], $plan['trigger']);
         }
         return $apiPlansResultMock;
     }
 
-    private function apiPlanFactory($plan): FeePlan
+    /**
+     * @dataProvider formatFeePlanForConfigSave
+     *
+     * @param $apiFeePlan
+     * @param $inputConfig
+     * @param $result
+     *
+     * @return void
+     */
+    public function testMergeApiConfigAndInputForSaveInConfig($apiFeePlan, $inputConfig, $result): void
     {
-        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $plan['key'], $matches);
-        $planData = [
-                'allowed' => $plan['allowed'],
-                'available_in_pos' => true,
-                'capped' => false,
-                'customer_fee_fixed' => 0,
-                'customer_fee_variable' => 0,
-                'customer_lending_rate' => 0,
-                'deferred_days' => $matches[2],
-                'deferred_months' => $matches[3],
-                'deferred_trigger_bypass_scoring' => false,
-                'deferred_trigger_limit_days' => $plan['trigger'],
-                'first_installment_ratio' => null,
-                'installments_count' => $matches[1],
-                'is_under_maximum_interest_regulated_rate' => true,
-                'kind' => 'general',
-                'max_purchase_amount' => 200000,
-                'merchant' => 'merchant_11tqLqZ6gQgUg6jrkXSrz7rGdIMuI5oImX',
-                'merchant_fee_variable' => 75,
-                'merchant_fee_fixed' => 0,
-                'min_purchase_amount' => 5000,
-                'payout_on_acceptance' => false
-        ];
-        return new FeePlan($planData);
+        $this->assertEquals($result, $this->createPaymentPlansHelper()->formatFeePlanConfigForSave($apiFeePlan, $inputConfig));
     }
+
+    /**
+     * @dataProvider formatFeePlanDataProviderForDisplay
+     *
+     * @param $apiFeePlan
+     * @param $configFeePlan
+     * @param $result
+     *
+     * @return void
+     */
+    public function testFormatFeePlanConfigForBackOfficeDisplay($apiFeePlan, $configFeePlan, $result): void
+    {
+        $this->assertEquals($result, $this->createPaymentPlansHelper()->formatFeePlanConfigForBackOfficeDisplaying($apiFeePlan, $configFeePlan));
+    }
+
+    public function formatFeePlanDataProviderForDisplay(): array
+    {
+        $dataToDisplayDefaultValue = FeePlanConfigFactoryMock::getDefaultDataPlan();
+
+        $dataToDisplay3InstallmentAutoEnable = FeePlanConfigFactoryMock::getDefaultDataPlan();
+        $dataToDisplay3InstallmentAutoEnable['key'] = FeePlanFactoryMock::KEY_3;
+        $dataToDisplay3InstallmentAutoEnable['enabled'] = 1;
+        $dataToDisplay3InstallmentAutoEnable['pnx_label'] = 'Pay in 3 installments';
+
+        $dataToDisplayDeferred = FeePlanConfigFactoryMock::getDefaultDataPlan();
+        $dataToDisplayDeferred['key'] = FeePlanFactoryMock::KEY_15;
+        $dataToDisplayDeferred['pnx_label'] = 'Pay later - D+15';
+
+        $dataToDisplayDisablePlan = FeePlanConfigFactoryMock::getDefaultDataPlan();
+        $dataToDisplayDisablePlan['enabled'] = 1;
+        $dataToDisplayDisablePlan['custom_min_purchase_amount'] = 65;
+        $dataToDisplayDisablePlan['custom_max_purchase_amount'] = 2500;
+
+        return [
+            'Auto enable 3 installment plan if config is empty' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_3, true),
+                'configPlan' => null,
+                'resultPlanForDisplay' => FeePlanConfigFactoryMock::feePlanConfigForDisplayFactory($dataToDisplay3InstallmentAutoEnable),
+            ],
+            'Deferred plan Config is empty' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_15, true),
+                'configPlan' => null,
+                'resultPlanForDisplay' => FeePlanConfigFactoryMock::feePlanConfigForDisplayFactory($dataToDisplayDeferred),
+            ],
+            'Installment plan Config is empty' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_2, true),
+                'configPlan' => null,
+                'resultPlanForDisplay' => FeePlanConfigFactoryMock::feePlanConfigForDisplayFactory($dataToDisplayDefaultValue),
+            ],
+            'Plan is enabled with non default custom value in config' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_2, true),
+                'configPlan' => FeePlanConfigFactoryMock::feePlanConfigFactory(FeePlanFactoryMock::KEY_2, 1, null, 6500, 250000),
+                'resultPlanForDisplay' => FeePlanConfigFactoryMock::feePlanConfigForDisplayFactory($dataToDisplayDisablePlan),
+            ]
+        ];
+    }
+
+    public function formatFeePlanForConfigSave(): array
+    {
+        return [
+            'activate fee plan' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_15, true),
+                'inputConfig' => [
+                    'enabled' => 1,
+                    'custom_min_purchase_amount' => 50,
+                    'custom_max_purchase_amount' => 2000
+                ],
+                'mergeResult' => FeePlanConfigFactoryMock::feePlanConfigFactory(FeePlanFactoryMock::KEY_15, 1)
+            ],
+            'non active fee plan' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_15, true),
+                'inputConfig' => [
+                    'enabled' => 0,
+                    'custom_min_purchase_amount' => 50,
+                    'custom_max_purchase_amount' => 2000
+                ],
+                'mergeResult' => FeePlanConfigFactoryMock::feePlanConfigFactory(FeePlanFactoryMock::KEY_15)
+            ],
+            'Active fee plan with min and max change in' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_15, true),
+                'inputConfig' => [
+                    'enabled' => 1,
+                    'custom_min_purchase_amount' => 65,
+                    'custom_max_purchase_amount' => 1200
+                ],
+                'mergeResult' => FeePlanConfigFactoryMock::feePlanConfigFactory(FeePlanFactoryMock::KEY_15, 1, null, 6500, 120000)
+            ],
+            'Active fee plan with min and max change Out' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_15, true),
+                'inputConfig' => [
+                    'enabled' => 1,
+                    'custom_min_purchase_amount' => 35,
+                    'custom_max_purchase_amount' => 2500
+                ],
+                'mergeResult' => FeePlanConfigFactoryMock::feePlanConfigFactory(FeePlanFactoryMock::KEY_15, 1)
+            ],
+            'Active fee plan with min and max change invert' => [
+                'apiFeePlan' => FeePlanFactoryMock::feePlanFactory(FeePlanFactoryMock::KEY_15, true),
+                'inputConfig' => [
+                    'enabled' => 1,
+                    'custom_min_purchase_amount' => 2500,
+                    'custom_max_purchase_amount' => 32
+                ],
+                'mergeResult' => FeePlanConfigFactoryMock::feePlanConfigFactory(FeePlanFactoryMock::KEY_15, 1)
+            ]
+        ];
+    }
+
 }

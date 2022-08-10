@@ -90,10 +90,10 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
             'deferredDays' => intval($plan->deferred_days),
             'deferredMonths' => intval($plan->deferred_months),
 
-            'deferredTriggerEnable' => isset($deferred_trigger_limit_days),
-            'deferredTriggerDays' => $deferred_trigger_limit_days,
+            'deferredTriggerEnable' => !empty($deferred_trigger_limit_days),
+            'deferredTriggerDays' => intval($deferred_trigger_limit_days),
 
-            'enabled' => $plan->installments_count === 3,
+            'enabled' => 0,
 
             'minAllowedAmount' => $plan->min_purchase_amount,
             'minAmount' => $plan->min_purchase_amount,

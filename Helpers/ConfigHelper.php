@@ -17,7 +17,6 @@ class ConfigHelper extends AbstractHelper
 {
     const XML_PATH_PAYMENT = 'payment';
     const XML_PATH_METHODE = Config::CODE;
-    const XML_PATH_CANLOG = 'duration';
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
@@ -46,6 +45,8 @@ class ConfigHelper extends AbstractHelper
      * @param Context $context
      * @param StoreHelper $storeHelper
      * @param WriterInterface $writerInterface
+     * @param SerializerInterface $serializer
+     * @param TypeListInterface $typeList
      */
     public function __construct(
         Context $context,
@@ -191,13 +192,21 @@ class ConfigHelper extends AbstractHelper
         return self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $configCode;
     }
 
-    public function saveBasePlansConfig($plans): void
+    /**
+     * @param array $plans
+     *
+     * @return void
+     */
+    public function saveBasePlansConfig(array $plans): void
     {
         $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
         $this->saveConfig(self::BASE_PLANS_TIME, time(), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
         $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
 
+    /**
+     * @return FeePlan[]
+     */
     public function getBaseApiPlansConfig(): array
     {
         $baseApiFeePlansInArray = $this->serializer->unserialize($this->getConfigByCode(self::BASE_PLANS_CONFIG));
@@ -208,7 +217,12 @@ class ConfigHelper extends AbstractHelper
         return $feePlans;
     }
 
-    private function cleanCache($type): void
+    /**
+     * @param string $type
+     *
+     * @return void
+     */
+    private function cleanCache(string $type): void
     {
         $this->typeList->cleanType($type);
     }

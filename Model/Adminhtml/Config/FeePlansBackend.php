@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2018-2021 Alma SAS
  *
@@ -22,7 +23,6 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
@@ -38,7 +38,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\Serialize\Serializer\Json;
 use Alma\MonthlyPayments\Helpers\Logger;
 
-class PaymentPlans extends Serialized
+class FeePlansBackend extends Serialized
 {
     protected $apiKeyType = null;
 
@@ -119,6 +119,7 @@ class PaymentPlans extends Serialized
         $plansConfig = $this->plansConfigFactory->create(["data" => $value]);
 
         try {
+            $this->logger->info('MAJ API DESACTIVE', []);
             $plansConfig->updateFromApi();
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(
@@ -132,7 +133,7 @@ class PaymentPlans extends Serialized
     }
 
     /**
-     * @return PaymentPlans
+     * @return FeePlansBackend
      */
     public function beforeSave()
     {

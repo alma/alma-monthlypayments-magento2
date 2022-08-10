@@ -25,13 +25,18 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\Entities\FeePlan;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
-use Magento\Framework\Serialize\SerializerInterface;
 
 class PaymentPlansHelper
 {
+    const TRANSIENT_KEY_MIN_ALLOWED_AMOUNT = 'minAllowedAmount';
+    const KEY_MIN_AMOUNT = 'minAmount';
+    const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
+    const KEY_MAX_AMOUNT = 'maxAmount';
+
     /**
      * @var Logger
      */
@@ -44,27 +49,20 @@ class PaymentPlansHelper
      * @var PaymentPlansConfigInterface
      */
     private $paymentPlansConfig;
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
 
     /**
      * @param Logger $logger
      * @param PaymentPlansConfigInterface $paymentPlansConfig
-     * @param SerializerInterface $serializer
      * @param ConfigHelper $configHelper
      */
     public function __construct(
         Logger $logger,
         PaymentPlansConfigInterface $paymentPlansConfig,
-        SerializerInterface $serializer,
         ConfigHelper $configHelper
     ) {
         $this->logger = $logger;
         $this->configHelper = $configHelper;
         $this->paymentPlansConfig = $paymentPlansConfig;
-        $this->serializer = $serializer;
     }
 
     /**
@@ -96,12 +94,87 @@ class PaymentPlansHelper
             $baseFeePlans = [];
             foreach ($apiPlans as $feePlan) {
                 $planKey = PaymentPlanConfig::keyForFeePlan($feePlan);
-                $this->logger->info('base fee plans', [$this->serializer->serialize($feePlan)]);
                 $baseFeePlans[$planKey] = $feePlan;
             }
             $this->configHelper->saveBasePlansConfig($baseFeePlans);
         } catch (RequestError $e) {
             $this->logger->error('Error in save api base config plans', [$e->getMessage()]);
         }
+    }
+
+    /**
+     * @param $plan
+     *
+     * @return array
+     */
+    private function forceAmountThresholds($plan): array
+    {
+        if (
+            $plan[self::KEY_MIN_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
+            $plan[self::KEY_MIN_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
+            $plan[self::KEY_MIN_AMOUNT] > $plan[self::KEY_MAX_AMOUNT]
+        ) {
+            $plan[self::KEY_MIN_AMOUNT] = $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT];
+        }
+        if (
+            $plan[self::KEY_MAX_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
+            $plan[self::KEY_MAX_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
+            $plan[self::KEY_MAX_AMOUNT] < $plan[self::KEY_MIN_AMOUNT]
+        ) {
+            $plan[self::KEY_MAX_AMOUNT] = $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT];
+        }
+        return $plan;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    private function planLabelByKey(string $key): string
+    {
+        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $key, $matches);
+        $label = $key;
+
+        if (isset($matches[1])) {
+            $label =  __('Pay in %1 installments', $matches[1]);
+        }
+        if (isset($matches[2]) && $matches[2] != 0) {
+            $label =  __('Pay later - D+%1', $matches[2]);
+        }
+        return $label;
+    }
+
+    public function formatFeePlanConfigForBackOfficeDisplaying(FeePlan $feePlan, array $feePlanConfig = null): array
+    {
+        $key = PaymentPlanConfig::keyForFeePlan($feePlan);
+        $defaultEnabled = 0;
+        if ($key === 'general:3:0:0') {
+            $defaultEnabled = 1;
+        }
+        return [
+            'key' => $key,
+            'pnx_label' => $this->planLabelByKey($key),
+            'enabled' => isset($feePlanConfig['enabled']) ? intval($feePlanConfig['enabled']) : $defaultEnabled,
+            'min_purchase_amount' => Functions::priceFromCents($feePlan->min_purchase_amount),
+            'custom_min_purchase_amount' => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents(intval($feePlanConfig['minAmount'])) : Functions::priceFromCents($feePlan->min_purchase_amount),
+            'custom_max_purchase_amount' => isset($feePlanConfig['maxAmount']) ? Functions::priceFromCents(intval($feePlanConfig['maxAmount'])) : Functions::priceFromCents($feePlan->max_purchase_amount),
+            'max_purchase_amount' => Functions::priceFromCents($feePlan->max_purchase_amount),
+        ];
+    }
+
+    /**
+     * @param FeePlan $feePlan
+     * @param array $configInput
+     *
+     * @return array
+     */
+    public function formatFeePlanConfigForSave(FeePlan $feePlan, array $configInput): array
+    {
+        $newFeePlan = PaymentPlanConfig::defaultConfigForFeePlan($feePlan);
+        $newFeePlan['enabled'] = $configInput['enabled'];
+        $newFeePlan['minAmount'] = Functions::priceToCents($configInput['custom_min_purchase_amount']);
+        $newFeePlan['maxAmount'] = Functions::priceToCents($configInput['custom_max_purchase_amount']);
+        return $this->forceAmountThresholds($newFeePlan);
     }
 }
