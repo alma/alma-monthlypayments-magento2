@@ -141,13 +141,6 @@
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\FeePlansConfigBackendModel</backend_model>
                         <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\FeePlansConfigFrontModel</frontend_model>
                     </field>
-                    <field id="payment_plans2" translate="label" sortOrder="23" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
-                        <label>Payment plans</label>
-                        <config_path>payment/alma_monthly_payments/payment_plans</config_path>
-                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\FeePlansBackend</backend_model>
-                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\Plans</frontend_model>
-                    </field>
                 </group>
                 <!-- PAYMENT ON TRIGGER DISPLAY CONFIGURATION -->
                 <group id="alma_trigger_config" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
