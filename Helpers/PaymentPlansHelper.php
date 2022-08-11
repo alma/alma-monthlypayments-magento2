@@ -146,7 +146,7 @@ class PaymentPlansHelper
      *
      * @return string
      */
-    private function planLabelByKey(string $key): string
+    public function planLabelByKey(string $key): string
     {
         preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $key, $matches);
         $label = $key;
@@ -175,7 +175,21 @@ class PaymentPlansHelper
             'custom_min_purchase_amount' => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents(intval($feePlanConfig['minAmount'])) : Functions::priceFromCents($feePlan->min_purchase_amount),
             'custom_max_purchase_amount' => isset($feePlanConfig['maxAmount']) ? Functions::priceFromCents(intval($feePlanConfig['maxAmount'])) : Functions::priceFromCents($feePlan->max_purchase_amount),
             'max_purchase_amount' => Functions::priceFromCents($feePlan->max_purchase_amount),
+            'fee' => $this->getFee($feePlan)
         ];
+    }
+
+    /**
+     * @param FeePlan $feePlan
+     *
+     * @return array
+     */
+    private function getFee(FeePlan $feePlan): array
+    {
+        $fee = [];
+        $fee['merchant'] = ['merchant_fee_fixed' => $feePlan->merchant_fee_fixed, 'merchant_fee_variable' => $feePlan->merchant_fee_variable ];
+        $fee['customer'] = ['customer_fee_fixed' => $feePlan->customer_fee_fixed, 'customer_fee_variable' => $feePlan->customer_fee_variable ];
+        return $fee;
     }
 
     /**

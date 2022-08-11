@@ -5,8 +5,10 @@ namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config;
 use Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\DynamicRowEnableSelect;
 use Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\DynamicRowText;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Element\BlockInterface;
@@ -30,6 +32,10 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      * @var DynamicRowText|BlockInterface
      */
     private $renderString;
+    /**
+     * @var PaymentPlansHelper
+     */
+    private $paymentPlansHelper;
 
 
     /**
@@ -39,6 +45,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      * @param SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
+        PaymentPlansHelper $paymentPlansHelper,
         Context $context,
         Logger $logger,
         array $data = [],
@@ -51,6 +58,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             $secureRenderer
         );
         $this->logger = $logger;
+        $this->paymentPlansHelper = $paymentPlansHelper;
     }
 
     /**
@@ -159,5 +167,55 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             );
         }
         return $this->renderString;
+    }
+    /**
+     * Get the grid and scripts contents
+     *
+     * @param AbstractElement $element
+     *
+     * @return string
+     */
+    protected function _getElementHtml(AbstractElement $element)
+    {
+        $this->logger->info('$element', [$element]);
+        $this->logger->info('$element', [$element->getValue()]);
+
+        $element->setComment($this->getHtmlComment($element->getValue()));
+        $this->setElement($element);
+        $html = $this->_toHtml();
+        $this->_arrayRowsCache = null;
+        // doh, the object is used as singleton!
+        return $html;
+    }
+
+    private function getHtmlComment($feePlans): string
+    {
+        $html = '<div style="font-size: x-small" data-toggle="collapse" ><p>' . __('Fees applied to each transaction :') . '</p>';
+        foreach ($feePlans as $key => $plan) {
+            $customerFees = $plan['fee']['customer'];
+            $merchantFees = $plan['fee']['merchant'];
+
+            $html .= '<p class="content">';
+            $html .= '<b>' . $this->paymentPlansHelper->planLabelByKey($key) . '</b> : ';
+            if ($merchantFees['merchant_fee_variable'] != 0) {
+                $html .= ' ' . __('Merchant fee variable:') . ' ' . intval($merchantFees['merchant_fee_variable']) / 100 . '%';
+            }
+            if ($merchantFees['merchant_fee_fixed'] != 0) {
+                $html .= ' ' . __('Merchant fee fixed:') . ' ' . intval($merchantFees['merchant_fee_variable']) / 100 . '%';
+            }
+            $html .= ' <b>-</b> ';
+            if ($customerFees['customer_fee_fixed'] == 0 && $customerFees['customer_fee_variable'] == 0) {
+                $html .= ' ' . __('Customer fee:') . ' ' . __('no fees');
+            }
+            if ($customerFees['customer_fee_fixed'] != 0) {
+                $html .= ' ' . __('Customer fixed fee:') . ' ' . intval($customerFees['customer_fee_fixed']) / 100 . '%';
+            }
+            if ($customerFees['customer_fee_variable'] != 0) {
+                $html .= ' ' . __('Customer variable fee:') . ' ' . intval($customerFees['customer_fee_variable']) / 100 . '%';
+            }
+            $html .= '</p>';
+        }
+        $html .= '</div>';
+        return $html;
     }
 }
