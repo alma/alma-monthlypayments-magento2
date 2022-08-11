@@ -29,7 +29,7 @@ class FeePlanFactoryMock
         int $minAmount = 5000,
         int $maxAmount = 200000
     ): array {
-        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $key, $matches);
+        preg_match('!general:([\d]+):([\d]+):([\d]+)!', $key, $matches);
         return [
             'allowed' => $allowed,
             'available_in_pos' => true,

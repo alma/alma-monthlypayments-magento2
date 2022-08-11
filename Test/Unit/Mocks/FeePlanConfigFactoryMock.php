@@ -6,7 +6,7 @@ class FeePlanConfigFactoryMock
 {
     public static function feePlanConfigFactory($key, $enabled = 0, $triggerDays = null, $minAMount = 5000, $MaxAmount = 200000, $minAllowedAMount = 5000, $maxAllowedAMount = 200000): array
     {
-        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $key, $matches);
+        preg_match('!general:([\d]+):([\d]+):([\d]+)!', $key, $matches);
         return [
             'kind' => 'general',
             'installmentsCount' => $matches[1],

@@ -148,7 +148,7 @@ class PaymentPlansHelper
      */
     public function planLabelByKey(string $key): string
     {
-        preg_match('!general:([0-9]+):([0-9]+):([0-9]+)!', $key, $matches);
+        preg_match('!general:([\d]+):([\d]+):([\d]+)!', $key, $matches);
         $label = $key;
 
         if (isset($matches[1])) {

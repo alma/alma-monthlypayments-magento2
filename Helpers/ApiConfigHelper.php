@@ -14,16 +14,6 @@ class ApiConfigHelper extends ConfigHelper
     const CONFIG_TEST_API_KEY = 'test_api_key';
     const CONFIG_API_MODE = 'api_mode';
 
-    public function __construct(
-        Context $context,
-        StoreHelper $storeHelper,
-        WriterInterface $writerInterface,
-        SerializerInterface $serializer,
-        TypeListInterface $typeList
-    ) {
-        parent::__construct($context, $storeHelper, $writerInterface, $serializer, $typeList);
-    }
-
     /**
      * @param string|null $scope
      * @param string|null $storeId
