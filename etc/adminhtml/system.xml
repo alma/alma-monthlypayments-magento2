@@ -137,7 +137,7 @@
                     <field id="payment_plans" translate="label" sortOrder="22" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <label>Payment plans</label>
-                        <config_path>payment/alma_monthly_payments/payment_plans2</config_path>
+                        <config_path>payment/alma_monthly_payments/payment_plans</config_path>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\FeePlansConfigBackendModel</backend_model>
                         <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\FeePlansConfigFrontModel</frontend_model>
                     </field>
