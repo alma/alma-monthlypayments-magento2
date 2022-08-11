@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2018-2021 Alma SAS
  *
@@ -83,6 +84,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     {
         $deferred_trigger_limit_days = $plan->getDeferredTriggerLimitDays();
         return [
+            'allowed' => $plan->allowed,
             'kind' => $plan->kind,
 
             'installmentsCount' => $plan->installments_count,
