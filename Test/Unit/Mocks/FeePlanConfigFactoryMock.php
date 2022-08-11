@@ -34,7 +34,9 @@ class FeePlanConfigFactoryMock
             'customerFees' => [
                 'variable' => 0,
                 'fixed' => 0
-            ]
+            ],
+            'allowed' => true
+
         ];
     }
 
@@ -60,7 +62,11 @@ class FeePlanConfigFactoryMock
             "min_purchase_amount" => $data['min_purchase_amount'],
             "custom_min_purchase_amount" => $data['custom_min_purchase_amount'],
             "custom_max_purchase_amount" => $data['custom_max_purchase_amount'],
-            "max_purchase_amount" => $data['max_purchase_amount']
+            "max_purchase_amount" => $data['max_purchase_amount'],
+            "fee" => [
+                "merchant" => ['merchant_fee_variable' => 75, 'merchant_fee_fixed' => 0],
+                "customer" => ['customer_fee_variable' => 0, 'customer_fee_fixed' => 0]
+            ]
         ];
     }
 }
