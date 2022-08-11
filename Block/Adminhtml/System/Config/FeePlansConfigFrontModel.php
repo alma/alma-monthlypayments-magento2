@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config;
 
 use Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\DynamicRowEnableSelect;
 use Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\DynamicRowText;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
@@ -25,10 +24,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      */
     private $selectOptions;
     /**
-     * @var Logger
-     */
-    private $logger;
-    /**
      * @var DynamicRowText|BlockInterface
      */
     private $renderString;
@@ -39,15 +34,14 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
 
 
     /**
+     * @param PaymentPlansHelper $paymentPlansHelper
      * @param Context $context
-     * @param Logger $logger
      * @param array $data
      * @param SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
         PaymentPlansHelper $paymentPlansHelper,
         Context $context,
-        Logger $logger,
         array $data = [],
         ?SecureHtmlRenderer $secureRenderer = null
     ) {
@@ -57,7 +51,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             $data,
             $secureRenderer
         );
-        $this->logger = $logger;
         $this->paymentPlansHelper = $paymentPlansHelper;
     }
 
@@ -130,7 +123,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
         $options = [];
         $selectFieldData = $row->getSelectField();
         if ($selectFieldData !== null) {
-            $this->logger->info('$selectFieldData', [$selectFieldData]);
             $options['option_' . $this->getSelectFieldOptions()->calcOptionHash($selectFieldData)] = 'selected="selected"';
         }
         $row->setData('option_extra_attrs', $options);
@@ -177,9 +169,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      */
     protected function _getElementHtml(AbstractElement $element)
     {
-        $this->logger->info('$element', [$element]);
-        $this->logger->info('$element', [$element->getValue()]);
-
         $element->setComment($this->getHtmlComment($element->getValue()));
         $this->setElement($element);
         $html = $this->_toHtml();
