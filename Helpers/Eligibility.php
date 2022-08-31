@@ -171,7 +171,7 @@ class Eligibility extends AbstractHelper
         }
 
         if (empty($installmentsQuery)) {
-            $this->logger->info('No eligible installment in config for this amount');
+            $this->logger->info('No eligible installment in config for this amount', [$cartTotal]);
             return [];
         }
 
@@ -237,7 +237,7 @@ class Eligibility extends AbstractHelper
         try {
             $plansEligibility = $this->getPlansEligibility();
         } catch (\Exception $e) {
-            $this->logger->error("Error checking payment eligibility: {$e->getMessage()}");
+            $this->logger->error("Error checking payment eligibility:", [$e->getMessage()]);
             return false;
         }
 

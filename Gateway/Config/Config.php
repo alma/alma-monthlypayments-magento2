@@ -241,11 +241,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $plansConfig = $this->plansConfigFactory->create(["data" => $data]);
         if (empty($data)) {
             // No plans config data has ever been saved – fetch what we need
-            try {
-                $plansConfig->updateFromApi();
-            } catch (RequestError $e) {
-                $this->logger->error('getPaymentPlansConfig Error : ', [$e->getMessage()]);
-            }
+            $plansConfig->updateFromApi();
         }
         return $plansConfig;
     }

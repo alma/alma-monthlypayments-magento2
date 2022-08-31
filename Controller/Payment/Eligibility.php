@@ -63,7 +63,7 @@ class Eligibility extends Action
         try {
             $this->eligibilityHelper->checkEligibility();
         } catch (\Exception $e) {
-            $this->logger->info('Control payment eligibility Exception : ',[$e->getMessage()]);
+            $this->logger->error('Control payment eligibility Exception : ', [$e->getMessage()]);
             return false;
         }
 
