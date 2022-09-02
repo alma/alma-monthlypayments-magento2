@@ -75,7 +75,7 @@
 "Maximum amount (€)","Montant maximum (€)"
 "Maximum purchase amount for which this payment plan will be enabled","Maximum d'achat pour lequel cet échéancier sera proposé"
 "Pay later - <%= deferredType %>+<%= deferredDuration %>","Paiement différé à <%= deferredType %>+<%= deferredDuration %>"
-"Pay later - D+%1","Pay later - D+%1"
+"Pay later - D+%1","Payer plus tard - D+%1"
 "Pay in <%= installmentsCount %> installments","Paiement en <%= installmentsCount %> fois"
 "You can offer <%= installmentsCount %>-installment payments for amounts between <b><%= almaPriceFromCents(minAllowedAmount) %>€</b> and <b><%= almaPriceFromCents(maxAllowedAmount) %>€</b>.","Vous pouvez proposer le paiement en <%= installmentsCount %> fois pour des montants entre <b><%= almaPriceFromCents(minAllowedAmount) %>€</b> et <b><%= almaPriceFromCents(maxAllowedAmount) %>€</b>."
 "You can offer Pay Later payments at <%= deferredType %>+<%= deferredDuration %> for amounts between <b><%= almaPriceFromCents(minAllowedAmount) %>€</b> and <b><%= almaPriceFromCents(maxAllowedAmount) %>€</b>.","Vous pouvez proposer le paiement à <%= deferredType %>+<%= deferredDuration %> pour des montants entre <b><%= almaPriceFromCents(minAllowedAmount) %>€</b> et <b><%= almaPriceFromCents(maxAllowedAmount) %>€</b>."
