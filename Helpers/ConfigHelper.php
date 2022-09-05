@@ -22,7 +22,6 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_TYPOLOGY = 'trigger_typology';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
     const BASE_PLANS_CONFIG = 'base_config_plans';
-    const BASE_PLANS_TIME = 'base_config_plans_time';
 
     /**
      * @var WriterInterface
@@ -200,7 +199,6 @@ class ConfigHelper extends AbstractHelper
     public function saveBasePlansConfig(array $plans): void
     {
         $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
-        $this->saveConfig(self::BASE_PLANS_TIME, time(), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
         $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
 
