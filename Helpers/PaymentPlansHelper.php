@@ -169,20 +169,32 @@ class PaymentPlansHelper
     public function formatLocalFeePlanConfig(FeePlan $feePlan, array $feePlanConfig = null): array
     {
         $key = PaymentPlanConfig::keyForFeePlan($feePlan);
-        $defaultEnabled = 0;
-        if ($key === 'general:3:0:0') {
-            $defaultEnabled = 1;
-        }
         return [
             'key' => $key,
             'pnx_label' => $this->planLabelByKey($key),
-            'enabled' => isset($feePlanConfig['enabled']) ? intval($feePlanConfig['enabled']) : $defaultEnabled,
+            'enabled' => $this->getEnabledDefaultValue($feePlan, $feePlanConfig),
             'min_purchase_amount' => Functions::priceFromCents($feePlan->min_purchase_amount),
             'custom_min_purchase_amount' => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents(intval($feePlanConfig['minAmount'])) : Functions::priceFromCents($feePlan->min_purchase_amount),
             'custom_max_purchase_amount' => isset($feePlanConfig['maxAmount']) ? Functions::priceFromCents(intval($feePlanConfig['maxAmount'])) : Functions::priceFromCents($feePlan->max_purchase_amount),
             'max_purchase_amount' => Functions::priceFromCents($feePlan->max_purchase_amount),
             'fee' => $this->getFee($feePlan)
         ];
+    }
+
+    /**
+     * @param FeePlan $feePlan
+     * @param array|null $feePlanConfig
+     *
+     * @return int
+     */
+    private function getEnabledDefaultValue(FeePlan $feePlan, array $feePlanConfig = null) : int
+    {
+        $key = PaymentPlanConfig::keyForFeePlan($feePlan);
+        $defaultEnabled = 0;
+        if ($key === 'general:3:0:0') {
+            $defaultEnabled = 1;
+        }
+        return isset($feePlanConfig['enabled']) ? intval($feePlanConfig['enabled']) : $defaultEnabled;
     }
 
     /**
