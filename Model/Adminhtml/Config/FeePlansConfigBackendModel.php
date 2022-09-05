@@ -101,7 +101,7 @@ class FeePlansConfigBackendModel extends Value
             if ($key === 'general:1:0:0' || !$feePlan->allowed) {
                 continue;
             }
-            $feePlans[$key] = $this->paymentPlansHelper->formatFeePlanConfigForBackOfficeDisplaying($feePlan, $value[$key] ?? null);
+            $feePlans[$key] = $this->paymentPlansHelper->formatLocalFeePlanConfig($feePlan, $value[$key] ?? null);
         }
 
         $this->setValue($feePlans);

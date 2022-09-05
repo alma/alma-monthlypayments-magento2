@@ -166,7 +166,7 @@ class PaymentPlansHelper
      *
      * @return array
      */
-    public function formatFeePlanConfigForBackOfficeDisplaying(FeePlan $feePlan, array $feePlanConfig = null): array
+    public function formatLocalFeePlanConfig(FeePlan $feePlan, array $feePlanConfig = null): array
     {
         $key = PaymentPlanConfig::keyForFeePlan($feePlan);
         $defaultEnabled = 0;

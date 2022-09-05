@@ -109,7 +109,7 @@ class PaymentPlansHelperTest extends TestCase
      */
     public function testFormatFeePlanConfigForBackOfficeDisplay($apiFeePlan, $configFeePlan, $result): void
     {
-        $this->assertEquals($result, $this->createPaymentPlansHelper()->formatFeePlanConfigForBackOfficeDisplaying($apiFeePlan, $configFeePlan));
+        $this->assertEquals($result, $this->createPaymentPlansHelper()->formatLocalFeePlanConfig($apiFeePlan, $configFeePlan));
     }
 
     public function formatFeePlanDataProviderForDisplay(): array
