@@ -160,6 +160,12 @@ class PaymentPlansHelper
         return $label;
     }
 
+    /**
+     * @param FeePlan $feePlan
+     * @param array|null $feePlanConfig
+     *
+     * @return array
+     */
     public function formatFeePlanConfigForBackOfficeDisplaying(FeePlan $feePlan, array $feePlanConfig = null): array
     {
         $key = PaymentPlanConfig::keyForFeePlan($feePlan);
