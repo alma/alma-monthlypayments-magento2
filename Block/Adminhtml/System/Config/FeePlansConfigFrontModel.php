@@ -177,7 +177,12 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
         return $html;
     }
 
-    private function getHtmlComment($feePlans): string
+    /**
+     * @param array $feePlans
+     *
+     * @return string
+     */
+    private function getHtmlComment(array $feePlans): string
     {
         $html = '<div style="font-size: x-small" data-toggle="collapse" ><p>' . __('Fees applied to each transaction :') . '</p>';
         foreach ($feePlans as $key => $plan) {
