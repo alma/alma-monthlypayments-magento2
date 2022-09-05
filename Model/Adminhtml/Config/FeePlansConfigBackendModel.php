@@ -69,7 +69,6 @@ class FeePlansConfigBackendModel extends Value
     {
 
         $value = $this->getValue();
-        $this->logger->info('$Before save value INPUTS', [$value]);
         if (isset($value['__empty'])) {
             unset($value['__empty']);
         }
