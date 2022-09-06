@@ -80,7 +80,7 @@ class Eligibility extends Template
         try {
             $this->eligibilityHelper->checkEligibility();
         } catch (\Exception $e) {
-            $this->logger->info('Check Eligibility Exception : ',[$e->getMessage()]);
+            $this->logger->error('Check Eligibility Exception : ',[$e->getMessage()]);
         }
     }
 

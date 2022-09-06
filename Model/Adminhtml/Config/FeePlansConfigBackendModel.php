@@ -21,10 +21,6 @@ class FeePlansConfigBackendModel extends Value
      */
     private $serialize;
     /**
-     * @var Logger
-     */
-    private $logger;
-    /**
      * @var PaymentPlansHelper
      */
     private $paymentPlansHelper;
@@ -40,7 +36,6 @@ class FeePlansConfigBackendModel extends Value
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         SerializerInterface $serialize,
-        Logger $logger,
         PaymentPlansHelper $paymentPlansHelper,
         ConfigHelper $configHelper,
         AbstractResource $resource = null,
@@ -57,7 +52,6 @@ class FeePlansConfigBackendModel extends Value
             $data
         );
         $this->serialize = $serialize;
-        $this->logger = $logger;
         $this->paymentPlansHelper = $paymentPlansHelper;
         $this->configHelper = $configHelper;
     }

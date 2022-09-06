@@ -63,7 +63,7 @@ class StoreHelper extends AbstractHelper
         try {
             return $this->state->getAreaCode();
         } catch (LocalizedException $e) {
-            $this->logger->info('Error in getAreaCode', [$e->getMessage()]);
+            $this->logger->error('Error in getAreaCode', [$e->getMessage()]);
             return 'frontend';
         }
     }

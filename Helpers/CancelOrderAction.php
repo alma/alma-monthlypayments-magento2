@@ -67,7 +67,7 @@ class CancelOrderAction extends Action
         try {
             $this->almaPayment = $this->paymentValidation->getAlmaPayment($paymentId);
         } catch (RequestError $e) {
-            $this->logger->error('Cancel order - get alma Payment error',[$e->getMessage()]);
+            $this->logger->error('Cancel order - get alma Payment error', [$e->getMessage()]);
             return $this->redirectToCart();
         }
 
@@ -80,7 +80,7 @@ class CancelOrderAction extends Action
         try {
             $order->addStatusHistoryComment(__(static::CANCEL_MESSAGE))->save();
         } catch (\Exception $e){
-            $this->logger->error('Cancel order - save history error',[$e->getMessage()]);
+            $this->logger->error('Cancel order - save history error', [$e->getMessage()]);
         }
         $this->orderManagement->cancel($order->getEntityId());
         return $this->redirectToCart();
