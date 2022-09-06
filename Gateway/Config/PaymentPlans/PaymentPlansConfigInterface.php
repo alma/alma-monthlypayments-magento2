@@ -36,6 +36,12 @@ interface PaymentPlansConfigInterface
     public function updateFromApi();
 
     /**
+     * Get fee plans from Alma API
+     *
+     */
+    public function getFeePlansFromApi();
+
+    /**
      *  Merge in default config data for given plan
      */
     public function updatePlanDefaults(string $planKey, array $defaultConfig);

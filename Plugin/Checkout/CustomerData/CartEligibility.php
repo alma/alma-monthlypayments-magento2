@@ -80,7 +80,7 @@ class CartEligibility
         try {
             $this->eligibilityHelper->checkEligibility();
         } catch (\Exception $e) {
-            $this->logger->warning("Error checking for cart eligibility in minicart: {$e->getMessage()}");
+            $this->logger->warning("Error checking for cart eligibility in minicart:", [$e->getMessage()]);
             return $result;
         }
 

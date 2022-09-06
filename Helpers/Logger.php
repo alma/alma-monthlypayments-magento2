@@ -25,6 +25,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use DateTimeZone;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem\DirectoryList;
@@ -53,16 +54,16 @@ class Logger extends Monolog
         DirectoryList $directoryList,
         string $name,
         $handlers = [],
-        $processors = []
+        $processors = [],
+        ?DateTimeZone $timezone = null
     ) {
-
         try {
             $handlers[] = new StreamHandler($directoryList->getPath('log') . '/alma.log', self::INFO);
         } catch (FileSystemException $e) {
         } catch (\Exception $e) {
         }
 
-        parent::__construct($name, $handlers, $processors);
+        parent::__construct($name, $handlers, $processors, $timezone);
         $this->scopeConfig = $scopeConfig;
     }
 

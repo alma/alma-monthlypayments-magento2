@@ -245,7 +245,7 @@ class PaymentValidation
         try {
             $this->alma->getDefaultClient()->payments->flagAsPotentialFraud($almaPayment->id, $reason);
         } catch (RequestError | AlmaClientException $e) {
-            $this->logger->error("Error flagging payment {$almaPayment->id} as fraudulent");
+            $this->logger->error("Error flagging payment as fraudulent", [$almaPayment->id]);
         }
     }
 

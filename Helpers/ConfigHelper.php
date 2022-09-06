@@ -2,23 +2,26 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\Entities\FeePlan;
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Cache\Type\Config as CacheConfig;
+use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class ConfigHelper extends AbstractHelper
 {
     const XML_PATH_PAYMENT = 'payment';
     const XML_PATH_METHODE = Config::CODE;
-    const XML_PATH_CANLOG = 'duration';
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
+    const BASE_PLANS_CONFIG = 'base_config_plans';
 
     /**
      * @var WriterInterface
@@ -28,20 +31,34 @@ class ConfigHelper extends AbstractHelper
      * @var StoreHelper
      */
     private $storeHelper;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+    /**
+     * @var TypeListInterface
+     */
+    private $typeList;
 
     /**
      * @param Context $context
      * @param StoreHelper $storeHelper
      * @param WriterInterface $writerInterface
+     * @param SerializerInterface $serializer
+     * @param TypeListInterface $typeList
      */
     public function __construct(
         Context $context,
         StoreHelper $storeHelper,
-        WriterInterface $writerInterface
+        WriterInterface $writerInterface,
+        SerializerInterface $serializer,
+        TypeListInterface $typeList
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeHelper = $storeHelper;
+        $this->serializer = $serializer;
+        $this->typeList = $typeList;
     }
 
     /**
@@ -136,6 +153,7 @@ class ConfigHelper extends AbstractHelper
     {
         if ($merchant) {
             $this->saveConfig($path, $merchant->id, $scope, $storeId);
+            $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
         }
     }
 
@@ -160,6 +178,7 @@ class ConfigHelper extends AbstractHelper
     public function changeApiModeToTest($scope, $storeId): void
     {
         $this->writerInterface->delete($this->getConfigPath('api_mode'), $scope, $storeId);
+        $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
 
     /**
@@ -172,4 +191,37 @@ class ConfigHelper extends AbstractHelper
         return self::XML_PATH_PAYMENT . '/' . self::XML_PATH_METHODE . '/' . $configCode;
     }
 
+    /**
+     * @param array $plans
+     *
+     * @return void
+     */
+    public function saveBasePlansConfig(array $plans): void
+    {
+        $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
+        $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
+    }
+
+    /**
+     * @return FeePlan[]
+     */
+    public function getBaseApiPlansConfig(): array
+    {
+        $baseApiFeePlansInArray = $this->serializer->unserialize($this->getConfigByCode(self::BASE_PLANS_CONFIG));
+        $feePlans = [];
+        foreach ($baseApiFeePlansInArray as $key => $feePlanInArray) {
+            $feePlans[$key] = new FeePlan($feePlanInArray);
+        }
+        return $feePlans;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return void
+     */
+    private function cleanCache(string $type): void
+    {
+        $this->typeList->cleanType($type);
+    }
 }
