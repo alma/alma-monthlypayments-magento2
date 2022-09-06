@@ -5,6 +5,7 @@ v2.9.0
 ------
 * fix : multi store management
 * feature : use only test or prod api Key
+* feature : change payment methode configuration in back office
 
 v2.8.2
 ------
