@@ -29,7 +29,10 @@ class UpdateCancelUrl implements DataPatchInterface
         $this->resourceConnection = $resourceConnection;
     }
 
-    public function getAliases()
+    /**
+     * @return array|string[]
+     */
+    public function getAliases(): array
     {
         return [];
     }
@@ -38,7 +41,7 @@ class UpdateCancelUrl implements DataPatchInterface
      * @return void
      * @throws NoSuchEntityException
      */
-    public function apply()
+    public function apply(): void
     {
         $path = sprintf(ConfigGateway::DEFAULT_PATH_PATTERN, Config::CODE, Config::CONFIG_CUSTOMER_CANCEL_URL);
         $oldProcessedPath = $this->customerCancelUrl->getOldDefaultUrl();
@@ -54,7 +57,7 @@ class UpdateCancelUrl implements DataPatchInterface
     }
 
     /**
-     * @return array
+     * @return array|string[]
      */
     public static function getDependencies(): array
     {
