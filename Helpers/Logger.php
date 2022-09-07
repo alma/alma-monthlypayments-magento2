@@ -25,7 +25,6 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use DateTimeZone;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem\DirectoryList;
