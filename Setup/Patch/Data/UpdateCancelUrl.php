@@ -15,9 +15,18 @@ class UpdateCancelUrl implements DataPatchInterface
 {
     const PATH_EQUAL = 'path = ?';
 
-    private Logger $logger;
-    private CustomerCancelUrl $customerCancelUrl;
-    private ResourceConnection $resourceConnection;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var CustomerCancelUrl
+     */
+    private $customerCancelUrl;
+    /**
+     * @var ResourceConnection
+     */
+    private $resourceConnection;
 
     public function __construct(
         Logger $logger,
