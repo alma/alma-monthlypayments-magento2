@@ -54,8 +54,7 @@ class Logger extends Monolog
         DirectoryList $directoryList,
         string $name,
         $handlers = [],
-        $processors = [],
-        ?DateTimeZone $timezone = null
+        $processors = []
     ) {
         try {
             $handlers[] = new StreamHandler($directoryList->getPath('log') . '/alma.log', self::INFO);
@@ -63,7 +62,7 @@ class Logger extends Monolog
         } catch (\Exception $e) {
         }
 
-        parent::__construct($name, $handlers, $processors, $timezone);
+        parent::__construct($name, $handlers, $processors);
         $this->scopeConfig = $scopeConfig;
     }
 
