@@ -29,8 +29,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Logger\Monolog;
+use Monolog\DateTimeImmutable;
 use Monolog\Handler\StreamHandler;
-
 
 class Logger extends Monolog
 {
@@ -69,9 +69,11 @@ class Logger extends Monolog
      * @param int $level
      * @param string $message
      * @param array $context
+     * @param DateTimeImmutable|null $dateTimeImmutable
+     *
      * @return bool
      */
-    public function addRecord($level, $message, array $context = []): bool
+    public function addRecord($level, $message, array $context = [], ?DateTimeImmutable $dateTimeImmutable = null): bool
     {
         if (!$this->canLog()) {
             return true;
