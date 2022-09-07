@@ -11,7 +11,6 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Element\BlockInterface;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class FeePlansConfigFrontModel extends AbstractFieldArray
 {
@@ -37,19 +36,16 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      * @param PaymentPlansHelper $paymentPlansHelper
      * @param Context $context
      * @param array $data
-     * @param SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
         PaymentPlansHelper $paymentPlansHelper,
         Context $context,
-        array $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null
+        array $data = []
     ) {
         $this->setTemplate('system/config/form/field/array.phtml');
         parent::__construct(
             $context,
-            $data,
-            $secureRenderer
+            $data
         );
         $this->paymentPlansHelper = $paymentPlansHelper;
     }
