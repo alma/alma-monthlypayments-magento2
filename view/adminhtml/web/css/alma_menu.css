@@ -40,3 +40,12 @@
 li#menu-vendor_extension-menu_id > a > span {
 display: none;
 }
+
+#alma_soc_detail_title {
+    padding: 10px 0;
+    cursor: pointer;
+}
+#alma_soc_detail_content {
+    display: none;
+    padding: 0 0 0 15px;
+}

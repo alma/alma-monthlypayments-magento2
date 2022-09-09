@@ -1,0 +1,36 @@
+<?php /** @var Alma\MonthlyPayments\Block\Adminhtml\System\SocBlockLegal $block */ ?>
+<div style="margin-left: 10px">
+    <div><b><?= $block->getBlockTitle() ?></b></div>
+    <div><?= $block->getDescription() ?></div>
+    <div>
+        <div id="alma_soc_detail_title" class="action-toggle-triangle   "><u><?= $block->getDetailTitle() ?></u></div>
+        <div id="alma_soc_detail_content">
+            <ul>
+                <?php foreach ($block->getDetailsArgs() as $arg) :?>
+                    <li>
+                        <?= $arg ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+    <a href="<?= $block->getConfigPageUrl() ?>" > <?= $block->getLinkTitle() ?> </a>
+</div>
+
+<script>
+    require([
+        'jquery'
+    ], function(jQuery){
+        var isOpen = false;
+        jQuery('#alma_soc_detail_title').click(function () {
+            if (isOpen) {
+                jQuery('#alma_soc_detail_content').hide();
+                isOpen = false;
+            } else {
+                jQuery('#alma_soc_detail_content').show();
+                isOpen = true;
+            }
+        });
+
+    });
+</script>
