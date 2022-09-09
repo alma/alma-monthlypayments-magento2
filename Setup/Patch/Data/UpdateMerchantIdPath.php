@@ -14,6 +14,10 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Payment\Gateway\Config\Config as ConfigGateway;
 
+/**
+ *  Get merchant_id value and clone it in test_merchant_id and live_merchant_id by store view
+ *  Delete old merchant_id config
+ */
 class UpdateMerchantIdPath implements DataPatchInterface
 {
     const PATH_EQUAL = 'path = ?';
@@ -90,16 +94,7 @@ class UpdateMerchantIdPath implements DataPatchInterface
         $apiKeysRows = $this->resourceConnection->getConnection()->fetchAll($apiQuery);
 
         foreach ($apiKeysRows as $apiKeysRow) {
-            preg_match('/(live|test)/', $apiKeysRow['path'], $matches);
-            $apiKey = $this->scopeConfig->getValue($apiKeysRow['path'], $apiKeysRow['scope'], $apiKeysRow['scope_id']);
-            $apiMode = $matches[0];
-            try {
-                $merchant = $this->almaClient->createInstance($apiKey, $apiMode)->merchants->me();
-                $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $merchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
-            } catch (AlmaClientException $e) {
-                $this->logger->error('Error in upgrade data', [$e->getMessage()]);
-                $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $oldMerchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
-            }
+            $this->saveNewMerchantId($apiKeysRow, $oldMerchant);
         }
         $this->configHelper->deleteConfig($oldMerchantIdPath, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
         $this->configHelper->deleteConfig('fully_configured', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
@@ -111,5 +106,27 @@ class UpdateMerchantIdPath implements DataPatchInterface
     private function getCoreTable(): string
     {
         return $this->resourceConnection->getTableName('core_config_data');
+    }
+
+    /**
+     * @param $apiKeysRow
+     * @param Merchant $oldMerchant
+     *
+     * @return mixed
+     * @throws RequestError
+     */
+    protected function saveNewMerchantId($apiKeysRow, Merchant $oldMerchant)
+    {
+        preg_match('/(live|test)/', $apiKeysRow['path'], $matches);
+        $apiKey = $this->scopeConfig->getValue($apiKeysRow['path'], $apiKeysRow['scope'], $apiKeysRow['scope_id']);
+        $apiMode = $matches[0];
+        try {
+            $merchant = $this->almaClient->createInstance($apiKey, $apiMode)->merchants->me();
+            $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $merchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
+        } catch (AlmaClientException $e) {
+            $this->logger->error('Error in upgrade data', [$e->getMessage()]);
+            $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $oldMerchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
+        }
+        return $matches;
     }
 }
