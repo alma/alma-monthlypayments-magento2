@@ -330,6 +330,13 @@
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>customer_cancel_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/customer_cancel_url</config_path>
                     </field>
+                    <field id="share_checkout_enable" translate="label comment" type="select" sortOrder="17" showInDefault="1">
+                        <label>Merchant data sharing</label>
+                        <comment>We enable Alma to anonymously retrieve, analyse the usage of our payment methods and share with me insights in order to increase my overall performance.</comment>
+                        <config_path>payment/alma_monthly_payments/share_checkout_enable</config_path>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\ShareOfCheckoutDate</backend_model>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\SOCSelect</source_model>
+                    </field>
                     <field id="failure_return_url" translate="label comment" type="text" sortOrder="16"
                            showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Failure return url</label>

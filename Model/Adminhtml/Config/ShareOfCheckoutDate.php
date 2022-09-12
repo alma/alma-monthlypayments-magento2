@@ -27,10 +27,8 @@ class ShareOfCheckoutDate extends Value
      * @param TypeListInterface $cacheTypeList
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
-     * @param array $data
      */
-    public function __construct
-    (
+    public function __construct(
         ShareOfCheckoutHelper $shareOfCheckoutHelper,
         Context $context,
         Registry $registry,
@@ -38,8 +36,7 @@ class ShareOfCheckoutDate extends Value
         TypeListInterface $cacheTypeList,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null
-    )
-    {
+    ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, []);
         $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
     }

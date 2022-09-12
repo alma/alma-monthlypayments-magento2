@@ -72,14 +72,27 @@ class ShareOfCheckoutHelper extends AbstractHelper
     }
 
     /**
-     * @return bool
+     * Get SOC selector value ( 2 : not set - 0 : no - 1 yes )
+     * @return int
      */
-    public function shareOfCheckoutIsEnabled(): bool
+    public function getShareOfCheckoutSelectorValue(): int
     {
         return $this->scopeConfig->getValue(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_ENABLE_KEY,
             ScopeInterface::SCOPE_STORE
         );
+    }
+
+    /**
+     * Change SOC selector value into bool
+     * @return bool
+     */
+    public function shareOfCheckoutIsEnabled(): bool
+    {
+        if ($this->getShareOfCheckoutSelectorValue() === 1) {
+            return true;
+        }
+        return false;
     }
 
     /**
