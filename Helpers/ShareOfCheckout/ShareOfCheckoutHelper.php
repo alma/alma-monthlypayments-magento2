@@ -77,10 +77,10 @@ class ShareOfCheckoutHelper extends AbstractHelper
      */
     public function getShareOfCheckoutSelectorValue(): int
     {
-        return $this->scopeConfig->getValue(
+        return intval($this->scopeConfig->getValue(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_ENABLE_KEY,
             ScopeInterface::SCOPE_STORE
-        );
+        ));
     }
 
     /**

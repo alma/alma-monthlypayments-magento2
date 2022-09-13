@@ -43,7 +43,7 @@ class ShareOfCheckout
      */
     public function shareDays(): void
     {
-        if ($this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()) {
+        if (!$this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()) {
             return ;
         }
 
