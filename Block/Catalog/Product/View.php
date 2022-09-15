@@ -26,8 +26,13 @@
 
 namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
-use Magento\Catalog\Block\Product\Context;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaProductException;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\ProductRepository;
+use Magento\Catalog\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
@@ -36,6 +41,7 @@ use Alma\MonthlyPayments\Helpers\Functions;
 use Magento\Framework\Locale\Resolver;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
+use Magento\Framework\View\Element\Template\Context;
 
 class View extends Template
 {
@@ -71,6 +77,18 @@ class View extends Template
      * @var WidgetConfigHelper
      */
     private $widgetConfigHelper;
+    /**
+     * @var Session
+     */
+    private $catalogSession;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var ProductRepository
+     */
+    private $productRepository;
 
     /**
      * @param Context $context
@@ -79,9 +97,10 @@ class View extends Template
      * @param WidgetConfigHelper $widgetConfigHelper
      * @param Config $config
      * @param Resolver $localeResolver
+     * @param Session $catalogSession
+     * @param Logger $logger
+     * @param ProductRepository $productRepository
      * @param array $data
-     *
-     * @throws LocalizedException
      */
     public function __construct(
         Context $context,
@@ -90,28 +109,59 @@ class View extends Template
         WidgetConfigHelper $widgetConfigHelper,
         Config $config,
         Resolver $localeResolver,
+        Session $catalogSession,
+        Logger $logger,
+        ProductRepository $productRepository,
         array $data = []
     ) {
         parent::__construct($context, $data);
+        $this->logger = $logger;
+        $this->catalogSession = $catalogSession;
         $this->config = $config;
         $this->registry = $registry;
         $this->localeResolver = $localeResolver;
-        $this->getProduct();
-        $this->getPlans();
         $this->apiConfigHelper = $apiConfigHelper;
         $this->widgetConfigHelper = $widgetConfigHelper;
+        $this->productRepository = $productRepository;
+        $this->getPlans();
     }
 
     /**
-     * @return void
-     * @throws LocalizedException
+     * Get last viewed product id session
+     * @return int
      */
-    private function getProduct()
+    private function getLastViewProductId(): int
     {
-        $this->product = $this->registry->registry('product');
-        if (!$this->product->getId()) {
-            throw new LocalizedException(__('Failed to initialize product'));
+        $this->logger->info('$this->catalogSession->getData()', [$this->catalogSession->getData()]);
+        return intval($this->catalogSession->getData('last_viewed_product_id'));
+    }
+
+    /**
+     * @return ProductInterface
+     * @throws AlmaProductException
+     */
+    private function getProduct(): ProductInterface
+    {
+        if (!is_null($this->product)) {
+            return $this->product;
         }
+
+        try {
+            $this->product = $this->productRepository->getById($this->getLastViewProductId());
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error('No product in product Repository with this id', ['Exception message' => $e->getMessage(), 'Product ID' => $this->getLastViewProductId()]);
+            throw new AlmaProductException(sprintf('No product in product Repository with this id %s', $this->getLastViewProductId()));
+        }
+
+        if (is_null($this->product)) {
+            $this->product = $this->registry->registry('product');
+            $this->logger->info('with registry', [$this->product]);
+        }
+        if (is_null($this->product)) {
+            $this->logger->error('Impossible to get product with registry method', []);
+            throw new AlmaProductException('Error in getProduct in magento product repository');
+        }
+        return $this->product;
     }
 
     /**
@@ -132,9 +182,8 @@ class View extends Template
 
     /**
      * @return bool
-     * @throws LocalizedException
      */
-    private function isExcluded()
+    private function isExcluded(): bool
     {
         return in_array($this->getProductType(), $this->config->getExcludedProductTypes(), true);
     }
@@ -142,7 +191,7 @@ class View extends Template
     /**
      * @return Config
      */
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->config;
     }
@@ -150,7 +199,7 @@ class View extends Template
     /**
      * @return Config
      */
-    public function getWidgetConfig()
+    public function getWidgetConfig(): Config
     {
         return $this->widgetConfigHelper;
     }
@@ -158,16 +207,15 @@ class View extends Template
     /**
      * @return string
      */
-    public function getActiveMode()
+    public function getActiveMode(): string
     {
         return strtoupper($this->apiConfigHelper->getActiveMode());
     }
 
     /**
      * @return string
-     * @throws LocalizedException
      */
-    public function _toHtml()
+    public function _toHtml(): string
     {
         return ($this->getNameInLayout() == $this->widgetConfigHelper->getWidgetPosition()
         && !$this->isExcluded() ? parent::_toHtml() : '');
@@ -176,55 +224,67 @@ class View extends Template
     /**
      * @return string
      */
-    public function getJsonPlans()
+    public function getJsonPlans(): string
     {
         return (!empty($this->plans) ? json_encode($this->plans) : '');
     }
 
     /**
-     * @return int
-     * @throws LocalizedException
+     * @return int | null
      */
-    public function getProductId()
+    public function getProductId(): ?int
     {
-        return $this->product->getId();
+        try {
+            return $this->getProduct()->getId();
+        } catch (AlmaProductException $e) {
+            return null;
+        }
     }
 
     /**
-     * @return string
-     * @throws LocalizedException
+     * @return string | null
      */
-    public function getProductName()
+    public function getProductName(): ?string
     {
-        return $this->product->getName();
+        try {
+            return $this->getProduct()->getName();
+        } catch (AlmaProductException $e) {
+            return null;
+        }
     }
 
     /**
-     * @return array|string
-     * @throws LocalizedException
+     * @return string | null
      */
-    public function getProductType()
+    public function getProductType(): ?string
     {
-        return $this->product->getTypeId();
+        try {
+            return $this->getProduct()->getTypeId();
+        } catch (AlmaProductException $e) {
+            return null;
+        }
     }
 
     /**
-     * @return int
-     * @throws LocalizedException
+     * @return int | null
      */
-    public function getPrice()
+    public function getPrice(): ?int
     {
-        return Functions::priceToCents($this->product->getFinalPrice());
+        try {
+            return Functions::priceToCents($this->getProduct()->getFinalPrice());
+        } catch (AlmaProductException $e) {
+            return null;
+        }
     }
     /**
      * Return locale and convert it
      * @return string
      */
-    public function getLocale(){
-        $locale ='en';
+    public function getLocale(): string
+    {
+        $locale = 'en';
         $localeStoreCode = $this->localeResolver->getLocale();
-
-        if (preg_match('/^([a-z]{2})_([A-Z]{2})$/',$localeStoreCode,$matches)){
+        if (preg_match('/^([a-z]{2})_([A-Z]{2})$/', $localeStoreCode, $matches)) {
             $locale = $matches[1];
         }
         return $locale;
