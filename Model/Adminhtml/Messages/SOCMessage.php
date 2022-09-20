@@ -6,6 +6,9 @@ use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Framework\Notification\MessageInterface;
 use Magento\Framework\View\LayoutFactory;
 
+/**
+ * Add a message in admin back office for SOC validation.
+ */
 class SOCMessage implements MessageInterface
 {
     /**
