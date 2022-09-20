@@ -70,7 +70,7 @@ class OrderHelper extends AbstractHelper
     /**
      * @return array
      */
-    public function getShareOfCheckoutByPaymentMethods(): array
+    public function getSOCByPaymentMethods(): array
     {
         $ordersByCheckouts = [];
         /** @var OrderInterface $order */
@@ -143,7 +143,7 @@ class OrderHelper extends AbstractHelper
                 'from' => [$this->dateHelper->getStartDate()],
                 'to' => [$this->dateHelper->getEndDate()],
             ])
-            ->addFieldToFilter('state', ['in' => ShareOfCheckoutHelper::SHARED_ORDER_STATES]);
+            ->addFieldToFilter('state', ['in' => SOCHelper::SHARED_ORDER_STATES]);
         $this->setOrderCollection($collection);
     }
 

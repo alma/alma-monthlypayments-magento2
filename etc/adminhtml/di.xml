@@ -37,7 +37,9 @@
     <type name="Magento\Framework\Notification\MessageList">
         <arguments>
             <argument name="messages" xsi:type="array">
-                <item name="soc_notification" xsi:type="string">Alma\MonthlyPayments\Model\Adminhtml\Messages\SocMessage</item>
+                <item name="soc_notification" xsi:type="string">
+                    Alma\MonthlyPayments\Model\Adminhtml\Messages\SOCMessage
+                </item>
             </argument>
         </arguments>
     </type>

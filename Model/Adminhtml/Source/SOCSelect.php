@@ -25,7 +25,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
-use Alma\MonthlyPayments\Helpers\ShareOfCheckout\ShareOfCheckoutHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
@@ -35,17 +35,17 @@ class SOCSelect implements ArrayInterface
 {
 
     /**
-     * @var ShareOfCheckoutHelper
+     * @var SOCHelper
      */
-    private $shareOfCheckoutHelper;
+    private $SOCHelper;
 
     /**
-     * @param ShareOfCheckoutHelper $shareOfCheckoutHelper
+     * @param SOCHelper $SOCHelper
      */
     public function __construct(
-        ShareOfCheckoutHelper $shareOfCheckoutHelper
+        SOCHelper $SOCHelper
     ) {
-        $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
+        $this->SOCHelper = $SOCHelper;
     }
 
     /**
@@ -54,7 +54,7 @@ class SOCSelect implements ArrayInterface
     public function toOptionArray(): array
     {
         $arrayResult = [];
-        if ($this->shareOfCheckoutHelper->getShareOfCheckoutSelectorValue() == 2) {
+        if ($this->SOCHelper->getSelectorValue() == SOCHelper::SELECTOR_NOT_SET) {
             $arrayResult[] = ['value' => 2, 'label' => __('-- Please select --')];
         }
         $arrayResult[] = ['value' => 0, 'label' => __('No')];

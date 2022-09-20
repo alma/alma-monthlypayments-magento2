@@ -2,27 +2,31 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Messages;
 
-use Alma\MonthlyPayments\Helpers\ShareOfCheckout\ShareOfCheckoutHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Framework\Notification\MessageInterface;
 use Magento\Framework\View\LayoutFactory;
 
-class SocMessage implements MessageInterface
+class SOCMessage implements MessageInterface
 {
     /**
      * @var LayoutFactory
      */
     private $layoutFactory;
     /**
-     * @var ShareOfCheckoutHelper
+     * @var SOCHelper
      */
-    private $shareOfCheckoutHelper;
+    private $SOCHelper;
 
+    /**
+     * @param LayoutFactory $layoutFactory
+     * @param SOCHelper $SOCHelper
+     */
     public function __construct(
         LayoutFactory $layoutFactory,
-        ShareOfCheckoutHelper $shareOfCheckoutHelper
+        SOCHelper $SOCHelper
     ) {
         $this->layoutFactory = $layoutFactory;
-        $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
+        $this->SOCHelper = $SOCHelper;
     }
 
     /**
@@ -38,10 +42,7 @@ class SocMessage implements MessageInterface
      */
     public function isDisplayed(): bool
     {
-        if ($this->shareOfCheckoutHelper->getShareOfCheckoutSelectorValue() === 2) {
-            return true;
-        }
-        return false;
+        return $this->SOCHelper->getSelectorValue() === SOCHelper::SELECTOR_NOT_SET;
     }
 
     /**

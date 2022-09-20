@@ -41,7 +41,7 @@ class PayloadBuilder extends AbstractHelper
             "start_time"      => $this->dateHelper->getStartDate(),
             "end_time"        => $this->dateHelper->getEndDate(),
             "orders"          => $this->orderHelper->getTotalsOrders(),
-            "payment_methods" => $this->orderHelper->getShareOfCheckoutByPaymentMethods()
+            "payment_methods" => $this->orderHelper->getSOCByPaymentMethods()
         ];
     }
 

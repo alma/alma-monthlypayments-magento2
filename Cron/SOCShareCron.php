@@ -5,18 +5,18 @@ namespace Alma\MonthlyPayments\Cron;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\DateHelper;
-use Alma\MonthlyPayments\Helpers\ShareOfCheckout\ShareOfCheckoutHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 
-class ShareOfCheckout
+class SOCShareCron
 {
     /**
      * @var Logger
      */
     private $logger;
     /**
-     * @var ShareOfCheckoutHelper
+     * @var SOCHelper
      */
-    private $shareOfCheckoutHelper;
+    private $SOCHelper;
     /**
      * @var DateHelper
      */
@@ -24,16 +24,16 @@ class ShareOfCheckout
 
     /**
      * @param Logger $logger
-     * @param ShareOfCheckoutHelper $shareOfCheckoutHelper
+     * @param SOCHelper $SOCHelper
      * @param DateHelper $dateHelper
      */
     public function __construct(
-        Logger $logger,
-        ShareOfCheckoutHelper $shareOfCheckoutHelper,
+        Logger     $logger,
+        SOCHelper  $SOCHelper,
         DateHelper $dateHelper
     ) {
         $this->logger = $logger;
-        $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
+        $this->SOCHelper = $SOCHelper;
         $this->dateHelper = $dateHelper;
     }
 
@@ -43,22 +43,22 @@ class ShareOfCheckout
      */
     public function shareDays(): void
     {
-        if (!$this->shareOfCheckoutHelper->shareOfCheckoutIsEnabled()) {
+        if (!$this->SOCHelper->isEnabled()) {
             return ;
         }
 
         try {
-            $shareOfCheckoutEnabledDate = $this->shareOfCheckoutHelper->getShareOfCheckoutEnabledDate();
-            $lastUpdateDate = $this->shareOfCheckoutHelper->getLastUpdateDate();
+            $enabledDate = $this->SOCHelper->getEnabledDate();
+            $lastUpdateDate = $this->SOCHelper->getLastUpdateDate();
         } catch (RequestError $e) {
             $this->logger->info('Get Last Update Date error - end of process - message : ', [$e->getMessage()]);
             return;
         }
 
-        $datesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate, $shareOfCheckoutEnabledDate);
+        $datesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate, $enabledDate);
         foreach ($datesToShare as $date) {
             try {
-                $this->shareOfCheckoutHelper->shareDay($date);
+                $this->SOCHelper->shareDay($date);
             } catch (RequestError $e) {
                 $this->logger->info('Share of checkout error - end of process - message : ', [$e->getMessage()]);
                 return;

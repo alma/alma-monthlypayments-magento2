@@ -2,7 +2,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
-use Alma\MonthlyPayments\Helpers\ShareOfCheckout\ShareOfCheckoutHelper;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
@@ -11,16 +11,16 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 
-class ShareOfCheckoutDate extends Value
+class SOCDate extends Value
 {
 
     /**
-     * @var ShareOfCheckoutHelper
+     * @var SOCHelper
      */
-    private $shareOfCheckoutHelper;
+    private $SOCHelper;
 
     /**
-     * @param ShareOfCheckoutHelper $shareOfCheckoutHelper
+     * @param SOCHelper $SOCHelper
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
@@ -29,27 +29,27 @@ class ShareOfCheckoutDate extends Value
      * @param AbstractDb|null $resourceCollection
      */
     public function __construct(
-        ShareOfCheckoutHelper $shareOfCheckoutHelper,
-        Context $context,
-        Registry $registry,
+        SOCHelper            $SOCHelper,
+        Context              $context,
+        Registry             $registry,
         ScopeConfigInterface $config,
-        TypeListInterface $cacheTypeList,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null
+        TypeListInterface    $cacheTypeList,
+        AbstractResource     $resource = null,
+        AbstractDb           $resourceCollection = null
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, []);
-        $this->shareOfCheckoutHelper = $shareOfCheckoutHelper;
+        $this->SOCHelper = $SOCHelper;
     }
 
     /**
-     * @return ShareOfCheckoutDate
+     * @return SOCDate
      */
     public function afterSave()
     {
         if ($this->isValueChanged() && $this->getValue()) {
-            $this->shareOfCheckoutHelper->saveShareOfCheckoutDate(date('Y-m-d'));
+            $this->SOCHelper->saveDate(date('Y-m-d'));
         } elseif ($this->isValueChanged() && !$this->getValue()) {
-            $this->shareOfCheckoutHelper->deleteShareOfCheckoutDate();
+            $this->SOCHelper->deleteDate();
         }
         return parent::afterSave();
     }
