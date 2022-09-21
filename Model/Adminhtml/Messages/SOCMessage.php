@@ -18,18 +18,18 @@ class SOCMessage implements MessageInterface
     /**
      * @var SOCHelper
      */
-    private $SOCHelper;
+    private $socHelper;
 
     /**
      * @param LayoutFactory $layoutFactory
-     * @param SOCHelper $SOCHelper
+     * @param SOCHelper $socHelper
      */
     public function __construct(
         LayoutFactory $layoutFactory,
-        SOCHelper $SOCHelper
+        SOCHelper $socHelper
     ) {
         $this->layoutFactory = $layoutFactory;
-        $this->SOCHelper = $SOCHelper;
+        $this->socHelper = $socHelper;
     }
 
     /**
@@ -45,7 +45,7 @@ class SOCMessage implements MessageInterface
      */
     public function isDisplayed(): bool
     {
-        return $this->SOCHelper->getSelectorValue() === SOCHelper::SELECTOR_NOT_SET;
+        return $this->socHelper->getSelectorValue() === SOCHelper::SELECTOR_NOT_SET;
     }
 
     /**

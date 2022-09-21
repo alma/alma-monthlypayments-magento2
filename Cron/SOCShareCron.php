@@ -16,7 +16,7 @@ class SOCShareCron
     /**
      * @var SOCHelper
      */
-    private $SOCHelper;
+    private $socHelper;
     /**
      * @var DateHelper
      */
@@ -24,16 +24,16 @@ class SOCShareCron
 
     /**
      * @param Logger $logger
-     * @param SOCHelper $SOCHelper
+     * @param SOCHelper $socHelper
      * @param DateHelper $dateHelper
      */
     public function __construct(
         Logger     $logger,
-        SOCHelper  $SOCHelper,
+        SOCHelper  $socHelper,
         DateHelper $dateHelper
     ) {
         $this->logger = $logger;
-        $this->SOCHelper = $SOCHelper;
+        $this->socHelper = $socHelper;
         $this->dateHelper = $dateHelper;
     }
 
@@ -43,13 +43,13 @@ class SOCShareCron
      */
     public function shareDays(): void
     {
-        if (!$this->SOCHelper->isEnabled()) {
-            return ;
+        if (!$this->socHelper->isEnabled()) {
+            return;
         }
 
         try {
-            $enabledDate = $this->SOCHelper->getEnabledDate();
-            $lastUpdateDate = $this->SOCHelper->getLastUpdateDate();
+            $enabledDate = $this->socHelper->getEnabledDate();
+            $lastUpdateDate = $this->socHelper->getLastUpdateDate();
         } catch (RequestError $e) {
             $this->logger->info('Get Last Update Date error - end of process - message : ', [$e->getMessage()]);
             return;
@@ -58,7 +58,7 @@ class SOCShareCron
         $datesToShare = $this->dateHelper->getDatesInInterval($lastUpdateDate, $enabledDate);
         foreach ($datesToShare as $date) {
             try {
-                $this->SOCHelper->shareDay($date);
+                $this->socHelper->shareDay($date);
             } catch (RequestError $e) {
                 $this->logger->info('Share of checkout error - end of process - message : ', [$e->getMessage()]);
                 return;

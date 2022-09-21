@@ -17,10 +17,10 @@ class SOCDate extends Value
     /**
      * @var SOCHelper
      */
-    private $SOCHelper;
+    private $socHelper;
 
     /**
-     * @param SOCHelper $SOCHelper
+     * @param SOCHelper $socHelper
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
@@ -29,7 +29,7 @@ class SOCDate extends Value
      * @param AbstractDb|null $resourceCollection
      */
     public function __construct(
-        SOCHelper            $SOCHelper,
+        SOCHelper            $socHelper,
         Context              $context,
         Registry             $registry,
         ScopeConfigInterface $config,
@@ -38,7 +38,7 @@ class SOCDate extends Value
         AbstractDb           $resourceCollection = null
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, []);
-        $this->SOCHelper = $SOCHelper;
+        $this->socHelper = $socHelper;
     }
 
     /**
@@ -47,9 +47,9 @@ class SOCDate extends Value
     public function afterSave()
     {
         if ($this->isValueChanged() && $this->getValue()) {
-            $this->SOCHelper->saveDate(date('Y-m-d'));
+            $this->socHelper->saveDate(date('Y-m-d'));
         } elseif ($this->isValueChanged() && !$this->getValue()) {
-            $this->SOCHelper->deleteDate();
+            $this->socHelper->deleteDate();
         }
         return parent::afterSave();
     }

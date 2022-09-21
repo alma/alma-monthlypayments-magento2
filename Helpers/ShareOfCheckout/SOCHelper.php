@@ -16,8 +16,8 @@ use Magento\Store\Model\ScopeInterface;
 class SOCHelper extends AbstractHelper
 {
     const SHARED_ORDER_STATES = ['processing', 'complete'];
-    const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enabled';
-    const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
+    const ENABLE_KEY = 'soc_enabled';
+    const DATE_KEY = 'soc_date';
     const SELECTOR_NO =  0;
     const SELECTOR_YES =  1;
     const SELECTOR_NOT_SET =  2;
@@ -80,8 +80,8 @@ class SOCHelper extends AbstractHelper
      */
     public function getSelectorValue(): int
     {
-        return intval($this->scopeConfig->getValue(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_ENABLE_KEY,
+        return intval($this->scopeConfig->getValue( 
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::ENABLE_KEY,
             ScopeInterface::SCOPE_STORE
         ));
     }
@@ -180,6 +180,6 @@ class SOCHelper extends AbstractHelper
      */
     private function getDateKey(): string
     {
-        return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_DATE_KEY;
+        return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::DATE_KEY;
     }
 }

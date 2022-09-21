@@ -37,15 +37,15 @@ class SOCSelect implements ArrayInterface
     /**
      * @var SOCHelper
      */
-    private $SOCHelper;
+    private $socHelper;
 
     /**
-     * @param SOCHelper $SOCHelper
+     * @param SOCHelper $socHelper
      */
     public function __construct(
-        SOCHelper $SOCHelper
+        SOCHelper $socHelper
     ) {
-        $this->SOCHelper = $SOCHelper;
+        $this->socHelper = $socHelper;
     }
 
     /**
@@ -54,11 +54,11 @@ class SOCSelect implements ArrayInterface
     public function toOptionArray(): array
     {
         $arrayResult = [];
-        if ($this->SOCHelper->getSelectorValue() == SOCHelper::SELECTOR_NOT_SET) {
-            $arrayResult[] = ['value' => 2, 'label' => __('-- Please select --')];
+        if ($this->socHelper->getSelectorValue() == SOCHelper::SELECTOR_NOT_SET) {
+            $arrayResult[] = ['value' => SOCHelper::SELECTOR_NOT_SET, 'label' => __('-- Please select --')];
         }
-        $arrayResult[] = ['value' => 0, 'label' => __('No')];
-        $arrayResult[] = ['value' => 1, 'label' => __('Yes')];
+        $arrayResult[] = ['value' => SOCHelper::SELECTOR_NO, 'label' => __('No')];
+        $arrayResult[] = ['value' => SOCHelper::SELECTOR_YES, 'label' => __('Yes')];
         return $arrayResult;
     }
 }
