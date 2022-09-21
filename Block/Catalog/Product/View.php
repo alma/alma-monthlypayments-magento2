@@ -123,7 +123,6 @@ class View extends Template
         $this->apiConfigHelper = $apiConfigHelper;
         $this->widgetConfigHelper = $widgetConfigHelper;
         $this->productRepository = $productRepository;
-        $this->getPlans();
     }
 
     /**
@@ -158,19 +157,20 @@ class View extends Template
             $this->logger->info('with registry', [$this->product]);
         }
         if (is_null($this->product)) {
-            $this->logger->error('Impossible to get product with registry method', []);
-            throw new AlmaProductException('Error in getProduct in magento product repository');
+            $this->logger->error('No product in product registry', []);
+            throw new AlmaProductException('No product in product registry');
         }
         return $this->product;
     }
 
     /**
-     * @return void
+     * @return array
      */
-    private function getPlans()
+    private function getPlans(): array
     {
+        $plans = [];
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-            $this->plans[] = array(
+            $plans[] = array(
                 'installmentsCount' => $planConfig->installmentsCount(),
                 'minAmount' => $planConfig->minimumAmount(),
                 'maxAmount' => $planConfig->maximumAmount(),
@@ -178,6 +178,7 @@ class View extends Template
                 'deferredMonths' => $planConfig->deferredMonths()
             );
         }
+        return $plans;
     }
 
     /**
@@ -226,7 +227,8 @@ class View extends Template
      */
     public function getJsonPlans(): string
     {
-        return (!empty($this->plans) ? json_encode($this->plans) : '');
+        $plans = $this->getPlans();
+        return (!empty($plans) ? json_encode($plans) : '');
     }
 
     /**

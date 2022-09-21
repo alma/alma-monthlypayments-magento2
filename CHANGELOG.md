@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.9.1
+------
+* fix : deprecated registry in product page
+* feature : Add Share of checkout legal message
+
 v2.9.0
 ------
 * fix : multi store management

@@ -230,7 +230,7 @@ class Eligibility extends AbstractHelper
 
         $this->message = __($nonEligibilityMessage);
         if (!$this->checkItemsTypes()) {
-            $this->message .= '<br>' . $excludedProductsMessage;
+            $this->message .= '<br>' . __($excludedProductsMessage);
             return false;
         }
 
