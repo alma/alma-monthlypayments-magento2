@@ -32,8 +32,6 @@ class OrderHelper extends AbstractHelper
      */
     private $dateHelper;
 
-
-
     /**
      * @param Context $context
      * @param CollectionFactory $collectionFactory
@@ -62,7 +60,7 @@ class OrderHelper extends AbstractHelper
                 $ordersByCurrency[$currency] = $this->initTotalOrderResult($currency);
             }
             $ordersByCurrency[$currency][self::TOTAL_AMOUNT_KEY] += $this->getOrderPaymentAmount($order);
-            $ordersByCurrency[$currency][self::TOTAL_COUNT_KEY] ++ ;
+            $ordersByCurrency[$currency][self::TOTAL_COUNT_KEY] ++;
         }
         return array_values($ordersByCurrency);
     }
@@ -155,7 +153,6 @@ class OrderHelper extends AbstractHelper
         $this->orderCollection = null;
     }
 
-
     /**
      * @param OrderInterface $order
      *
@@ -167,5 +164,4 @@ class OrderHelper extends AbstractHelper
         $payment = $order->getPayment();
         return Functions::priceToCents($payment->getAmountPaid() - $payment->getAmountRefunded());
     }
-
 }

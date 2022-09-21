@@ -72,6 +72,4 @@ class SocBlockLegal extends Template
     {
         return $this->urlBuilder->getUrl('adminhtml/system_config/edit/section/payment/', ['_secure' => true]);
     }
-
-
 }

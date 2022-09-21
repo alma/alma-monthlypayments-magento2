@@ -80,7 +80,7 @@ class SOCHelper extends AbstractHelper
      */
     public function getSelectorValue(): int
     {
-        return intval($this->scopeConfig->getValue( 
+        return intval($this->scopeConfig->getValue(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::ENABLE_KEY,
             ScopeInterface::SCOPE_STORE
         ));
