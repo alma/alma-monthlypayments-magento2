@@ -66,10 +66,6 @@ class View extends Template
     private $localeResolver;
 
     /**
-     * @var array
-     */
-    private $plans = array();
-    /**
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
@@ -154,7 +150,6 @@ class View extends Template
 
         if (is_null($this->product)) {
             $this->product = $this->registry->registry('product');
-            $this->logger->info('with registry', [$this->product]);
         }
         if (is_null($this->product)) {
             $this->logger->error('No product in product registry', []);
