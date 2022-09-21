@@ -16,7 +16,7 @@ use Magento\Store\Model\ScopeInterface;
 class SOCHelper extends AbstractHelper
 {
     const SHARED_ORDER_STATES = ['processing', 'complete'];
-    const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
+    const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enabled';
     const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
     const SELECTOR_NO =  0;
     const SELECTOR_YES =  1;
