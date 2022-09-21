@@ -54,7 +54,7 @@ class SOCMessage implements MessageInterface
     public function getText(): string
     {
         $layout = $this->layoutFactory->create();
-        $blockOption = $layout->createBlock("Alma\MonthlyPayments\Block\Adminhtml\System\SocLegal")->setTemplate("Alma_MonthlyPayments::system/soc-legal.phtml");
+        $blockOption = $layout->createBlock("Alma\MonthlyPayments\Block\Adminhtml\System\SocBlockLegal")->setTemplate("Alma_MonthlyPayments::system/soc-legal.phtml");
         return $blockOption->toHtml();
     }
 
