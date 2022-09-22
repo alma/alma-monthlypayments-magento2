@@ -71,6 +71,11 @@ class View extends Template
      * @var WidgetConfigHelper
      */
     private $widgetConfigHelper;
+    
+    /**
+     * @var Context
+     */
+    private $context;
 
     /**
      * @param Context $context
@@ -96,6 +101,7 @@ class View extends Template
         $this->config = $config;
         $this->registry = $registry;
         $this->localeResolver = $localeResolver;
+        $this->context = $context;
         $this->getProduct();
         $this->getPlans();
         $this->apiConfigHelper = $apiConfigHelper;
@@ -108,7 +114,7 @@ class View extends Template
      */
     private function getProduct()
     {
-        $this->product = $this->registry->registry('product');
+        $this->product = $this->context->getRegistry()->registry('product');
         if (!$this->product->getId()) {
             throw new LocalizedException(__('Failed to initialize product'));
         }
