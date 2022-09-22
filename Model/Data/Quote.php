@@ -29,13 +29,11 @@ use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\ProductImage;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
 use Magento\Quote\Model\Quote as MagentoQuote;
 use Magento\Quote\Model\Quote\Item;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class Quote
 {
@@ -52,38 +50,31 @@ class Quote
      * @var Resolver
      */
     private $locale;
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
      * Quote constructor.
      *
-     * @param ProductImage                $productImageHelper
+     * @param ProductImage $productImageHelper
      * @param CategoryRepositoryInterface $categoryRepository
-     * @param Resolver                    $locale ;
- */
+     * @param Resolver $locale
+     */
     public function __construct(
         ProductImage $productImageHelper,
         CategoryRepositoryInterface $categoryRepository,
-        Resolver $locale,
-        Logger $logger
-
-    )
-    {
+        Resolver $locale
+    ) {
         $this->productImageHelper = $productImageHelper;
         $this->categoryRepository = $categoryRepository;
         $this->locale             = $locale;
-        $this->logger             = $logger;
     }
 
     /**
+     * Create payload to eligibility request
+     *
      * @param MagentoQuote $quote
      * @param array        $installmentsQuery
      *
      * @return array
-     * @throws InputException
      */
     public function eligibilityDataFromQuote(MagentoQuote $quote, array $installmentsQuery): array
     {
@@ -108,10 +99,12 @@ class Quote
     }
 
     /**
+     * Create Line_item payload for payment
+     *
      * @param MagentoQuote $quote
      * @return array
      */
-    public function lineItemsDataFromQuote(MagentoQuote $quote)
+    public function lineItemsDataFromQuote(MagentoQuote $quote): array
     {
         $data = [];
         $items = $quote->getAllItems();
@@ -126,7 +119,11 @@ class Quote
                 'unit_price' => Functions::priceToCents($item->getPrice()),
                 'quantity' => $item->getQty(),
                 'url' => $product->getUrlInStore(),
-                'picture_url' => $this->productImageHelper->getImageUrl($product, 'product_page_image_small', ['width' => 512, 'height' => 512]),
+                'picture_url' => $this->productImageHelper->getImageUrl(
+                    $product,
+                    'product_page_image_small',
+                    ['width' => 512, 'height' => 512]
+                ),
                 'is_virtual' => $item->getIsVirtual(),
             ];
         }
@@ -135,10 +132,12 @@ class Quote
     }
 
     /**
+     * Get product categories for line_item payload
+     *
      * @param Product $product
      * @return array
      */
-    private function getProductCategories(Product $product)
+    private function getProductCategories(Product $product): array
     {
         $paths = [];
         $categoryIds = $product->getAvailableInCategories();
@@ -151,7 +150,7 @@ class Quote
                 continue;
             }
 
-            $components = explode('/', $category->getPath());
+            $components = explode('/', (string)$category->getPath());
             if (count($components) <= 1) {
                 continue;
             }

@@ -25,40 +25,42 @@
 
 namespace Alma\MonthlyPayments\Gateway\Config;
 
-use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
-    const CODE = 'alma_monthly_payments';
+    public const CODE = 'alma_monthly_payments';
+    public const ORDER_PAYMENT_ID = 'PAYMENT_ID';
+    public const ORDER_PAYMENT_URL = 'PAYMENT_URL';
+    public const ORDER_PAYMENT_TRIGGER = 'TRIGGER';
+    private const CONFIG_SORT_ORDER = 'sort_order';
+    private const CONFIG_ELIGIBILITY_MESSAGE = 'eligibility_message';
+    private const CONFIG_NON_ELIGIBILITY_MESSAGE = 'non_eligibility_message';
+    private const CONFIG_SHOW_ELIGIBILITY_MESSAGE = 'show_eligibility_message';
+    private const CONFIG_EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
+    private const CONFIG_EXCLUDED_PRODUCTS_MESSAGE = 'excluded_products_message';
+    private const CONFIG_RETURN_URL = 'return_url';
+    private const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
+    public const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
+    private const FAILURE_RETURN_URL = 'failure_return_url';
+    private const CONFIG_PAYMENT_PLANS = 'payment_plans';
+    private const ALMA_IS_ACTIVE = 'active';
 
-    const ORDER_PAYMENT_ID = 'PAYMENT_ID';
-    const ORDER_PAYMENT_URL = 'PAYMENT_URL';
-    const ORDER_PAYMENT_TRIGGER = 'TRIGGER';
-    const CONFIG_SORT_ORDER = 'sort_order';
-    const CONFIG_ELIGIBILITY_MESSAGE = 'eligibility_message';
-    const CONFIG_NON_ELIGIBILITY_MESSAGE = 'non_eligibility_message';
-    const CONFIG_SHOW_ELIGIBILITY_MESSAGE = 'show_eligibility_message';
-    const CONFIG_EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
-    const CONFIG_EXCLUDED_PRODUCTS_MESSAGE = 'excluded_products_message';
-    const CONFIG_RETURN_URL = 'return_url';
-    const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
-    const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
-    const FAILURE_RETURN_URL = 'failure_return_url';
-    const CONFIG_PAYMENT_PLANS = 'payment_plans';
-
-    const ALMA_IS_ACTIVE = 'active';
-
-    const EXCLUDED_PRODUCT_TYPES = 'excluded_product_types';
-
-
+    /**
+     * @var string
+     */
     private $pathPattern;
+    /**
+     * @var string | null
+     */
     private $methodCode;
+    /**
+     * @var PaymentPlansConfigInterfaceFactory
+     */
     private $plansConfigFactory;
     /**
      * @var ApiConfigHelper
@@ -68,41 +70,36 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @var StoreHelper
      */
     private $storeHelper;
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
-     * Config constructor.
+     * Config constructor
      *
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
      * @param ApiConfigHelper $apiConfigHelper
-     * @param Logger $logger
      * @param StoreHelper $storeHelper
-     * @param null $methodCode
+     * @param string|null $methodCode
      * @param string $pathPattern
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         ApiConfigHelper $apiConfigHelper,
-        Logger $logger,
         StoreHelper $storeHelper,
-        $methodCode = null,
-        $pathPattern = self::DEFAULT_PATH_PATTERN
+        string $methodCode = null,
+        string $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
         $this->plansConfigFactory = $plansConfigFactory;
-        $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
         $this->storeHelper = $storeHelper;
     }
 
     /**
+     * Format config path like payment/alma/enabled
+     *
      * @param string $field
      *
      * @return string
@@ -113,6 +110,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get config value
+     *
      * @param string $field
      * @param mixed|null $default
      * @param int|string|null $storeId
@@ -132,6 +131,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get Alma plugin enabled status
+     *
      * @return bool
      */
     public function getIsActive(): bool
@@ -140,6 +141,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get payment method position from config
+     *
      * @return int
      */
     public function getSortOrder(): int
@@ -148,6 +151,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get Eligibility message from config
+     *
      * @return mixed|null
      */
     public function getEligibilityMessage()
@@ -156,6 +161,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get Non Eligibility message from configuration
+     *
      * @return mixed|null
      */
     public function getNonEligibilityMessage()
@@ -164,22 +171,28 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get display eligibility message status from configuration
+     *
      * @return bool
      */
     public function showEligibilityMessage(): bool
     {
-        return ((bool)(int)$this->get(self::CONFIG_SHOW_ELIGIBILITY_MESSAGE) && $this->getIsActive());
+        return (bool)(int)$this->get(self::CONFIG_SHOW_ELIGIBILITY_MESSAGE) && $this->getIsActive();
     }
 
     /**
+     * Get exclude product types from configuration
+     *
      * @return false|string[]
      */
     public function getExcludedProductTypes()
     {
-        return explode(',', $this->get(self::CONFIG_EXCLUDED_PRODUCT_TYPES));
+        return explode(',', (string)$this->get(self::CONFIG_EXCLUDED_PRODUCT_TYPES));
     }
 
     /**
+     * Get exclude product message from configuration
+     *
      * @return mixed|null
      */
     public function getExcludedProductsMessage()
@@ -188,6 +201,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get return url from configuration
+     *
      * @return mixed|null
      */
     public function getReturnUrl()
@@ -196,6 +211,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get inp url from configuration
+     *
      * @return mixed|null
      */
     public function getIpnCallbackUrl()
@@ -204,6 +221,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get cancel url from configuration
+     *
      * @return mixed|null
      */
     public function getCustomerCancelUrl()
@@ -212,6 +231,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get failure url from configuration
+     *
      * @return mixed|null
      */
     public function getFailureReturnUrl()
@@ -220,6 +241,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get merchant id for the current active mode
+     *
      * @param string|null $storeId
      *
      * @return string|null
@@ -231,13 +254,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     }
 
     /**
+     * Get payment plans configuration from configuration
+     *
      * @return PaymentPlansConfigInterface
      */
     public function getPaymentPlansConfig(): PaymentPlansConfigInterface
     {
         $data = $this->get(self::CONFIG_PAYMENT_PLANS, []);
 
-        /** @var PaymentPlansConfigInterface $plansConfig */
         $plansConfig = $this->plansConfigFactory->create(["data" => $data]);
         if (empty($data)) {
             // No plans config data has ever been saved – fetch what we need
@@ -246,4 +270,3 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         return $plansConfig;
     }
 }
-
