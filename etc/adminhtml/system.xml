@@ -332,10 +332,10 @@
                     </field>
                     <field id="soc_enabled" translate="label comment" type="select" sortOrder="17" showInDefault="1">
                         <label>Merchant data sharing</label>
-                        <comment>We enable Alma to anonymously retrieve, analyse the usage of our payment methods and share with me insights in order to increase my overall performance.</comment>
                         <config_path>payment/alma_monthly_payments/soc_enabled</config_path>
                         <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\SOCDate</backend_model>
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\SOCSelect</source_model>
+                            <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\SOCComment</frontend_model>
                     </field>
                     <field id="failure_return_url" translate="label comment" type="text" sortOrder="16"
                            showInDefault="1" showInWebsite="1" showInStore="1">

@@ -46,6 +46,17 @@ class ApiConfigHelper extends ConfigHelper
     {
         return $this->getConfigByCode(self::CONFIG_TEST_API_KEY);
     }
+
+    /**
+     * Check if a key is saved
+     *
+     * @return bool
+     */
+    public function hasKey(): bool
+    {
+        return (!empty($this->getTestKey()) || !empty($this->getLiveKey()));
+    }
+
     /**
      * @return bool
      */

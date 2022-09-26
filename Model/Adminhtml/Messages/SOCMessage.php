@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Messages;
 
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Framework\Notification\MessageInterface;
 use Magento\Framework\View\LayoutFactory;
@@ -11,6 +12,7 @@ use Magento\Framework\View\LayoutFactory;
  */
 class SOCMessage implements MessageInterface
 {
+    const POSITION = 'message';
     /**
      * @var LayoutFactory
      */
@@ -19,20 +21,29 @@ class SOCMessage implements MessageInterface
      * @var SOCHelper
      */
     private $socHelper;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * @param LayoutFactory $layoutFactory
+     * @param ApiConfigHelper $apiConfigHelper
      * @param SOCHelper $socHelper
      */
     public function __construct(
         LayoutFactory $layoutFactory,
+        ApiConfigHelper $apiConfigHelper,
         SOCHelper $socHelper
     ) {
         $this->layoutFactory = $layoutFactory;
         $this->socHelper = $socHelper;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
+     * Return message ID
+     *
      * @return string
      */
     public function getIdentity(): string
@@ -41,24 +52,40 @@ class SOCMessage implements MessageInterface
     }
 
     /**
+     * Define the display conditions
+     *
      * @return bool
      */
     public function isDisplayed(): bool
     {
-        return $this->socHelper->getSelectorValue() === SOCHelper::SELECTOR_NOT_SET;
+        return (
+            $this->socHelper->getSelectorValue() === SOCHelper::SELECTOR_NOT_SET &&
+            $this->apiConfigHelper->hasKey()
+        );
     }
 
     /**
+     * Défine Text message with a block for data and a template
+     *
      * @return string
      */
     public function getText(): string
     {
         $layout = $this->layoutFactory->create();
-        $blockOption = $layout->createBlock("Alma\MonthlyPayments\Block\Adminhtml\System\SocBlockLegal")->setTemplate("Alma_MonthlyPayments::system/soc-legal.phtml");
+        $blockOption = $layout->createBlock(
+            "Alma\MonthlyPayments\Block\Adminhtml\System\SOCBlockLegal",
+            '',
+            ['data'=>[
+                'link' => true,
+                'position' => self::POSITION
+            ]]
+        )->setTemplate("Alma_MonthlyPayments::system/soc-legal.phtml");
         return $blockOption->toHtml();
     }
 
     /**
+     * Return message severity
+     *
      * @return int
      */
     public function getSeverity(): int

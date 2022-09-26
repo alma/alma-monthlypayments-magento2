@@ -1,10 +1,13 @@
-<?php /** @var Alma\MonthlyPayments\Block\Adminhtml\System\SocBlockLegal $block */ ?>
+<?php
+/** @var Alma\MonthlyPayments\Block\Adminhtml\System\SOCBlockLegal $block */
+$position = $block->getPosition()
+?>
 <div style="margin-left: 10px">
     <div><strong><?= $block->getBlockTitle() ?></strong></div>
     <div><?= $block->getDescription() ?></div>
     <div>
-        <div id="alma_soc_detail_title" class="action-toggle-triangle   "><u><?= $block->getDetailTitle() ?></u></div>
-        <div id="alma_soc_detail_content">
+        <div id="alma_soc_detail_title_<?=$position?>" class="alma_collapse"><u><?= $block->getDetailTitle() ?></u></div>
+        <div id="alma_soc_detail_content_<?=$position?>">
             <ul>
                 <?php foreach ($block->getDetailsArgs() as $arg) :?>
                     <li>
@@ -14,7 +17,9 @@
             </ul>
         </div>
     </div>
-    <a href="<?= $block->getConfigPageUrl() ?>" > <?= $block->getLinkTitle() ?> </a>
+    <?php if ($block->hasLink()): ?>
+        <a href="<?= $block->getConfigPageUrl() ?>" > <?= $block->getLinkTitle() ?> </a>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -22,12 +27,14 @@
         'jquery'
     ], function(jQuery){
         var isOpen = false;
-        jQuery('#alma_soc_detail_title').click(function () {
+        jQuery('#alma_soc_detail_title_<?=$position?>').click(function () {
             if (isOpen) {
-                jQuery('#alma_soc_detail_content').hide();
+                jQuery('#alma_soc_detail_title_<?=$position?>').removeClass('open');
+                jQuery('#alma_soc_detail_content_<?=$position?>').hide();
                 isOpen = false;
             } else {
-                jQuery('#alma_soc_detail_content').show();
+                jQuery('#alma_soc_detail_title_<?=$position?>').addClass('open');
+                jQuery('#alma_soc_detail_content_<?=$position?>').show();
                 isOpen = true;
             }
         });

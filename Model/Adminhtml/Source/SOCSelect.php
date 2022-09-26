@@ -26,12 +26,12 @@
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Data\OptionSourceInterface;
 
 /**
  * Class APIModes
  */
-class SOCSelect implements ArrayInterface
+class SOCSelect implements OptionSourceInterface
 {
 
     /**
@@ -49,7 +49,9 @@ class SOCSelect implements ArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return array of options as value-label pairs
+     *
+     * @return array Format: array(array('value' => '<value>', 'label' => '<label>'), ...)
      */
     public function toOptionArray(): array
     {

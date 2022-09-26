@@ -34,18 +34,35 @@
     content: '\e800';
     font-size : 3.2rem;
     padding: 0 0 25px 0;
-
 }
 
 li#menu-vendor_extension-menu_id > a > span {
 display: none;
 }
 
-#alma_soc_detail_title {
+.alma_collapse:after {
+    content: '' !important;
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-top-color: #000;
+    border-style: solid;
+    border-width: 0.8rem 0.5rem 0 0.5rem;
+    margin-top: 6px;
+    margin-left: 5px;
+    transition: all .2s linear;
+}
+.alma_collapse.open:after {
+     border-color: transparent;
+     border-bottom-color: #000;
+     border-width: 0 0.5rem 0.8rem 0.5rem;
+}
+#alma_soc_detail_title_message, #alma_soc_detail_title_comment {
     padding: 10px 0;
     cursor: pointer;
 }
-#alma_soc_detail_content {
+#alma_soc_detail_content_message, #alma_soc_detail_content_comment {
     display: none;
     padding: 0 0 0 15px;
 }
