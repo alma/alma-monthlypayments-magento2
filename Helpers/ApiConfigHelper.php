@@ -13,6 +13,8 @@ class ApiConfigHelper extends ConfigHelper
     const CONFIG_LIVE_API_KEY = 'live_api_key';
     const CONFIG_TEST_API_KEY = 'test_api_key';
     const CONFIG_API_MODE = 'api_mode';
+    const TEST_MODE_KEY = 'test';
+    const LIVE_MODE_KEY = 'live';
 
     /**
      * @param string|null $scope

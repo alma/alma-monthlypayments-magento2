@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Messages;
 
+use Alma\MonthlyPayments\Block\Adminhtml\System\SOCBlockLegal;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Framework\Notification\MessageInterface;
@@ -12,7 +13,7 @@ use Magento\Framework\View\LayoutFactory;
  */
 class SOCMessage implements MessageInterface
 {
-    const POSITION = 'message';
+    public const POSITION = 'message';
     /**
      * @var LayoutFactory
      */
@@ -60,7 +61,7 @@ class SOCMessage implements MessageInterface
     {
         return (
             $this->socHelper->getSelectorValue() === SOCHelper::SELECTOR_NOT_SET &&
-            $this->apiConfigHelper->hasKey()
+            $this->apiConfigHelper->getActiveMode() === ApiConfigHelper::LIVE_MODE_KEY
         );
     }
 
@@ -73,7 +74,7 @@ class SOCMessage implements MessageInterface
     {
         $layout = $this->layoutFactory->create();
         $blockOption = $layout->createBlock(
-            "Alma\MonthlyPayments\Block\Adminhtml\System\SOCBlockLegal",
+            SOCBlockLegal::class,
             '',
             ['data'=>[
                 'link' => true,
@@ -94,3 +95,4 @@ class SOCMessage implements MessageInterface
     }
 
 }
+

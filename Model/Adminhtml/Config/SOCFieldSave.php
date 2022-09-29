@@ -90,7 +90,7 @@ class SOCFieldSave extends Value
     /**
      * Save consent date after save
      *
-     * @return SOCFieldSave
+     * @return $this
      */
     public function afterSave()
     {
