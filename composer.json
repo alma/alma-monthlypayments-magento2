@@ -1,5 +1,5 @@
 {
-    "name": "alma/alma-monthlypayments-magento2",
+    "name": "almapay/alma-monthlypayments-magento2",
     "description": "Integrates Alma Monthly Payments into Magento 2",
     "require": {
         "php": ">=7.1",
