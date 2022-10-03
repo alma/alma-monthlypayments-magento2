@@ -26,43 +26,38 @@
 
 namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
-use Magento\Catalog\Block\Product\Context;
 use Alma\MonthlyPayments\Gateway\Config\Config;
-use Magento\Framework\View\Element\Template;
-use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Registry;
-use Alma\MonthlyPayments\Helpers\Functions;
-use Magento\Framework\Locale\Resolver;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\WidgetConfigHelper;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Block\Product\Context;
+use Magento\Catalog\Block\Product\View as ProductView;
+use Magento\Catalog\Helper\Product;
+use Magento\Catalog\Model\ProductTypes\ConfigInterface;
+use Magento\Customer\Model\Session;
+use Magento\Framework\Json\EncoderInterface as JsonEncoderInterfaceAlias;
+use Magento\Framework\Locale\FormatInterface;
+use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Stdlib\StringUtils;
+use Magento\Framework\Url\EncoderInterface;
 
-class View extends Template
+class View extends ProductView
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
     /**
      * @var Config
      */
     private $config;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @var Product
-     */
-    private $product;
-
     /**
      * @var Resolver
      */
     private $localeResolver;
-
-    /**
-     * @var array
-     */
-    private $plans = array();
     /**
      * @var ApiConfigHelper
      */
@@ -73,158 +68,195 @@ class View extends Template
     private $widgetConfigHelper;
 
     /**
+     * Construct with parent dependency
+     *
      * @param Context $context
-     * @param Registry $registry
+     * @param EncoderInterface $urlEncoder
+     * @param JsonEncoderInterfaceAlias $jsonEncoder
+     * @param StringUtils $string
+     * @param Product $productHelper
+     * @param ConfigInterface $productTypeConfig
+     * @param FormatInterface $localeFormat
+     * @param Session $customerSession
+     * @param ProductRepositoryInterface $productRepository
+     * @param PriceCurrencyInterface $priceCurrency
      * @param ApiConfigHelper $apiConfigHelper
      * @param WidgetConfigHelper $widgetConfigHelper
      * @param Config $config
      * @param Resolver $localeResolver
+     * @param Logger $logger
      * @param array $data
-     *
-     * @throws LocalizedException
      */
     public function __construct(
-        Context $context,
-        Registry $registry,
-        ApiConfigHelper $apiConfigHelper,
-        WidgetConfigHelper $widgetConfigHelper,
-        Config $config,
-        Resolver $localeResolver,
+        Context                    $context,
+        EncoderInterface           $urlEncoder,
+        JsonEncoderInterfaceAlias  $jsonEncoder,
+        StringUtils                $string,
+        Product                    $productHelper,
+        ConfigInterface            $productTypeConfig,
+        FormatInterface            $localeFormat,
+        Session                    $customerSession,
+        ProductRepositoryInterface $productRepository,
+        PriceCurrencyInterface     $priceCurrency,
+        ApiConfigHelper            $apiConfigHelper,
+        WidgetConfigHelper         $widgetConfigHelper,
+        Config                     $config,
+        Resolver                   $localeResolver,
+        Logger                     $logger,
         array $data = []
     ) {
-        parent::__construct($context, $data);
+        parent::__construct(
+            $context,
+            $urlEncoder,
+            $jsonEncoder,
+            $string,
+            $productHelper,
+            $productTypeConfig,
+            $localeFormat,
+            $customerSession,
+            $productRepository,
+            $priceCurrency,
+            $data
+        );
+        $this->logger = $logger;
         $this->config = $config;
-        $this->registry = $registry;
         $this->localeResolver = $localeResolver;
-        $this->getProduct();
-        $this->getPlans();
         $this->apiConfigHelper = $apiConfigHelper;
         $this->widgetConfigHelper = $widgetConfigHelper;
     }
 
     /**
-     * @return void
-     * @throws LocalizedException
+     * Get enabled fee plans on config
+     *
+     * @return array
      */
-    private function getProduct()
+    private function getPlans(): array
     {
-        $this->product = $this->registry->registry('product');
-        if (!$this->product->getId()) {
-            throw new LocalizedException(__('Failed to initialize product'));
-        }
-    }
-
-    /**
-     * @return void
-     */
-    private function getPlans()
-    {
+        $plans = [];
         foreach ($this->config->getPaymentPlansConfig()->getEnabledPlans() as $planConfig) {
-            $this->plans[] = array(
+            $plans[] = [
                 'installmentsCount' => $planConfig->installmentsCount(),
                 'minAmount' => $planConfig->minimumAmount(),
                 'maxAmount' => $planConfig->maximumAmount(),
                 'deferredDays' => $planConfig->deferredDays(),
                 'deferredMonths' => $planConfig->deferredMonths()
-            );
+            ];
         }
+        return $plans;
     }
 
     /**
+     * Check if product type is in config exclusion group
+     *
      * @return bool
-     * @throws LocalizedException
      */
-    private function isExcluded()
+    private function isExcluded(): bool
     {
         return in_array($this->getProductType(), $this->config->getExcludedProductTypes(), true);
     }
 
     /**
+     * Return config property
+     *
      * @return Config
      */
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->config;
     }
 
     /**
+     * Return widgetConfigHelper for template
+     *
      * @return Config
      */
-    public function getWidgetConfig()
+    public function getWidgetConfig(): Config
     {
         return $this->widgetConfigHelper;
     }
 
     /**
+     * Get the current active mode
+     *
      * @return string
      */
-    public function getActiveMode()
+    public function getActiveMode(): string
     {
         return strtoupper($this->apiConfigHelper->getActiveMode());
     }
 
     /**
+     * Convert to html
+     *
      * @return string
-     * @throws LocalizedException
      */
-    public function _toHtml()
+    public function _toHtml(): string
     {
         return ($this->getNameInLayout() == $this->widgetConfigHelper->getWidgetPosition()
         && !$this->isExcluded() ? parent::_toHtml() : '');
     }
 
     /**
+     * Return plan in Json for Front treatment
+     *
      * @return string
      */
-    public function getJsonPlans()
+    public function getJsonPlans(): string
     {
-        return (!empty($this->plans) ? json_encode($this->plans) : '');
+        $plans = $this->getPlans();
+        return (!empty($plans) ? json_encode($plans) : '');
     }
 
     /**
+     * Return product ID
+     *
      * @return int
-     * @throws LocalizedException
      */
-    public function getProductId()
+    public function getProductId(): int
     {
-        return $this->product->getId();
+        return $this->getProduct()->getId();
     }
 
     /**
+     * Return product name
+     *
      * @return string
-     * @throws LocalizedException
      */
-    public function getProductName()
+    public function getProductName(): string
     {
-        return $this->product->getName();
+        return $this->getProduct()->getName();
     }
 
     /**
-     * @return array|string
-     * @throws LocalizedException
+     * Return product type for exclusion
+     *
+     * @return string
      */
-    public function getProductType()
+    public function getProductType(): string
     {
-        return $this->product->getTypeId();
+        return $this->getProduct()->getTypeId();
     }
 
     /**
-     * @return int
-     * @throws LocalizedException
+     * Return product price for the badge
+     *
+     * @return int | null
      */
-    public function getPrice()
+    public function getPrice(): ?int
     {
-        return Functions::priceToCents($this->product->getFinalPrice());
+        return Functions::priceToCents($this->getProduct()->getFinalPrice());
     }
+
     /**
      * Return locale and convert it
+     *
      * @return string
      */
-    public function getLocale(){
-        $locale ='en';
+    public function getLocale(): string
+    {
+        $locale = 'en';
         $localeStoreCode = $this->localeResolver->getLocale();
-
-        if (preg_match('/^([a-z]{2})_([A-Z]{2})$/',$localeStoreCode,$matches)){
+        if (preg_match('/^([a-z]{2})_([A-Z]{2})$/', $localeStoreCode, $matches)) {
             $locale = $matches[1];
         }
         return $locale;
