@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v3.0.0
+------
+* feature: change vendor name to almapay
+* fix: get product error on product page  when cache is enabled
+
 v2.9.0
 ------
 * fix : multi store management
