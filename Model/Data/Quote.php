@@ -26,9 +26,14 @@
 namespace Alma\MonthlyPayments\Model\Data;
 
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ProductImage;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
@@ -50,22 +55,32 @@ class Quote
      * @var Resolver
      */
     private $locale;
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
 
     /**
      * Quote constructor.
      *
      * @param ProductImage $productImageHelper
      * @param CategoryRepositoryInterface $categoryRepository
+     * @param Logger $logger
+     * @param CollectionFactory $collectionFactory
      * @param Resolver $locale
      */
     public function __construct(
         ProductImage $productImageHelper,
         CategoryRepositoryInterface $categoryRepository,
+        Logger $logger,
+        CollectionFactory $collectionFactory,
         Resolver $locale
     ) {
         $this->productImageHelper = $productImageHelper;
         $this->categoryRepository = $categoryRepository;
         $this->locale             = $locale;
+        $this->logger             = $logger;
+        $this->collectionFactory = $collectionFactory;
     }
 
     /**
@@ -127,7 +142,7 @@ class Quote
                 'is_virtual' => $item->getIsVirtual(),
             ];
         }
-
+        $this->logger->info('$data', [$data]);
         return $data;
     }
 
@@ -139,58 +154,46 @@ class Quote
      */
     private function getProductCategories(Product $product): array
     {
-        $paths = [];
-        $categoryIds = $product->getAvailableInCategories();
-
-        // Find each category the product belongs to
-        foreach ($categoryIds as $categoryId) {
-            try {
-                $category = $this->categoryRepository->get($categoryId);
-            } catch (NoSuchEntityException $e) {
-                continue;
-            }
-
-            $components = explode('/', (string)$category->getPath());
-            if (count($components) <= 1) {
-                continue;
-            }
-            $components = array_slice($components, 1);
-
-            // Get the full category path for that category
-            $path = "";
-            foreach ($components as $component) {
-                $path .= "/";
-
-                try {
-                    $cat = $this->categoryRepository->get($component);
-                } catch (NoSuchEntityException $e) {
-                    continue;
-                }
-
-                $path .= $cat->getName();
-            }
-
-            $paths[] = $path;
+        $categoryIds = $product->getCategoryIds();
+        try {
+            $categoryCollection = $this->getCategoryCollection($categoryIds);
+        } catch (LocalizedException $e) {
+            $this->logger->info(
+                'Impossible to create category collection for product',
+                [
+                    'product ID '=> $product->getId(),
+                    'Exception Message' => $e->getMessage()
+                ]
+            );
+            return [];
+        }
+        $productCategories = [];
+        foreach ($categoryCollection as $cate) {
+            /** @var $cate Category */
+            $productCategories[] = $cate->getData('url_path');
         }
 
-        // Only keep leaves
-        $categories = [];
-        foreach ($paths as $path) {
-            $merge = false;
-            foreach ($paths as $otherPath) {
-                if ($path != $otherPath && mb_strpos($otherPath, $path) === 0) {
-                    $merge = true;
-                    break;
-                }
-            }
+        return $productCategories;
+    }
 
-            if ($merge) {
-                continue;
-            }
+    /**
+     * Get category collection by
+     *
+     * @param array $categoryIds
+     * @param int $level
+     *
+     * @return Collection
+     * @throws LocalizedException
+     */
+    public function getCategoryCollection(array $categoryIds, int $level = 1): Collection
+    {
+        $collection = $this->collectionFactory->create();
+        $collection->addAttributeToSelect('*');
+        $collection->addAttributeToFilter('entity_id', $categoryIds);
+        $collection->addIsActiveFilter();
+        // select categories of certain level
+        $collection->addLevelFilter($level);
 
-            $categories[] = $path;
-        }
-
-        return $categories;
+        return $collection;
     }
 }
