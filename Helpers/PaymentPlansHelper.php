@@ -22,7 +22,6 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Entities\FeePlan;
@@ -117,7 +116,7 @@ class PaymentPlansHelper
      */
     private function forceAmountThresholds($plan): array
     {
-        $key = $plan['kind'].':'.$plan['installmentsCount'].':'.$plan['deferredDays'].':'.$plan['deferredMonths'];
+        $key = $plan['kind'] . ':' . $plan['installmentsCount'] . ':' . $plan['deferredDays'] . ':' . $plan['deferredMonths'];
         if (
             $plan[self::KEY_MIN_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MIN_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
@@ -162,11 +161,11 @@ class PaymentPlansHelper
 
     /**
      * @param FeePlan $feePlan
-     * @param array|null $feePlanConfig
+     * @param array $feePlanConfig
      *
      * @return array
      */
-    public function formatLocalFeePlanConfig(FeePlan $feePlan, array $feePlanConfig = null): array
+    public function formatLocalFeePlanConfig(FeePlan $feePlan, array $feePlanConfig): array
     {
         $key = PaymentPlanConfig::keyForFeePlan($feePlan);
         return [
@@ -219,9 +218,11 @@ class PaymentPlansHelper
     public function formatFeePlanConfigForSave(FeePlan $feePlan, array $configInput): array
     {
         $newFeePlan = PaymentPlanConfig::defaultConfigForFeePlan($feePlan);
-        $newFeePlan['enabled'] = $configInput['enabled'];
-        $newFeePlan['minAmount'] = Functions::priceToCents($configInput['custom_min_purchase_amount']);
-        $newFeePlan['maxAmount'] = Functions::priceToCents($configInput['custom_max_purchase_amount']);
+        if (!empty($configInput)) {
+            $newFeePlan['enabled'] = $configInput['enabled'];
+            $newFeePlan['minAmount'] = Functions::priceToCents($configInput['custom_min_purchase_amount']);
+            $newFeePlan['maxAmount'] = Functions::priceToCents($configInput['custom_max_purchase_amount']);
+        }
         return $this->forceAmountThresholds($newFeePlan);
     }
 }
