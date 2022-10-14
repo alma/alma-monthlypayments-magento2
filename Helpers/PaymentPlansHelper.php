@@ -210,18 +210,21 @@ class PaymentPlansHelper
         return $fee;
     }
 
-    /**
+   /**
      * @param FeePlan $feePlan
-     * @param array $configInput
+     * @param array|null $configInput
      *
      * @return array
      */
-    public function formatFeePlanConfigForSave(FeePlan $feePlan, array $configInput): array
+    public function formatFeePlanConfigForSave(FeePlan $feePlan, $configInput): array
     {
         $newFeePlan = PaymentPlanConfig::defaultConfigForFeePlan($feePlan);
-        $newFeePlan['enabled'] = $configInput['enabled'];
-        $newFeePlan['minAmount'] = Functions::priceToCents($configInput['custom_min_purchase_amount']);
-        $newFeePlan['maxAmount'] = Functions::priceToCents($configInput['custom_max_purchase_amount']);
+
+        if (!empty($configInput)) {
+            $newFeePlan['enabled'] = $configInput['enabled'];
+            $newFeePlan['minAmount'] = Functions::priceToCents($configInput['custom_min_purchase_amount']);
+            $newFeePlan['maxAmount'] = Functions::priceToCents($configInput['custom_max_purchase_amount']);
+        }
         return $this->forceAmountThresholds($newFeePlan);
     }
 }
