@@ -351,7 +351,7 @@ class Eligibility extends AbstractHelper
      */
     public function getMessage(): string
     {
-        return __($this->message);
+        return $this->message;
     }
 
     /**
