@@ -123,6 +123,7 @@
                 <group id="alma_general_config" translate="label" type="text" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Payment method configuration</label>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\GeneralGroupFrontModel</frontend_model>
                     <field id="payment_expiration" translate="label" sortOrder="20" showInDefault="1">
                         <label>Payment expiration time</label>
                         <config_path>payment/alma_monthly_payments/payment_expiration</config_path>
