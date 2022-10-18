@@ -7,7 +7,7 @@ use Alma\API\Endpoints\ShareOfCheckout;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
-use Alma\MonthlyPayments\Model\Adminhtml\Config\SOCFieldSave;
+use Alma\MonthlyPayments\Model\Adminhtml\Config\SOCConsentField;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Message\ManagerInterface;
@@ -15,8 +15,16 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use PHPUnit\Framework\TestCase;
 
-class SOCFieldSaveTest extends TestCase
+/**
+ * Class SOCConsentFieldTest
+ *
+ * This class tests SOCConsentField class
+ */
+class SOCConsentFieldTest extends TestCase
 {
+    /**
+     * @return void
+     */
     public function setUp(): void
     {
         $this->socHelper = $this->createMock(SOCHelper::class);
@@ -29,16 +37,27 @@ class SOCFieldSaveTest extends TestCase
         $this->messageManager = $this->createMock(ManagerInterface::class);
     }
 
+    /**
+     * @return void
+     */
     public function testBeforeSaveExitWithoutChanges()
     {
         $this->createShareOfCheckoutMock();
-        $socFieldSaveObject = $this->createSOCFieldSave();
+        $socFieldSaveObject = $this->createSOCConsentField();
         $this->assertEquals($socFieldSaveObject, $socFieldSaveObject->beforeSave());
     }
-    private function createSOCFieldSave(): SOCFieldSave
+
+    /**
+     * @return SOCConsentField
+     */
+    private function createSOCConsentField(): SOCConsentField
     {
-        return new SOCFieldSave(...$this->getConstructorDependency());
+        return new SOCConsentField(...$this->getConstructorDependency());
     }
+
+    /**
+     * @return void
+     */
     private function createShareOfCheckoutMock(): void
     {
         $socEndpoint = $this->createMock(ShareOfCheckout::class);
@@ -50,6 +69,9 @@ class SOCFieldSaveTest extends TestCase
         $this->almaClient->method('getDefaultClient')->willReturn($almaClientMock);
     }
 
+    /**
+     * @return array
+     */
     private function getConstructorDependency(): array
     {
         return [

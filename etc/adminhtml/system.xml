@@ -336,9 +336,9 @@
                         </depends>
                         <label>Merchant data sharing</label>
                         <config_path>payment/alma_monthly_payments/soc_enabled</config_path>
-                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\SOCFieldSave</backend_model>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\SOCConsentField</backend_model>
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\SOCSelect</source_model>
-                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\SOCFieldFrontModel</frontend_model>
+                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\SOCConsentFieldFrontModel</frontend_model>
                     </field>
                     <field id="failure_return_url" translate="label comment" type="text" sortOrder="16"
                            showInDefault="1" showInWebsite="1" showInStore="1">

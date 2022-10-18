@@ -10,7 +10,7 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ResourceInterface;
 use Magento\Framework\View\LayoutFactory;
 
-class SOCFieldFrontModel extends Field
+class SOCConsentFieldFrontModel extends Field
 {
     public const POSITION = 'comment';
     /**

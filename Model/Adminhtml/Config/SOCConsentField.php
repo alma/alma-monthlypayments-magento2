@@ -16,7 +16,12 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 
-class SOCFieldSave extends Value
+/**
+ * Class SOCConsentField
+ *
+ * This class is used to manage data of the Share of Checkout consent in back-office
+ */
+class SOCConsentField extends Value
 {
 
     /**
@@ -70,9 +75,9 @@ class SOCFieldSave extends Value
     /**
      * Send consent to API
      *
-     * @return SOCFieldSave
+     * @return SOCConsentField
      */
-    public function beforeSave(): SOCFieldSave
+    public function beforeSave(): SOCConsentField
     {
         if (!$this->isValueChanged()) {
             return $this;
