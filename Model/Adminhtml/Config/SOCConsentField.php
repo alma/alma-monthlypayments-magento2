@@ -82,13 +82,7 @@ class SOCConsentField extends Value
         if (!$this->isValueChanged()) {
             return $this;
         }
-        $value = $this->getValue();
-
-        $endpoint = 'addConsent';
-        if ($value == SOCHelper::SELECTOR_NO) {
-            $endpoint = 'removeConsent';
-        }
-        $this->sendConsent($endpoint);
+        $this->sendConsent($this->getValue());
         return parent::beforeSave();
     }
 
@@ -119,14 +113,18 @@ class SOCConsentField extends Value
     /**
      * Send consent to alma API  - No save if an exception is trowed
      *
-     * @param string $endpoint
+     * @param string $value
      *
      * @return void
      */
-    protected function sendConsent(string $endpoint): void
+    protected function sendConsent(string $value): void
     {
         try {
-            $this->almaClient->getDefaultClient()->shareOfCheckout->$endpoint();
+            if ($value == SOCHelper::SELECTOR_NO) {
+                $this->almaClient->getDefaultClient()->shareOfCheckout->removeConsent();
+                return;
+            }
+            $this->almaClient->getDefaultClient()->shareOfCheckout->addConsent();
         } catch (RequestError | AlmaClientException $e) {
             $this->logger->error('SOC before save exception', [$e]);
             $this->messageManager->addErrorMessage(
