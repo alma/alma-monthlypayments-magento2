@@ -72,7 +72,7 @@ class FeePlansConfigBackendModel extends Value
             if ($key === 'general:1:0:0' || !$feePlan->allowed) {
                 continue;
             }
-            $feePlans[$key] = $this->paymentPlansHelper->formatFeePlanConfigForSave($feePlan, $value[$key] ?? null);
+            $feePlans[$key] = $this->paymentPlansHelper->formatFeePlanConfigForSave($feePlan, $value[$key] ?? []);
         }
         $encodedValue = $this->serialize->serialize($feePlans);
 
@@ -94,7 +94,7 @@ class FeePlansConfigBackendModel extends Value
             if ($key === 'general:1:0:0' || !$feePlan->allowed) {
                 continue;
             }
-            $feePlans[$key] = $this->paymentPlansHelper->formatLocalFeePlanConfig($feePlan, $value[$key] ?? null);
+            $feePlans[$key] = $this->paymentPlansHelper->formatLocalFeePlanConfig($feePlan, $value[$key] ?? []);
         }
 
         $this->setValue($feePlans);

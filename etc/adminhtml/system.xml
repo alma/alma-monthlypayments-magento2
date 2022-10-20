@@ -62,9 +62,6 @@
                 </field>
                 <group id="alma_customise_checkout" translate="label comment" type="text" sortOrder="10" showInDefault="1"
                    showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
                     <label>Customize Alma in your checkout</label>
                     <comment>Edit the text displayed when choosing the payment method in your checkout. It will adapt to the languages of your site.</comment>
                     <field id="alma_merge_payment" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
@@ -125,10 +122,8 @@
                 <!-- PAYMENT METHOD CONFIGURATION -->
                 <group id="alma_general_config" translate="label" type="text" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
                     <label>Payment method configuration</label>
+                    <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\GeneralGroupFrontModel</frontend_model>
                     <field id="payment_expiration" translate="label" sortOrder="20" showInDefault="1">
                         <label>Payment expiration time</label>
                         <config_path>payment/alma_monthly_payments/payment_expiration</config_path>
@@ -144,9 +139,6 @@
                 </group>
                 <!-- PAYMENT ON TRIGGER DISPLAY CONFIGURATION -->
                 <group id="alma_trigger_config" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
                     <label>Payment upon trigger</label>
                     <comment>This option is available only for Alma payment in 2x, 3x and 4x. When it's turned on, your clients will pay the first installment at the order status change. When your client order on your website, Alma will only ask for a payment authorization. Only status handled by Alma are available in the menu below. Please contact Alma if you need us to add another status.</comment>
                     <field id="trigger_is_allowed" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -178,10 +170,6 @@
                 <!-- CART DISPLAY CONFIGURATION -->
                 <group id="alma_cart_config" translate="label comment" type="text" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-
                     <label>Cart display</label>
                     <comment>A message can be displayed in the cart and minicart to indicate the order eligibility for monthly payments</comment>
 
@@ -205,10 +193,6 @@
                 <!-- PRODUCT PAGE DISPLAY CONFIGURATION -->
                 <group id="alma_product_config" translate="label comment" type="text" sortOrder="25" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-
                     <label>Product page display</label>
                     <comment>A badge can be displayed on product pages to indicate eligible payments plans</comment>
 
@@ -257,9 +241,6 @@
                 <!-- EXCLUDED PRODUCTS CONFIGURATION -->
                 <group id="alma_excluded_products_config" translate="label comment" type="text" sortOrder="30"
                        showInDefault="1" showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
 
                     <label>Products exclusions</label>
                     <comment><![CDATA[<p>Some products (gift cards, license keys, software, weapons, ...) cannot be sold with Alma, <a href="https://getalma.eu/legal/terms/payment" target="_blank">as per our terms</a> (see Exclusions paragraph).</p><p>If you are selling such products on your shop, you need to configure Alma so that it is not enabled when customers view or shop them.</p>]]></comment>
@@ -283,9 +264,6 @@
                 <!-- API CONFIGURATION -->
                 <group id="alma_api_config" translate="label comment" type="text" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
 
                     <label>API configuration</label>
                     <comment><![CDATA[You can find your API keys on <a href="https://dashboard.getalma.eu/security" target="_blank">your Alma dashboard</a>]]></comment>
