@@ -527,7 +527,7 @@ class Eligibility extends AbstractHelper
     {
         $type = 'other';
 
-        if ($installmentCount > 1 && !$isDeferred) {
+        if ($installmentCount >= 1 && !$isDeferred) {
             $type = self::INSTALLMENTS_TYPE;
         }
         if ($installmentCount > 4 && !$isDeferred) {

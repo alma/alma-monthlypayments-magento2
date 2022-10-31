@@ -35,7 +35,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     const KEY_MAX_AMOUNT = 'maxAmount';
     const TRANSIENT_KEY_MERCHANT_FEES = 'merchantFees';
     const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
-    const ALLOWED_MONTHLY_PLANS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const ALLOWED_MONTHLY_PLANS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     /**
      * @var array
