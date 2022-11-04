@@ -48,7 +48,7 @@ class SOCBlockLegal extends Template
     public function getDescription(): string
     {
         $html = "By accepting this option, you enable Alma to analyze the usage of your payment methods and get information in order to improve your clients' experience.";
-        $html .= " You can <a href='mailto:support@getalma.eu' target='_blank'>opt out and erase your data</a> at any moment.";
+        $html .= " You can <a href='mailto:support+soc@getalma.eu' target='_blank'>opt out and erase your data</a> at any moment.";
         return __($html);
     }
     /**
