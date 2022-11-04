@@ -143,18 +143,20 @@ class APIKeyValue extends Encrypted
         // Clean api key value by saving empty value
         $merchant = $this->availabilityHelper->getMerchant($this->apiKeyType, $value);
         if (empty($value) || $merchant) {
-            $this->saveAndEncryptValue();
             $this->configHelper->saveMerchantId(
                 $this->merchantIdPath,
                 $merchant,
                 $this->getScope(),
                 $this->getScopeId()
             );
-            if ($this->isValueChanged() && empty($value) && $this->apiKeyType == 'live') {
-                $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
+            if ($this->isValueChanged() && $this->apiKeyType == 'live') {
                 $this->configHelper->deleteConfig(SOCHelper::ENABLE_KEY, $this->getScope(), $this->getScopeId());
-
+                if (empty($value)) {
+                    $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
+                }
             }
+
+            $this->saveAndEncryptValue();
             return;
         }
         $this->disallowDataSave();
