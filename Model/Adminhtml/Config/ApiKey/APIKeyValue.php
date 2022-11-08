@@ -28,6 +28,7 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -116,6 +117,8 @@ class APIKeyValue extends Encrypted
     }
 
     /**
+     * Return API key name
+     *
      * @return Phrase
      */
     public function getApiKeyName(): Phrase
@@ -124,13 +127,14 @@ class APIKeyValue extends Encrypted
     }
 
     /**
+     * Action before save Api Key value
+     *
      * @return void
      */
     public function beforeSave(): void
     {
         $value = (string)$this->getValue();
-        if (
-            !$this->hasDataChanges() ||
+        if (!$this->hasDataChanges() ||
             preg_match('/^\*+$/', $value)
         ) {
             $this->disallowDataSave();
@@ -139,9 +143,20 @@ class APIKeyValue extends Encrypted
         // Clean api key value by saving empty value
         $merchant = $this->availabilityHelper->getMerchant($this->apiKeyType, $value);
         if (empty($value) || $merchant) {
+            $this->configHelper->saveMerchantId(
+                $this->merchantIdPath,
+                $merchant,
+                $this->getScope(),
+                $this->getScopeId()
+            );
+            if ($this->isValueChanged() && $this->apiKeyType == 'live') {
+                $this->configHelper->deleteConfig(SOCHelper::ENABLE_KEY, $this->getScope(), $this->getScopeId());
+                if (empty($value)) {
+                    $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
+                }
+            }
+
             $this->saveAndEncryptValue();
-            $this->configHelper->saveMerchantId($this->merchantIdPath, $merchant, $this->getScope(), $this->getScopeId());
-            $this->changeApiModeToTest($value);
             return;
         }
         $this->disallowDataSave();
@@ -165,19 +180,8 @@ class APIKeyValue extends Encrypted
     }
 
     /**
-     * Change API mode to test when Live api Key is empty.
+     * Encrypt and save value
      *
-     * @param string $value
-     *
-     */
-    public function changeApiModeToTest(string $value): void
-    {
-        if ($this->isValueChanged() && empty($value) && $this->apiKeyType == 'live') {
-            $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
-        }
-    }
-
-    /**
      * @return void
      */
     protected function saveAndEncryptValue(): void

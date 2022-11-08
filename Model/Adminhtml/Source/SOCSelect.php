@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!--
+<?php
 /**
  * 2018 Alma / Nabla SAS
  *
@@ -23,24 +22,45 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  *
  */
--->
 
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Alma\MonthlyPayments\Block\Info">
-        <arguments>
-            <argument name="data" xsi:type="array">
-                <item xsi:type="string" name="is_secure_mode">0</item>
-            </argument>
-        </arguments>
-    </type>
-    <type name="Magento\Framework\Notification\MessageList">
-        <arguments>
-            <argument name="messages" xsi:type="array">
-                <item name="soc_notification" xsi:type="string">
-                    Alma\MonthlyPayments\Model\Adminhtml\Messages\SOCMessage
-                </item>
-            </argument>
-        </arguments>
-    </type>
-</config>
+namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
+
+use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
+use Magento\Framework\Data\OptionSourceInterface;
+
+/**
+ * Class APIModes
+ */
+class SOCSelect implements OptionSourceInterface
+{
+
+    /**
+     * @var SOCHelper
+     */
+    private $socHelper;
+
+    /**
+     * @param SOCHelper $socHelper
+     */
+    public function __construct(
+        SOCHelper $socHelper
+    ) {
+        $this->socHelper = $socHelper;
+    }
+
+    /**
+     * Return array of options as value-label pairs
+     *
+     * @return array Format: array(array('value' => '<value>', 'label' => '<label>'), ...)
+     */
+    public function toOptionArray(): array
+    {
+        $arrayResult = [];
+        if ($this->socHelper->getSelectorValue() == SOCHelper::SELECTOR_NOT_SET) {
+            $arrayResult[] = ['value' => SOCHelper::SELECTOR_NOT_SET, 'label' => __('-- Please select --')];
+        }
+        $arrayResult[] = ['value' => SOCHelper::SELECTOR_NO, 'label' => __('No')];
+        $arrayResult[] = ['value' => SOCHelper::SELECTOR_YES, 'label' => __('Yes')];
+        return $arrayResult;
+    }
+}

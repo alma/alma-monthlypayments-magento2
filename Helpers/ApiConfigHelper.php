@@ -13,6 +13,8 @@ class ApiConfigHelper extends ConfigHelper
     const CONFIG_LIVE_API_KEY = 'live_api_key';
     const CONFIG_TEST_API_KEY = 'test_api_key';
     const CONFIG_API_MODE = 'api_mode';
+    const TEST_MODE_KEY = 'test';
+    const LIVE_MODE_KEY = 'live';
 
     /**
      * @param string|null $scope
@@ -46,6 +48,17 @@ class ApiConfigHelper extends ConfigHelper
     {
         return $this->getConfigByCode(self::CONFIG_TEST_API_KEY);
     }
+
+    /**
+     * Check if a key is saved
+     *
+     * @return bool
+     */
+    public function hasKey(): bool
+    {
+        return (!empty($this->getTestKey()) || !empty($this->getLiveKey()));
+    }
+
     /**
      * @return bool
      */

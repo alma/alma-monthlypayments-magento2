@@ -18,15 +18,15 @@ class DateHelper extends AbstractHelper
     /**
      *
      * @param string $from
-     * @param string $shareOfCheckoutEnabledDate
+     * @param string $enabledDate
      * @param string|null $to
      *
      * @return array
      */
-    public function getDatesInInterval(string $shareOfCheckoutEnabledDate, string $from, string $to = ''): array
+    public function getDatesInInterval(string $enabledDate, string $from, string $to = ''): array
     {
         $datesInInterval = [];
-        if ($shareOfCheckoutEnabledDate == '' || $from === '') {
+        if ($enabledDate == '' || $from === '') {
             return $datesInInterval;
         }
         if ($to === '') {
@@ -35,7 +35,7 @@ class DateHelper extends AbstractHelper
         $startTimestamp =  $from;
 
         while ($startTimestamp < $to) {
-            if ($startTimestamp > $shareOfCheckoutEnabledDate) {
+            if ($startTimestamp > $enabledDate) {
                 $datesInInterval[] = $startTimestamp;
             }
             $startTimestamp = $this->dateMoreOneDay($startTimestamp);

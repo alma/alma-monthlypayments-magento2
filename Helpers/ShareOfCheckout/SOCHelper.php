@@ -13,11 +13,14 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
 
-class ShareOfCheckoutHelper extends AbstractHelper
+class SOCHelper extends AbstractHelper
 {
     const SHARED_ORDER_STATES = ['processing', 'complete'];
-    const SHARE_CHECKOUT_ENABLE_KEY = 'share_checkout_enable';
-    const SHARE_CHECKOUT_DATE_KEY = 'share_checkout_date';
+    const ENABLE_KEY = 'soc_enabled';
+    const DATE_KEY = 'soc_date';
+    const SELECTOR_NO =  0;
+    const SELECTOR_YES =  1;
+    const SELECTOR_NOT_SET =  2;
 
     /**
      * @var Logger
@@ -72,14 +75,24 @@ class ShareOfCheckoutHelper extends AbstractHelper
     }
 
     /**
+     * Get SOC selector value ( 2 : not set - 0 : no - 1 yes )
+     * @return int
+     */
+    public function getSelectorValue(): int
+    {
+        return intval($this->scopeConfig->getValue(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::ENABLE_KEY,
+            ScopeInterface::SCOPE_STORE
+        ));
+    }
+
+    /**
+     * Change SOC selector value into bool
      * @return bool
      */
-    public function shareOfCheckoutIsEnabled(): bool
+    public function isEnabled(): bool
     {
-        return $this->scopeConfig->getValue(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_ENABLE_KEY,
-            ScopeInterface::SCOPE_STORE
-        );
+        return $this->getSelectorValue() === self::SELECTOR_YES;
     }
 
     /**
@@ -123,17 +136,17 @@ class ShareOfCheckoutHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getShareOfCheckoutEnabledDate(): string
+    public function getEnabledDate(): string
     {
-        $shareOfCheckoutEnabledDate = $this->scopeConfig->getValue(
-            $this->getShareOfCheckoutDateKey(),
+        $enabledDate = $this->scopeConfig->getValue(
+            $this->getDateKey(),
             ScopeInterface::SCOPE_STORE
         );
-        if (empty($shareOfCheckoutEnabledDate)) {
+        if (empty($enabledDate)) {
             $this->logger->info('Share of checkout feature was never activated', []);
             throw new InvalidArgumentException('Share of checkout feature was never activated');
         }
-        return $shareOfCheckoutEnabledDate;
+        return $enabledDate;
     }
 
     /**
@@ -149,24 +162,24 @@ class ShareOfCheckoutHelper extends AbstractHelper
      * @param string $date
      * @return void
      */
-    public function saveShareOfCheckoutDate(string $date): void
+    public function saveDate(string $date): void
     {
-        $this->configWriter->save($this->getShareOfCheckoutDateKey(), $date);
+        $this->configWriter->save($this->getDateKey(), $date);
     }
 
     /**
      * @return void
      */
-    public function deleteShareOfCheckoutDate(): void
+    public function deleteDate(): void
     {
-        $this->configWriter->delete($this->getShareOfCheckoutDateKey());
+        $this->configWriter->delete($this->getDateKey());
     }
 
     /**
      * @return string
      */
-    private function getShareOfCheckoutDateKey(): string
+    private function getDateKey(): string
     {
-        return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::SHARE_CHECKOUT_DATE_KEY;
+        return ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::DATE_KEY;
     }
 }

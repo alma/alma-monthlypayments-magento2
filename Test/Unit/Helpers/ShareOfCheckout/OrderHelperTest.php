@@ -137,7 +137,7 @@ class OrderHelperTest extends TestCase
         $orderHelper->setOrderCollection($orders);
         $this->assertEquals(
             $result,
-            $orderHelper->getShareOfCheckoutByPaymentMethods()
+            $orderHelper->getSOCByPaymentMethods()
         );
     }
 

@@ -16,6 +16,7 @@ class StoreHelper extends AbstractHelper
     const AREA_FRONT = 'frontend';
     const AREA_BACK = 'adminhtml';
     const AREA_API = 'webapi_rest';
+    const AREA_CRON = 'crontab';
 
     /**
      * @var Logger
@@ -78,6 +79,7 @@ class StoreHelper extends AbstractHelper
         switch ($areaCode) {
             case self::AREA_FRONT:
             case self::AREA_API:
+            case self::AREA_CRON:
                 return $this->storeResolver->getCurrentStoreId();
             case self::AREA_BACK:
                 return $this->backStoreId();

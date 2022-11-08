@@ -308,6 +308,16 @@
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>customer_cancel_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/customer_cancel_url</config_path>
                     </field>
+                    <field id="soc_enabled" translate="label comment" type="select" sortOrder="17" showInDefault="1">
+                        <depends>
+                            <field id="api_mode">live</field>
+                        </depends>
+                        <label>Merchant data sharing</label>
+                        <config_path>payment/alma_monthly_payments/soc_enabled</config_path>
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\SOCConsentField</backend_model>
+                        <source_model>Alma\MonthlyPayments\Model\Adminhtml\Source\SOCSelect</source_model>
+                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\SOCConsentFieldFrontModel</frontend_model>
+                    </field>
                     <field id="failure_return_url" translate="label comment" type="text" sortOrder="16"
                            showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Failure return url</label>
