@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v3.1.0
+------
+* New Alma logo ! 
+* fix: fatal error on disabled
+* feature: Share of Checkout
+* refactor: allowed plans
+
+
 v3.0.0
 ------
 * feature: change vendor name to almapay
