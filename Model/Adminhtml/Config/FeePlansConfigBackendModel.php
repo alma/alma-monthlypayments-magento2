@@ -69,7 +69,7 @@ class FeePlansConfigBackendModel extends Value
         $almaPlans = $this->configHelper->getBaseApiPlansConfig();
         $feePlans = [];
         foreach ($almaPlans as $key => $feePlan) {
-            if ($this->removeDisallowedPlans($key, $feePlan)) {
+            if (!$this->isAllowedPlan($key, $feePlan)) {
                 continue;
             }
             $feePlans[$key] = $this->paymentPlansHelper->formatFeePlanConfigForSave($feePlan, $value[$key] ?? []);
@@ -91,7 +91,7 @@ class FeePlansConfigBackendModel extends Value
         }
         $feePlans = [];
         foreach ($almaPlans as $key => $feePlan) {
-            if ($this->removeDisallowedPlans($key, $feePlan)) {
+            if (!$this->isAllowedPlan($key, $feePlan)) {
                 continue;
             }
             $feePlans[$key] = $this->paymentPlansHelper->formatLocalFeePlanConfig($feePlan, $value[$key] ?? []);
@@ -107,9 +107,9 @@ class FeePlansConfigBackendModel extends Value
      * @param $feePlan
      * @return bool
      */
-    public function removeDisallowedPlans($key, $feePlan): bool
+    public function isAllowedPlan($key, $feePlan): bool
     {
-        if ($key === 'general:1:0:0' || !$feePlan->allowed) {
+        if ($key !== 'general:1:0:0' && $feePlan->allowed) {
             return true;
         }
         return false;
