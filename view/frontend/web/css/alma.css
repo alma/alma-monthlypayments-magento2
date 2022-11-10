@@ -1,11 +1,16 @@
 .alma-cart-eligibility img {
-    height: 25px;
+    height: 45px;
 }
 
 .alma.payment-method .alma-plan-choices label {
     cursor: pointer;
-    width: 24%;
+    width: 28%;
     display: inline-block;
+}
+.alma.payment-method .alma-plan-choices label span {
+    position: relative;
+    padding-left: 0.2rem;
+    bottom: 0.2rem  ;
 }
 
 .alma.payment-method .alma-plan-logo {
@@ -17,9 +22,10 @@
     position: relative;
     padding : 0 10px;
     float: right;
-    bottom: 3.5rem;
-    width: 35px;
+    bottom: 3.8rem;
+    width: 50px;
 }
+
 .alma.payment-method ul.alma-installments {
     padding: 0;
     margin-bottom: 2rem;
