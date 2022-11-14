@@ -157,7 +157,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getEligibilityMessage()
     {
-        return $this->get(self::CONFIG_ELIGIBILITY_MESSAGE);
+        return __($this->get(self::CONFIG_ELIGIBILITY_MESSAGE));
     }
 
     /**
