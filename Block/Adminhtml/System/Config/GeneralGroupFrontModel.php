@@ -4,26 +4,23 @@ namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Magento\Config\Block\System\Config\Form\Fieldset as BlockFieldSet;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class GeneralGroupFrontModel extends BlockFieldSet
 {
-    private Config $config;
+    private $config;
 
     public function __construct(
         \Magento\Backend\Block\Context $context,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\View\Helper\Js $jsHelper,
         Config $config,
-        array $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null
+        array $data = []
     ) {
         parent::__construct(
             $context,
             $authSession,
             $jsHelper,
-            $data,
-            $secureRenderer
+            $data
         );
         $this->config = $config;
     }
