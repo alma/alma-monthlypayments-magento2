@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v3.1.1
+------
+* fix: cart eligibility translations
+* fix: SecureHtmlRenderer does not exist
+* fix: Parse error: syntax error unexpected 'Config'
+
 v3.1.0
 ------
 * New Alma logo ! 
