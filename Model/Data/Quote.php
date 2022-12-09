@@ -122,7 +122,7 @@ class Quote
     public function lineItemsDataFromQuote(MagentoQuote $quote): array
     {
         $data = [];
-        $items = $quote->getAllItems();
+        $items = $quote->getAllVisibleItems();
 
         /** @var Item $item */
         foreach ($items as $item) {
