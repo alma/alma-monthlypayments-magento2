@@ -32,6 +32,7 @@ use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -41,9 +42,9 @@ class ApiUrlValue extends Value implements ProcessorInterface
     protected $oldUrlPath = null;
 
     /**
-     * @var StoreManagerInterface
+     * @var Url
      */
-    private $storeManager;
+    private $url;
 
     /**
      * ApiUrlValue constructor.
@@ -51,34 +52,32 @@ class ApiUrlValue extends Value implements ProcessorInterface
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
-     * @param StoreManagerInterface $storeManager
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
+     * @param Url $url
      * @param array $data
      */
     public function __construct(
+        Url $url,
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        StoreManagerInterface $storeManager,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
-        $this->storeManager = $storeManager;
+        $this->url = $url;
     }
 
     /**
      * @inheritDoc
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function processValue($value): string
     {
         if (empty($value)) {
-            $value = $this->storeManager->getStore()->getUrl(
+            $value = $this->url->getUrl(
                 $this->urlPath,
                 ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
             );
@@ -88,14 +87,12 @@ class ApiUrlValue extends Value implements ProcessorInterface
 
     /**
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getOldDefaultUrl(): string
     {
-        return $this->storeManager->getStore()->getUrl(
+        return $this->url->getUrl(
             $this->oldUrlPath,
             ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
         );
     }
 }
-
