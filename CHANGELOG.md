@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v3.1.2
+------
+* fix: sql error for product without category
+* fix: remove backend path in return url
+* fix: readme composer vendor name
+* fix: init empty message
+
 v3.1.1
 ------
 * fix: cart eligibility translations
