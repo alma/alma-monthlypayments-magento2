@@ -22,7 +22,7 @@ You first need to create your merchant account on [dashboard.getalma.eu](https:/
 The easiest way to install the extension is to use Composer:
 
 ```bash
-$ composer require alma/alma-monthlypayments-magento2
+$ composer require almapay/alma-monthlypayments-magento2
 $ bin/magento module:enable Alma_MonthlyPayments
 $ bin/magento setup:upgrade && bin/magento setup:static-content:deploy
 ```
