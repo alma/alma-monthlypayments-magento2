@@ -141,7 +141,6 @@ class Quote
                 'is_virtual' => $item->getIsVirtual(),
             ];
         }
-        $this->logger->info('$data', [$data]);
         return $data;
     }
 
@@ -172,7 +171,7 @@ class Quote
         $productCategories = [];
         foreach ($categoryCollection as $cate) {
             /** @var $cate Category */
-            $productCategories[] = $cate->getData('name');
+            $productCategories[] = $cate->getData('url_path') ?: $cate->getData('name');
         }
         return $productCategories;
     }
@@ -181,20 +180,16 @@ class Quote
      * Get category collection by
      *
      * @param array $categoryIds
-     * @param int $level
      *
      * @return Collection
      * @throws LocalizedException
      */
-    public function getCategoryCollection(array $categoryIds, int $level = 2): Collection
+    public function getCategoryCollection(array $categoryIds): Collection
     {
         $collection = $this->collectionFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addAttributeToFilter('entity_id', $categoryIds);
         $collection->addIsActiveFilter();
-        // select categories of certain level
-        $collection->addLevelFilter($level);
-
         return $collection;
     }
 }
