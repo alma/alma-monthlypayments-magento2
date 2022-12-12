@@ -34,7 +34,6 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\Quote\AddressAdapter;
 use Magento\Quote\Model\Quote as MagentoQuote;
@@ -122,7 +121,7 @@ class Quote
     public function lineItemsDataFromQuote(MagentoQuote $quote): array
     {
         $data = [];
-        $items = $quote->getAllItems();
+        $items = $quote->getAllVisibleItems();
 
         /** @var Item $item */
         foreach ($items as $item) {
@@ -142,7 +141,6 @@ class Quote
                 'is_virtual' => $item->getIsVirtual(),
             ];
         }
-        $this->logger->info('$data', [$data]);
         return $data;
     }
 
@@ -155,6 +153,9 @@ class Quote
     private function getProductCategories(Product $product): array
     {
         $categoryIds = $product->getCategoryIds();
+        if (empty($categoryIds)) {
+            return [];
+        }
         try {
             $categoryCollection = $this->getCategoryCollection($categoryIds);
         } catch (LocalizedException $e) {
@@ -170,9 +171,8 @@ class Quote
         $productCategories = [];
         foreach ($categoryCollection as $cate) {
             /** @var $cate Category */
-            $productCategories[] = $cate->getData('url_path');
+            $productCategories[] = $cate->getData('url_path') ?: $cate->getData('name');
         }
-
         return $productCategories;
     }
 
@@ -180,20 +180,16 @@ class Quote
      * Get category collection by
      *
      * @param array $categoryIds
-     * @param int $level
      *
      * @return Collection
      * @throws LocalizedException
      */
-    public function getCategoryCollection(array $categoryIds, int $level = 1): Collection
+    public function getCategoryCollection(array $categoryIds): Collection
     {
         $collection = $this->collectionFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addAttributeToFilter('entity_id', $categoryIds);
         $collection->addIsActiveFilter();
-        // select categories of certain level
-        $collection->addLevelFilter($level);
-
         return $collection;
     }
 }

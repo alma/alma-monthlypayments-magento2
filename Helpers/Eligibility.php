@@ -117,6 +117,7 @@ class Eligibility extends AbstractHelper
         $this->alreadyLoaded = false;
         $this->eligible = false;
         $this->currentFeePlans = [];
+        $this->message = '';
     }
 
     /**
