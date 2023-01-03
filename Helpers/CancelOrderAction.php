@@ -88,6 +88,6 @@ class CancelOrderAction extends Action
 
     private function redirectToCart()
     {
-        return $this->_redirect('checkout/cart');
+        return $this->_redirect('checkout', ['_fragment' => 'payment']);
     }
 }
