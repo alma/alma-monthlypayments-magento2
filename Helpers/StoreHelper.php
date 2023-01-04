@@ -9,7 +9,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreResolver;
+use Magento\Store\Model\StoreManagerInterface;
 
 class StoreHelper extends AbstractHelper
 {
@@ -17,6 +17,7 @@ class StoreHelper extends AbstractHelper
     const AREA_BACK = 'adminhtml';
     const AREA_API = 'webapi_rest';
     const AREA_CRON = 'crontab';
+    const AREA_GRAPHQL = 'graphql';
 
     /**
      * @var Logger
@@ -31,21 +32,21 @@ class StoreHelper extends AbstractHelper
      */
     private $request;
     /**
-     * @var StoreResolver
+     * @var StoreManagerInterface
      */
-    private $storeResolver;
+    private $storeManagement;
 
     /**
      * @param Context $context
      * @param State $state
-     * @param StoreResolver $storeResolver
      * @param RequestInterface $request
+     * @param StoreManagerInterface $storeManagement
      * @param Logger $logger
      */
     public function __construct(
         Context $context,
         State $state,
-        StoreResolver $storeResolver,
+        StoreManagerInterface $storeManagement,
         RequestInterface $request,
         Logger $logger
     ) {
@@ -53,7 +54,7 @@ class StoreHelper extends AbstractHelper
         $this->logger = $logger;
         $this->state = $state;
         $this->request = $request;
-        $this->storeResolver = $storeResolver;
+        $this->storeManagement = $storeManagement;
     }
 
     /**
@@ -76,17 +77,15 @@ class StoreHelper extends AbstractHelper
     public function getStoreId(): string
     {
         $areaCode = $this->getAreaCode();
-        switch ($areaCode) {
-            case self::AREA_FRONT:
-            case self::AREA_API:
-            case self::AREA_CRON:
-                return $this->storeResolver->getCurrentStoreId();
-            case self::AREA_BACK:
-                return $this->backStoreId();
-            default:
-                $this->logger->error('Error in Area Code', [$areaCode]);
-                return '0';
+        if ($areaCode === self::AREA_BACK) {
+            return $this->backStoreId();
         }
+        if (!in_array($areaCode, [self::AREA_FRONT, self::AREA_API, self::AREA_CRON, self::AREA_GRAPHQL])) {
+            $this->logger->error('Error in Area Code', [$areaCode]);
+        }
+        $this->logger->error('$this->storeManagement->getStore()->getId()', [$this->storeManagement->getStore()->getId()]);
+
+        return $this->storeManagement->getStore()->getId();
     }
 
     /**
@@ -133,5 +132,4 @@ class StoreHelper extends AbstractHelper
         }
         return '0';
     }
-
 }
