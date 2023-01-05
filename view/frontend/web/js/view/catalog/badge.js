@@ -30,17 +30,22 @@ define([
     'widgets/Alma',
     'jquery',
     'Magento_Catalog/js/price-utils'
-], function (Alma, $, priceUtils){
+], function (Alma, $){
     'use strict';
 
     return function (config){
         var priceContainer = getHtmlPriceContainer(config.productId, false);
+
         priceContainer.on('DOMSubtreeModified', function () {
             updateWidget();
         });
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
-        var qtyNode = document.getElementById('qty');
-        qtyNode.addEventListener("input",function(){updateWidget()});
+
+        if (config.useQuantityForWidgetPrice) {
+            var qtyNode = document.getElementById('qty');
+
+            qtyNode.addEventListener('input',function () {updateWidget();});
+        }
 
         moveToCustomPosition(config.customDisplay, config.containerId);
         updateWidget();
@@ -55,7 +60,7 @@ define([
                 }
             );
         }
-    }
+    };
 
     /**
      *
