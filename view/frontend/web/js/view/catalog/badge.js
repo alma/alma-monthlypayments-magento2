@@ -37,7 +37,9 @@ define([
         var priceContainer = getHtmlPriceContainer(config.productId, false);
 
         priceContainer.on('DOMSubtreeModified', function () {
-            updateWidget();
+            if (config.useQuantityForWidgetPrice) {
+                updateWidget();
+            }
         });
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
 
