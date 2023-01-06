@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v3.1.3
+------
+* feat: redirection to payment page after cancel order
+
 v3.1.2
 ------
 * fix: sql error for product without category
