@@ -81,9 +81,8 @@ class StoreHelper extends AbstractHelper
             return $this->backStoreId();
         }
         if (!in_array($areaCode, [self::AREA_FRONT, self::AREA_API, self::AREA_CRON, self::AREA_GRAPHQL])) {
-            $this->logger->error('Error in Area Code', [$areaCode]);
+            $this->logger->warning('Error in Area Code', [$areaCode]);
         }
-        $this->logger->error('$this->storeManagement->getStore()->getId()', [$this->storeManagement->getStore()->getId()]);
 
         return $this->storeManagement->getStore()->getId();
     }
