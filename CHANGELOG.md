@@ -3,6 +3,8 @@ Changelog
 
 v3.1.3
 ------
+* fix: product page TTC price when "Update with qty" is false
+* feat: No refresh widget when "Update with qty" is false
 * feat: redirection to payment page after cancel order
 
 v3.1.2
