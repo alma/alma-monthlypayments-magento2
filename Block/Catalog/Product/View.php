@@ -244,7 +244,7 @@ class View extends ProductView
      */
     public function getPrice(): ?int
     {
-        return Functions::priceToCents($this->getProduct()->getFinalPrice());
+        return Functions::priceToCents($this->getProduct()->getPriceInfo()->getPrice('final_price')->getAmount()->getValue());
     }
 
     /**
