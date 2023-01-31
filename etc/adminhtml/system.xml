@@ -124,8 +124,9 @@
                        showInWebsite="1" showInStore="1">
                     <label>Payment method configuration</label>
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\GeneralGroupFrontModel</frontend_model>
-                    <field id="payment_expiration" translate="label" sortOrder="20" showInDefault="1">
+                    <field id="payment_expiration" translate="label comment" sortOrder="20" showInDefault="1">
                         <label>Payment expiration time</label>
+                        <comment>Duration in minutes.</comment>
                         <config_path>payment/alma_monthly_payments/payment_expiration</config_path>
                         <frontend_class>validate-number</frontend_class>
                     </field>

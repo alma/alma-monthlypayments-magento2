@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v3.2.0
+------
+* fix: Add unit of time in Payment expiration time comment.
+
 v3.1.3
 ------
 * fix: StoreResolver GraphQl compatibility
