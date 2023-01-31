@@ -138,16 +138,16 @@
                     </field>
                 </group>
                 <!-- PAYMENT ON TRIGGER DISPLAY CONFIGURATION -->
-                <group id="alma_trigger_config" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="alma_trigger_config" translate="label comment" type="text" sortOrder="15" showInDefault="0" showInWebsite="0" showInStore="0">
                     <label>Payment upon trigger</label>
                     <comment>This option is available only for Alma payment in 2x, 3x and 4x. When it's turned on, your clients will pay the first installment at the order status change. When your client order on your website, Alma will only ask for a payment authorization. Only status handled by Alma are available in the menu below. Please contact Alma if you need us to add another status.</comment>
-                    <field id="trigger_is_allowed" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="trigger_is_allowed" translate="label comment" type="select" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="0">
                         <label>Payment on trigger allowed on alma dashboard</label>
                         <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\TriggerAllowed</frontend_model>
                         <source_model>Alma\MonthlyPayments\Model\Adminhtml\Config\TriggerIsAllowed</source_model>
                         <config_path>payment/alma_monthly_payments/trigger_is_allowed</config_path>
                     </field>
-                    <field id="trigger_is_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="trigger_is_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="0">
                         <depends>
                             <field id="trigger_is_allowed">1</field>
                         </depends>
@@ -155,7 +155,7 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/alma_monthly_payments/trigger_is_enabled</config_path>
                     </field>
-                    <field id="trigger_typology" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="trigger_typology" translate="label comment" type="select" sortOrder="30" showInDefault="0" showInWebsite="0" showInStore="0">
                         <depends>
                             <field id="trigger_is_allowed">1</field>
                             <field id="trigger_is_enabled">1</field>
