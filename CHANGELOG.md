@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v3.2.0
+------
+* feat: change payment uppon trigger visibility
+
 v3.1.3
 ------
 * fix: StoreResolver GraphQl compatibility
