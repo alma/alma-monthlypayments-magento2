@@ -3,7 +3,10 @@ Changelog
 
 v3.2.0
 ------
+
+* fix: Add unit of time in Payment expiration time comment.
 * feat: change payment uppon trigger visibility
+
 
 v3.1.3
 ------
