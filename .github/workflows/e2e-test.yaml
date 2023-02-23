@@ -46,7 +46,7 @@ jobs:
             "name": "e2e-${{ github.run_id }}",
             "alma_plugin_branch": "${{ github.head_ref || github.ref_name }}",
             "alma_plugin_test_branch" : "main",
-            "cms": "adobe_commerce-${{ matrix.version }}",
+            "cms": "adobe-commerce-${{ matrix.version }}",
             "e2e": "true",
             "e2e_check_id": "${{ steps.e2e_status.outputs.check_id }}",
             "e2e_check_origin" : "${{ github.repository }}"
