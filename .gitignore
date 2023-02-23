@@ -1,3 +1,4 @@
 vendor
 .DS_Store
 auth.json
+/composer.lock

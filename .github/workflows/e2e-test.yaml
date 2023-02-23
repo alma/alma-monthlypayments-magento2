@@ -1,0 +1,60 @@
+---
+name: E2E Test
+on:
+  pull_request:
+    branches:
+      - "master"
+  workflow_dispatch:
+
+jobs:
+  launch:
+    strategy:
+      matrix:
+        version:
+        - 2.4.5
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get only last part of branch name in $SLUG_VERSION env var
+      run:  |
+        VERSION=${{ matrix.version }}
+        echo "SLUG_VERSION=${VERSION//./-}" >> $GITHUB_ENV
+
+    - name: Generate token
+      id: generate_token
+      uses: tibdex/github-app-token@v1.7.0
+      continue-on-error: true
+      with:
+        app_id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
+        private_key: ${{ secrets.ALMA_UPDATE_CHECKS_APP_PEM }}
+
+    - uses: LouisBrunner/checks-action@v1.5.0
+      id: e2e_status
+      with:
+        token: ${{ steps.generate_token.outputs.token }}
+        name: E2E Test / result (${{ matrix.version }})
+        status: "in_progress"
+
+    - name: Invoke e2e workflow with inputs
+      uses: benc-uk/workflow-dispatch@v1.2.2
+      with:
+        workflow: Deploy CMS
+        token: ${{ secrets.INFRA_WORKFLOW_TRIGGER_TOKEN }}
+        repo: "alma/integration-infrastructure"
+        ref: "main"
+        inputs: >
+          {
+            "name": "e2e-${{ github.run_id }}",
+            "alma_plugin_branch": "${{ github.head_ref || github.ref_name }}",
+            "alma_plugin_test_branch" : "main",
+            "cms": "adobe_commerce-${{ matrix.version }}",
+            "e2e": "true",
+            "e2e_check_id": "${{ steps.e2e_status.outputs.check_id }}",
+            "e2e_check_origin" : "${{ github.repository }}"
+          }
+
+    - uses: LouisBrunner/checks-action@v1.5.0
+      if: failure()
+      with:
+        token: ${{ steps.generate_token.outputs.token }}
+        check_id: ${{ steps.e2e_status.outputs.check_id }}
+        conclusion: failure
