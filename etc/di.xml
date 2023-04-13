@@ -106,6 +106,7 @@
                 <item name="payment" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder</item>
                 <item name="customer" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\CustomerDataBuilder</item>
                 <item name="order" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\OrderDataBuilder</item>
+                <item name="cart" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\CartDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
