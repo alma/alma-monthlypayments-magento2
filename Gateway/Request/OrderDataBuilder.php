@@ -76,10 +76,7 @@ class OrderDataBuilder implements BuilderInterface
 
         return [
             'order' => [
-                'merchant_reference' => $order->getOrderIncrementId(),
-                'data' => [
-                    'line_items' => $this->quoteData->lineItemsDataFromQuote($quote)
-                ]
+                'merchant_reference' => $order->getOrderIncrementId()
             ],
         ];
     }
