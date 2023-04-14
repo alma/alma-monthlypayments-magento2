@@ -69,6 +69,7 @@ class PaymentDataBuilder implements BuilderInterface
      * @param Config $config
      * @param Resolver $locale
      * @param ConfigHelper $configHelper
+     * @param CartDataBuilder $cartDataBuilder
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -108,7 +109,7 @@ class PaymentDataBuilder implements BuilderInterface
             'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
             'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
             'failure_return_url' => $this->config->getFailureReturnUrl(),
-            'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
+            'purchase_amount' => Functions::priceToCents($order->getGrandTotalAmount()),
             'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
             'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
             'locale' => $this->locale->getLocale(),
