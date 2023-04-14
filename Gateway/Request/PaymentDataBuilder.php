@@ -29,9 +29,12 @@ use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -56,6 +59,14 @@ class PaymentDataBuilder implements BuilderInterface
      * @var ConfigHelper
      */
     private $configHelper;
+    /**
+     * @var CartDataBuilder
+     */
+    private $cartDataBuilder;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * PaymentDataBuilder constructor.
@@ -69,12 +80,16 @@ class PaymentDataBuilder implements BuilderInterface
         CheckoutSession $checkoutSession,
         Config          $config,
         Resolver        $locale,
-        ConfigHelper    $configHelper
+        ConfigHelper    $configHelper,
+        CartDataBuilder $cartDataBuilder,
+        Logger $logger
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
         $this->locale = $locale;
         $this->configHelper = $configHelper;
+        $this->cartDataBuilder = $cartDataBuilder;
+        $this->logger = $logger;
     }
 
     /**
@@ -111,8 +126,9 @@ class PaymentDataBuilder implements BuilderInterface
                 'quote_id' => $quoteId,
             ],
         ];
+        $cartData = $this->cartDataBuilder->build($buildSubject);
         $configArray = $this->trigger($configArray, $planConfig);
-        return ['payment' => array_merge($planConfig->getPaymentData(), $configArray)];
+        return ['payment' => array_merge($planConfig->getPaymentData(), $configArray, $cartData)];
     }
 
     /**
