@@ -34,33 +34,6 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 class OrderDataBuilder implements BuilderInterface
 {
     /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-
-    /**
-     * @var AlmaQuote
-     */
-    private $quoteData;
-
-    /**
-     * OrderDataBuilder constructor.
-     * @param UrlInterface $urlBuilder
-     * @param CheckoutSession $checkoutSession
-     * @param AlmaQuote $quoteData
-     */
-    public function __construct(UrlInterface $urlBuilder, CheckoutSession $checkoutSession, AlmaQuote $quoteData)
-    {
-        $this->urlBuilder = $urlBuilder;
-        $this->checkoutSession = $checkoutSession;
-        $this->quoteData = $quoteData;
-    }
-
-    /**
      * Builds ENV request
      *
      * @param array $buildSubject
@@ -72,7 +45,6 @@ class OrderDataBuilder implements BuilderInterface
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $order = $paymentDO->getOrder();
-        $quote = $this->checkoutSession->getQuote();
 
         return [
             'order' => [

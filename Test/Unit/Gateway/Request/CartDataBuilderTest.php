@@ -73,10 +73,7 @@ class CartDataBuilderTest extends TestCase
     public function testBuild($dataObject, $expectedPayload):void
     {
         $cartDataBuilder = $this->createCartDataBuilderTest();
-        try {
-            $this->assertEquals($expectedPayload, $cartDataBuilder->build($dataObject));
-        } catch (NoSuchEntityException | LocalizedException $e) {
-        }
+        $this->assertEquals($expectedPayload, $cartDataBuilder->build($dataObject));
     }
 
     public function cartPayloadDataProvider():array
