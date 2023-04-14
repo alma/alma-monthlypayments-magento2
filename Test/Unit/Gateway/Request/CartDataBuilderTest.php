@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class CartDataBuilderTest extends TestCase
 {
-    const MEDIA_BASE_URL = 'http://adobe-commerce-a-2-4-5.local.test/media/';
+    const MEDIA_BASE_URL = 'https://adobe-commerce-a-2-4-5.local.test/media/';
     /**
      * @var Logger
      */
@@ -329,7 +329,7 @@ class CartDataBuilderTest extends TestCase
     ):Item {
         $product = $this->createMock(Product::class);
         $product->method('getCategoryIds')->willReturn($categories);
-        $product->method('getProductUrl')->willReturn('http://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html');
+        $product->method('getProductUrl')->willReturn('https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html');
         $product->method('getImage')->willReturn('/w/b/wb04-blue-0.jpg');
 
         $item = $this->createMock(Item::class);
@@ -367,7 +367,7 @@ class CartDataBuilderTest extends TestCase
             'line_price' => $rowPrice,
             'is_gift' => false,
             'categories' => $categories,
-            'url' => 'http://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html',
+            'url' => 'https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html',
             'picture_url' => self::MEDIA_BASE_URL . 'catalog/product' . '/w/b/wb04-blue-0.jpg',
             'requires_shipping' => !$isVirtual,
             'taxes_included' => $taxAmount
