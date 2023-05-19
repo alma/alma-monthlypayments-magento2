@@ -45,6 +45,12 @@ class Functions
         return (int)(round($price * 100));
     }
 
+    /**
+    * Get payment type with plankey
+    *
+    * @param string $planKey
+    * @return string
+     */
     public static function getPaymentType(string $planKey): string
     {
         $matches = [];

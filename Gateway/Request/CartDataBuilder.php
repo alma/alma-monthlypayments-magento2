@@ -147,15 +147,13 @@ class CartDataBuilder implements BuilderInterface
      */
     private function getMediaUrl(string $path): string
     {
-        $url = '';
-
         try {
-            $url = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $path;
+            return $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $path;
         } catch (NoSuchEntityException $e) {
             $this->logger->warning('Error in get media base url:', [$e->getMessage()]);
         }
 
-        return $url;
+        return '';
     }
 
     /**
@@ -168,7 +166,6 @@ class CartDataBuilder implements BuilderInterface
     {
         $productsIds = [];
         foreach ($orderItems as $item) {
-
             if (!$item->isDummy()) {
                 $productsIds[] = $item->getProductId();
             }
@@ -184,7 +181,6 @@ class CartDataBuilder implements BuilderInterface
      */
     private function formatCategoriesInArray(Collection $productsCategories): array
     {
-
         $categories = [];
         foreach ($productsCategories as $category) {
             /** @var Category $category */
