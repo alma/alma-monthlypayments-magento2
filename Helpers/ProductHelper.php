@@ -6,6 +6,7 @@ use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
+
 class ProductHelper
 {
     /**
