@@ -1,6 +1,6 @@
 <?php
 /**
- * 2018-2019 Alma SAS
+ * 2018-2023 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -18,7 +18,7 @@
  * IN THE SOFTWARE.
  *
  * @author    Alma SAS <contact@getalma.eu>
- * @copyright 2018-2019 Alma SAS
+ * @copyright 2018-2023 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
@@ -26,7 +26,11 @@ namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Catalog\Model\CategoryRepository;
+use Alma\MonthlyPayments\Helpers\ProductHelper;
+use Magento\Catalog\Model\Category;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -34,6 +38,9 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Sales\Model\Order\Item;
 use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * CartDataBuilder build Cart Data for Alma credit Payment Payload
+ */
 class CartDataBuilder implements BuilderInterface
 {
     /**
@@ -41,24 +48,95 @@ class CartDataBuilder implements BuilderInterface
      */
     private $logger;
     /**
-     * @var CategoryRepository
-     */
-    private $categoryRepository;
-    /**
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var ProductHelper
+     */
+    private $productHelper;
 
     /**
      * @param Logger $logger
-     * @param CategoryRepository $categoryRepository
      * @param StoreManagerInterface $storeManager
+     * @param ProductHelper $productHelper
      */
-    public function __construct(Logger $logger, CategoryRepository $categoryRepository, StoreManagerInterface $storeManager)
-    {
+    public function __construct(
+        Logger $logger,
+        StoreManagerInterface $storeManager,
+        ProductHelper $productHelper
+    ) {
         $this->logger = $logger;
-        $this->categoryRepository = $categoryRepository;
         $this->storeManager = $storeManager;
+        $this->productHelper = $productHelper;
+    }
+
+    /**
+     * Build cart data for payload
+     *
+     * @param array $buildSubject
+     * @return array[]
+     */
+    public function build(array $buildSubject): array
+    {
+        $paymentDO = SubjectReader::readPayment($buildSubject);
+        $orderItems = $paymentDO->getOrder()->getItems();
+        $productsIds = $this->getProductsIds($orderItems);
+        $products = $this->productHelper->getProductsItems($productsIds);
+        $productsCategories = $this->productHelper->getProductsCategories($products);
+        $categories = $this->formatCategoriesInArray($productsCategories);
+        $dataForCartItemPayload = $this->formatDataForPayload($orderItems, $products, $categories);
+
+        return [
+            'cart' => [
+                'items' =>  $this->formatOrderItems($dataForCartItemPayload)
+            ],
+        ];
+    }
+
+    /**
+     * Parse order items for formatting
+     *
+     * @param array $dataProducts
+     * @return array
+     */
+    private function formatOrderItems(array $dataProducts): array
+    {
+        $formattedItems = [];
+
+        foreach ($dataProducts as $data) {
+            if (isset($data['item']) && isset($data['product']) && isset($data['categories'])) {
+                $formattedItems[] = $this->formatItem($data);
+            } else {
+                $this->logger->warning(' Error with cart data payload', [$data]);
+            }
+        }
+        return $formattedItems;
+    }
+
+    /**
+     * Format array with order item, product, and categories for payment payload
+     *
+     * @param array $data
+     * @return array
+     */
+    private function formatItem(array $data): array
+    {
+        return [
+            'sku' => $data['item']->getSku(),
+            'vendor' => '',
+            'title' => $data['item']->getName(),
+            'variant_title' => $data['item']->getProductOptions()['simple_name'] ?? '',
+            'quantity' => (int) $data['item']->getQtyOrdered(),
+            'unit_price' => Functions::priceToCents($data['item']->getPriceInclTax()),
+            'line_price' => Functions::priceToCents($data['item']->getBaseRowTotalInclTax()),
+            'is_gift' => false,
+            'categories' => $data['categories'],
+            'url' => $data['product']->getProductUrl(),
+            'picture_url' => $this->getMediaUrl($data['product']->getImage()),
+            'requires_shipping' => !$data['item']->getIsVirtual(),
+            'taxes_included' => (bool) $data['item']->getTaxAmount()
+        ];
     }
 
     /**
@@ -81,82 +159,67 @@ class CartDataBuilder implements BuilderInterface
     }
 
     /**
-     * Build cart data for payload
+     * Get all non dummy productsIds for orderItems
      *
-     * @param array $buildSubject
-     * @return array[]
-     */
-    public function build(array $buildSubject): array
-    {
-        $paymentDO = SubjectReader::readPayment($buildSubject);
-        $orderItems = $paymentDO->getOrder()->getItems();
-
-        return [
-            'cart' => [
-                'items' =>  $this->formatOrderItems($orderItems)
-            ],
-        ];
-    }
-
-    /**
-     * Parse order items for formatting
-     *
-     * @param Item[] $orderItems
+     * @param array $orderItems
      * @return array
      */
-    private function formatOrderItems(array $orderItems): array
+    private function getProductsIds(array $orderItems): array
     {
-        $formattedItems = [];
+        $productsIds = [];
         foreach ($orderItems as $item) {
+
             if (!$item->isDummy()) {
-                $formattedItems[] = $this->formatItem($item);
+                $productsIds[] = $item->getProductId();
             }
         }
-        return $formattedItems;
+        return $productsIds;
     }
 
     /**
-     * Format Order item for payment payload
+     * Format categories collection in associative array ['entity_id' => Category]
      *
-     * @param Item $item
+     * @param Collection $productsCategories
      * @return array
      */
-    private function formatItem(Item $item): array
+    private function formatCategoriesInArray(Collection $productsCategories): array
     {
-        return [
-            'sku' => $item->getSku(),
-            'vendor' => '',
-            'title' => $item->getName(),
-            'variant_title' => $item->getProductOptions()['simple_name'] ?? '',
-            'quantity' => (int) $item->getQtyOrdered(),
-            'unit_price' => Functions::priceToCents($item->getPriceInclTax()),
-            'line_price' => Functions::priceToCents($item->getBaseRowTotalInclTax()),
-            'is_gift' => false,
-            'categories' => $this->getCategoryNames($item->getProduct()->getCategoryIds()),
-            'url' => $item->getProduct()->getProductUrl(),
-            'picture_url' => $this->getMediaUrl($item->getProduct()->getImage()),
-            'requires_shipping' => !$item->getIsVirtual(),
-            'taxes_included' => (bool) $item->getTaxAmount()
-        ];
+
+        $categories = [];
+        foreach ($productsCategories as $category) {
+            /** @var Category $category */
+            $categories[$category->getEntityId()] = $category->getName();
+        }
+        return $categories;
     }
 
     /**
-     * Get categories name by ID
-     *
-     * @param array $ids
+     * @param array $orderItems
+     * @param ProductCollection $products
+     * @param array $categories
      * @return array
      */
-    private function getCategoryNames(array $ids):array
+    private function formatDataForPayload(array $orderItems, ProductCollection $products, array $categories): array
     {
-        $categoryNames = [];
-        foreach ($ids as $id) {
-            try {
-                $name = $this->categoryRepository->get($id)->getName();
-                $categoryNames[] = $name;
-            } catch (NoSuchEntityException $e) {
-                $this->logger->warning('No category for id', [$id]);
+        $dataForCartItemPayload = [];
+        foreach ($orderItems as $item) {
+            /** @var Item $item */
+            if (!$item->isDummy()) {
+                $dataForCartItemPayload[$item->getProductId()]['item'] = $item;
             }
         }
-        return $categoryNames;
+
+        foreach ($products as $product) {
+            /** @var Product $product */
+            $dataForCartItemPayload[$product->getEntityId()]['product'] = $product;
+            $productCategoriesNames = [];
+            foreach ($product->getCategoryIds() as $categoryId) {
+                if (isset($categories[$categoryId])) {
+                    $productCategoriesNames[] = $categories[$categoryId];
+                }
+            }
+            $dataForCartItemPayload[$product->getEntityId()]['categories'] = $productCategoriesNames;
+        }
+        return $dataForCartItemPayload;
     }
 }

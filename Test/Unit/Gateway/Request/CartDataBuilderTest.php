@@ -4,12 +4,13 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Request\CartDataBuilder;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\ProductHelper;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Helper\Image;
-use Magento\Catalog\Model\CategoryRepository;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollectionAlias;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Sales\Model\Order\Item;
@@ -29,22 +30,9 @@ class CartDataBuilderTest extends TestCase
     {
         $this->logger = $this->createMock(Logger::class);
 
-        $catGear = $this->createMock(CategoryInterface::class);
-        $catGear->method('getName')->willReturn('Gear');
-        $catBag = $this->createMock(CategoryInterface::class);
-        $catBag->method('getName')->willReturn('Bags');
         $this->imageHelper = $this->createMock(Image::class);
         $this->imageHelper->method('init')->willReturn($this->imageHelper);
         $this->imageHelper->method('getUrl')->willReturn('');
-
-        $categoryMap = ['3'=>$catGear,'4'=>$catBag];
-        $this->categoryRepository = $this->createMock(CategoryRepository::class);
-        $this->categoryRepository->expects($this->any())->method('get')->with($this->isType('string'))->will($this->returnCallback(function ($argument) use ($categoryMap) {
-            if (!isset($categoryMap[$argument])) {
-                return '';
-            }
-            return $categoryMap[$argument];
-        }));
 
         $storeInterface = $this->createMock(Store::class);
         $storeInterface->method('getBaseUrl')->willReturn(self::MEDIA_BASE_URL);
@@ -56,8 +44,8 @@ class CartDataBuilderTest extends TestCase
     {
         return [
             $this->logger,
-            $this->categoryRepository,
-            $this->storeManagerInterface
+            $this->storeManagerInterface,
+            $this->productHelper
         ];
     }
     private function createCartDataBuilderTest(): CartDataBuilder
@@ -70,15 +58,47 @@ class CartDataBuilderTest extends TestCase
      *
      * @return void
      */
-    public function testBuild($dataObject, $expectedPayload):void
+    public function testBuild(array $dataItems, $expectedPayload):void
     {
+        $products = [];
+        $items = [];
+        foreach ($dataItems as $data) {
+            $products[] = $this->productFactory(...$data);
+            $items[] = $this->itemFactory(...$data);
+        }
+
+
+        $productIterator = new \ArrayIterator($products);
+        $productCollectionMock = $this->createMock(ProductCollectionAlias::class);
+        $productCollectionMock->method('getIterator')->willReturn($productIterator);
+
+        $catGear = $this->createMock(Category::class);
+        $catGear->method('getEntityId')->willReturn('3');
+        $catGear->method('getName')->willReturn('Gear');
+        $catBag = $this->createMock(Category::class);
+        $catBag->method('getEntityId')->willReturn('4');
+        $catBag->method('getName')->willReturn('Bags');
+        $categoriesCollectionMock = $this->createMock(Collection::class);
+        $categoryIterator = new \ArrayIterator([$catGear,$catBag]);
+        $categoriesCollectionMock->method('getIterator')->willReturn($categoryIterator);
+
+        $this->productHelper = $this->createMock(ProductHelper::class);
+        $this->productHelper->method('getProductsItems')->willReturn($productCollectionMock);
+        $this->productHelper->method('getProductsCategories')->willReturn($categoriesCollectionMock);
+
         $cartDataBuilder = $this->createCartDataBuilderTest();
-        $this->assertEquals($expectedPayload, $cartDataBuilder->build($dataObject));
+        $this->assertEquals(
+            $expectedPayload,
+            $cartDataBuilder->build(
+                ["payment" => $this->createPaymentDataObject($items)]
+            )
+        );
     }
 
     public function cartPayloadDataProvider():array
     {
-        $simple1 = $this->itemFactory(
+        $simple1 = [
+            '1',
             'base-01',
             'Simple product 1',
             2.0,
@@ -86,7 +106,7 @@ class CartDataBuilderTest extends TestCase
             44.60,
             0,
             2.10
-        );
+        ];
         $formattedSimple1 = $this->formattedItemFactory(
             'base-01',
             'Simple product 1',
@@ -97,7 +117,8 @@ class CartDataBuilderTest extends TestCase
             false,
             true
         );
-        $simple2 = $this->itemFactory(
+        $simple2 = [
+            '2',
             'base-02',
             'Simple product 2',
             1.0,
@@ -105,7 +126,7 @@ class CartDataBuilderTest extends TestCase
             24.30,
             0,
             1.10
-        );
+        ];
         $formattedSimple2 = $this->formattedItemFactory(
             'base-02',
             'Simple product 2',
@@ -116,7 +137,8 @@ class CartDataBuilderTest extends TestCase
             false,
             true
         );
-        $simpleWithoutCategory = $this->itemFactory(
+        $simpleWithoutCategory = [
+            '3',
             'base-02',
             'Simple product 2',
             1.0,
@@ -125,7 +147,7 @@ class CartDataBuilderTest extends TestCase
             0,
             1.10,
             []
-        );
+        ];
         $formattedSimpleWithoutCategory = $this->formattedItemFactory(
             'base-02',
             'Simple product 2',
@@ -137,7 +159,8 @@ class CartDataBuilderTest extends TestCase
             true,
             []
         );
-        $virtualProduct1 = $this->itemFactory(
+        $virtualProduct1 = [
+            '4',
             'base-02',
             'Simple product 2',
             1.0,
@@ -145,7 +168,7 @@ class CartDataBuilderTest extends TestCase
             24.30,
             1,
             1.10
-        );
+        ];
         $formattedVirtualProduct1 = $this->formattedItemFactory(
             'base-02',
             'Simple product 2',
@@ -156,7 +179,8 @@ class CartDataBuilderTest extends TestCase
             true,
             true
         );
-        $simpleWithoutTax = $this->itemFactory(
+        $simpleWithoutTax = [
+            '5',
             'base-01',
             'Simple product 1',
             2.0,
@@ -164,7 +188,7 @@ class CartDataBuilderTest extends TestCase
             44.60,
             0,
             0
-        );
+        ];
         $formattedSimpleWithoutTax = $this->formattedItemFactory(
             'base-01',
             'Simple product 1',
@@ -176,7 +200,8 @@ class CartDataBuilderTest extends TestCase
             false
         );
 
-        $dummyConfigurableProduct = $this->itemFactory(
+        $dummyConfigurableProduct = [
+            '6',
             'config-dummy-01',
             'Configurable dummy product 1',
             1.0,
@@ -186,8 +211,9 @@ class CartDataBuilderTest extends TestCase
             0,
             ['3','4'],
             true
-        );
-        $configurableProduct = $this->itemFactory(
+        ];
+        $configurableProduct = [
+            '7',
             'config-01',
             'Configurable product 1',
             1.0,
@@ -198,7 +224,7 @@ class CartDataBuilderTest extends TestCase
             ['3','4'],
             false,
             ['simple_name' => 'Configurable product 1 - with variation']
-        );
+        ];
         $formattedConfigurableProduct = $this->formattedItemFactory(
             'config-01',
             'Configurable product 1',
@@ -211,9 +237,7 @@ class CartDataBuilderTest extends TestCase
         );
         return [
             '1 simple product' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([$simple1])
-                ],
+                'products' =>  [$simple1],
                 'expected_payload' => [
                     'cart' => [
                         'items' => [
@@ -223,9 +247,7 @@ class CartDataBuilderTest extends TestCase
                 ]
             ],
             '2 simple products' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([$simple1, $simple2])
-                ],
+                'products' =>  [$simple1, $simple2],
                 'expected_payload' => [
                     'cart' => [
                         'items' => [
@@ -235,9 +257,7 @@ class CartDataBuilderTest extends TestCase
                 ]
             ],
             '1 simple product without category' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([$simpleWithoutCategory])
-                ],
+                'products' =>  [$simpleWithoutCategory],
                 'expected_payload' => [
                     'cart' => [
                         'items' => [
@@ -247,9 +267,7 @@ class CartDataBuilderTest extends TestCase
                 ]
             ],
             '1 virtual product' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([$virtualProduct1])
-                ],
+                'products' =>  [$virtualProduct1],
                 'expected_payload' => [
                     'cart' => [
                         'items' => [
@@ -259,9 +277,7 @@ class CartDataBuilderTest extends TestCase
                 ]
             ],
             '1 simple without tax' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([$simpleWithoutTax])
-                ],
+                'products' =>  [$simpleWithoutTax],
                 'expected_payload' => [
                     'cart' => [
                         'items' => [
@@ -271,9 +287,7 @@ class CartDataBuilderTest extends TestCase
                 ]
             ],
             '1 configurable product with dummy item' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([$configurableProduct, $dummyConfigurableProduct])
-                ],
+                'products' =>  [$configurableProduct, $dummyConfigurableProduct],
                 'expected_payload' => [
                     'cart' => [
                         'items' => [
@@ -283,12 +297,10 @@ class CartDataBuilderTest extends TestCase
                 ]
             ],
             '1 configurable product with dummy item and 1 simple' => [
-                'data_object' => [
-                    'payment' => $this->createPaymentDataObject([
+                'products' =>  [
                         $configurableProduct,
                         $dummyConfigurableProduct,
                         $simple1
-                    ])
                 ],
                 'expected_payload' => [
                     'cart' => [
@@ -313,6 +325,7 @@ class CartDataBuilderTest extends TestCase
     }
 
     private function itemFactory(
+        string $pid,
         string $sku,
         string $name,
         float $qty,
@@ -324,23 +337,39 @@ class CartDataBuilderTest extends TestCase
         bool $dummy = false,
         array $productOptions= []
     ):Item {
-        $product = $this->createMock(Product::class);
-        $product->method('getCategoryIds')->willReturn($categories);
-        $product->method('getProductUrl')->willReturn('https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html');
-        $product->method('getImage')->willReturn('/w/b/wb04-blue-0.jpg');
-
         $item = $this->createMock(Item::class);
+        $item->method('getProductId')->willReturn($pid);
         $item->method('getSku')->willReturn($sku);
         $item->method('getName')->willReturn($name);
         $item->method('getProductOptions')->willReturn($productOptions);
         $item->method('getQtyOrdered')->willReturn($qty);
         $item->method('getPriceInclTax')->willReturn($price);
         $item->method('getBaseRowTotalInclTax')->willReturn($rowPrice);
-        $item->method('getProduct')->willReturn($product);
         $item->method('getIsVirtual')->willReturn($isVirtual);
         $item->method('getTaxAmount')->willReturn($taxAmount);
         $item->method('isDummy')->willReturn($dummy);
         return $item;
+    }
+    private function productFactory(
+        string $pid,
+        string $sku,
+        string $name,
+        float $qty,
+        float $price,
+        float $rowPrice,
+        bool $isVirtual,
+        float $taxAmount,
+        array $categories = ['3','4'],
+        bool $dummy = false,
+        array $productOptions= []
+    ):Product {
+        $product = $this->createMock(Product::class);
+        $product->method('getEntityId')->willReturn($pid);
+        $product->method('getName')->willReturn($name);
+        $product->method('getCategoryIds')->willReturn($categories);
+        $product->method('getProductUrl')->willReturn('https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html');
+        $product->method('getImage')->willReturn('/w/b/wb04-blue-0.jpg');
+        return $product;
     }
 
     private function formattedItemFactory(
