@@ -2,10 +2,10 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Framework\Exception\LocalizedException;
 
 class ProductHelper
 {
@@ -25,6 +25,7 @@ class ProductHelper
     /**
      * @param Logger $logger
      * @param Collection $productCollection
+     * @param CategoryCollection $categoryCollection
      */
     public function __construct(
         Logger $logger,
@@ -37,6 +38,8 @@ class ProductHelper
     }
 
     /**
+     * Get a product collection with product ID array
+     *
      * @param array $productIds
      * @return Collection
      */
@@ -46,6 +49,8 @@ class ProductHelper
     }
 
     /**
+     * Get all product categories id for a product collection
+     *
      * @param Collection $products
      * @return array
      */
@@ -60,6 +65,13 @@ class ProductHelper
         return array_values($categoriesId);
     }
 
+    /**
+     * Get a collection of categories with categories' ID array
+     *
+     * @param Collection $products
+     * @return CategoryCollection
+     * @throws LocalizedException
+     */
     public function getProductsCategories(Collection $products): CategoryCollection
     {
         $categoriesId = $this->getProductsCategoriesIds($products);
