@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v3.3.0
+------
+
+* feat: Add quote items in Alma payment payload for credit.
+
 v3.2.0
 ------
 

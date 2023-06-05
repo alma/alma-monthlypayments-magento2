@@ -28,6 +28,7 @@ namespace Alma\MonthlyPayments\Gateway\Request;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\Eligibility;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
@@ -56,6 +57,10 @@ class PaymentDataBuilder implements BuilderInterface
      * @var ConfigHelper
      */
     private $configHelper;
+    /**
+     * @var CartDataBuilder
+     */
+    private $cartDataBuilder;
 
     /**
      * PaymentDataBuilder constructor.
@@ -64,17 +69,20 @@ class PaymentDataBuilder implements BuilderInterface
      * @param Config $config
      * @param Resolver $locale
      * @param ConfigHelper $configHelper
+     * @param CartDataBuilder $cartDataBuilder
      */
     public function __construct(
         CheckoutSession $checkoutSession,
         Config          $config,
         Resolver        $locale,
-        ConfigHelper    $configHelper
+        ConfigHelper    $configHelper,
+        CartDataBuilder $cartDataBuilder
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
         $this->locale = $locale;
         $this->configHelper = $configHelper;
+        $this->cartDataBuilder = $cartDataBuilder;
     }
 
     /**
@@ -101,7 +109,7 @@ class PaymentDataBuilder implements BuilderInterface
             'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
             'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
             'failure_return_url' => $this->config->getFailureReturnUrl(),
-            'purchase_amount' => Functions::priceToCents((float)$order->getGrandTotalAmount()),
+            'purchase_amount' => Functions::priceToCents($order->getGrandTotalAmount()),
             'shipping_address' => Address::dataFromAddress($order->getShippingAddress()),
             'billing_address' => Address::dataFromAddress($order->getBillingAddress()),
             'locale' => $this->locale->getLocale(),
@@ -111,6 +119,10 @@ class PaymentDataBuilder implements BuilderInterface
                 'quote_id' => $quoteId,
             ],
         ];
+        if (Eligibility::SPREAD_TYPE === Functions::getPaymentType($planKey)) {
+            $cartData = $this->cartDataBuilder->build($buildSubject);
+            $configArray = array_merge($cartData, $configArray);
+        }
         $configArray = $this->trigger($configArray, $planConfig);
         return ['payment' => array_merge($planConfig->getPaymentData(), $configArray)];
     }
