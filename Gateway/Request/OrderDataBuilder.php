@@ -22,12 +22,8 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-
 namespace Alma\MonthlyPayments\Gateway\Request;
 
-use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
-use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
