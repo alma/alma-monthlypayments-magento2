@@ -17,11 +17,17 @@ class OrderDataBuilderTest extends TestCase
      */
     private $logger;
 
+    /**
+     * @return void
+     */
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
     }
 
+    /**
+     * @return Logger[]
+     */
     private function getConstructorDependency(): array
     {
         return [
@@ -29,11 +35,19 @@ class OrderDataBuilderTest extends TestCase
         ];
     }
 
+    /**
+     * @return OrderDataBuilder
+     */
     private function createOrderDataBuilderTest(): OrderDataBuilder
     {
         return new OrderDataBuilder(...$this->getConstructorDependency());
     }
 
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function testOrderPayload():void
     {
         $paymentDataBuilder = $this->createOrderDataBuilderTest()->build($this->mockBuildSubject());
