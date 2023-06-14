@@ -31,12 +31,14 @@ class OrderHelper extends AbstractHelper
         Context $context,
         OrderFactory $orderFactory,
         OrderRepositoryInterface $orderRepository,
-        OrderManagementInterface $orderManagement
+        OrderManagementInterface $orderManagement,
+        Logger $logger
     ) {
         parent::__construct($context);
         $this->orderFactory = $orderFactory;
         $this->orderManagement = $orderManagement;
         $this->orderRepository = $orderRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -84,5 +86,23 @@ class OrderHelper extends AbstractHelper
         $this->orderRepository->save($order);
     }
 
+    /**
+     * Get an order collection
+     */
+    public function getOrderCollectionByCustomerId(int $customerId)
+    {
+        $this->logger->info('Get Order collection', []);
 
+        $orderCollection = $this->orderFactory->create($customerId)
+        ->addFieldToSelect('*')
+        ->addFieldToFilter('status', ['in' => [Order::STATE_COMPLETE, Order::STATE_PROCESSING]])
+        ->setOrder(
+            'created_at',
+            'desc'
+        )
+        ->setPageSize(10)
+        ->setCurPage(1);
+         $this->logger->info('Order collection', [$orderCollection]);
+         return $orderCollection;
+    }
 }

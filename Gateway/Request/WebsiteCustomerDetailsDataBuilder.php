@@ -25,21 +25,28 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\OrderHelper;
 use Magento\Payment\Gateway\Data\Order\OrderAdapter;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
-class OrderDataBuilder implements BuilderInterface
+class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
 {
     /**
      * @var Logger
      */
     private $logger;
+    /**
+     * @var OrderHelper
+     */
+    private $orderHelper;
 
     public function __construct(
-        Logger $logger
+        Logger $logger,
+        OrderHelper $orderHelper
     ) {
         $this->logger = $logger;
+        $this->orderHelper = $orderHelper;
     }
 
     /**
@@ -52,13 +59,26 @@ class OrderDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
+        $this->logger->info('coucou');
         $paymentDO = SubjectReader::readPayment($buildSubject);
+        $this->logger->info('coucou2');
+
         /** @var OrderAdapter $order */
         $order = $paymentDO->getOrder();
+        $this->logger->info('coucou3');
+
+        $previousOrders = [];
+        if ($order->getCustomerId()) {
+            $this->logger->info('coucou5');
+            $previousOrders2 = $this->orderHelper->getOrderCollectionByCustomerId($order->getCustomerId());
+            $this->logger->info('coucou6');
+            $this->logger->info("Previous order collection", [$previousOrders2]);
+        }
+        $this->logger->info('coucou4');
 
         return [
-            'order' => [
-                'merchant_reference' => $order->getOrderIncrementId()
+            'website_customer_details' => [
+                'previous_orders' => $previousOrders
             ]
         ];
     }
