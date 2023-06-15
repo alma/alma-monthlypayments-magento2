@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -69,7 +68,7 @@ class FeePlansConfigBackendModel extends Value
         $almaPlans = $this->configHelper->getBaseApiPlansConfig();
         $feePlans = [];
         foreach ($almaPlans as $key => $feePlan) {
-            if (!$this->isAllowedPlan($key, $feePlan)) {
+            if (!$feePlan->allowed) {
                 continue;
             }
             $feePlans[$key] = $this->paymentPlansHelper->formatFeePlanConfigForSave($feePlan, $value[$key] ?? []);
@@ -91,27 +90,12 @@ class FeePlansConfigBackendModel extends Value
         }
         $feePlans = [];
         foreach ($almaPlans as $key => $feePlan) {
-            if (!$this->isAllowedPlan($key, $feePlan)) {
+            if (!$feePlan->allowed) {
                 continue;
             }
             $feePlans[$key] = $this->paymentPlansHelper->formatLocalFeePlanConfig($feePlan, $value[$key] ?? []);
         }
 
         $this->setValue($feePlans);
-    }
-
-    /**
-     *
-     *
-     * @param $key
-     * @param $feePlan
-     * @return bool
-     */
-    public function isAllowedPlan($key, $feePlan): bool
-    {
-        if ($key !== 'general:1:0:0' && $feePlan->allowed) {
-            return true;
-        }
-        return false;
     }
 }

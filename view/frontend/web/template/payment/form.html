@@ -26,6 +26,9 @@
     <!-- ko if: mergedPaymentMethod -->
         <!-- ko template: 'Alma_MonthlyPayments/payment/merged' --><!-- /ko -->
     <!-- /ko -->
+    <!-- ko if: instantPaymentMethod -->
+        <!-- ko template: 'Alma_MonthlyPayments/payment/instant' --><!-- /ko -->
+    <!-- /ko -->
     <!-- ko if: installmentsPaymentMethod -->
         <!-- ko template: 'Alma_MonthlyPayments/payment/installments' --><!-- /ko -->
     <!-- /ko -->

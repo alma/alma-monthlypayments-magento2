@@ -81,7 +81,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             ]
         );
         $this->addColumn(
-            'custom_min_purchase_amount',
+            PaymentPlansHelper::CUSTOM_MIN_PURCHASE_KEY,
             [
                 'label' => __('Min display amount'),
                 'style' => self::SMALL_INPUT_COLUMN,

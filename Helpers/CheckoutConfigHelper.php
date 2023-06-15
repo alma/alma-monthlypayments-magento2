@@ -8,13 +8,33 @@ class CheckoutConfigHelper extends Config
 {
     const MERGE_PAYMENT_TITLE = 'title';
     const MERGE_PAYMENT_DESC = 'description';
+    const PAY_NOW_TITLE = 'alma_pay_now_title';
+    const PAY_NOW_DESC = 'alma_pay_now_desc';
     const INSTALLMENTS_PAYMENT_TITLE = 'alma_installments_payment_title';
     const INSTALLMENTS_PAYMENT_DESC = 'alma_installments_payment_desc';
     const SPREAD_PAYMENT_TITLE = 'alma_spread_payment_title';
     const SPREAD_PAYMENT_DESC = 'alma_spread_payment_desc';
     const DEFERRED_PAYMENT_TITLE = 'alma_deferred_payment_title';
     const DEFERRED_PAYMENT_DESC = 'alma_deferred_payment_desc';
-    const MERGE_PAYEMENT_METHODS = 'alma_merge_payment';
+    const MERGE_PAYMENT_METHODS = 'alma_merge_payment';
+
+    /**
+     * Get pay now title
+     * @return string
+     */
+    public function getPayNowTitle(): string
+    {
+        return (string)$this->get(self::PAY_NOW_TITLE);
+    }
+
+    /**
+     * Get pay now description
+     * @return string
+     */
+    public function getPayNowDesc(): string
+    {
+        return (string)$this->get(self::PAY_NOW_DESC);
+    }
 
     /**
      * Get payment installment title
@@ -90,6 +110,6 @@ class CheckoutConfigHelper extends Config
      */
     public function getAreMergedPaymentMethods():int
     {
-        return (bool)(int)$this->get(self::MERGE_PAYEMENT_METHODS);
+        return (bool)(int)$this->get(self::MERGE_PAYMENT_METHODS);
     }
 }

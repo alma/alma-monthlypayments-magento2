@@ -44,6 +44,7 @@ use \InvalidArgumentException;
 
 class Eligibility extends AbstractHelper
 {
+    const INSTANT_TYPE = 'instant';
     const INSTALLMENTS_TYPE = 'installments';
     const SPREAD_TYPE = 'spread';
     const DEFERRED_TYPE = 'deferred';
@@ -276,7 +277,7 @@ class Eligibility extends AbstractHelper
      */
     public function getEligiblePlans(): array
     {
-            try {
+        try {
             return array_filter($this->getPlansEligibility(), function ($planEligibility) {
                 return $planEligibility->getEligibility()->isEligible();
             });
@@ -527,8 +528,10 @@ class Eligibility extends AbstractHelper
     private function buildType(int $installmentCount, bool $isDeferred): string
     {
         $type = 'other';
-
-        if ($installmentCount >= 1 && !$isDeferred) {
+        if ($installmentCount == 1 && !$isDeferred) {
+            $type = self::INSTANT_TYPE;
+        }
+        if ($installmentCount > 1 && !$isDeferred) {
             $type = self::INSTALLMENTS_TYPE;
         }
         if ($installmentCount > 4 && !$isDeferred) {

@@ -2,8 +2,8 @@
 namespace Alma\MonthlyPayments\CustomerData;
 
 use Alma\MonthlyPayments\Helpers\CheckoutConfigHelper;
-use Magento\Customer\CustomerData\SectionSourceInterface;
 use Alma\MonthlyPayments\Helpers\Eligibility;
+use Magento\Customer\CustomerData\SectionSourceInterface;
 
 class AlmaSection implements SectionSourceInterface
 {
@@ -27,11 +27,14 @@ class AlmaSection implements SectionSourceInterface
     public function __construct(
         Eligibility $eligibility,
         CheckoutConfigHelper $checkoutConfigHelper
-    )
-    {
+    ) {
         $this->eligibility = $eligibility;
         $this->checkoutConfigHelper = $checkoutConfigHelper;
         $this->paymentOptions = [
+            Eligibility::INSTANT_TYPE => [
+                'title' => __($this->checkoutConfigHelper->getPayNowTitle()),
+                'description'  => __($this->checkoutConfigHelper->getPayNowDesc()),
+            ],
             Eligibility::INSTALLMENTS_TYPE => [
                 'title' => __($this->checkoutConfigHelper->getInstallmentsPaymentTitle()),
                 'description'  => __($this->checkoutConfigHelper->getInstallmentsPaymentDesc()),
@@ -51,7 +54,6 @@ class AlmaSection implements SectionSourceInterface
         ];
     }
 
-
     /**
      * @return array
      */
@@ -59,9 +61,9 @@ class AlmaSection implements SectionSourceInterface
     {
         $areMergePaymentMethods = $this->checkoutConfigHelper->getAreMergedPaymentMethods();
         $eligibilities[Eligibility::MERGED_TYPE] = $this->eligibility->getEligiblePlans();
-        if(!$areMergePaymentMethods){
+        if (!$areMergePaymentMethods) {
             $enabledPlanInBO = $this->eligibility->getEnabledConfigPaymentPlans();
-            foreach ($enabledPlanInBO as $planConfig){
+            foreach ($enabledPlanInBO as $planConfig) {
                 $type = $this->eligibility->getPaymentType($planConfig->planKey());
                 $eligibilities[$type] = [];
             }
@@ -70,14 +72,14 @@ class AlmaSection implements SectionSourceInterface
 
         $allPaymentPlans = [];
         $paymentMethods = [];
-        foreach ($eligibilities as $typeName => $eligibility){
+        foreach ($eligibilities as $typeName => $eligibility) {
             $paymentMethodText = $this->getPaymentMethodTexts($typeName);
             $paymentMethods[$typeName] = [
               'title' => $paymentMethodText['title'],
               'description' => $paymentMethodText['description'],
               'paymentPlans' => []
             ];
-            foreach ( $eligibility as $plan) {
+            foreach ($eligibility as $plan) {
                 $paymentPlan = $plan->getPlanConfig()->toArray();
                 $paymentPlan['eligibility'] = $plan->getEligibility();
                 $allPaymentPlans[]=$paymentPlan;

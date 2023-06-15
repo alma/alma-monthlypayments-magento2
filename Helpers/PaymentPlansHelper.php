@@ -36,6 +36,8 @@ class PaymentPlansHelper
     const KEY_MIN_AMOUNT = 'minAmount';
     const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
     const KEY_MAX_AMOUNT = 'maxAmount';
+    const PAY_NOW_KEY = 'general:1:0:0';
+    const CUSTOM_MIN_PURCHASE_KEY = 'custom_min_purchase_amount';
 
     /**
      * @var Logger
@@ -101,6 +103,10 @@ class PaymentPlansHelper
             $baseFeePlans = [];
             foreach ($apiPlans as $feePlan) {
                 $planKey = PaymentPlanConfig::keyForFeePlan($feePlan);
+                // Fix min purchase amount to 1€
+                if ($planKey === self::PAY_NOW_KEY) {
+                    $feePlan->min_purchase_amount = 100;
+                }
                 $baseFeePlans[$planKey] = $feePlan;
             }
             $this->configHelper->saveBasePlansConfig($baseFeePlans);
@@ -153,8 +159,15 @@ class PaymentPlansHelper
         if (isset($matches[1])) {
             $label =  __('Pay in %1 installments', $matches[1]);
         }
+        // TODO refactor with basket items PR
+        if (isset($matches[1]) && $matches[1] === '1'  & $matches[2] == 0 && $matches[3] == 0) {
+            $label =  __('Pay now');
+        }
         if (isset($matches[2]) && $matches[2] != 0) {
             $label =  __('Pay later - D+%1', $matches[2]);
+        }
+        if (isset($matches[3]) && $matches[3] != 0) {
+            $label =  __('Pay later - %1 month', $matches[3]);
         }
         return $label;
     }
@@ -173,7 +186,7 @@ class PaymentPlansHelper
             'pnx_label' => $this->planLabelByKey($key),
             'enabled' => $this->getEnabledDefaultValue($feePlan, $feePlanConfig),
             'min_purchase_amount' => Functions::priceFromCents($feePlan->min_purchase_amount),
-            'custom_min_purchase_amount' => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents(intval($feePlanConfig['minAmount'])) : Functions::priceFromCents($feePlan->min_purchase_amount),
+            self::CUSTOM_MIN_PURCHASE_KEY => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents(intval($feePlanConfig['minAmount'])) : Functions::priceFromCents($feePlan->min_purchase_amount),
             'custom_max_purchase_amount' => isset($feePlanConfig['maxAmount']) ? Functions::priceFromCents(intval($feePlanConfig['maxAmount'])) : Functions::priceFromCents($feePlan->max_purchase_amount),
             'max_purchase_amount' => Functions::priceFromCents($feePlan->max_purchase_amount),
             'fee' => $this->getFee($feePlan)
@@ -220,7 +233,7 @@ class PaymentPlansHelper
         $newFeePlan = PaymentPlanConfig::defaultConfigForFeePlan($feePlan);
         if (!empty($configInput)) {
             $newFeePlan['enabled'] = $configInput['enabled'];
-            $newFeePlan['minAmount'] = Functions::priceToCents($configInput['custom_min_purchase_amount']);
+            $newFeePlan['minAmount'] = Functions::priceToCents($configInput[self::CUSTOM_MIN_PURCHASE_KEY]);
             $newFeePlan['maxAmount'] = Functions::priceToCents($configInput['custom_max_purchase_amount']);
         }
         return $this->forceAmountThresholds($newFeePlan);
