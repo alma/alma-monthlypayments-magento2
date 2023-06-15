@@ -82,6 +82,18 @@
                         <config_path>payment/alma_monthly_payments/description</config_path>
                         <depends><field id="alma_merge_payment">1</field></depends>
                     </field>
+                    <group id="alma_pay_now_payment" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <depends><field id="alma_merge_payment">0</field></depends>
+                        <label>Pay now:</label>
+                        <field id="alma_pay_now_title" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <config_path>payment/alma_monthly_payments/alma_pay_now_title</config_path>
+                            <label>Title</label>
+                        </field>
+                        <field id="alma_pay_now_desc" translate="label comment" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <config_path>payment/alma_monthly_payments/alma_pay_now_desc</config_path>
+                            <label>Description</label>
+                        </field>
+                    </group>
                     <group id="alma_installments_payment" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <depends><field id="alma_merge_payment">0</field></depends>
                         <label>Payments in 2,3 and 4 installments:</label>
