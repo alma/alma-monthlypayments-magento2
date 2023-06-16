@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - 7.8.0
+          - 2.4.5
     runs-on: ubuntu-latest
     steps:
       - name: Get only last part of branch name in $SLUG_VERSION env var
