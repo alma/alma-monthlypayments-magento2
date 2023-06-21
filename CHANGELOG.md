@@ -6,6 +6,11 @@ v3.4.0
 
 *  feat: Pay now by credit card with Alma
 
+v3.3.0
+------
+
+* feat: Add quote items in Alma payment payload for credit.
+
 v3.2.0
 ------
 

@@ -44,4 +44,49 @@ class Functions
     {
         return (int)(round($price * 100));
     }
+
+    /**
+    * Get payment type with plankey
+    *
+    * @param string $planKey
+    * @return string
+     */
+    public static function getPaymentType(string $planKey): string
+    {
+        $matches = [];
+        $isKnownType = preg_match('/^general:(\d{1,2}):(\d{1,2}):(\d{1,2})$/', $planKey, $matches);
+
+        if ($isKnownType) {
+            $installmentCount = $matches[1];
+            $isDeferred = $matches[2] > 0 || $matches[3] > 0;
+
+            return self::buildType($installmentCount, $isDeferred);
+        }
+        // We don't know this paymentType
+        return 'other';
+    }
+
+    /**
+     * Build type for according to installment count and is deferred flag
+     *
+     * @param int $installmentCount
+     * @param bool $isDeferred
+     *
+     * @return string
+     */
+    private static function buildType(int $installmentCount, bool $isDeferred): string
+    {
+        $type = 'other';
+
+        if ($installmentCount >= 1 && !$isDeferred) {
+            $type = Eligibility::INSTALLMENTS_TYPE;
+        }
+        if ($installmentCount > 4 && !$isDeferred) {
+            $type = Eligibility::SPREAD_TYPE;
+        }
+        if ($installmentCount == 1 && $isDeferred) {
+            $type = Eligibility::DEFERRED_TYPE;
+        }
+        return $type;
+    }
 }

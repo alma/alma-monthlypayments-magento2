@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
+use Alma\MonthlyPayments\Gateway\Request\CartDataBuilder;
 use Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Magento\Checkout\Model\Session;
@@ -23,8 +24,12 @@ class PaymentDataBuilderTest extends TestCase
     const EXPIRATION_TIME =  '2';
     const INCREMENT_ID =  '100001';
     const QUOTE_ID =  '454';
-    const PLAN_KEY =  'general:4:0:0';
-    const INSTALLMENT_COUNT =  '4';
+    const PLAN_KEY_CREDIT =  'general:10:0:0';
+    const INSTALLMENT_CREDIT_COUNT =  '10';
+    const PLAN_KEY_DEFERRED =  'general:1:15:0';
+    const DEFERRED_COUNT =  '15';
+    const PLAN_KEY =  'general:3:0:0';
+    const INSTALLMENT_COUNT =  '3';
     const LOCALE =  'en_US';
 
     public function setUp(): void
@@ -33,6 +38,16 @@ class PaymentDataBuilderTest extends TestCase
         $this->config = $this->createMock(Config::class);
         $this->locale = $this->createMock(Resolver::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
+        $this->cartDataBuilder = $this->createMock(CartDataBuilder::class);
+        $this->cartDataBuilder->method('build')->willReturn(
+            [
+                'cart' => [
+                    'items' => [
+                        'item1'
+                    ]
+                ]
+            ]
+        );
     }
 
     /**
@@ -40,10 +55,10 @@ class PaymentDataBuilderTest extends TestCase
      *
      * @return void
      */
-    public function testTriggerPaymentPayload($order, $response): void
+    public function testPaymentPayload($order, $response): void
     {
         $infoInterfaceMock = $this->createMock(InfoInterface::class);
-        $infoInterfaceMock->expects($this->once())->method('getAdditionalInformation')->willReturn(self::PLAN_KEY);
+        $infoInterfaceMock->expects($this->once())->method('getAdditionalInformation')->willReturn($order['plan_key']);
 
         $orderInterfaceMock = $this->createMock(OrderAdapterInterface::class);
         $orderInterfaceMock->expects($this->once())->method('getOrderIncrementId')->willReturn(self::INCREMENT_ID);
@@ -56,8 +71,8 @@ class PaymentDataBuilderTest extends TestCase
         $this->checkoutSession->expects($this->once())->method('getQuoteId')->willReturn(self::QUOTE_ID);
 
         $paymentPlanConfigMock = $this->createMock(PaymentPlanConfigInterface::class);
-        $plansMock = [self::PLAN_KEY => $paymentPlanConfigMock];
-        $paymentPlanConfigMock->expects($this->once())->method('getPaymentData')->willReturn(['installments_count' => self::INSTALLMENT_COUNT]);
+        $plansMock = [$order['plan_key'] => $paymentPlanConfigMock];
+        $paymentPlanConfigMock->expects($this->once())->method('getPaymentData')->willReturn(['installments_count' => $order['installment_count']]);
         $paymentPlanConfigMock->expects($this->any())->method('hasDeferredTrigger')->willReturn($order['plan_has_trigger']);
 
         $paymentPlansConfigMock = $this->createMock(PaymentPlansConfigInterface::class);
@@ -74,14 +89,104 @@ class PaymentDataBuilderTest extends TestCase
         $this->configHelper->expects($this->once())->method('triggerIsEnabled')->willReturn($order['has_trigger']);
 
         $buildSubjectMock = ['payment' => $paymentDataObjectMock];
-        $paymentDataBuilder = $this->createPaymentDataBuilderTest();
-        $this->assertEquals($response, $paymentDataBuilder->build($buildSubjectMock));
+        $paymentDataBuilder = $this->createPaymentDataBuilderTest()->build($buildSubjectMock);
+        $this->assertEquals($response, $paymentDataBuilder);
     }
 
     public function paymentPayloadDataProvider(): array
     {
-        $paymentBase = [
-            'installments_count' => self::INSTALLMENT_COUNT,
+        return [
+            'Payload with installment key' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY,
+                    'installment_count' => self::INSTALLMENT_COUNT,
+                    'has_trigger' => false,
+                    'plan_has_trigger' => false,
+                ],
+                'final_payload' => [
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_COUNT)
+                ]
+            ],
+            'Payload with plan deferred key' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY_DEFERRED,
+                    'installment_count' => self::DEFERRED_COUNT,
+                    'has_trigger' => false,
+                    'plan_has_trigger' => false,
+                ],
+                'final_payload' => [
+                    'payment' => $this->paymentFactory(self::DEFERRED_COUNT)
+                ]
+            ],
+            'Payload with plan credit key' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY_CREDIT,
+                    'installment_count' => self::INSTALLMENT_CREDIT_COUNT,
+                    'has_trigger' => false,
+                    'plan_has_trigger' => false,
+                ],
+                'final_payload' => [
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT, true)
+                ]
+            ],
+            'Payload without trigger' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY,
+                    'installment_count' => self::INSTALLMENT_COUNT,
+                    'has_trigger' => false,
+                    'plan_has_trigger' => false,
+                ],
+                'final_payload' => [
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_COUNT)
+                ]
+            ],
+            'Trigger option is enable but plan does not have trigger option' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY,
+                    'installment_count' => self::INSTALLMENT_COUNT,
+                    'has_trigger' => true,
+                    'plan_has_trigger' => false,
+                ],
+                'final_payload' => [
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_COUNT)
+                ]
+            ],
+            'Trigger option is enable but plan has trigger option' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY,
+                    'installment_count' => self::INSTALLMENT_COUNT,
+                    'has_trigger' => true,
+                    'plan_has_trigger' => true,
+                ],
+                'final_payload' => [
+                    'payment' => array_merge(
+                        $this->paymentFactory(self::INSTALLMENT_COUNT),
+                        [
+                            'deferred' => 'trigger',
+                            'deferred_description' => '',
+                        ]
+                    )
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return PaymentDataBuilder
+     */
+    private function createPaymentDataBuilderTest(): PaymentDataBuilder
+    {
+        return new PaymentDataBuilder(...$this->getConstructorDependency());
+    }
+
+    /**
+     * @param string $installmentCount
+     * @return array
+     */
+    private function paymentFactory(string $installmentCount, bool $cart = false): array
+    {
+        $cartData = [
+            'installments_count' => $installmentCount,
             'return_url' => self::RETURN_URL,
             'ipn_callback_url' => self::IPN_URL,
             'customer_cancel_url' => self::CANCEL_URL,
@@ -97,48 +202,19 @@ class PaymentDataBuilderTest extends TestCase
             ]
         ];
 
-        return [
-            'Payload without trigger' => [
-                'order' => [
-                    'has_trigger' => false,
-                    'plan_has_trigger' => false,
-                ],
-                'final_payload' => [
-                    'payment' => $paymentBase
+        if ($cart) {
+            $cartData['cart'] = [
+                'items' => [
+                    'item1'
                 ]
-            ],
-            'Trigger option is enable but plan do not have trigger option' => [
-                'order' => [
-                    'has_trigger' => true,
-                    'plan_has_trigger' => false,
-                ],
-                'final_payload' => [
-                    'payment' => $paymentBase
-                ]
-            ],
-            'Trigger option is enable but plan has trigger option' => [
-                'order' => [
-                    'has_trigger' => true,
-                    'plan_has_trigger' => true,
-                ],
-                'final_payload' => [
-                    'payment' => array_merge(
-                        $paymentBase,
-                        [
-                            'deferred' => 'trigger',
-                            'deferred_description' => '',
-                        ]
-                    )
-                ]
-            ]
-        ];
+            ];
+        }
+        return $cartData;
     }
 
-    private function createPaymentDataBuilderTest(): PaymentDataBuilder
-    {
-        return new PaymentDataBuilder(...$this->getConstructorDependency());
-    }
-
+    /**
+     * @return array
+     */
     private function getConstructorDependency(): array
     {
         return [
@@ -146,6 +222,7 @@ class PaymentDataBuilderTest extends TestCase
             $this->config,
             $this->locale,
             $this->configHelper,
+            $this->cartDataBuilder
         ];
     }
 }
