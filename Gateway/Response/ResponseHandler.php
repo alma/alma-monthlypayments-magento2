@@ -59,8 +59,6 @@ class ResponseHandler implements HandlerInterface
 
         /** @var Payment $almaPayment */
         $almaPayment = $response['almaPayment'];
-        $this->logger->info('AlmaPayment', [$almaPayment]);
-        $this->logger->info('AlmaPayment url', [$almaPayment->url]);
         $payment->setTransactionId($almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_ID, $almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_URL, $almaPayment->url);

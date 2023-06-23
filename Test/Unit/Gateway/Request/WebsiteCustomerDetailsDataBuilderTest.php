@@ -9,6 +9,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
+use Magento\Reports\Model\ResourceModel\Customer\Orders\Collection;
+use Magento\Sales\Model\Order;
 use PHPUnit\Framework\TestCase;
 
 class WebsiteCustomerDetailsDataBuilderTest extends TestCase
@@ -51,27 +53,31 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
     /**
      * @dataProvider payloadDataProvider
      * @param array $customer
-     * @param array $orders
+     * @param Collection $orderCollection
      * @param array $previousOrders
      * @return void
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function testWebsiteCustomerDetailsPayload(array $customer, array $orders, array $previousOrders):void
+    public function testWebsiteCustomerDetailsPayload(array $customer, Collection $orderCollection, array $previousOrders, bool $isGuest):void
     {
+        //mock orders
+        $this->orderHelper->method('getValidOrderCollectionByCustomerId')->willReturn($orderCollection);
         $paymentDataBuilder = $this->createWebsiteCustomerDetailsDataBuilderTest()
             ->build($this->mockBuildSubject($customer));
-        $this->assertEquals($this->responseBuilder($previousOrders), $paymentDataBuilder);
+        $this->assertEquals($this->responseBuilder($previousOrders, $isGuest), $paymentDataBuilder);
     }
 
     /**
-     * @param $previousOrders
+     * @param array $previousOrders
+     * @param bool $isGuest
      * @return array
      */
-    private function responseBuilder($previousOrders):array
+    private function responseBuilder(array $previousOrders,bool $isGuest):array
     {
         return [
             'website_customer_details' => [
+                'is_guest' => $isGuest,
                 'previous_orders' => $previousOrders
             ]
         ];
@@ -101,16 +107,69 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
                 'customer' => [
                     'id' => null
                 ],
-                'orders' => [],
-                'previousOrders' => []
+                'orderCollection' => $this->mockOrderCollectionFactory(),
+                'previousOrders' => [],
+                'isGuest' => true
             ],
-            'Previous order must be an empty array for identified customer' => [
+            'Previous order must be an empty array for identified customer without previous order' => [
                 'customer' => [
                     'id' => 1
                 ],
-                'orders' => [],
-                'previousOrders' => []
+                'orderCollection' => $this->mockOrderCollectionFactory(),
+                'previousOrders' => [],
+                'isGuest' => false
+            ],
+            'Previous order must be an array for identified customer with previous order' => [
+                'customer' => [
+                    'id' => 1
+                ],
+                'orderCollection' => $this->mockOrderCollectionFactory(
+                    [
+                        $this->mockOrderFactory(123),
+                        $this->mockOrderFactory(223)
+                    ]
+                ),
+                'previousOrders' => [
+                    [
+                        "purchase_amount"=> 12300,
+                        "created"=> 1687513900,
+                        "items" => [],
+                        "payment_method" =>'',
+                        "shipping_method" => ''
+                    ],
+                    [
+                        "purchase_amount"=> 22300,
+                        "created"=> 1687513900,
+                        "items" => [],
+                        "payment_method" =>'',
+                        "shipping_method" => ''
+                    ]
+                ],
+                'isGuest' => false
             ],
         ];
+    }
+
+    /**
+     * Get a mock order collection
+     *
+     * @param array $orders
+     * @return Collection
+     */
+    private function mockOrderCollectionFactory(array $orders = []): Collection
+    {
+        $emptyIterator = new \ArrayIterator($orders);
+        $emptyCollection = $this->createPartialMock(Collection::class, ['getIterator']);
+        $emptyCollection->method('getIterator')->willReturn($emptyIterator);
+        return $emptyCollection;
+    }
+
+    private function mockOrderFactory($total): Order
+    {
+        $order = $this->createMock(Order::class);
+        $order->method('getGrandTotal')->willReturn($total);
+        $order->method('getCreatedAt')->willReturn('Fri, 23 Jun 2023 09:51:40 GMT');
+        $order->method('getItems')->willReturn([]);
+        return $order;
     }
 }

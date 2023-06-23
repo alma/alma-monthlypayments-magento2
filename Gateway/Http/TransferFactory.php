@@ -25,7 +25,7 @@
 
 namespace Alma\MonthlyPayments\Gateway\Http;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
+
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
@@ -36,21 +36,14 @@ class TransferFactory implements TransferFactoryInterface
      * @var TransferBuilder
      */
     private $transferBuilder;
-    /**
-     * @var Config
-     */
-    private $config;
 
     /**
      * @param TransferBuilder $transferBuilder
-     * @param Config $config
      */
     public function __construct(
-        TransferBuilder $transferBuilder,
-        Config $config
+        TransferBuilder $transferBuilder
     ) {
         $this->transferBuilder = $transferBuilder;
-        $this->config = $config;
     }
 
     /**

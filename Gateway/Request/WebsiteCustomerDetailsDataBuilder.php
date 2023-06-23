@@ -24,11 +24,14 @@
 
 namespace Alma\MonthlyPayments\Gateway\Request;
 
+use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\OrderHelper;
 use Magento\Payment\Gateway\Data\Order\OrderAdapter;
+use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 
 class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
 {
@@ -59,27 +62,50 @@ class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
-        $this->logger->info('coucou');
         $paymentDO = SubjectReader::readPayment($buildSubject);
-        $this->logger->info('coucou2');
 
         /** @var OrderAdapter $order */
         $order = $paymentDO->getOrder();
-        $this->logger->info('coucou3');
 
         $previousOrders = [];
-        if ($order->getCustomerId()) {
-            $this->logger->info('coucou5');
-            $previousOrders2 = $this->orderHelper->getOrderCollectionByCustomerId($order->getCustomerId());
-            $this->logger->info('coucou6');
-            $this->logger->info("Previous order collection", [$previousOrders2]);
-        }
-        $this->logger->info('coucou4');
+        $isGuest = true;
 
+        if ($order->getCustomerId()) {
+            $isGuest = false;
+            $customerOrderCollection = $this->orderHelper->getValidOrderCollectionByCustomerId($order->getCustomerId());
+
+            foreach ($customerOrderCollection as $previousOrder) {
+                $previousOrders[] = $this->formatPreviousOrderForPaymentPayload($previousOrder);
+            }
+        }
+        $this->logger->info('Previous Order', [
+            [
+                'website_customer_details' => [
+                    'is_guest' => $isGuest,
+                    'previous_orders' => $previousOrders
+                ]
+            ]
+        ]);
         return [
             'website_customer_details' => [
+                'is_guest' => $isGuest,
                 'previous_orders' => $previousOrders
             ]
+        ];
+    }
+
+    /**
+    * @param OrderInterface | OrderAdapterInterface $order
+    * @return array
+     */
+    private function formatPreviousOrderForPaymentPayload($order): array
+    {
+        return [
+            "purchase_amount"=> Functions::priceToCents($order->getGrandTotal()),
+            "payment_method"=> $this->orderHelper->getOrderPaymentMethodName($order),
+            "shipping_method"=> $this->orderHelper->getOrderShippingMethodName($order),
+            "created"=> strtotime($order->getCreatedAt()),
+            "items" => $this->orderHelper->formatOrderItems($order->getItems())
         ];
     }
 }
