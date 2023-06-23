@@ -60,7 +60,6 @@ class CartDataBuilder implements BuilderInterface
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $orderItems = $paymentDO->getOrder()->getItems();
         $items = $this->orderHelper->formatOrderItems($orderItems);
-        $this->logger->info('Credit Items in cart', [$items]);
         return [
             'cart' => [
                 'items' =>  $items

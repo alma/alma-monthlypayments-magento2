@@ -53,12 +53,10 @@ class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
     }
 
     /**
-     * Builds ENV request
+     * Build website_customer_details data
      *
      * @param array $buildSubject
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function build(array $buildSubject)
     {
@@ -78,14 +76,6 @@ class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
                 $previousOrders[] = $this->formatPreviousOrderForPaymentPayload($previousOrder);
             }
         }
-        $this->logger->info('Previous Order', [
-            [
-                'website_customer_details' => [
-                    'is_guest' => $isGuest,
-                    'previous_orders' => $previousOrders
-                ]
-            ]
-        ]);
         return [
             'website_customer_details' => [
                 'is_guest' => $isGuest,
@@ -95,10 +85,12 @@ class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
     }
 
     /**
-    * @param OrderInterface | OrderAdapterInterface $order
-    * @return array
+     * Format Previous orders data
+     *
+     * @param OrderInterface $order
+     * @return array
      */
-    private function formatPreviousOrderForPaymentPayload($order): array
+    private function formatPreviousOrderForPaymentPayload(OrderInterface $order): array
     {
         return [
             "purchase_amount"=> Functions::priceToCents($order->getGrandTotal()),

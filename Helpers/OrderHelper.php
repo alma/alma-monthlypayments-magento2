@@ -3,11 +3,9 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Magento\Catalog\Model\Category;
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -23,9 +21,7 @@ use Magento\Store\Model\StoreManagerInterface;
 class OrderHelper extends AbstractHelper
 {
     /**
-     * @param OrderInterface $order
-     *
-     * @return string
+     * @var OrderFactory
      */
     private $orderFactory;
     /**
@@ -36,11 +32,33 @@ class OrderHelper extends AbstractHelper
      * @var OrderRepositoryInterface
      */
     private $orderRepository;
-    private $orderCollectionFactory;
+    /**
+     * @var Logger
+     */
     private $logger;
+    /**
+     * @var ProductHelper
+     */
     private $productHelper;
+    /**
+     * @var CollectionFactory
+     */
+    private $orderCollectionFactory;
+    /**
+     * @var StoreManagerInterface
+     */
     private $storeManager;
 
+    /**
+     * @param Context $context
+     * @param OrderFactory $orderFactory
+     * @param CollectionFactory $orderCollectionFactory
+     * @param OrderRepositoryInterface $orderRepository
+     * @param OrderManagementInterface $orderManagement
+     * @param ProductHelper $productHelper
+     * @param StoreManagerInterface $storeManager
+     * @param Logger $logger
+     */
     public function __construct(
         Context $context,
         OrderFactory $orderFactory,
@@ -97,6 +115,7 @@ class OrderHelper extends AbstractHelper
 
     /**
      * Performs persist operations for a specified order.
+     *
      * @param Order $order
      *
      * @return void
@@ -108,10 +127,11 @@ class OrderHelper extends AbstractHelper
 
     /**
      * Get an order collection
+     *
      * @param int $customerId
      * @return Collection
      */
-    public function getValidOrderCollectionByCustomerId(int $customerId): Collection
+    public function getValidOrderCollectionByCustomerId(int  $customerId): Collection
     {
         return $this->orderCollectionFactory->create($customerId)
         ->addFieldToSelect('*')
@@ -135,6 +155,7 @@ class OrderHelper extends AbstractHelper
     }
     /**
      * Get payment methode by order;
+     *
      * @param Order $order
      * @return string
      */
@@ -145,7 +166,7 @@ class OrderHelper extends AbstractHelper
     /**
      * Parse order items for formatting
      *
-     * @param array $dataProducts
+     * @param array $orderItems
      * @return array
      */
     public function formatOrderItems(array $orderItems): array
@@ -162,9 +183,10 @@ class OrderHelper extends AbstractHelper
     }
 
     /**
+     * Format order items for payment payload
+     *
      * @param array $orderItems
      * @return mixed
-     * @throws LocalizedException
      */
     private function formatOrderItemsForPaymentPayload(array $orderItems)
     {
@@ -172,6 +194,7 @@ class OrderHelper extends AbstractHelper
         $products = $this->productHelper->getProductsItems($productsIds);
         $productsCategories = $this->productHelper->getProductsCategories($products);
         $categories = $this->formatCategoriesInArray($productsCategories);
+
         return $this->formatDataForPayload($orderItems, $products, $categories);
     }
     /**
@@ -188,6 +211,7 @@ class OrderHelper extends AbstractHelper
                 $productsIds[] = $item->getProductId();
             }
         }
+
         return $productsIds;
     }
     /**
@@ -207,6 +231,8 @@ class OrderHelper extends AbstractHelper
     }
 
     /**
+     * Format orderItems, products and categories for payment payload
+     *
      * @param array $orderItems
      * @param ProductCollection $products
      * @param array $categories
@@ -223,7 +249,6 @@ class OrderHelper extends AbstractHelper
         }
 
         foreach ($products as $product) {
-            /** @var Product $product */
             $dataForCartItemPayload[$product->getEntityId()]['product'] = $product;
             $productCategoriesNames = [];
             foreach ($product->getCategoryIds() as $categoryId) {
@@ -233,6 +258,7 @@ class OrderHelper extends AbstractHelper
             }
             $dataForCartItemPayload[$product->getEntityId()]['categories'] = $productCategoriesNames;
         }
+
         return $dataForCartItemPayload;
     }
     /**
