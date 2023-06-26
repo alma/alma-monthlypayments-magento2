@@ -28,7 +28,7 @@ class GeneralGroupFrontModel extends BlockFieldSet
     protected function _getHeaderCommentHtml($element)
     {
         if (!$this->config->getIsActive()) {
-            $translatedComment  = __('Attention: You have to enable the plugin for accepting payments. Meanwhile, you can complete your configuration.');
+            $translatedComment  = __('Warning: You have to enable the plugin for accepting payments. Meanwhile, you can complete your configuration.');
             $element->setComment(
                 sprintf(
                     '<div style="color: red">%s</div>',

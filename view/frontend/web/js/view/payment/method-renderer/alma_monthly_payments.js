@@ -82,17 +82,18 @@ define(
             totals: quote.getTotals(),
 
             initialize: function () {
-                self=this;
+                self = this;
                 this._super();
                 this.almaSectionName = 'alma_section';
 
                 this.config = window.checkoutConfig.payment[this.item.method];
-                this.almaSection = ko.observable(customerData.get(self.almaSectionName)())
+                this.almaSection = ko.observable(customerData.get(self.almaSectionName)());
 
                 this.checkedPaymentMethod = ko.observable('');
                 this.lastSelectedPlanKey =  ko.observable({});
 
-                ['merged','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption))
+                // eslint-disable-next-line max-len
+                ['merged','paynow','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption));
             },
 
             initObservablesAndComputedFor : function (paymentOption) {
@@ -104,18 +105,20 @@ define(
 
                 if(this.almaSection().paymentMethods[paymentOption]) {
                     // -- Init Installments computed based on section
-                    this[`${paymentOption}PaymentMethod`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption])
-                    this[`${paymentOption}PaymentPlans`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption].paymentPlans)
+                    this[`${paymentOption}PaymentMethod`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption]);
+                    this[`${paymentOption}PaymentPlans`] = ko.computed(() => customerData.get(self.almaSectionName)().paymentMethods[paymentOption].paymentPlans);
                     // -- Init selected plan for payment schedule display
                     var defaultPlan = '';
-                    if (this[`${paymentOption}PaymentPlans`]()[0] != undefined){
+                    if (this[`${paymentOption}PaymentPlans`]()[0] !== undefined) {
                     defaultPlan = this[`${paymentOption}PaymentPlans`]()[0];
                     }
                     this[`${paymentOption}SelectedPlanKey`] = ko.observable(defaultPlan.key);
                     this[`${paymentOption}SelectedPlan`] = ko.computed(() =>
-                        self.selectedPlan(self[`${paymentOption}SelectedPlanKey`](),self[`${paymentOption}PaymentPlans`](), paymentCode)
-                    )
-                    this[`${paymentOption}IsChecked`] = ko.computed(() => self.fallbackIsChecked(paymentCode))
+                        self.selectedPlan(self[`${paymentOption}SelectedPlanKey`](),
+                            self[`${paymentOption}PaymentPlans`](),
+                            paymentCode)
+                    );
+                    this[`${paymentOption}IsChecked`] = ko.computed(() => self.fallbackIsChecked(paymentCode));
                 }
             },
 

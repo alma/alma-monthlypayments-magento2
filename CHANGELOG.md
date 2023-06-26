@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v3.4.0
+------
+
+*  feat: Pay now by credit card with Alma
+
 v3.3.0
 ------
 

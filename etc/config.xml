@@ -68,11 +68,13 @@
                 <alma_merge_payment>0</alma_merge_payment>
                 <title>Alma monthly and deferred payments</title>
                 <description>Pay in deferred or multiple monthly payments with your credit card.</description>
-                <alma_installments_payment_title>Pay in installments with Alma</alma_installments_payment_title>
+                <alma_pay_now_title>Pay now by credit card</alma_pay_now_title>
+                <alma_pay_now_desc>Fast and secured payments</alma_pay_now_desc>
+                <alma_installments_payment_title>Pay in installments</alma_installments_payment_title>
                 <alma_installments_payment_desc>Fast and secure payment by credit card</alma_installments_payment_desc>
-                <alma_spread_payment_title>Spread your payments with Alma</alma_spread_payment_title>
+                <alma_spread_payment_title>Spread your payments</alma_spread_payment_title>
                 <alma_spread_payment_desc>Fast and secure payment by credit card</alma_spread_payment_desc>
-                <alma_deferred_payment_title>Buy now, Pay later with Alma</alma_deferred_payment_title>
+                <alma_deferred_payment_title>Buy now, Pay later</alma_deferred_payment_title>
                 <alma_deferred_payment_desc>Fast and secure payment by credit card</alma_deferred_payment_desc>
 
                 <trigger_is_allowed>0</trigger_is_allowed>

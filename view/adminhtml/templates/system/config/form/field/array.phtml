@@ -3,6 +3,9 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
+
 ?>
 
 <?php
@@ -82,10 +85,13 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
                         for (var i = 0; i < rowInputElementNames.length; i++) {
                             if ($(rowInputElementNames[i])) {
                                 $(rowInputElementNames[i]).setValue(rowData.column_values[rowInputElementNames[i]]);
+
+                                if ($(rowInputElementNames[i]).id === "<?= PaymentPlansHelper::PAY_NOW_KEY?>_<?=PaymentPlansHelper::CUSTOM_MIN_PURCHASE_KEY?>"){
+                                    $(rowInputElementNames[i]).setAttribute("readonly", true)
+                                }
                             }
                         }
                     }
-
 
                 },
 
