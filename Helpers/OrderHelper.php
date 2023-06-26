@@ -175,7 +175,11 @@ class OrderHelper extends AbstractHelper
         $formattedItems = [];
 
         foreach ($dataProducts as $data) {
-            if (isset($data['item']) && isset($data['product']) && isset($data['categories'])) {
+            if (
+                isset($data['item'])
+                && isset($data['product'])
+                && isset($data['categories'])
+            ) {
                 $formattedItems[] = $this->formatItem($data);
             }
         }
