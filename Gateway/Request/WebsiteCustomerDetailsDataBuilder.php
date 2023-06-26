@@ -28,7 +28,6 @@ use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\OrderHelper;
 use Magento\Payment\Gateway\Data\Order\OrderAdapter;
-use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Sales\Api\Data\OrderInterface;
