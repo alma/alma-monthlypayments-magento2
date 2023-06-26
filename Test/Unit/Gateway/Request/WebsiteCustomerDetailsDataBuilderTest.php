@@ -5,8 +5,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 use Alma\MonthlyPayments\Gateway\Request\WebsiteCustomerDetailsDataBuilder;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\OrderHelper;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Reports\Model\ResourceModel\Customer\Orders\Collection;
@@ -55,9 +53,8 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
      * @param array $customer
      * @param Collection $orderCollection
      * @param array $previousOrders
+     * @param bool $isGuest
      * @return void
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function testWebsiteCustomerDetailsPayload(array $customer, Collection $orderCollection, array $previousOrders, bool $isGuest):void
     {
@@ -73,7 +70,7 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
      * @param bool $isGuest
      * @return array
      */
-    private function responseBuilder(array $previousOrders,bool $isGuest):array
+    private function responseBuilder(array $previousOrders, bool $isGuest):array
     {
         return [
             'website_customer_details' => [

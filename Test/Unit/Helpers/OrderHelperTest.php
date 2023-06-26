@@ -345,16 +345,6 @@ class OrderHelperTest extends TestCase
         ];
     }
 
-    private function createPaymentDataObject(array $items):PaymentDataObjectInterface
-    {
-        $orderAdapter = $this->createMock(OrderAdapterInterface::class);
-        $orderAdapter->method('getItems')->willReturn($items);
-
-        $paymentDataObject = $this->createMock(PaymentDataObjectInterface::class);
-        $paymentDataObject->method('getOrder')->willReturn($orderAdapter);
-        return $paymentDataObject;
-    }
-
     private function itemFactory(
         string $pid,
         string $sku,
@@ -364,7 +354,6 @@ class OrderHelperTest extends TestCase
         float $rowPrice,
         bool $isVirtual,
         float $taxAmount,
-        array $categories = ['3','4'],
         bool $dummy = false,
         array $productOptions= []
     ):Item {
@@ -383,16 +372,8 @@ class OrderHelperTest extends TestCase
     }
     private function productFactory(
         string $pid,
-        string $sku,
         string $name,
-        float $qty,
-        float $price,
-        float $rowPrice,
-        bool $isVirtual,
-        float $taxAmount,
         array $categories = ['3','4'],
-        bool $dummy = false,
-        array $productOptions= []
     ):Product {
         $product = $this->createMock(Product::class);
         $product->method('getEntityId')->willReturn($pid);
@@ -425,7 +406,7 @@ class OrderHelperTest extends TestCase
             'is_gift' => false,
             'categories' => $categories,
             'url' => 'https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html',
-            'picture_url' => self::MEDIA_BASE_URL . 'catalog/product' . '/w/b/wb04-blue-0.jpg',
+            'picture_url' => self::MEDIA_BASE_URL . 'catalog/product/w/b/wb04-blue-0.jpg',
             'requires_shipping' => !$isVirtual,
             'taxes_included' => $taxAmount
         ];
