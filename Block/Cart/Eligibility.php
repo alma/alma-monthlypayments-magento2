@@ -46,6 +46,10 @@ class Eligibility extends Template
      * @var Helpers\Availability
      */
     private $availabilityHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Eligibility constructor.
