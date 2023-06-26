@@ -42,6 +42,10 @@ class AvailabilityValidator extends AbstractValidator
      * @var Eligibility
      */
     private $eligibilityHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * AvailabilityValidator constructor.

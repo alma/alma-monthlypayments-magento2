@@ -58,6 +58,10 @@ class Quote
      * @var CollectionFactory
      */
     private $collectionFactory;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Quote constructor.

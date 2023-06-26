@@ -26,11 +26,11 @@
 namespace Alma\MonthlyPayments\Controller\Payment;
 
 use Alma\MonthlyPayments\Helpers\Eligibility as EligibilityHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class Eligibility extends Action
 {
@@ -38,18 +38,23 @@ class Eligibility extends Action
      * @var EligibilityHelper
      */
     private $eligibilityHelper;
+    /**
+     * @var Logger
+     */
+    private Logger $logger;
 
     /**
      * Eligibility constructor.
+     *
      * @param Context $context
      * @param EligibilityHelper $eligibilityHelper
+     * @param Logger $logger
      */
     public function __construct(
         Context $context,
         EligibilityHelper $eligibilityHelper,
         Logger $logger
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->logger = $logger;
         $this->eligibilityHelper = $eligibilityHelper;
