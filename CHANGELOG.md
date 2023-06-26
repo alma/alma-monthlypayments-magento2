@@ -1,15 +1,14 @@
 Changelog
 =========
+
 v3.4.0
 ------
 
+* feat: Pay now by credit card with Alma
 * feat: Add data for Alma Risk - 10 past purchases
 * fix: Fix return SEPA issue
+* fix: Fix php 8.2 compatibility issues
 
-v3.4.0
-------
-
-*  feat: Pay now by credit card with Alma
 
 v3.3.0
 ------
@@ -20,7 +19,7 @@ v3.2.0
 ------
 
 * fix: Add unit of time in Payment expiration time comment.
-* feat: change payment uppon trigger visibility
+* feat: change payment upon trigger visibility
 
 
 v3.1.3
