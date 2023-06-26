@@ -4,15 +4,16 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use Magento\Framework\Exception\LocalizedException;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class ProductHelper
 {
     /**
-     * @var Collection
+     * @var CollectionFactory
      */
-    private $productCollection;
+    private $productCollectionFactory;
     /**
      * @var Logger
      */
@@ -20,21 +21,21 @@ class ProductHelper
     /**
      * @var CategoryCollection
      */
-    private $categoryCollection;
+    private $categoryCollectionFactory;
 
     /**
      * @param Logger $logger
-     * @param Collection $productCollection
-     * @param CategoryCollection $categoryCollection
+     * @param CollectionFactory $productCollectionFactory
+     * @param CategoryCollectionFactory $categoryCollectionFactory
      */
     public function __construct(
-        Logger $logger,
-        Collection $productCollection,
-        CategoryCollection $categoryCollection
+        Logger             $logger,
+        CollectionFactory  $productCollectionFactory,
+        CategoryCollectionFactory $categoryCollectionFactory
     ) {
-        $this->productCollection = $productCollection;
+        $this->productCollectionFactory = $productCollectionFactory;
         $this->logger = $logger;
-        $this->categoryCollection = $categoryCollection;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
     }
 
     /**
@@ -45,7 +46,10 @@ class ProductHelper
      */
     public function getProductsItems(array $productIds): Collection
     {
-        return $this->productCollection->addAttributeToSelect('*')->addFieldToFilter('entity_id', ['in'=>$productIds]);
+        /** @var Collection $collection */
+        $collection = $this->productCollectionFactory->create();
+        $collection->addAttributeToSelect('*');
+        return $collection->addAttributeToFilter('entity_id', ['in'=>$productIds]);
     }
 
     /**
@@ -64,19 +68,16 @@ class ProductHelper
 
         return array_values($categoriesId);
     }
-
     /**
-     * Get a collection of categories with categories' ID array
+     * Generate categories collection with product a collection
      *
      * @param Collection $products
      * @return CategoryCollection
-     * @throws LocalizedException
      */
     public function getProductsCategories(Collection $products): CategoryCollection
     {
         $categoriesId = $this->getProductsCategoriesIds($products);
-        return $this->categoryCollection->addAttributeToSelect(['*'])->addFieldToFilter('entity_id', ['in'=>$categoriesId]);
 
+        return $this->categoryCollectionFactory->create()->addAttributeToSelect('*')->addFieldToFilter('entity_id', ['in'=>$categoriesId]);
     }
-
 }

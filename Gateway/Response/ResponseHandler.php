@@ -27,12 +27,22 @@ namespace Alma\MonthlyPayments\Gateway\Response;
 
 use Alma\API\Entities\Payment;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order;
 
 class ResponseHandler implements HandlerInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
     /**
      * Handles transaction id
      *
@@ -49,7 +59,6 @@ class ResponseHandler implements HandlerInterface
 
         /** @var Payment $almaPayment */
         $almaPayment = $response['almaPayment'];
-
         $payment->setTransactionId($almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_ID, $almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_URL, $almaPayment->url);

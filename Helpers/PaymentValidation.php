@@ -202,13 +202,11 @@ class PaymentValidation
             throw new AlmaPaymentValidationException($errorMessage);
         }
 
-        // Check that the Alma API has correctly registered the first installment as paid
-        $firstInstalment = $almaPayment->payment_plan[0];
-        if (!in_array($almaPayment->state, [AlmaPayment::STATE_IN_PROGRESS, AlmaPayment::STATE_PAID]) || $firstInstalment->state !== Instalment::STATE_PAID) {
+        // Check that the Alma API has correctly registered
+        if (!in_array($almaPayment->state, [AlmaPayment::STATE_IN_PROGRESS, AlmaPayment::STATE_PAID])) {
             $rejectionReason = __(
-                "Payment state incorrect (%1 & %2) for order %3",
+                "Payment state incorrect (%1) for order %3",
                 $almaPayment->state,
-                $firstInstalment->state,
                 $order->getIncrementId()
             );
 

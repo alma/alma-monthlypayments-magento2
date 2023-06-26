@@ -1,6 +1,6 @@
 <?php
 /**
- * 2018-2023 Alma SAS
+ * 2018-2019 Alma SAS
  *
  * THE MIT LICENSE
  *
@@ -18,29 +18,31 @@
  * IN THE SOFTWARE.
  *
  * @author    Alma SAS <contact@getalma.eu>
- * @copyright 2018-2023 Alma SAS
+ * @copyright 2018-2019 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
 namespace Alma\MonthlyPayments\Gateway\Request;
 
+use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\OrderHelper;
+use Magento\Payment\Gateway\Data\Order\OrderAdapter;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 
-/**
- * CartDataBuilder build Cart Data for Alma credit Payment Payload
- */
-class CartDataBuilder implements BuilderInterface
+class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
 {
+    /**
+     * @var Logger
+     */
     private $logger;
+    /**
+     * @var OrderHelper
+     */
     private $orderHelper;
 
-    /**
-     * @param Logger $logger
-     * @param OrderHelper $orderHelper
-     */
     public function __construct(
         Logger $logger,
         OrderHelper $orderHelper
@@ -50,20 +52,51 @@ class CartDataBuilder implements BuilderInterface
     }
 
     /**
-     * Build cart data for payload
+     * Build website_customer_details data
      *
      * @param array $buildSubject
-     * @return array[]
+     * @return array
      */
-    public function build(array $buildSubject): array
+    public function build(array $buildSubject)
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
-        $orderItems = $paymentDO->getOrder()->getItems();
-        $items = $this->orderHelper->formatOrderItems($orderItems);
+
+        /** @var OrderAdapter $order */
+        $order = $paymentDO->getOrder();
+
+        $previousOrders = [];
+        $isGuest = true;
+
+        if ($order->getCustomerId()) {
+            $isGuest = false;
+            $customerOrderCollection = $this->orderHelper->getValidOrderCollectionByCustomerId($order->getCustomerId());
+
+            foreach ($customerOrderCollection as $previousOrder) {
+                $previousOrders[] = $this->formatPreviousOrderForPaymentPayload($previousOrder);
+            }
+        }
         return [
-            'cart' => [
-                'items' =>  $items
-            ],
+            'website_customer_details' => [
+                'is_guest' => $isGuest,
+                'previous_orders' => $previousOrders
+            ]
+        ];
+    }
+
+    /**
+     * Format Previous orders data
+     *
+     * @param OrderInterface $order
+     * @return array
+     */
+    private function formatPreviousOrderForPaymentPayload(OrderInterface $order): array
+    {
+        return [
+            "purchase_amount"=> Functions::priceToCents($order->getGrandTotal()),
+            "payment_method"=> $this->orderHelper->getOrderPaymentMethodName($order),
+            "shipping_method"=> $this->orderHelper->getOrderShippingMethodName($order),
+            "created"=> strtotime($order->getCreatedAt()),
+            "items" => $this->orderHelper->formatOrderItems($order->getItems())
         ];
     }
 }

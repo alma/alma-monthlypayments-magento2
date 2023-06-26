@@ -22,17 +22,26 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  */
 
-
 namespace Alma\MonthlyPayments\Gateway\Request;
 
-use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
-use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\UrlInterface;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Payment\Gateway\Data\Order\OrderAdapter;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
 class OrderDataBuilder implements BuilderInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(
+        Logger $logger
+    ) {
+        $this->logger = $logger;
+    }
+
     /**
      * Builds ENV request
      *
@@ -43,13 +52,15 @@ class OrderDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
+
         $paymentDO = SubjectReader::readPayment($buildSubject);
+        /** @var OrderAdapter $order */
         $order = $paymentDO->getOrder();
 
         return [
             'order' => [
                 'merchant_reference' => $order->getOrderIncrementId()
-            ],
+            ]
         ];
     }
 }

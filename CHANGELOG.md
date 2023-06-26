@@ -1,5 +1,10 @@
 Changelog
 =========
+v3.4.0
+------
+
+* feat: Add data for Alma Risk - 10 past purchases
+* fix: Fix return SEPA issue
 
 v3.4.0
 ------
