@@ -110,7 +110,6 @@ class Pay extends Action
         $this->request = $request;
         $this->orderHelper = $orderHelper;
         $this->almaClient = $almaClient;
-        $this->context = $context;
     }
 
     /**
