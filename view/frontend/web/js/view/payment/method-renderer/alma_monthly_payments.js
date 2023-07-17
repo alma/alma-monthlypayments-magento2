@@ -21,11 +21,17 @@
  * @license   https://opensource.org/licenses/MIT The MIT License
  *
  */
-
+require.config({
+    paths: {
+        'inPage/Alma': 'https://cdn.jsdelivr.net/npm/@alma/in-page@2.x/dist/index.umd'
+    }
+});
 /*browser:true*/
 /*global define*/
 define(
     [
+        'inPage/Alma',
+        'mage/storage',
         'ko',
         'jquery',
         'underscore',
@@ -36,8 +42,9 @@ define(
         'Magento_Customer/js/customer-data',
         'uiRegistry',
         'Magento_Checkout/js/model/quote',
+        'Magento_Ui/js/model/messageList',
     ],
-    function (ko, $, _, $t, Component, fullScreenLoader, priceUtils, customerData ,registry,quote) {
+    function (Alma, storage, ko, $, _, $t, Component, fullScreenLoader, priceUtils, customerData ,registry, quote, messageList) {
         'use strict';
         var self;
         // This below is a workaround for a Magento bug: payment methods are not reordered when you navigate from
@@ -83,6 +90,7 @@ define(
 
             initialize: function () {
                 self = this;
+                self.reloadCartSection();
                 this._super();
                 this.almaSectionName = 'alma_section';
 
@@ -91,6 +99,7 @@ define(
 
                 this.checkedPaymentMethod = ko.observable('');
                 this.lastSelectedPlanKey =  ko.observable({});
+                this.lastSelectedPlan = ko.observable({});
 
                 // eslint-disable-next-line max-len
                 ['merged','paynow','installments','spread','deferred'].forEach((paymentOption)=>this.initObservablesAndComputedFor(paymentOption));
@@ -131,15 +140,16 @@ define(
                     return plan.key === key;
                 });
                 currentSelectedPlan.paymentCode = paymentCode;
-                if(self.checkedPaymentMethod() == paymentCode){
+                if(self.checkedPaymentMethod() === paymentCode){
                     self.lastSelectedPlanKey()[paymentCode] = currentSelectedPlan.key;
+                    self.lastSelectedPlan()[paymentCode] = currentSelectedPlan;
                 }
                 return currentSelectedPlan;
             },
 
             fallbackIsChecked : function (paymentCode) {
                 var isChecked = false;
-                if(( this.isChecked() == null|| this.isChecked() == this.getCode() ) && this.checkedPaymentMethod() == paymentCode){
+                if(( this.isChecked() == null|| this.isChecked() === this.getCode() ) && this.checkedPaymentMethod() === paymentCode){
                     isChecked = true;
                 }
                 return isChecked;
@@ -192,8 +202,8 @@ define(
                 return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
             },
             getSelectedPlanForCurrentPaymentMethod:function(){
-                const currentPaymentMehod = self.checkedPaymentMethod();
-                return self.lastSelectedPlanKey()[currentPaymentMehod];
+                const currentPaymentMethod = self.checkedPaymentMethod();
+                return self.lastSelectedPlanKey()[currentPaymentMethod];
             },
             getData: function () {
                 return $.extend(
@@ -205,10 +215,88 @@ define(
                     }
                 );
             },
+            selectPaymentMethod : function() {
+                self.unMountInPage();
+                const currentPaymentMethod = self.checkedPaymentMethod();
+                if( self.lastSelectedPlan()[currentPaymentMethod].inPageAllowed) {
+                    self.selectInstallments(self.lastSelectedPlan()[currentPaymentMethod]);
+                }
+                return true;
+            },
+            selectInstallments : function(plan){
+                self.unMountInPage();
+                const merchantId = self.config.merchantId
+                const totalInCent = self.totals().grand_total * 100
+                const installmentsCount = plan.installmentsCount
+                const environment = self.config.activeMode
+                const locale = self.config.locale
+                self.inPage = Alma.initialize({
+                    'merchantId': merchantId,
+                    'amountInCents': totalInCent,
+                    'installmentsCount': installmentsCount,
+                    'selector': '#alma-in-page',
+                    'environment': environment.toUpperCase(),
+                    'locale': locale.substr(0, 2)
+                })
+                return true;
+            },
             afterPlaceOrder: function () {
                 fullScreenLoader.startLoader();
-                // Get payment page URL from checkoutConfig and redirect
-                $.mage.redirect(this.config.redirectTo);
+                const redirectUrl = this.config.redirectTo;
+                const currentPaymentMethod = self.checkedPaymentMethod();
+                if (self.lastSelectedPlan()[currentPaymentMethod].inPageAllowed) {
+                    storage.post(
+                        redirectUrl,
+                        JSON.stringify({'planKey': self.lastSelectedPlan()[currentPaymentMethod].key}),
+                        true
+                    ).done(
+                        function (response) {
+                            self.inPage.startPayment(
+                                {
+                                    paymentId: response.paymentId,
+                                    onUserCloseModal : () => {
+                                        self.inPageCancelOrder();
+                                    }
+                                }
+                            );
+                        }
+                    ).fail(
+                        function (response) {
+                            self.reloadCartSection();
+                            messageList.addErrorMessage({ message: $t(response.responseJSON.message) });
+                            fullScreenLoader.stopLoader();
+                            console.log(response);
+                        }
+                    );
+                } else {
+                    $.mage.redirect(redirectUrl);
+                }
+            },
+            unMountInPage : function(){
+                if( self.inpage !== undefined) {
+                    self.inPage.unmount();
+                }
+            },
+            reloadCartSection : function() {
+                var sections = ['cart'];
+                customerData.invalidate(sections);
+                customerData.reload(sections, true);
+            },
+            inPageCancelOrder: function (){
+                storage.post(
+                    this.config.inPageCancelUrl,
+                    '',
+                    true
+                ).done(
+                    function (response){
+                        self.reloadCartSection();
+                    }
+                ).fail(
+                    function (response){
+                        self.reloadCartSection();
+                    }
+                );
+                fullScreenLoader.stopLoader();
             }
         });
     }

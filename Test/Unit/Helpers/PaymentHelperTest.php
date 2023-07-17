@@ -40,7 +40,6 @@ class PaymentHelperTest extends TestCase
         $this->paymentHelper->getOrderIdFromAlmaPayment($almaPaymentMock);
     }
 
-
     public function testIfGettingOrderIdReturnStringWhitGoodPayment(): void
     {
         $testOrderId = '1000001';
@@ -50,4 +49,13 @@ class PaymentHelperTest extends TestCase
         $this->assertSame($testOrderId, $result);
     }
 
+    public function testGetKeyWithAlmaPayment(): void
+    {
+        $almaPaymentData = new Payment([
+            'installments_count' => '3',
+            'deferred_days' => '0',
+            'deferred_months' => '0'
+        ]);
+        $this->assertEquals('general:3:0:0', $this->paymentHelper->getAlmaPaymentPlanKey($almaPaymentData));
+    }
 }

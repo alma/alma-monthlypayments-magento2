@@ -28,4 +28,16 @@ class PaymentHelper extends AbstractHelper
         }
         return $order_id;
     }
+
+    /**
+     * Generate plan key with an Alma payment
+     *
+     * @param Payment $almaPayment
+     * @return string
+     */
+    public function getAlmaPaymentPlanKey(Payment $almaPayment): string
+    {
+        return sprintf('general:%s:%s:%s', $almaPayment->installments_count, $almaPayment->deferred_days, $almaPayment->deferred_months);
+    }
+
 }

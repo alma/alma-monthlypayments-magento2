@@ -35,6 +35,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 {
     public const CODE = 'alma_monthly_payments';
     public const ORDER_PAYMENT_ID = 'PAYMENT_ID';
+    public const ORDER_PAYMENT_PLAN_KEY = 'PAYMENT_KEY';
     public const ORDER_PAYMENT_URL = 'PAYMENT_URL';
     public const ORDER_PAYMENT_TRIGGER = 'TRIGGER';
     private const CONFIG_SORT_ORDER = 'sort_order';

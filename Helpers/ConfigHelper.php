@@ -20,6 +20,7 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
+    const IN_PAGE_ENABLED = 'in_page_enabled';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
     const BASE_PLANS_CONFIG = 'base_config_plans';
 
@@ -118,6 +119,16 @@ class ConfigHelper extends AbstractHelper
     public function getTranslatedTrigger(): string
     {
         return __($this->getTrigger());
+    }
+
+    /**
+     * Get in page activation setting
+     *
+     * @return bool
+     */
+    public function inPageIsEnabled(): bool
+    {
+        return (bool)$this->getConfigByCode(self::IN_PAGE_ENABLED);
     }
 
     /**

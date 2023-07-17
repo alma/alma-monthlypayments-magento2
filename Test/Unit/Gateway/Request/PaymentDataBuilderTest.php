@@ -8,6 +8,7 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface
 use Alma\MonthlyPayments\Gateway\Request\CartDataBuilder;
 use Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Locale\Resolver;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
@@ -22,6 +23,8 @@ class PaymentDataBuilderTest extends TestCase
     const CANCEL_URL =  'https://mywebsite/alma/payment/cancel/';
     const FAILURE_URL =  'https://mywebsite/alma/payment/failure/';
     const EXPIRATION_TIME =  '2';
+    const ORIGIN_ONLINE =  'online';
+    const ORIGIN_INPAGE =  'online_in_page';
     const INCREMENT_ID =  '100001';
     const QUOTE_ID =  '454';
     const PLAN_KEY_CREDIT =  'general:10:0:0';
@@ -32,6 +35,13 @@ class PaymentDataBuilderTest extends TestCase
     const INSTALLMENT_COUNT =  '3';
     const LOCALE =  'en_US';
 
+    private $checkoutSession;
+    private $config;
+    private $locale;
+    private $configHelper;
+    private $cartDataBuilder;
+    private $paymentPlansHelper;
+
     public function setUp(): void
     {
         $this->checkoutSession = $this->createMock(Session::class);
@@ -39,6 +49,7 @@ class PaymentDataBuilderTest extends TestCase
         $this->locale = $this->createMock(Resolver::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->cartDataBuilder = $this->createMock(CartDataBuilder::class);
+        $this->paymentPlansHelper = $this->createMock(PaymentPlansHelper::class);
         $this->cartDataBuilder->method('build')->willReturn(
             [
                 'cart' => [
@@ -89,6 +100,8 @@ class PaymentDataBuilderTest extends TestCase
         $this->configHelper->expects($this->once())->method('triggerIsEnabled')->willReturn($order['has_trigger']);
 
         $buildSubjectMock = ['payment' => $paymentDataObjectMock];
+
+        $this->paymentPlansHelper->method('inPageIsAllowed')->willReturn($order['inpage']);
         $paymentDataBuilder = $this->createPaymentDataBuilderTest()->build($buildSubjectMock);
         $this->assertEquals($response, $paymentDataBuilder);
     }
@@ -102,6 +115,7 @@ class PaymentDataBuilderTest extends TestCase
                     'installment_count' => self::INSTALLMENT_COUNT,
                     'has_trigger' => false,
                     'plan_has_trigger' => false,
+                    'inpage' => false,
                 ],
                 'final_payload' => [
                     'payment' => $this->paymentFactory(self::INSTALLMENT_COUNT)
@@ -113,6 +127,7 @@ class PaymentDataBuilderTest extends TestCase
                     'installment_count' => self::DEFERRED_COUNT,
                     'has_trigger' => false,
                     'plan_has_trigger' => false,
+                    'inpage' => false,
                 ],
                 'final_payload' => [
                     'payment' => $this->paymentFactory(self::DEFERRED_COUNT)
@@ -124,9 +139,22 @@ class PaymentDataBuilderTest extends TestCase
                     'installment_count' => self::INSTALLMENT_CREDIT_COUNT,
                     'has_trigger' => false,
                     'plan_has_trigger' => false,
+                    'inpage' => false,
                 ],
                 'final_payload' => [
                     'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT, true)
+                ]
+            ],
+            'Payload with In page Installment key' => [
+                'order' => [
+                    'plan_key' => self::PLAN_KEY_CREDIT,
+                    'installment_count' => self::INSTALLMENT_CREDIT_COUNT,
+                    'has_trigger' => false,
+                    'plan_has_trigger' => false,
+                    'inpage' => true,
+                ],
+                'final_payload' => [
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT, true, self::ORIGIN_INPAGE)
                 ]
             ],
             'Payload without trigger' => [
@@ -135,6 +163,7 @@ class PaymentDataBuilderTest extends TestCase
                     'installment_count' => self::INSTALLMENT_COUNT,
                     'has_trigger' => false,
                     'plan_has_trigger' => false,
+                    'inpage' => false,
                 ],
                 'final_payload' => [
                     'payment' => $this->paymentFactory(self::INSTALLMENT_COUNT)
@@ -146,6 +175,7 @@ class PaymentDataBuilderTest extends TestCase
                     'installment_count' => self::INSTALLMENT_COUNT,
                     'has_trigger' => true,
                     'plan_has_trigger' => false,
+                    'inpage' => false,
                 ],
                 'final_payload' => [
                     'payment' => $this->paymentFactory(self::INSTALLMENT_COUNT)
@@ -157,6 +187,7 @@ class PaymentDataBuilderTest extends TestCase
                     'installment_count' => self::INSTALLMENT_COUNT,
                     'has_trigger' => true,
                     'plan_has_trigger' => true,
+                    'inpage' => false,
                 ],
                 'final_payload' => [
                     'payment' => array_merge(
@@ -181,13 +212,16 @@ class PaymentDataBuilderTest extends TestCase
 
     /**
      * @param string $installmentCount
+     * @param bool $cart
+     * @param string $inpage
      * @return array
      */
-    private function paymentFactory(string $installmentCount, bool $cart = false): array
+    private function paymentFactory(string $installmentCount, bool $cart = false, string $inpage = self::ORIGIN_ONLINE): array
     {
         $cartData = [
             'installments_count' => $installmentCount,
             'return_url' => self::RETURN_URL,
+            'origin' => $inpage,
             'ipn_callback_url' => self::IPN_URL,
             'customer_cancel_url' => self::CANCEL_URL,
             'failure_return_url' => self::FAILURE_URL,
@@ -222,7 +256,8 @@ class PaymentDataBuilderTest extends TestCase
             $this->config,
             $this->locale,
             $this->configHelper,
-            $this->cartDataBuilder
+            $this->cartDataBuilder,
+            $this->paymentPlansHelper
         ];
     }
 }

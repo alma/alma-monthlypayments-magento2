@@ -136,6 +136,13 @@
                        showInWebsite="1" showInStore="1">
                     <label>Payment method configuration</label>
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\GeneralGroupFrontModel</frontend_model>
+                    <field id="in_page_enabled" type="select" translate="label comment" sortOrder="10" showInDefault="1"  showInWebsite="1"
+                           showInStore="1">
+                        <label>Activate in-page checkout</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>Activate this setting if you want a in-page checkout</comment>
+                        <config_path>payment/alma_monthly_payments/in_page_enabled</config_path>
+                    </field>
                     <field id="payment_expiration" translate="label comment" sortOrder="20" showInDefault="1">
                         <label>Payment expiration time</label>
                         <comment>Duration in minutes.</comment>

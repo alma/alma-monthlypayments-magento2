@@ -45,7 +45,7 @@
         <!-- ko foreach: installmentsPaymentPlans -->
         <label data-bind="attr: { for: 'alma-select-plan-' + key }">
             <input type="radio" name="alma-selected-plan-installments"
-                   data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.installmentsSelectedPlanKey ">
+                   data-bind="attr: { id: 'alma-select-plan-' + key, value: key }, checked: $parent.installmentsSelectedPlanKey, click: $parent.selectInstallments ">
             <!-- ko if: logo -->
             <img class="alma-plan-logo"
                  data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/' + logo), alt: logo }">
@@ -54,27 +54,31 @@
         </label>
         <!-- /ko -->
         </p>
-
         <ul class="alma-installments">
         <!-- ko if: installmentsSelectedPlan().eligibility -->
             <!-- ko foreach: installmentsSelectedPlan().eligibility.paymentPlan -->
-            <li>
-                <!-- ko if: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
-                     <span class="alma-installment--due-date" data-bind="text: $parent.onTriggerLabel($index())"></span>
+                <!-- ko if: $parent.installmentsSelectedPlan().inPageAllowed -->
+                <div id="alma-in-page"></div>
                 <!-- /ko -->
-                <!-- ko ifnot: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
-                <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
-                <!-- /ko -->
-                <span class="alma-installment--amount-column">
-                        <span class="alma-installment--amount"
-                              data-bind="text: $parent.formattedPrice(total_amount)"></span>
-                    <!-- ko if: customer_fee > 0 -->
-                            <span class="alma-installment--fee">
-                                <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>
-                            </span>
+                <!-- ko ifnot: $parent.installmentsSelectedPlan().inPageAllowed -->
+                <li>
+                    <!-- ko if: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
+                         <span class="alma-installment--due-date" data-bind="text: $parent.onTriggerLabel($index())"></span>
                     <!-- /ko -->
-                    </span>
-            </li>
+                    <!-- ko ifnot: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
+                    <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                    <!-- /ko -->
+                    <span class="alma-installment--amount-column">
+                            <span class="alma-installment--amount"
+                                  data-bind="text: $parent.formattedPrice(total_amount)"></span>
+                        <!-- ko if: customer_fee > 0 -->
+                                <span class="alma-installment--fee">
+                                    <span data-bind="text: $parent.getFeesMention(customer_fee)"></span>
+                                </span>
+                        <!-- /ko -->
+                        </span>
+                </li>
+                <!-- /ko -->
             <!-- /ko -->
         <!-- /ko -->
         </ul>

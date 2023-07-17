@@ -25,11 +25,12 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Alma\MonthlyPayments\Helpers\Logger;
-use Magento\Checkout\Model\Session;
 use Magento\Authorization\Model\UserContextInterface;
-use Magento\Quote\Model\QuoteRepository;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\QuoteRepository;
+use Magento\Sales\Api\Data\OrderInterface;
 
 class QuoteHelper
 {
@@ -70,8 +71,7 @@ class QuoteHelper
         UserContextInterface $userContext,
         QuoteRepository $quoteRepository,
         Session $checkoutSession
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->userContext = $userContext;
         $this->quoteRepository = $quoteRepository;
@@ -86,19 +86,19 @@ class QuoteHelper
      */
     public function getQuote():?CartInterface
     {
-        if(isset($this->quoteId)){
+        if (isset($this->quoteId)) {
             $quoteById = $this->getQuoteById();
         }
-        if (isset($quoteById)){
+        if (isset($quoteById)) {
             return $quoteById;
         }
         $contextUserQuote = $this->getQuoteByContextUserId();
-        if(isset($contextUserQuote)){
+        if (isset($contextUserQuote)) {
             return $contextUserQuote;
         }
 
         $sessionQuote = $this->getQuoteFromSession();
-        if (isset($sessionQuote)){
+        if (isset($sessionQuote)) {
             return $sessionQuote;
         }
         return null;
@@ -113,6 +113,23 @@ class QuoteHelper
         $this->quoteId = $quoteId;
     }
 
+    /**
+     * Restore quote with an order
+     *
+     * @param OrderInterface $order
+     * @return void
+     * @throws NoSuchEntityException
+     */
+    public function restoreQuote(OrderInterface $order): void
+    {
+        // Keep quote active in case the customer comes back to the site without paying
+        $quote = $this->quoteRepository->get($order->getQuoteId());
+        $quote->setIsActive(true);
+        $this->checkoutSession->restoreQuote();
+        $this->quoteRepository->save($quote);
+
+        $this->checkoutSession->setLastQuoteId($quote->getId())->setLastSuccessQuoteId($quote->getId())->setLastOrderId($order->getId())->setLastRealOrderId($order->getIncrementId());
+    }
 
     /**
      * Get quote from session if is define
@@ -123,12 +140,11 @@ class QuoteHelper
     {
         $quote = null;
         $sessionQuoteId = $this->getQuoteIdFromSession();
-        if($sessionQuoteId != null){
+        if ($sessionQuoteId != null) {
             $quote = $this->checkoutSession->getQuote();
         }
         return $quote;
     }
-
 
     /**
      * @return CartInterface|null
@@ -138,7 +154,7 @@ class QuoteHelper
     {
         $quote = null;
         $customerUserId = $this->getContextUserId();
-        if($customerUserId > 0){
+        if ($customerUserId > 0) {
             $quote = $this->quoteRepository->getActiveForCustomer($customerUserId);
         }
         return $quote;
@@ -154,7 +170,7 @@ class QuoteHelper
         try {
             $quote = $this->quoteRepository->get($this->quoteId);
         } catch (\Exception $e) {
-            $this->logger->info('getQuoteById Exception : ',[$e->getMessage()]);
+            $this->logger->info('getQuoteById Exception : ', [$e->getMessage()]);
         }
         return $quote;
     }
@@ -175,5 +191,4 @@ class QuoteHelper
     {
         return $this->checkoutSession->getQuoteId();
     }
-
 }

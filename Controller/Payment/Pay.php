@@ -25,11 +25,23 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
+use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\OrderHelper;
+use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
+use Alma\MonthlyPayments\Helpers\QuoteHelper;
+use Alma\MonthlyPayments\Model\Exceptions\InPagePayException;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Quote\Model\QuoteRepository;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\Order;
 
 class Pay extends Action
 {
@@ -38,25 +50,67 @@ class Pay extends Action
      */
     private $checkoutSession;
     /**
-     * @var QuoteRepository
+     * @var QuoteHelper
      */
-    private $quoteRepository;
+    private $quoteHelper;
+    /**
+     * @var PaymentPlansHelper
+     */
+    private $paymentPlansHelper;
+    /**
+     * @var JsonFactory
+     */
+    private $jsonFactory;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var Http
+     */
+    private $request;
+    /**
+     * @var OrderHelper
+     */
+    private $orderHelper;
+    /**
+     * @var AlmaClient
+     */
+    private $almaClient;
 
     /**
      * Pay constructor.
+     * @param Logger $logger
+     * @param Http $request
      * @param Context $context
      * @param CheckoutSession $checkoutSession
-     * @param QuoteRepository $quoteRepository
+     * @param QuoteHelper $quoteHelper
+     * @param PaymentPlansHelper $paymentPlansHelper
+     * @param OrderHelper $orderHelper
+     * @param JsonFactory $jsonFactory
      */
     public function __construct(
+        Logger $logger,
+        Http $request,
         Context $context,
         CheckoutSession $checkoutSession,
-        QuoteRepository $quoteRepository
-    )
-    {
+        QuoteHelper $quoteHelper,
+        PaymentPlansHelper $paymentPlansHelper,
+        OrderHelper $orderHelper,
+        JsonFactory $jsonFactory,
+        AlmaClient $almaClient
+
+    ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
-        $this->quoteRepository = $quoteRepository;
+        $this->quoteHelper = $quoteHelper;
+        $this->paymentPlansHelper = $paymentPlansHelper;
+        $this->jsonFactory = $jsonFactory;
+        $this->logger = $logger;
+        $this->request = $request;
+        $this->orderHelper = $orderHelper;
+        $this->almaClient = $almaClient;
+        $this->context = $context;
     }
 
     /**
@@ -67,29 +121,106 @@ class Pay extends Action
     {
         $order = $this->checkoutSession->getLastRealOrder();
         if (!$order) {
+            $this->logger->error('Error: cannot find order in session');
             throw new LocalizedException(__('Error: cannot find order in session'));
         }
 
         $payment = $order->getPayment();
         if (!$payment) {
-            throw new LocalizedException(__('Error getting payment information from session'));
+            return $this->errorProcess($order, 'Error: getting payment information from session');
         }
 
-        $url = $payment->getAdditionalInformation()['PAYMENT_URL'];
+        $paymentID = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_ID];
+        if (empty($paymentID)) {
+            return $this->errorProcess($order, 'Error: no payment id found in session');
+        }
+
+        $url = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_URL];
         if (empty($url)) {
-            throw new LocalizedException(__('Error: no payment URL found in session'));
+            return $this->errorProcess($order, 'Error: no payment URL found in session', $paymentID);
         }
 
-        // Keep quote active in case the customer comes back to the site without paying
-        $quote = $this->quoteRepository->get($order->getQuoteId());
-        $quote->setIsActive(true);
-        $this->checkoutSession->restoreQuote();
-        $this->quoteRepository->save($quote);
+        $paymentPlanKey = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_PLAN_KEY];
+        if (empty($paymentPlanKey)) {
+            return $this->errorProcess($order, 'Error: no payment payment plan key found in session', $paymentID);
+        }
 
-        $this->checkoutSession->setLastQuoteId($quote->getId())->setLastSuccessQuoteId($quote->getId())->setLastOrderId($order->getId())->setLastRealOrderId($order->getIncrementId());
+        if ($this->request->isPost()) {
+            try {
+                $postPaymentPlanKey = $this->getRequestPaymentPlanKey();
+            } catch (InPagePayException $e) {
+                return $this->errorProcess($order, $e->getMessage(), $paymentID);
+            }
+            if ($paymentPlanKey != $postPaymentPlanKey) {
+                return $this->errorProcess($order, 'Error: posted payment plan key and order payment plan key are not the same', $paymentID);
+            }
+        }
 
+
+        if ($this->paymentPlansHelper->inPageIsAllowed($paymentPlanKey)) {
+            $response = $this->jsonFactory->create();
+            $response->setData(['error' => false, 'paymentId' => $paymentID]);
+            return $response;
+        } else {
+            $redirect = $this->resultRedirectFactory->create();
+            $redirect->setUrl($url);
+            return $redirect;
+        }
+    }
+
+    /**
+     * Get request content.
+     *
+     * @return string
+     * @throws InPagePayException
+     */
+    private function getRequestPaymentPlanKey(): string
+    {
+        $requestContent = json_decode($this->request->getContent(), true);
+        if (
+            !isset($requestContent) ||
+            !isset($requestContent['planKey']) ||
+            !preg_match('!general:([\d]+):([\d]+):([\d]+)!', $requestContent['planKey'])
+        ) {
+            throw new InPagePayException('Request data are not valid', $this->logger);
+        }
+
+        return $requestContent['planKey'];
+    }
+
+    /**
+     * Error process : restore cart and throw an exception
+     *
+     * @param Order $order
+     * @param string $message
+     * @return Redirect | Json
+     * @throws NoSuchEntityException
+     */
+    private function errorProcess(Order $order, string $message, string $paymentID = '')
+    {
+        $this->logger->error('Error in pay process :', [$message]);
+        $this->quoteHelper->restoreQuote($order);
+        if ($order->canCancel()) {
+            $order->cancel();
+            $order->addStatusToHistory(Order::STATE_CANCELED, $message);
+            $this->orderHelper->save($order);
+        }
+        if ($this->request->isPost()) {
+            $response = $this->jsonFactory->create();
+            $response->setStatusHeader(400);
+            $response->setData(['error' => true, 'message' => $message]);
+            $this->messageManager->addWarningMessage(__($message));
+            return $response;
+        }
+        if ($paymentID !== '') {
+            try {
+                $this->almaClient->getDefaultClient()->payments->cancel($paymentID);
+            } catch (\Exception $e) {
+                $this->logger->error('Error in cancel Alma payment', [$e->getMessage()]);
+            }
+        }
         $redirect = $this->resultRedirectFactory->create();
-        $redirect->setUrl($url);
-        return $redirect;
+        $this->messageManager->addWarningMessage(__('Something went wrong while.'));
+        return $redirect->setPath('checkout/cart/');
     }
 }

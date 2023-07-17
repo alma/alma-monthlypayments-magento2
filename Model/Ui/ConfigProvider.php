@@ -26,12 +26,12 @@
 namespace Alma\MonthlyPayments\Model\Ui;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\CheckoutConfigHelper;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -56,6 +56,10 @@ class ConfigProvider implements ConfigProviderInterface
      * @var CheckoutConfigHelper
      */
     private $checkoutConfigHelper;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * ConfigProvider constructor.
@@ -70,14 +74,15 @@ class ConfigProvider implements ConfigProviderInterface
         Config $config,
         ResolverInterface $localeResolver,
         ConfigHelper $configHelper,
-        CheckoutConfigHelper $checkoutConfigHelper
-    )
-    {
+        CheckoutConfigHelper $checkoutConfigHelper,
+        ApiConfigHelper $apiConfigHelper
+    ) {
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
         $this->localeResolver = $localeResolver;
         $this->configHelper = $configHelper;
         $this->checkoutConfigHelper = $checkoutConfigHelper;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -89,11 +94,14 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 Config::CODE => [
                     'redirectTo' => $this->urlBuilder->getUrl('alma/payment/pay'),
+                    'inPageCancelUrl' => $this->urlBuilder->getUrl('alma/payment/cancelInPagePayment'),
                     'title' => __($this->checkoutConfigHelper->getMergePaymentTitle()),
                     'description' => __($this->checkoutConfigHelper->getMergePaymentDesc()),
                     'triggerEnable' => __($this->configHelper->triggerIsEnabled()),
                     'triggerLabel' => __($this->configHelper->getTrigger()),
                     'sortOrder' => $this->config->getSortOrder(),
+                    'merchantId' => $this->config->getMerchantId(),
+                    'activeMode' => $this->apiConfigHelper->getActiveMode(),
                     'locale' => str_replace('_', '-', $this->localeResolver->getLocale())
                 ]
             ]

@@ -30,6 +30,7 @@ use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Eligibility;
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Model\Data\Address;
 use Alma\MonthlyPayments\Observer\PaymentDataAssignObserver;
 use Magento\Checkout\Model\Session as CheckoutSession;
@@ -61,6 +62,10 @@ class PaymentDataBuilder implements BuilderInterface
      * @var CartDataBuilder
      */
     private $cartDataBuilder;
+    /**
+     * @var PaymentPlansHelper
+     */
+    private $paymentPlansHelper;
 
     /**
      * PaymentDataBuilder constructor.
@@ -76,13 +81,15 @@ class PaymentDataBuilder implements BuilderInterface
         Config          $config,
         Resolver        $locale,
         ConfigHelper    $configHelper,
-        CartDataBuilder $cartDataBuilder
+        CartDataBuilder $cartDataBuilder,
+        PaymentPlansHelper $paymentPlansHelper
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
         $this->locale = $locale;
         $this->configHelper = $configHelper;
         $this->cartDataBuilder = $cartDataBuilder;
+        $this->paymentPlansHelper = $paymentPlansHelper;
     }
 
     /**
@@ -106,6 +113,7 @@ class PaymentDataBuilder implements BuilderInterface
 
         $configArray = [
             'return_url' => $this->config->getReturnUrl(),
+            'origin' => $this->paymentPlansHelper->inPageIsAllowed($planKey) ? 'online_in_page' : 'online',
             'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
             'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
             'failure_return_url' => $this->config->getFailureReturnUrl(),
