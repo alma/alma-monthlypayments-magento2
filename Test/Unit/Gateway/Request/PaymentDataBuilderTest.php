@@ -101,7 +101,7 @@ class PaymentDataBuilderTest extends TestCase
 
         $buildSubjectMock = ['payment' => $paymentDataObjectMock];
 
-        $this->paymentPlansHelper->method('inPageIsAllowed')->willReturn($order['inpage']);
+        $this->paymentPlansHelper->method('isInPageAllowed')->willReturn($order['inpage']);
         $paymentDataBuilder = $this->createPaymentDataBuilderTest()->build($buildSubjectMock);
         $this->assertEquals($response, $paymentDataBuilder);
     }

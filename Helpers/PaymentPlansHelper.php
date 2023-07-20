@@ -99,11 +99,10 @@ class PaymentPlansHelper
      * @param string $planKey
      * @return bool
      */
-    public function inPageIsAllowed(string $planKey): bool
+    public function isInPageAllowed(string $planKey): bool
     {
-        //TODO create test isPayNow isInstallment isDeferred IsCredit in plan helper and refactor
         $planIsAllowed = preg_match('!general:[1-4]:0:0!', $planKey);
-        return $this->configHelper->inPageIsEnabled() && $planIsAllowed;
+        return $this->configHelper->isInPageEnabled() && $planIsAllowed;
     }
 
     /**

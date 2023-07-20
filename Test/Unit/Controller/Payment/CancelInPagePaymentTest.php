@@ -33,6 +33,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->orderHelper = $this->createMock(OrderHelper::class);
         $this->almaClient = $this->createMock(AlmaClient::class);
     }
+
     private function getConstructorDependency(): array
     {
         return [
@@ -49,6 +50,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->generateJsonResponse();
         $this->assertInstanceOf(Json::class, $this->createCancelInaPgePayment()->execute());
     }
+
     public function testShouldGetOrderInCheckoutSession():void
     {
         $this->generateJsonResponse();
@@ -56,6 +58,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->checkoutSession->expects($this->once())->method('getLastRealOrder')->willReturn($this->createOrder());
         $this->createCancelInaPgePayment()->execute();
     }
+
     public function testShouldReturnErrorIfNoOrderInSession():void
     {
         $this->generateJsonResponse(true);
@@ -63,6 +66,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->checkoutSession->expects($this->once())->method('getLastRealOrder')->willReturn(null);
         $this->createCancelInaPgePayment()->execute();
     }
+
     public function testShouldNotCallOrderCancelIfNotCancellableAndReturnError():void
     {
         $this->generateJsonResponse(true);
@@ -71,10 +75,11 @@ class CancelInPagePaymentTest extends TestCase
         $this->checkoutSession->expects($this->once())->method('getLastRealOrder')->willReturn($order);
         $this->createCancelInaPgePayment()->execute();
     }
+
     public function testShouldCallOrderCancel():void
     {
         $this->generateJsonResponse();
-        $this->generateAlmaClient();
+        $this->generateAlmaClient(true);
         $this->checkoutSession->expects($this->once())->method('getLastRealOrder')->willReturn($this->createOrder());
         $this->createCancelInaPgePayment()->execute();
     }
@@ -88,6 +93,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->checkoutSession->expects($this->once())->method('getLastRealOrder')->willReturn($order);
         $this->createCancelInaPgePayment()->execute();
     }
+
     public function testShouldRestoreQuote():void
     {
         $this->generateJsonResponse();
@@ -96,6 +102,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->checkoutSession->expects($this->once())->method('restoreQuote');
         $this->createCancelInaPgePayment()->execute();
     }
+
     public function testShouldSaveTheOrderRepository():void
     {
         $this->generateJsonResponse();
@@ -104,6 +111,7 @@ class CancelInPagePaymentTest extends TestCase
         $this->orderHelper->expects($this->once())->method('save');
         $this->createCancelInaPgePayment()->execute();
     }
+
     public function testShouldCancelAlmaPayment():void
     {
         $this->generateJsonResponse();
@@ -131,6 +139,7 @@ class CancelInPagePaymentTest extends TestCase
 
         return $order;
     }
+
     private function generateJsonResponse($error = false): void
     {
         $jsonMock = $this->createMock(Json::class);
@@ -152,5 +161,4 @@ class CancelInPagePaymentTest extends TestCase
             ->method('getDefaultClient')
             ->willReturn($clientMock);
     }
-
 }

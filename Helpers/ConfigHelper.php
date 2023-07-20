@@ -126,7 +126,7 @@ class ConfigHelper extends AbstractHelper
      *
      * @return bool
      */
-    public function inPageIsEnabled(): bool
+    public function isInPageEnabled(): bool
     {
         return (bool)$this->getConfigByCode(self::IN_PAGE_ENABLED);
     }

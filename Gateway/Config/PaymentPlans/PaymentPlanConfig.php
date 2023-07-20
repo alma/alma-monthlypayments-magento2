@@ -172,7 +172,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     {
         $this->data['key']= self::planKey();
         $this->data['logo']= self::logoFileName();
-        $this->data['inPageAllowed']= $this->paymentPlansHelper->inPageIsAllowed(self::planKey());
+        $this->data['inPageAllowed']= $this->paymentPlansHelper->isInPageAllowed(self::planKey());
         return $this->data;
     }
 

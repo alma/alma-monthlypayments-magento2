@@ -121,26 +121,31 @@ class Pay extends Action
         $order = $this->checkoutSession->getLastRealOrder();
         if (!$order) {
             $this->logger->error('Error: cannot find order in session');
+
             throw new LocalizedException(__('Error: cannot find order in session'));
         }
 
         $payment = $order->getPayment();
         if (!$payment) {
+
             return $this->errorProcess($order, 'Error: getting payment information from session');
         }
 
         $paymentID = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_ID];
         if (empty($paymentID)) {
+
             return $this->errorProcess($order, 'Error: no payment id found in session');
         }
 
         $url = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_URL];
         if (empty($url)) {
+
             return $this->errorProcess($order, 'Error: no payment URL found in session', $paymentID);
         }
 
         $paymentPlanKey = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_PLAN_KEY];
         if (empty($paymentPlanKey)) {
+
             return $this->errorProcess($order, 'Error: no payment payment plan key found in session', $paymentID);
         }
 
@@ -148,23 +153,27 @@ class Pay extends Action
             try {
                 $postPaymentPlanKey = $this->getRequestPaymentPlanKey();
             } catch (InPagePayException $e) {
+
                 return $this->errorProcess($order, $e->getMessage(), $paymentID);
             }
             if ($paymentPlanKey != $postPaymentPlanKey) {
+
                 return $this->errorProcess($order, 'Error: posted payment plan key and order payment plan key are not the same', $paymentID);
             }
         }
 
-
-        if ($this->paymentPlansHelper->inPageIsAllowed($paymentPlanKey)) {
+        if ($this->paymentPlansHelper->isInPageAllowed($paymentPlanKey)) {
             $response = $this->jsonFactory->create();
             $response->setData(['error' => false, 'paymentId' => $paymentID]);
+
             return $response;
-        } else {
-            $redirect = $this->resultRedirectFactory->create();
-            $redirect->setUrl($url);
-            return $redirect;
         }
+
+        $redirect = $this->resultRedirectFactory->create();
+        $redirect->setUrl($url);
+
+        return $redirect;
+
     }
 
     /**
@@ -176,11 +185,13 @@ class Pay extends Action
     private function getRequestPaymentPlanKey(): string
     {
         $requestContent = json_decode($this->request->getContent(), true);
+
         if (
-            !isset($requestContent) ||
-            !isset($requestContent['planKey']) ||
-            !preg_match('!general:([\d]+):([\d]+):([\d]+)!', $requestContent['planKey'])
+            !isset($requestContent)
+            || !isset($requestContent['planKey'])
+            || !preg_match('!general:([\d]+):([\d]+):([\d]+)!', $requestContent['planKey'])
         ) {
+
             throw new InPagePayException('Request data are not valid', $this->logger);
         }
 
@@ -192,6 +203,7 @@ class Pay extends Action
      *
      * @param Order $order
      * @param string $message
+     * @param string $paymentID
      * @return Redirect | Json
      * @throws NoSuchEntityException
      */
@@ -209,6 +221,7 @@ class Pay extends Action
             $response->setStatusHeader(400);
             $response->setData(['error' => true, 'message' => $message]);
             $this->messageManager->addWarningMessage(__($message));
+
             return $response;
         }
         if ($paymentID !== '') {
@@ -220,6 +233,7 @@ class Pay extends Action
         }
         $redirect = $this->resultRedirectFactory->create();
         $this->messageManager->addWarningMessage(__('Something went wrong while.'));
+
         return $redirect->setPath('checkout/cart/');
     }
 }

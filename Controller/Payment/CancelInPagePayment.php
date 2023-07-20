@@ -2,10 +2,8 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
-use Alma\API\RequestError;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
-use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\OrderHelper;
 use Magento\Checkout\Model\Session;
@@ -61,12 +59,16 @@ class CancelInPagePayment implements ActionInterface
     {
         $response = $this->jsonFactory->create();
         $order = $this->session->getLastRealOrder();
+
         if (!$order) {
             $this->error($response, 'No Order in session');
+
             return $response;
         }
+
         if (!$order->canCancel()) {
             $this->error($response, 'Order can not be cancelled');
+
             return $response;
         }
         $order->cancel()->addStatusToHistory(Order::STATE_CANCELED, 'In Page Payment canceled by customer');
@@ -80,6 +82,7 @@ class CancelInPagePayment implements ActionInterface
             $this->logger->error('Error in cancel Alma payment', [$e->getMessage()]);
         }
         $response->setData(['error' => false, 'payment_id' => $paymentID]);
+
         return $response;
     }
 
@@ -92,6 +95,7 @@ class CancelInPagePayment implements ActionInterface
     {
         $response->setStatusHeader(400);
         $response->setData(['error' => true, 'message' => $message]);
+
         return $response;
     }
 }
