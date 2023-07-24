@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v3.5.0
+------
+
+* feat: Allow in page payment for Pay Now and pay in installments 
+
 v3.4.0
 ------
 
