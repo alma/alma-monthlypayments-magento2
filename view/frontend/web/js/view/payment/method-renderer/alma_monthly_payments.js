@@ -233,7 +233,6 @@ define(
                 const installmentsCount = plan.installmentsCount
                 const environment = self.config.activeMode
                 const locale = self.config.locale
-                console.log('#alma-in-page'+'-'+self.checkedPaymentMethod())
                 self.inPage = Alma.initialize({
                     'merchantId': merchantId,
                     'amountInCents': totalInCent,
