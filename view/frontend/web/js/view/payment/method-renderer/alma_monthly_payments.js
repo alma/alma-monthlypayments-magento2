@@ -224,17 +224,21 @@ define(
                 return true;
             },
             selectInstallments : function(plan){
+                if(!plan.inPageAllowed) {
+                    return true;
+                }
                 self.unMountInPage();
                 const merchantId = self.config.merchantId
                 const totalInCent = self.totals().grand_total * 100
                 const installmentsCount = plan.installmentsCount
                 const environment = self.config.activeMode
                 const locale = self.config.locale
+                console.log('#alma-in-page'+'-'+self.checkedPaymentMethod())
                 self.inPage = Alma.initialize({
                     'merchantId': merchantId,
                     'amountInCents': totalInCent,
                     'installmentsCount': installmentsCount,
-                    'selector': '#alma-in-page',
+                    'selector': '#alma-in-page'+'-'+self.checkedPaymentMethod(),
                     'environment': environment.toUpperCase(),
                     'locale': locale.substr(0, 2)
                 })

@@ -57,9 +57,6 @@
         <ul class="alma-installments">
         <!-- ko if: installmentsSelectedPlan().eligibility -->
             <!-- ko foreach: installmentsSelectedPlan().eligibility.paymentPlan -->
-                <!-- ko if: $parent.installmentsSelectedPlan().inPageAllowed -->
-                <div id="alma-in-page"></div>
-                <!-- /ko -->
                 <!-- ko ifnot: $parent.installmentsSelectedPlan().inPageAllowed -->
                 <li>
                     <!-- ko if: $parent.triggerIsEnable() && $parent.installmentsSelectedPlan().deferredTriggerEnable -->
@@ -79,6 +76,9 @@
                         </span>
                 </li>
                 <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: installmentsSelectedPlan().inPageAllowed -->
+            <div id="alma-in-page-alma_monthly_payments_installments"></div>
             <!-- /ko -->
         <!-- /ko -->
         </ul>
