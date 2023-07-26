@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 
 class ApiKeyValueTest extends TestCase
 {
+    const SECRET_VALUE = '******';
     private $context;
     private $registry;
     private $scope;
@@ -58,18 +59,18 @@ class ApiKeyValueTest extends TestCase
     public function testNoChangeReturnEmptyAndDisallowSave(): void
     {
         $this->mockGetMerchant();
-        $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn('test_key_1234567890');
-        $this->assertNull($ApiKeyObject->beforeSave());
-        $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
+        $apiKeyObject = $this->createPartialMockApiKeyObject();
+        $apiKeyObject->expects('hasDataChanges')->andReturn(false);
+        $apiKeyObject->expects('getValue')->andReturn('test_key_1234567890');
+        $this->assertNull($apiKeyObject->beforeSave());
+        $apiKeyObject->shouldHaveReceived('disallowDataSave')->once();
     }
 
     public function testGetApiTestModeForStars(): void
     {
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
         $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn('*******');
+        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
         $ApiKeyObject->expects('getApiKeyType')->andReturn('test');
         $this->apiConfigHelper->expects($this->once())->method('getTestKey');
         $this->assertNull($ApiKeyObject->beforeSave());
@@ -78,7 +79,7 @@ class ApiKeyValueTest extends TestCase
     {
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
         $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn('*******');
+        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
         $ApiKeyObject->expects('getApiKeyType')->andReturn('live');
         $this->apiConfigHelper->expects($this->once())->method('getLiveKey');
         $this->assertNull($ApiKeyObject->beforeSave());
@@ -89,7 +90,7 @@ class ApiKeyValueTest extends TestCase
 
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
         $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn('*******');
+        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
 
         $this->configHelper->expects($this->once())
             ->method('saveMerchantId');
@@ -107,7 +108,7 @@ class ApiKeyValueTest extends TestCase
 
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
         $ApiKeyObject->expects('hasDataChanges')->andReturn(true);
-        $ApiKeyObject->expects('getValue')->andReturn('******');
+        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
         $this->assertNull($ApiKeyObject->beforeSave());
         $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
         $ApiKeyObject->shouldNotHaveReceived('saveAndEncryptValue');
