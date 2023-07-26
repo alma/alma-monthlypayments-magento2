@@ -49,7 +49,7 @@ class PaymentHelperTest extends TestCase
         $this->assertSame($testOrderId, $result);
     }
 
-    public function testGetKeyWithAlmaPayment(): void
+    public function testGetPlanKeyForAlmaPayment(): void
     {
         $almaPaymentData = new Payment([
             'installments_count' => '3',
