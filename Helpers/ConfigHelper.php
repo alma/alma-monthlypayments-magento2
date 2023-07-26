@@ -67,9 +67,9 @@ class ConfigHelper extends AbstractHelper
      * @param string|null $scope
      * @param string|null $storeId
      *
-     * @return string
+     * @return string|null
      */
-    public function getConfigByCode($code, ?string $scope = null, ?string $storeId = null): string
+    public function getConfigByCode($code, ?string $scope = null, ?string $storeId = null): ?string
     {
         if (!$storeId) {
             $storeId = $this->storeHelper->getStoreId();
