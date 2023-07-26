@@ -179,7 +179,13 @@ class ConfigHelper extends AbstractHelper
     public function saveIsAllowedInPage(string $path, $merchant, $scope, $storeId): void
     {
         if ($merchant) {
-            $this->saveConfig($path, $merchant->cms_allow_inpage ? 1 : 0, $scope, $storeId);
+            $cmsAllowInPage = 1;
+
+            if (isset($merchant->cms_allow_inpage)) {
+                $cmsAllowInPage = $merchant->cms_allow_inpage ? 1 : 0;
+            }
+
+            $this->saveConfig($path, $cmsAllowInPage, $scope, $storeId);
             $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
         }
     }

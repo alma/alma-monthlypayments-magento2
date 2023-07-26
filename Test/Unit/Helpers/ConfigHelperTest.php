@@ -54,7 +54,7 @@ class ConfigHelperTest extends TestCase
         $merchant = $this->createMock(Merchant::class);
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
-            0,
+            1,
             0,
             1
         );

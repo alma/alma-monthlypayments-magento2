@@ -71,9 +71,7 @@ class InPageAllowed extends Field
         if ('test' === $this->apiConfigHelper->getActiveMode()) {
             $path = $this->testAPIKeyValue->getMerchantIsAllowedInPagePath();
         }
-        $this->logger->info('Path', [$path]);
         $inPageIsAllowed = $this->configHelper->getConfigByCode($path);
-        $this->logger->info('in Page is Allowed', [$inPageIsAllowed]);
         if (!$inPageIsAllowed) {
             $element->setReadonly(true, true);
             $element->setComment(__("Interested in this feature? Reach out to support@almapay.com to gain access."));
