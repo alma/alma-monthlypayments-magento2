@@ -191,6 +191,16 @@ class ConfigHelper extends AbstractHelper
     }
 
     /**
+     * Disable in page
+     *
+     * @return void
+     */
+    public function disableInPage():void
+    {
+        $this->saveConfig(self::IN_PAGE_ENABLED, 0, $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
+    }
+
+    /**
      * @param string $path
      * @param $scope
      * @param $storeId
