@@ -170,9 +170,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function toArray(): array
     {
-        $this->data['key']= self::planKey();
-        $this->data['logo']= self::logoFileName();
-        $this->data['inPageAllowed']= $this->paymentPlansHelper->isInPageAllowed(self::planKey());
+        $this->data['key']= $this->planKey();
+        $this->data['logo']= $this->logoFileName();
+        $this->data['inPageAllowed']= $this->paymentPlansHelper->isInPageAllowed($this->planKey());
         return $this->data;
     }
 
