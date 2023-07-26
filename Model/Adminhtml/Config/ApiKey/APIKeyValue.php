@@ -25,6 +25,7 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
@@ -44,6 +45,7 @@ class APIKeyValue extends Encrypted
 {
     protected $apiKeyType = '';
     protected $merchantIdPath = '';
+    protected $merchantIsAllowedInPagePath = '';
 
     /**
      * @var Availability
@@ -67,6 +69,10 @@ class APIKeyValue extends Encrypted
      * @var Logger
      */
     private $logger;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     /**
      * APIKeyValue constructor.
@@ -94,6 +100,7 @@ class APIKeyValue extends Encrypted
         MessageManager $messageManager,
         ConfigHelper $configHelper,
         Logger $logger,
+        ApiConfigHelper $apiConfigHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -114,6 +121,7 @@ class APIKeyValue extends Encrypted
         $this->hasError = false;
         $this->configHelper = $configHelper;
         $this->logger = $logger;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -133,30 +141,35 @@ class APIKeyValue extends Encrypted
      */
     public function beforeSave(): void
     {
-        $value = (string)$this->getValue();
-        if (!$this->hasDataChanges() ||
-            preg_match('/^\*+$/', $value)
+        $value = $this->getValue();
+        $valueIsStars = preg_match('/^\*+$/', $value);
+        if (
+            !$this->hasDataChanges()
+            || $valueIsStars
         ) {
             $this->disallowDataSave();
-            return;
+            $value = $this->getSavedApiKeyByFieldMode();
         }
+
         // Clean api key value by saving empty value
-        $merchant = $this->availabilityHelper->getMerchant($this->apiKeyType, $value);
+        $merchant = $this->availabilityHelper->getMerchant($this->getApiKeyType(), $value);
         if (empty($value) || $merchant) {
-            $this->configHelper->saveMerchantId(
-                $this->merchantIdPath,
-                $merchant,
-                $this->getScope(),
-                $this->getScopeId()
-            );
-            if ($this->isValueChanged() && $this->apiKeyType == 'live') {
+            $this->saveMerchantData($merchant);
+
+            if ($this->isValueChanged() && $this->getApiKeyType() == 'live') {
                 $this->configHelper->deleteConfig(SOCHelper::ENABLE_KEY, $this->getScope(), $this->getScopeId());
                 if (empty($value)) {
                     $this->configHelper->changeApiModeToTest($this->getScope(), $this->getScopeId());
                 }
             }
+            if (empty($value)) {
+                $this->configHelper->deleteConfig($this->getMerchantIsAllowedInPagePath(), $this->getScope(), $this->getScopeId());
+                $this->configHelper->deleteConfig($this->getMerchantIdPath(), $this->getScope(), $this->getScopeId());
+            }
 
-            $this->saveAndEncryptValue();
+            if (!$valueIsStars) {
+                $this->saveAndEncryptValue();
+            }
             return;
         }
         $this->disallowDataSave();
@@ -165,6 +178,28 @@ class APIKeyValue extends Encrypted
                 __("Error checking %s - other configuration has been saved"),
                 __($this->getApiKeyName())
             )
+        );
+    }
+
+    /**
+     * Save Merchant id and cms_allow_inpage
+     *
+     * @param $merchant
+     * @return void
+     */
+    private function saveMerchantData($merchant):void
+    {
+        $this->configHelper->saveMerchantId(
+            $this->getMerchantIdPath(),
+            $merchant,
+            $this->getScope(),
+            $this->getScopeId()
+        );
+        $this->configHelper->saveIsAllowedInPage(
+            $this->getMerchantIsAllowedInPagePath(),
+            $merchant,
+            $this->getScope(),
+            $this->getScopeId()
         );
     }
 
@@ -197,5 +232,48 @@ class APIKeyValue extends Encrypted
     protected function disallowDataSave(): void
     {
         $this->_dataSaveAllowed = false;
+    }
+
+    /**
+     * Return the api key type
+     *
+     * @return string
+     */
+    protected function getApiKeyType():string
+    {
+        return $this->apiKeyType;
+    }
+
+    /**
+     * Return is allowed in page path for database save
+     *
+     * @return string
+     */
+    public function getMerchantIsAllowedInPagePath(): string
+    {
+        return $this->merchantIsAllowedInPagePath;
+    }
+
+    /**
+     * Return merchant id path for database save
+     *
+     * @return string
+     */
+    public function getMerchantIdPath(): string
+    {
+        return $this->merchantIdPath;
+    }
+
+    /**
+     * Get saved Api key saved in DB for this field mode
+     * @return string
+     */
+    private function getSavedApiKeyByFieldMode(): string
+    {
+        if ('live' === $this->getApiKeyType()) {
+            return $this->apiConfigHelper->getLiveKey();
+        }
+
+        return $this->apiConfigHelper->getTestKey();
     }
 }

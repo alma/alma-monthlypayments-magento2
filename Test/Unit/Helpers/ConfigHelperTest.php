@@ -3,7 +3,9 @@
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
 use Alma\API\Entities\FeePlan;
+use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -15,6 +17,12 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigHelperTest extends TestCase
 {
+    protected $scopeConfig;
+    protected $context;
+    protected $storeHelper;
+    protected $writerInterface;
+    protected $serializer;
+    protected $typeList;
     protected function setUp(): void
     {
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
@@ -29,7 +37,6 @@ class ConfigHelperTest extends TestCase
 
     public function testBaseApiPlansConfigIsFeePlan(): void
     {
-
         $this->serializer->method('unserialize')->willReturn(
             [
                 FeePlanFactoryMock::dataFeePlanFactory(FeePlanFactoryMock::KEY_2),
@@ -40,6 +47,43 @@ class ConfigHelperTest extends TestCase
         foreach ($feePlans as $feePlan) {
             $this->assertInstanceOf(FeePlan::class, $feePlan);
         }
+    }
+
+    public function testCmsAllowInPageNotExistSaveTrue():void
+    {
+        $merchant = $this->createMock(Merchant::class);
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
+            1,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInPage('test', $merchant, 0, 1);
+    }
+    public function testCmsAllowInPageIsTrueSave1():void
+    {
+        $merchant = $this->createMock(Merchant::class);
+        $merchant->cms_allow_inpage = true;
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
+            1,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInPage('test', $merchant, 0, 1);
+    }
+
+    public function testCmsAllowInPageIsFalseSave0():void
+    {
+        $merchant = $this->createMock(Merchant::class);
+        $merchant->cms_allow_inpage = false;
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
+            0,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInPage('test', $merchant, 0, 1);
     }
 
     private function createConfigHelper(): ConfigHelper
@@ -57,5 +101,4 @@ class ConfigHelperTest extends TestCase
             $this->typeList
         ];
     }
-
 }

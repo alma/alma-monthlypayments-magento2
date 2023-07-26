@@ -18,6 +18,7 @@
                 <value id="jsdelivr_cdn" type="host">cdn.jsdelivr.net</value>
                 <value id="fonts_gstatic" type="host">fonts.gstatic.com</value>
                 <value id="fonts_gstatic" type="host">cdn.jsdelivr.net</value>
+                <value id="fonts_alma" type="host">cdn.almapay.com</value>
             </values>
         </policy>
         <policy id="connect-src">

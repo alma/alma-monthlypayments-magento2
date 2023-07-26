@@ -276,7 +276,7 @@ define(
                 }
             },
             unMountInPage : function(){
-                if( self.inpage !== undefined) {
+                if( self.inPage !== undefined) {
                     self.inPage.unmount();
                 }
             },
