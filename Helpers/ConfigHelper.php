@@ -20,6 +20,7 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
+    const IN_PAGE_ENABLED = 'in_page_enabled';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
     const BASE_PLANS_CONFIG = 'base_config_plans';
 
@@ -121,6 +122,16 @@ class ConfigHelper extends AbstractHelper
     }
 
     /**
+     * Get in page activation setting
+     *
+     * @return bool
+     */
+    public function isInPageEnabled(): bool
+    {
+        return (bool)$this->getConfigByCode(self::IN_PAGE_ENABLED);
+    }
+
+    /**
      * @return int
      */
     public function getPaymentExpirationTime(): int
@@ -153,6 +164,28 @@ class ConfigHelper extends AbstractHelper
     {
         if ($merchant) {
             $this->saveConfig($path, $merchant->id, $scope, $storeId);
+            $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
+        }
+    }
+
+    /**
+     * @param string $path
+     * @param Merchant|bool $merchant
+     * @param $scope
+     * @param $storeId
+     *
+     * @return void
+     */
+    public function saveIsAllowedInPage(string $path, $merchant, $scope, $storeId): void
+    {
+        if ($merchant) {
+            $cmsAllowInPage = 1;
+
+            if (isset($merchant->cms_allow_inpage)) {
+                $cmsAllowInPage = $merchant->cms_allow_inpage ? 1 : 0;
+            }
+
+            $this->saveConfig($path, $cmsAllowInPage, $scope, $storeId);
             $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
         }
     }
