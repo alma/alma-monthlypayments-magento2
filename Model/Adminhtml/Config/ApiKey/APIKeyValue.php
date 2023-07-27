@@ -202,7 +202,11 @@ class APIKeyValue extends Encrypted
             $this->getScope(),
             $this->getScopeId()
         );
-        if ($merchant && isset($merchant->cms_allow_inpage) && !$merchant->cms_allow_inpage) {
+        if (
+            $merchant
+            && isset($merchant->cms_allow_inpage)
+            && !$merchant->cms_allow_inpage
+        ) {
             $this->configHelper->disableInPage();
         }
     }
