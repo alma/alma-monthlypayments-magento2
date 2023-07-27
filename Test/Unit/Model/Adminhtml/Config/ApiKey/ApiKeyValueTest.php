@@ -105,15 +105,15 @@ class ApiKeyValueTest extends TestCase
     {
         $this->mockGetMerchant(false);
 
-        $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
+        $apiKeyObject = $this->createPartialMockApiKeyObject();
+        $apiKeyObject->expects('hasDataChanges')->andReturn(false);
+        $apiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
 
         $this->configHelper->expects($this->once())
             ->method('disableInPage');
 
-        $this->assertNull($ApiKeyObject->beforeSave());
-        $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
+        $this->assertNull($apiKeyObject->beforeSave());
+        $apiKeyObject->shouldHaveReceived('disallowDataSave')->once();
 
     }
 
