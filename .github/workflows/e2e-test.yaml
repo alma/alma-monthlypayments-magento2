@@ -2,7 +2,7 @@
 name: E2E Test
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["main", "develop"]
     types: ["opened", "synchronize", "reopened",  "ready_for_review"]
   workflow_dispatch:
 

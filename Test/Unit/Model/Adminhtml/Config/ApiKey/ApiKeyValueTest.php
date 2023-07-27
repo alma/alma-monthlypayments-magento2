@@ -101,6 +101,21 @@ class ApiKeyValueTest extends TestCase
         $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
 
     }
+    public function testIfFeatureFlagIsFalseInPageIsDisabled(): void
+    {
+        $this->mockGetMerchant(false);
+
+        $apiKeyObject = $this->createPartialMockApiKeyObject();
+        $apiKeyObject->expects('hasDataChanges')->andReturn(false);
+        $apiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
+
+        $this->configHelper->expects($this->once())
+            ->method('disableInPage');
+
+        $this->assertNull($apiKeyObject->beforeSave());
+        $apiKeyObject->shouldHaveReceived('disallowDataSave')->once();
+
+    }
 
     public function testStarsValueReturnEmptyAndDisallowSave(): void
     {
@@ -162,9 +177,10 @@ class ApiKeyValueTest extends TestCase
      * Get merchant Mock
      * @return void
      */
-    private function mockGetMerchant():void
+    private function mockGetMerchant(bool $flag = true):void
     {
         $merchantMock = $this->createMock(Merchant::class);
+        $merchantMock->cms_allow_inpage = $flag;
         $merchantMock->id = 'merchant_id';
         $this->availability->expects($this->once())
             ->method('getMerchant')

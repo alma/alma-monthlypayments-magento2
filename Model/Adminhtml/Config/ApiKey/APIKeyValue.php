@@ -31,6 +31,7 @@ use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Config\Model\Config\Backend\Encrypted;
+use Magento\Framework\App\Cache\Type\Config as CacheConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
@@ -201,6 +202,13 @@ class APIKeyValue extends Encrypted
             $this->getScope(),
             $this->getScopeId()
         );
+        if (
+            $merchant
+            && isset($merchant->cms_allow_inpage)
+            && !$merchant->cms_allow_inpage
+        ) {
+            $this->configHelper->disableInPage();
+        }
     }
 
     /**

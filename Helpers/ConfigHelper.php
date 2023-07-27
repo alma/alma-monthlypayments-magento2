@@ -67,9 +67,9 @@ class ConfigHelper extends AbstractHelper
      * @param string|null $scope
      * @param string|null $storeId
      *
-     * @return string
+     * @return string|null
      */
-    public function getConfigByCode($code, ?string $scope = null, ?string $storeId = null): string
+    public function getConfigByCode($code, ?string $scope = null, ?string $storeId = null): ?string
     {
         if (!$storeId) {
             $storeId = $this->storeHelper->getStoreId();
@@ -188,6 +188,16 @@ class ConfigHelper extends AbstractHelper
             $this->saveConfig($path, $cmsAllowInPage, $scope, $storeId);
             $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
         }
+    }
+
+    /**
+     * Disable in page
+     *
+     * @return void
+     */
+    public function disableInPage():void
+    {
+        $this->saveConfig(self::IN_PAGE_ENABLED, 0, $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
     }
 
     /**
