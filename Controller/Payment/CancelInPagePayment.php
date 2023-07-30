@@ -30,7 +30,7 @@ class CancelInPagePayment implements ActionInterface
      * @var OrderHelper
      */
     private $orderHelper;
-    private AlmaClient $almaClient;
+    private $almaClient;
 
     /**
      * @param Logger $logger
