@@ -41,7 +41,9 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: paynowPaymentMethod().description"></div>
-
+        <!-- ko if: paynowSelectedPlan().inPageAllowed -->
+        <div id="alma-in-page-alma_monthly_payments_paynow" style="display: none"></div>
+        <!-- /ko -->
 
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->

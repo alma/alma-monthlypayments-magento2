@@ -20,6 +20,7 @@ class ConfigHelper extends AbstractHelper
     const TRIGGER_IS_ALLOWED = 'trigger_is_allowed';
     const TRIGGER_IS_ENABLED = 'trigger_is_enabled';
     const TRIGGER_TYPOLOGY = 'trigger_typology';
+    const IN_PAGE_ENABLED = 'in_page_enabled';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
     const BASE_PLANS_CONFIG = 'base_config_plans';
 
@@ -66,9 +67,9 @@ class ConfigHelper extends AbstractHelper
      * @param string|null $scope
      * @param string|null $storeId
      *
-     * @return string
+     * @return string|null
      */
-    public function getConfigByCode($code, ?string $scope = null, ?string $storeId = null): string
+    public function getConfigByCode($code, ?string $scope = null, ?string $storeId = null): ?string
     {
         if (!$storeId) {
             $storeId = $this->storeHelper->getStoreId();
@@ -121,6 +122,16 @@ class ConfigHelper extends AbstractHelper
     }
 
     /**
+     * Get in page activation setting
+     *
+     * @return bool
+     */
+    public function isInPageEnabled(): bool
+    {
+        return (bool)$this->getConfigByCode(self::IN_PAGE_ENABLED);
+    }
+
+    /**
      * @return int
      */
     public function getPaymentExpirationTime(): int
@@ -155,6 +166,38 @@ class ConfigHelper extends AbstractHelper
             $this->saveConfig($path, $merchant->id, $scope, $storeId);
             $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
         }
+    }
+
+    /**
+     * @param string $path
+     * @param Merchant|bool $merchant
+     * @param $scope
+     * @param $storeId
+     *
+     * @return void
+     */
+    public function saveIsAllowedInPage(string $path, $merchant, $scope, $storeId): void
+    {
+        if ($merchant) {
+            $cmsAllowInPage = 1;
+
+            if (isset($merchant->cms_allow_inpage)) {
+                $cmsAllowInPage = $merchant->cms_allow_inpage ? 1 : 0;
+            }
+
+            $this->saveConfig($path, $cmsAllowInPage, $scope, $storeId);
+            $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
+        }
+    }
+
+    /**
+     * Disable in page
+     *
+     * @return void
+     */
+    public function disableInPage():void
+    {
+        $this->saveConfig(self::IN_PAGE_ENABLED, 0, $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
     }
 
     /**

@@ -26,6 +26,8 @@
 namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
 use Alma\API\Entities\FeePlan;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 
 class PaymentPlanConfig implements PaymentPlanConfigInterface
 {
@@ -41,14 +43,29 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      * @var array
      */
     private $data;
+    /**
+     * @var PaymentPlansHelper
+     */
+    private $paymentPlansHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * PaymentPlanConfig constructor.
+     * @param PaymentPlansHelper $paymentPlansHelper
+     * @param Logger $logger
      * @param array $data
      */
-    public function __construct(array $data = [])
-    {
+    public function __construct(
+        PaymentPlansHelper $paymentPlansHelper,
+        Logger $logger,
+        array $data = []
+    ) {
         $this->data = $data;
+        $this->paymentPlansHelper = $paymentPlansHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -128,8 +145,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         int $installmentsCount,
         int $deferredDays,
         int $deferredMonths
-    ): string
-    {
+    ): string {
         return implode(':', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
     }
 
@@ -145,8 +161,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         int $installmentsCount,
         int $deferredDays,
         int $deferredMonths
-    ): string
-    {
+    ): string {
         return implode('_', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
     }
 
@@ -155,8 +170,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function toArray(): array
     {
-        $this->data['key']= self::planKey();
-        $this->data['logo']= self::logoFileName();
+        $this->data['key']= $this->planKey();
+        $this->data['logo']= $this->logoFileName();
+        $this->data['inPageAllowed']= $this->paymentPlansHelper->isInPageAllowed($this->planKey());
         return $this->data;
     }
 
@@ -385,10 +401,10 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
         if (!$this->isDeferred() && in_array($this->installmentsCount(), self::ALLOWED_MONTHLY_PLANS)) {
             return 'p' . $this->installmentsCount() . 'x_logo.svg';
         }
-        if($this->isDeferred() && $this->deferredType() === 'D' && $this->installmentsCount() === 1){
+        if ($this->isDeferred() && $this->deferredType() === 'D' && $this->installmentsCount() === 1) {
             return $this->deferredDays() . 'j_logo.svg';
         }
-        if($this->isDeferred() && $this->deferredType() === 'M' && $this->installmentsCount() === 1){
+        if ($this->isDeferred() && $this->deferredType() === 'M' && $this->installmentsCount() === 1) {
             return $this->deferredMonths() . 'm_logo.svg';
         }
         return null;

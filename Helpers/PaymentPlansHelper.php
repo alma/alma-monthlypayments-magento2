@@ -94,6 +94,18 @@ class PaymentPlansHelper
     }
 
     /**
+     * Check if in page is allowed for a fee plan
+     *
+     * @param string $planKey
+     * @return bool
+     */
+    public function isInPageAllowed(string $planKey): bool
+    {
+        $planIsAllowed = preg_match('!general:[1-4]:0:0!', $planKey);
+        return $this->configHelper->isInPageEnabled() && $planIsAllowed;
+    }
+
+    /**
      * @return void
      */
     public function saveBaseApiPlansConfig(): void
@@ -116,11 +128,11 @@ class PaymentPlansHelper
     }
 
     /**
-     * @param $plan
+     * @param array $plan
      *
      * @return array
      */
-    private function forceAmountThresholds($plan): array
+    private function forceAmountThresholds(array $plan): array
     {
         $key = $plan['kind'] . ':' . $plan['installmentsCount'] . ':' . $plan['deferredDays'] . ':' . $plan['deferredMonths'];
         if (
@@ -188,11 +200,11 @@ class PaymentPlansHelper
 
     /**
      * @param FeePlan $feePlan
-     * @param array $feePlanConfig
+     * @param array|null $feePlanConfig
      *
      * @return array
      */
-    public function formatLocalFeePlanConfig(FeePlan $feePlan, array $feePlanConfig): array
+    public function formatLocalFeePlanConfig(FeePlan $feePlan, ?array $feePlanConfig): array
     {
         $key = PaymentPlanConfig::keyForFeePlan($feePlan);
         return [

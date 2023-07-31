@@ -28,6 +28,7 @@ namespace Alma\MonthlyPayments\Gateway\Response;
 use Alma\API\Entities\Payment;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\PaymentHelper;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order;
@@ -38,11 +39,19 @@ class ResponseHandler implements HandlerInterface
      * @var Logger
      */
     private $logger;
+    /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
 
-    public function __construct(Logger $logger)
-    {
+    public function __construct(
+        PaymentHelper $paymentHelper,
+        Logger $logger
+    ) {
+        $this->paymentHelper = $paymentHelper;
         $this->logger = $logger;
     }
+
     /**
      * Handles transaction id
      *
@@ -59,8 +68,11 @@ class ResponseHandler implements HandlerInterface
 
         /** @var Payment $almaPayment */
         $almaPayment = $response['almaPayment'];
+        $paymentPlanKey = $this->paymentHelper->getAlmaPaymentPlanKey($almaPayment);
+
         $payment->setTransactionId($almaPayment->id);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_ID, $almaPayment->id);
+        $payment->setAdditionalInformation(Config::ORDER_PAYMENT_PLAN_KEY, $paymentPlanKey);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_URL, $almaPayment->url);
         $payment->setAdditionalInformation(Config::ORDER_PAYMENT_TRIGGER, $almaPayment->deferred_trigger);
         $payment->setIsTransactionClosed(false);

@@ -10,7 +10,7 @@ use Magento\Sales\Api\OrderManagementInterface;
 
 class CancelOrderAction extends Action
 {
-    CONST CANCEL_MESSAGE = 'Cancel Order';
+    const CANCEL_MESSAGE = 'Cancel Order';
     /**
      * @var Logger
      */
@@ -35,6 +35,10 @@ class CancelOrderAction extends Action
      * @var OrderHelper
      */
     private $orderHelper;
+    /**
+     * @var QuoteHelper
+     */
+    private $quoteHelper;
 
     /**
      * @param Context $context
@@ -43,6 +47,7 @@ class CancelOrderAction extends Action
      * @param OrderManagementInterface $orderManagement
      * @param PaymentHelper $paymentHelper
      * @param OrderHelper $orderHelper
+     * @param QuoteHelper $quoteHelper
      */
     public function __construct(
         Context $context,
@@ -50,15 +55,16 @@ class CancelOrderAction extends Action
         PaymentValidation $paymentValidation,
         OrderManagementInterface $orderManagement,
         PaymentHelper $paymentHelper,
-        OrderHelper $orderHelper
-    )
-    {
+        OrderHelper $orderHelper,
+        QuoteHelper $quoteHelper
+    ) {
         parent::__construct($context);
         $this->logger = $logger;
         $this->paymentValidation = $paymentValidation;
         $this->orderManagement = $orderManagement;
         $this->paymentHelper = $paymentHelper;
         $this->orderHelper = $orderHelper;
+        $this->quoteHelper = $quoteHelper;
     }
 
     public function execute()
@@ -79,7 +85,8 @@ class CancelOrderAction extends Action
         }
         try {
             $order->addStatusHistoryComment(__(static::CANCEL_MESSAGE))->save();
-        } catch (\Exception $e){
+            $this->quoteHelper->restoreQuote($order);
+        } catch (\Exception $e) {
             $this->logger->error('Cancel order - save history error', [$e->getMessage()]);
         }
         $this->orderManagement->cancel($order->getEntityId());

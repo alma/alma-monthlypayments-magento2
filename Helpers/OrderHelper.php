@@ -95,11 +95,11 @@ class OrderHelper extends AbstractHelper
      * Cancels a specified order.
      * @param string $orderId
      *
-     * @return void
+     * @return bool
      */
-    public function cancel(string $orderId): void
+    public function cancel(string $orderId): bool
     {
-        $this->orderManagement->cancel($orderId);
+        return $this->orderManagement->cancel($orderId);
     }
 
     /**
