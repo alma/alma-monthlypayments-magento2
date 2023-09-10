@@ -22,7 +22,7 @@ jobs:
 
     - name: Generate token
       id: generate_token
-      uses: tibdex/github-app-token@v1.8.0
+      uses: tibdex/github-app-token@v2
       continue-on-error: true
       with:
         app_id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -37,7 +37,7 @@ jobs:
 
     - name: Generate Github token for integration-infrastructure repo
       id: generate_github_token
-      uses: tibdex/github-app-token@v1
+      uses: tibdex/github-app-token@v2
       with:
         app_id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private_key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
