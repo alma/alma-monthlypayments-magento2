@@ -94,8 +94,6 @@ class ApiKeyValueTest extends TestCase
 
         $this->configHelper->expects($this->once())
             ->method('saveMerchantId');
-        $this->configHelper->expects($this->once())
-            ->method('saveIsAllowedInPage');
 
         $this->assertNull($ApiKeyObject->beforeSave());
         $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
@@ -150,7 +148,6 @@ class ApiKeyValueTest extends TestCase
         $ApiKeyObject->expects('getValue')->andReturn('');
         $ApiKeyObject->expects('getScope')->andReturn(0);
         $ApiKeyObject->expects('getScopeId')->andReturn(1);
-        $ApiKeyObject->expects('getMerchantIsAllowedInPagePath')->andReturn('live_allowed_in_page');
         $ApiKeyObject->expects('getMerchantIdPath')->andReturn('live_merchant_id');
         $this->assertNull($ApiKeyObject->beforeSave());
         $ApiKeyObject->shouldNotHaveReceived('disallowDataSave');
