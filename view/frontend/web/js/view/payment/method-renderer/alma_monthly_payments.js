@@ -215,12 +215,13 @@ define(
                     }
                 );
             },
-            selectPaymentMethod : function() {
+            selectAlmaPaymentMethod : function() {
                 self.unMountInPage();
                 const currentPaymentMethod = self.checkedPaymentMethod();
                 if( self.lastSelectedPlan()[currentPaymentMethod].inPageAllowed) {
                     self.selectInstallments(self.lastSelectedPlan()[currentPaymentMethod]);
                 }
+                self.selectPaymentMethod();
                 return true;
             },
             selectInstallments : function(plan){
