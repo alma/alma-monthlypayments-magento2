@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v4.1.0
+------
+
+* feat: Remove Alma feature flag for In Page
+* fix : payment method selection bug on checkout
+
 v4.0.0
 ------
 

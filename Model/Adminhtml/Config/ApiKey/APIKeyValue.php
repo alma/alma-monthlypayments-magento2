@@ -28,10 +28,8 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\SOCHelper;
 use Magento\Config\Model\Config\Backend\Encrypted;
-use Magento\Framework\App\Cache\Type\Config as CacheConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
@@ -67,10 +65,6 @@ class APIKeyValue extends Encrypted
      */
     private $configHelper;
     /**
-     * @var Logger
-     */
-    private $logger;
-    /**
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
@@ -86,7 +80,6 @@ class APIKeyValue extends Encrypted
      * @param Availability $availabilityHelper
      * @param MessageManager $messageManager
      * @param ConfigHelper $configHelper
-     * @param Logger $logger
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -100,7 +93,6 @@ class APIKeyValue extends Encrypted
         Availability $availabilityHelper,
         MessageManager $messageManager,
         ConfigHelper $configHelper,
-        Logger $logger,
         ApiConfigHelper $apiConfigHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
@@ -121,7 +113,6 @@ class APIKeyValue extends Encrypted
         $this->messageManager = $messageManager;
         $this->hasError = false;
         $this->configHelper = $configHelper;
-        $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
     }
 
@@ -164,7 +155,6 @@ class APIKeyValue extends Encrypted
                 }
             }
             if (empty($value)) {
-                $this->configHelper->deleteConfig($this->getMerchantIsAllowedInPagePath(), $this->getScope(), $this->getScopeId());
                 $this->configHelper->deleteConfig($this->getMerchantIdPath(), $this->getScope(), $this->getScopeId());
             }
 
@@ -183,7 +173,7 @@ class APIKeyValue extends Encrypted
     }
 
     /**
-     * Save Merchant id and cms_allow_inpage
+     * Save Merchant id
      *
      * @param $merchant
      * @return void
@@ -196,19 +186,6 @@ class APIKeyValue extends Encrypted
             $this->getScope(),
             $this->getScopeId()
         );
-        $this->configHelper->saveIsAllowedInPage(
-            $this->getMerchantIsAllowedInPagePath(),
-            $merchant,
-            $this->getScope(),
-            $this->getScopeId()
-        );
-        if (
-            $merchant
-            && isset($merchant->cms_allow_inpage)
-            && !$merchant->cms_allow_inpage
-        ) {
-            $this->configHelper->disableInPage();
-        }
     }
 
     /**
@@ -250,16 +227,6 @@ class APIKeyValue extends Encrypted
     protected function getApiKeyType():string
     {
         return $this->apiKeyType;
-    }
-
-    /**
-     * Return is allowed in page path for database save
-     *
-     * @return string
-     */
-    public function getMerchantIsAllowedInPagePath(): string
-    {
-        return $this->merchantIsAllowedInPagePath;
     }
 
     /**
