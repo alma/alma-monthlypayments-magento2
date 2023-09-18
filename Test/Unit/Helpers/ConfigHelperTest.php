@@ -49,43 +49,6 @@ class ConfigHelperTest extends TestCase
         }
     }
 
-    public function testCmsAllowInPageNotExistSaveTrue():void
-    {
-        $merchant = $this->createMock(Merchant::class);
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
-            1,
-            0,
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInPage('test', $merchant, 0, 1);
-    }
-    public function testCmsAllowInPageIsTrueSave1():void
-    {
-        $merchant = $this->createMock(Merchant::class);
-        $merchant->cms_allow_inpage = true;
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
-            1,
-            0,
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInPage('test', $merchant, 0, 1);
-    }
-
-    public function testCmsAllowInPageIsFalseSave0():void
-    {
-        $merchant = $this->createMock(Merchant::class);
-        $merchant->cms_allow_inpage = false;
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . 'test',
-            0,
-            0,
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInPage('test', $merchant, 0, 1);
-    }
-
     private function createConfigHelper(): ConfigHelper
     {
         return new ConfigHelper(...$this->getDependency());

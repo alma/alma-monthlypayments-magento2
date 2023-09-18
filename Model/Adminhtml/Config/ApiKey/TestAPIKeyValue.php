@@ -31,7 +31,6 @@ class TestAPIKeyValue extends APIKeyValue
 {
     protected $apiKeyType = 'test';
     protected $merchantIdPath = 'test_merchant_id';
-    protected $merchantIsAllowedInPagePath = 'test_allowed_in_page';
 
     /**
      * @return Phrase
