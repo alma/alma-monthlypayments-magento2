@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="quote_item" resource="checkout" comment="Sales Flat Quote Item">
+        <column xsi:type="varchar" length="1024" name="alma_insurance" nullable="true" comment="Alma insurance"/>
+    </table>
+
+</schema>
