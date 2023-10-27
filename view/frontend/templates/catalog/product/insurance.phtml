@@ -1,1 +1,46 @@
-<iframe id="config-alma-iframe" class="alma-insurance-iframe" width="100%" height="100%" src="https://protect.staging.almapay.com/almaBackOfficeConfiguration.html"></iframe>
+
+<iframe id="insurance-alma-iframe" class="alma-insurance-iframe" width="100%" height="100%" src="https://protect.staging.almapay.com/almaProductInPageWidget.html"></iframe>
+<button id='alma_insurance_btn' >Click assurance</button>
+<input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="" >
+<input type="hidden" name="alma_insurance_name" form="product_addtocart_form" value="" >
+<input type="hidden" name="alma_insurance_price" form="product_addtocart_form" value="" >
+
+<script>
+    require([
+        'jquery'
+    ], function (
+        $
+    ) {
+        const almaInsuranceIframe = document.getElementById('insurance-alma-iframe').contentWindow
+        let currentResolve
+        let selectedAlmaInsurance = null
+
+        const messageCallback = (e) => {
+            console.log('callback');
+            if (e.data.type === 'buttonClicked') {
+                selectedAlmaInsurance = e.data.buttonText
+                $('input[name=alma_insurance_id]').val(selectedAlmaInsurance.id);
+                $('input[name=alma_insurance_name]').val(selectedAlmaInsurance.name);
+                $('input[name=alma_insurance_price]').val(selectedAlmaInsurance.price);
+            } else if (currentResolve) {
+                currentResolve(e.data)
+            }
+        }
+
+        const getAlmaWidgetData = () => {
+            console.log('plopPlop');
+            const promise = new Promise((resolve) => {
+                currentResolve = resolve
+                window.addEventListener('message', messageCallback)
+                almaInsuranceIframe.postMessage('getData', '*')
+            }).then((e) => {
+                window.removeEventListener('message', messageCallback)
+            })
+        }
+
+        $("#alma_insurance_btn").on('click',function(){
+            console.log('coucou')
+            window.getAlmaWidgetData = getAlmaWidgetData()
+        });
+    });
+</script>
