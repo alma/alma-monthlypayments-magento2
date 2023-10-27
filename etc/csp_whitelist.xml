@@ -34,6 +34,7 @@
         <policy id="frame-src">
             <values>
                 <value id="getalma.eu" type="host">*.getalma.eu</value>
+                <value id="almapay.com" type="host">*.almapay.com/</value>
             </values>
         </policy>
     </policies>
