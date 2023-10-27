@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
@@ -56,4 +57,18 @@ class InsuranceHelper extends AbstractHelper
         return $quoteItem->setAlmaInsurance($this->json->serialize($data));
     }
 
+    /**
+     * @return string|null
+     */
+    public function getInsuranceParamsInRequest(): ?InsuranceProduct
+    {
+
+        $insuranceId = $this->request->getParam('alma_insurance_id');
+        $insuranceName = $this->request->getParam('alma_insurance_name');
+        $insurancePrice = $this->request->getParam('alma_insurance_price');
+        if ($insuranceId && $insuranceName && $insurancePrice) {
+            return New InsuranceProduct((int)$insuranceId, $insuranceName, (int)substr($insurancePrice, 0, -1));
+        }
+        return null;
+    }
 }
