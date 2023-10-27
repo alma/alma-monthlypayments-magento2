@@ -3,14 +3,24 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Model\Quote\Item;
 
 class InsuranceHelper extends AbstractHelper
 {
+    const ALMA_INSURANCE_SKU = 'alma_insurance';
+
+    /**
+     * @var ProductRepository
+     */
+    private $productRepository;
     /**
      * @var Json
      */
@@ -19,6 +29,10 @@ class InsuranceHelper extends AbstractHelper
      * @var RequestInterface
      */
     private $request;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * @param Context $context
@@ -27,11 +41,15 @@ class InsuranceHelper extends AbstractHelper
     public function __construct(
         Context $context,
         RequestInterface $request,
+        ProductRepository $productRepository,
+        Logger $logger,
         Json $json
     ) {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
+        $this->productRepository = $productRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -58,7 +76,7 @@ class InsuranceHelper extends AbstractHelper
     }
 
     /**
-     * @return string|null
+     * @return InsuranceProduct|null
      */
     public function getInsuranceParamsInRequest(): ?InsuranceProduct
     {
@@ -70,5 +88,20 @@ class InsuranceHelper extends AbstractHelper
             return New InsuranceProduct((int)$insuranceId, $insuranceName, (int)substr($insurancePrice, 0, -1));
         }
         return null;
+    }
+
+
+    /**
+     * @return Product|null
+     */
+    public function getAlmaInsuranceProduct(): ?Product
+    {
+        try {
+            return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU);
+        } catch (NoSuchEntityException $e) {
+            $message = 'No alma Insurance product in Catalog - Use a product with sku : '. InsuranceHelper::ALMA_INSURANCE_SKU;
+            $this->logger->error($message,[$e]);
+           throw new AlmaInsuranceProductException($message,0, $e);
+        }
     }
 }
