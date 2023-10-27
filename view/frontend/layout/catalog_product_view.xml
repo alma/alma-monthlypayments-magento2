@@ -69,5 +69,13 @@
                    template="Alma_MonthlyPayments::catalog/product/view.phtml"
                    after="-"/>
         </referenceContainer>
+        <referenceContainer name="product.info.price">
+            <block
+            class="Alma\MonthlyPayments\Block\Catalog\Product\Insurance"
+            name="catalog.product.view.insurance"
+            as="alma_insurance_product"
+            template="Alma_MonthlyPayments::catalog/product/insurance.phtml"
+            />
+        </referenceContainer>
     </body>
 </page>
