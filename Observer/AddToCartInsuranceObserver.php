@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!--
+<?php
+/**
  * 2018-2021 Alma SAS
  *
  * THE MIT LICENSE
@@ -20,14 +20,19 @@
  * @author    Alma SAS <contact@getalma.eu>
  * @copyright 2018-2021 Alma SAS
  * @license   https://opensource.org/licenses/MIT The MIT License
- * -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="payment_method_assign_data_alma_monthly_payments">
-        <observer name="alma_monthly_payments_gateway_data_assign"
-                  instance="Alma\MonthlyPayments\Observer\PaymentDataAssignObserver"/>
-    </event>
-    <event name="checkout_cart_product_add_after">
-        <observer name="checkout_cart_product_add_after_alma_insurance" instance="Alma\MonthlyPayments\Observer\AddToCartInsuranceObserver" />
-    </event>
-</config>
+ */
+
+namespace Alma\MonthlyPayments\Observer;
+
+use Alma\MonthlyPayments\Helpers\InsuranceHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+
+class AddToCartInsuranceObserver implements ObserverInterface
+{
+    public function execute(Observer $observer)
+    {
+        // TODO: Implement execute() method.
+    }
+}
