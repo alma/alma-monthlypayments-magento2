@@ -92,9 +92,9 @@ class InsuranceHelper extends AbstractHelper
 
 
     /**
-     * @return Product|null
+     * @return Product
      */
-    public function getAlmaInsuranceProduct(): ?Product
+    public function getAlmaInsuranceProduct(): Product
     {
         try {
             return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU);
