@@ -26,13 +26,95 @@ namespace Alma\MonthlyPayments\Observer;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\DataObjectFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\ItemFactory;
 
 class AddToCartInsuranceObserver implements ObserverInterface
 {
+    /**
+     * @var InsuranceHelper
+     */
+    private $insuranceHelper;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var Item\Processor
+     */
+    private $itemProcessor;
+    /**
+     * @var DataObjectFactory
+     */
+    private $objectFactory;
+    /**
+     * @var ItemFactory
+     */
+    private $quoteItemFactory;
+
+    /**
+     * @param InsuranceHelper $insuranceHelper
+     * @param Logger $logger
+     */
+    public function __construct(
+        InsuranceHelper $insuranceHelper,
+        Item\Processor $itemProcessor,
+        DataObjectFactory $objectFactory,
+        ItemFactory $quoteItemFactory,
+        Logger $logger
+    ) {
+        $this->logger = $logger;
+        $this->insuranceHelper = $insuranceHelper;
+        $this->itemProcessor = $itemProcessor;
+        $this->objectFactory = $objectFactory;
+        $this->quoteItemFactory = $quoteItemFactory;
+    }
+
     public function execute(Observer $observer)
     {
-        // TODO: Implement execute() method.
+        $this->logger->info('Start Observer');
+        try {
+            $insuranceProduct = $this->insuranceHelper->getAlmaInsuranceProduct();
+        } catch (AlmaInsuranceProductException $e) {
+            return;
+        }
+
+        try {
+            /** @var Item $quoteItem */
+            $quoteItem = $observer->getData('quote_item');
+
+            if ($quoteItem->getProduct()->getId() === $insuranceProduct->getId()) {
+                $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$quoteItem->getProduct()]);
+                return;
+            }
+            $insuranceProductInRequest = $this->insuranceHelper->getInsuranceParamsInRequest();
+            if ($insuranceProductInRequest) {
+                $this->insuranceHelper->setQuoteItemAlmaInsurance($quoteItem, $insuranceProductInRequest->toArray());
+            }
+            $this->addInsuranceProductToQuote($quoteItem, $insuranceProduct);
+        } catch (\Exception $e) {
+            $this->logger->info('Error', [$e]);
+        }
+    }
+
+    /**
+     * @param Item $quoteItem
+     * @param Product $insuranceProduct
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function addInsuranceProductToQuote(Item $quoteItem, Product $insuranceProduct): void
+    {
+        $quote = $quoteItem->getQuote();
+        $insuranceInQuote = $quote->addProduct($insuranceProduct);
+        $price = rand(100, 200);
+        $insuranceInQuote->setCustomPrice($price);
+        $insuranceInQuote->setOriginalCustomPrice($price);
+        $insuranceInQuote->getProduct()->setIsSuperMode(true);
     }
 }
