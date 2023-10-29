@@ -31,6 +31,8 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\DataObjectFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\ItemFactory;
 
@@ -92,29 +94,37 @@ class AddToCartInsuranceObserver implements ObserverInterface
                 $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$quoteItem->getProduct()]);
                 return;
             }
-            $insuranceProductInRequest = $this->insuranceHelper->getInsuranceParamsInRequest();
-            if ($insuranceProductInRequest) {
-                $this->insuranceHelper->setQuoteItemAlmaInsurance($quoteItem, $insuranceProductInRequest->toArray());
+            $insuranceObject = $this->insuranceHelper->getInsuranceParamsInRequest();
+            if ($insuranceObject) {
+                $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($quoteItem->getProduct()->getId(), $insuranceObject->getId()));
+                $this->insuranceHelper->setQuoteItemAlmaInsurance($quoteItem, $insuranceObject->toArray());
             }
-            $this->addInsuranceProductToQuote($quoteItem, $insuranceProduct);
+            $insuranceProductInQuote = $this->addInsuranceProductToQuote($quoteItem->getQuote(), $insuranceProduct);
+            $this->insuranceHelper->setQuoteItemAlmaInsurance($insuranceProductInQuote, $insuranceObject->toArray());
         } catch (\Exception $e) {
             $this->logger->info('Error', [$e]);
         }
     }
 
     /**
-     * @param Item $quoteItem
+     * @param Quote $quote
      * @param Product $insuranceProduct
-     * @return void
+     * @return Item
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function addInsuranceProductToQuote(Item $quoteItem, Product $insuranceProduct): void
+    public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct): Item
     {
-        $quote = $quoteItem->getQuote();
-        $insuranceInQuote = $quote->addProduct($insuranceProduct);
-        $price = rand(100, 200);
-        $insuranceInQuote->setCustomPrice($price);
-        $insuranceInQuote->setOriginalCustomPrice($price);
-        $insuranceInQuote->getProduct()->setIsSuperMode(true);
+        try {
+            $insuranceInQuote = $quote->addProduct($insuranceProduct);
+            $price = rand(100, 200);
+            $insuranceInQuote->setCustomPrice($price);
+            $insuranceInQuote->setOriginalCustomPrice($price);
+            $insuranceInQuote->getProduct()->setIsSuperMode(true);
+            return $insuranceInQuote;
+        } catch (LocalizedException $e) {
+            $message = 'Impossible to add Insurance in cart';
+            $this->logger->error($message, [$e->getMessage()]);
+            throw new AlmaInsuranceProductException($message, 0, $e);
+        }
     }
 }
