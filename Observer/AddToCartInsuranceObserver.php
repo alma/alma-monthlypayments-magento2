@@ -28,13 +28,11 @@ use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\DataObjectFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
-use Magento\Quote\Model\Quote\ItemFactory;
 
 class AddToCartInsuranceObserver implements ObserverInterface
 {
@@ -46,18 +44,6 @@ class AddToCartInsuranceObserver implements ObserverInterface
      * @var Logger
      */
     private $logger;
-    /**
-     * @var Item\Processor
-     */
-    private $itemProcessor;
-    /**
-     * @var DataObjectFactory
-     */
-    private $objectFactory;
-    /**
-     * @var ItemFactory
-     */
-    private $quoteItemFactory;
 
     /**
      * @param InsuranceHelper $insuranceHelper
@@ -65,16 +51,10 @@ class AddToCartInsuranceObserver implements ObserverInterface
      */
     public function __construct(
         InsuranceHelper $insuranceHelper,
-        Item\Processor $itemProcessor,
-        DataObjectFactory $objectFactory,
-        ItemFactory $quoteItemFactory,
         Logger $logger
     ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
-        $this->itemProcessor = $itemProcessor;
-        $this->objectFactory = $objectFactory;
-        $this->quoteItemFactory = $quoteItemFactory;
     }
 
     public function execute(Observer $observer)
@@ -110,7 +90,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
      * @param Quote $quote
      * @param Product $insuranceProduct
      * @return Item
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws AlmaInsuranceProductException
      */
     public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct): Item
     {

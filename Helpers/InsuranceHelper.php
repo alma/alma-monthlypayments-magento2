@@ -36,6 +36,9 @@ class InsuranceHelper extends AbstractHelper
 
     /**
      * @param Context $context
+     * @param RequestInterface $request
+     * @param ProductRepository $productRepository
+     * @param Logger $logger
      * @param Json $json
      */
     public function __construct(
@@ -88,6 +91,11 @@ class InsuranceHelper extends AbstractHelper
         }
         return null;
     }
+
+    /**
+     * @param string $price
+     * @return float
+     */
     public function formatPrice(string $price):float
     {
         return (float)substr($price, 0, -1);
