@@ -70,7 +70,7 @@ class InsuranceHelper extends AbstractHelper
      * @param array $data
      * @return Item
      */
-    public function setQuoteItemAlmaInsurance(Item $quoteItem, array $data): Item
+    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data): Item
     {
         return $quoteItem->setAlmaInsurance($this->json->serialize($data));
     }

@@ -79,7 +79,6 @@ class AddToCartInsuranceObserver implements ObserverInterface
 
     public function execute(Observer $observer)
     {
-        $this->logger->info('Start Observer');
         try {
             $insuranceProduct = $this->insuranceHelper->getAlmaInsuranceProduct();
         } catch (AlmaInsuranceProductException $e) {
@@ -94,15 +93,16 @@ class AddToCartInsuranceObserver implements ObserverInterface
                 $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$quoteItem->getProduct()]);
                 return;
             }
+
             $insuranceObject = $this->insuranceHelper->getInsuranceParamsInRequest();
             if ($insuranceObject) {
                 $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($quoteItem->getProduct()->getId(), $insuranceObject->getId()));
-                $this->insuranceHelper->setQuoteItemAlmaInsurance($quoteItem, $insuranceObject->toArray());
+                $this->insuranceHelper->setAlmaInsuranceToQuoteItem($quoteItem, $insuranceObject->toArray());
             }
             $insuranceProductInQuote = $this->addInsuranceProductToQuote($quoteItem->getQuote(), $insuranceProduct);
-            $this->insuranceHelper->setQuoteItemAlmaInsurance($insuranceProductInQuote, $insuranceObject->toArray());
+            $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray());
         } catch (\Exception $e) {
-            $this->logger->info('Error', [$e]);
+            $this->logger->info('Error', [$e->getMessage()]);
         }
     }
 
