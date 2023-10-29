@@ -28,6 +28,7 @@ use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -79,7 +80,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
                 $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($quoteItem->getProduct()->getId(), $insuranceObject->getId()));
                 $this->insuranceHelper->setAlmaInsuranceToQuoteItem($quoteItem, $insuranceObject->toArray());
             }
-            $insuranceProductInQuote = $this->addInsuranceProductToQuote($quoteItem->getQuote(), $insuranceProduct);
+            $insuranceProductInQuote = $this->addInsuranceProductToQuote($quoteItem->getQuote(), $insuranceProduct, $quoteItem->getQty());
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray());
         } catch (\Exception $e) {
             $this->logger->info('Error', [$e->getMessage()]);
@@ -89,13 +90,14 @@ class AddToCartInsuranceObserver implements ObserverInterface
     /**
      * @param Quote $quote
      * @param Product $insuranceProduct
+     * @param int $qty
      * @return Item
      * @throws AlmaInsuranceProductException
      */
-    public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct): Item
+    public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct, int $qty): Item
     {
         try {
-            $insuranceInQuote = $quote->addProduct($insuranceProduct);
+            $insuranceInQuote = $quote->addProduct($insuranceProduct, $this->makeAddRequest($insuranceProduct, $qty));
             $price = rand(100, 200);
             $insuranceInQuote->setCustomPrice($price);
             $insuranceInQuote->setOriginalCustomPrice($price);
@@ -106,5 +108,23 @@ class AddToCartInsuranceObserver implements ObserverInterface
             $this->logger->error($message, [$e->getMessage()]);
             throw new AlmaInsuranceProductException($message, 0, $e);
         }
+    }
+
+    /**
+     * @param Product $product
+     * @param int $qty
+     * @return DataObject
+     */
+    private function makeAddRequest(Product $product, int $qty = 1): DataObject
+    {
+        $data = [
+            'product' => $product->getEntityId(),
+            'qty' => $qty
+        ];
+
+        $request = new DataObject();
+        $request->setData($data);
+
+        return $request;
     }
 }
