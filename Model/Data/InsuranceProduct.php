@@ -16,15 +16,21 @@ class InsuranceProduct
      * @var float
      */
     private $price;
+    /**
+     * @var mixed
+     */
+    private $linkToken;
 
     public function __construct(
         int $id,
         string $name,
-        float $price
+        float $price,
+        int $linkToken = null
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->price = $price;
+        $this->linkToken = $linkToken;
     }
 
     /**
@@ -59,7 +65,25 @@ class InsuranceProduct
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'price' => $this->price
+            'price' => $this->price,
+            'link' => $this->linkToken
         ];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLinkToken(): ?string
+    {
+        return $this->linkToken;
+    }
+
+    /**
+     * @param string $linkToken
+     * @return void
+     */
+    public function setLinkToken(string $linkToken): void
+    {
+        $this->linkToken = $linkToken;
     }
 }

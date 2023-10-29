@@ -80,7 +80,6 @@ class InsuranceHelper extends AbstractHelper
      */
     public function getInsuranceParamsInRequest(): ?InsuranceProduct
     {
-
         $insuranceId = $this->request->getParam('alma_insurance_id');
         $insuranceName = $this->request->getParam('alma_insurance_name');
         $insurancePrice = $this->request->getParam('alma_insurance_price');
@@ -96,15 +95,26 @@ class InsuranceHelper extends AbstractHelper
 
     /**
      * @return Product
+     * @throws AlmaInsuranceProductException
      */
     public function getAlmaInsuranceProduct(): Product
     {
         try {
-            return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU);
+            return $this->productRepository->get(self::ALMA_INSURANCE_SKU);
         } catch (NoSuchEntityException $e) {
-            $message = 'No alma Insurance product in Catalog - Use a product with sku : '. InsuranceHelper::ALMA_INSURANCE_SKU;
-            $this->logger->error($message,[$e]);
-           throw new AlmaInsuranceProductException($message,0, $e);
+            $message = 'No alma Insurance product in Catalog - Use a product with sku : ' . self::ALMA_INSURANCE_SKU;
+            $this->logger->error($message, [$e->getMessage()]);
+            throw new AlmaInsuranceProductException($message, 0, $e);
         }
+    }
+
+    /**
+     * @param int $productId
+     * @param int $insuranceId
+     * @return string
+     */
+    public function createLinkToken(int $productId, int $insuranceId): string
+    {
+        return (hash('sha256', $productId . time() . $insuranceId));
     }
 }
