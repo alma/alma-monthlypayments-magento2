@@ -85,11 +85,14 @@ class InsuranceHelper extends AbstractHelper
         $insuranceName = $this->request->getParam('alma_insurance_name');
         $insurancePrice = $this->request->getParam('alma_insurance_price');
         if ($insuranceId && $insuranceName && $insurancePrice) {
-            return New InsuranceProduct((int)$insuranceId, $insuranceName, (int)substr($insurancePrice, 0, -1));
+            return new InsuranceProduct((int)$insuranceId, $insuranceName, $this->formatPrice($insurancePrice));
         }
         return null;
     }
-
+    public function formatPrice(string $price):float
+    {
+        return (float)substr($price, 0, -1);
+    }
 
     /**
      * @return Product
