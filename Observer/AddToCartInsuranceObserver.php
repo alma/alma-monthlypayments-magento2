@@ -69,17 +69,16 @@ class AddToCartInsuranceObserver implements ObserverInterface
         try {
             /** @var Item $addedItemToQuote */
             $addedItemToQuote = $observer->getData('quote_item');
-
             if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
                 $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()]);
                 return;
             }
-
             $insuranceObject = $this->insuranceHelper->getInsuranceParamsInRequest();
-            if ($insuranceObject) {
-                $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
-                $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray());
+            if (!$insuranceObject) {
+                return;
             }
+            $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
+            $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray());
             $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $addedItemToQuote);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray());
         } catch (\Exception $e) {
