@@ -67,20 +67,20 @@ class AddToCartInsuranceObserver implements ObserverInterface
         }
 
         try {
-            /** @var Item $quoteItem */
-            $quoteItem = $observer->getData('quote_item');
+            /** @var Item $addedItemToQuote */
+            $addedItemToQuote = $observer->getData('quote_item');
 
-            if ($quoteItem->getProduct()->getId() === $insuranceProduct->getId()) {
-                $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$quoteItem->getProduct()]);
+            if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
+                $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()]);
                 return;
             }
 
             $insuranceObject = $this->insuranceHelper->getInsuranceParamsInRequest();
             if ($insuranceObject) {
-                $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($quoteItem->getProduct()->getId(), $insuranceObject->getId()));
-                $this->insuranceHelper->setAlmaInsuranceToQuoteItem($quoteItem, $insuranceObject->toArray());
+                $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
+                $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray());
             }
-            $insuranceProductInQuote = $this->addInsuranceProductToQuote($quoteItem->getQuote(), $insuranceProduct, $quoteItem->getQty());
+            $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $addedItemToQuote);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray());
         } catch (\Exception $e) {
             $this->logger->info('Error', [$e->getMessage()]);
@@ -90,15 +90,16 @@ class AddToCartInsuranceObserver implements ObserverInterface
     /**
      * @param Quote $quote
      * @param Product $insuranceProduct
-     * @param int $qty
+     * @param Item $addedItemToQuote
      * @return Item
      * @throws AlmaInsuranceProductException
      */
-    public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct, int $qty): Item
+    public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct, Item $addedItemToQuote): Item
     {
         try {
-            $insuranceInQuote = $quote->addProduct($insuranceProduct, $this->makeAddRequest($insuranceProduct, $qty));
+            $insuranceInQuote = $quote->addProduct($insuranceProduct, $this->makeAddRequest($insuranceProduct, $addedItemToQuote->getQty()));
             $price = rand(100, 200);
+            $insuranceInQuote->setName($insuranceInQuote->getName() . ' - ' . $addedItemToQuote->getName());
             $insuranceInQuote->setCustomPrice($price);
             $insuranceInQuote->setOriginalCustomPrice($price);
             $insuranceInQuote->getProduct()->setIsSuperMode(true);
