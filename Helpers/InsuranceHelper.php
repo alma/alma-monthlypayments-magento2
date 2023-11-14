@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
@@ -16,6 +17,7 @@ use Magento\Quote\Model\Quote\Item;
 class InsuranceHelper extends AbstractHelper
 {
     const ALMA_INSURANCE_SKU = 'alma_insurance';
+    const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
 
     /**
      * @var ProductRepository
@@ -33,6 +35,10 @@ class InsuranceHelper extends AbstractHelper
      * @var Logger
      */
     private $logger;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
 
     /**
      * @param Context $context
@@ -46,13 +52,24 @@ class InsuranceHelper extends AbstractHelper
         RequestInterface $request,
         ProductRepository $productRepository,
         Logger $logger,
-        Json $json
+        Json $json,
+        ConfigHelper $configHelper
     ) {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
         $this->productRepository = $productRepository;
         $this->logger = $logger;
+        $this->configHelper = $configHelper;
+    }
+
+    /**
+     * @return InsuranceConfig
+     */
+    public function getConfig():InsuranceConfig
+    {
+        $configData = $this->configHelper->getConfigByCode(self::ALMA_INSURANCE_CONFIG_CODE);
+        return new InsuranceConfig($configData);
     }
 
     /**
