@@ -18,6 +18,7 @@ class InsuranceHelper extends AbstractHelper
 {
     const ALMA_INSURANCE_SKU = 'alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
+    const IFRAME_BASE_URL ='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
 
     /**
      * @var ProductRepository
@@ -68,7 +69,7 @@ class InsuranceHelper extends AbstractHelper
      */
     public function getConfig():InsuranceConfig
     {
-        $configData = $this->configHelper->getConfigByCode(self::ALMA_INSURANCE_CONFIG_CODE);
+        $configData = (string)$this->configHelper->getConfigByCode(self::ALMA_INSURANCE_CONFIG_CODE);
         return new InsuranceConfig($configData);
     }
 
@@ -141,5 +142,18 @@ class InsuranceHelper extends AbstractHelper
     public function createLinkToken(int $productId, int $insuranceId): string
     {
         return (hash('sha256', $productId . time() . $insuranceId));
+    }
+
+    public function getIframeUrlWithParams():string
+    {
+        $configArray = $this->getConfig()->getArrayConfig();
+        unset($configArray['is_insurance_activated']);
+        $paramNumber=0;
+        $uri ='';
+        foreach ($configArray as $key=>$value) {
+            $uri .= ($paramNumber===0 ? '?' : '&').$key.'='.($value ? 'true' : 'false');
+            $paramNumber++;
+        }
+        return self::IFRAME_BASE_URL.$uri;
     }
 }

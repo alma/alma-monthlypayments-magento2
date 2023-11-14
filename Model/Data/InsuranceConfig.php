@@ -86,6 +86,6 @@ class InsuranceConfig
 
     public function getArrayConfig():array
     {
-        return $this->arrayData;
+        return (array)$this->arrayData;
     }
 }
