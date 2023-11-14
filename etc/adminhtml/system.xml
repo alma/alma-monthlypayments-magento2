@@ -36,10 +36,9 @@
                 <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Insurance</frontend_model>
                 <field id="alma_insurance_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
                        showInStore="1">
-                    <config_path>payment/alma_insurance/config</config_path>
+                    <config_path>payment/alma_monthly_payments/insurance_config</config_path>
                     <label>Alma Insurance</label>
                 <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\InsuranceWidget</frontend_model>
-                <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\InsuranceWidgetBackendModel</backend_model>
                 </field>
             </group>
             <group id="alma_monthly_payments" translate="label comment" type="text" sortOrder="1" showInDefault="1"
