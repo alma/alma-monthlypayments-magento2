@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Block\Adminhtml\Form\Field;
 
+use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
@@ -10,14 +11,21 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class InsuranceWidget extends Field
 {
     /**
+     * @var InsuranceHelper
+     */
+    private $insuranceHelper;
+
+    /**
      * @param Context $context
      * @param array $data
      */
     public function __construct(
         Context $context,
+        InsuranceHelper $insuranceHelper,
         array $data = []
     ) {
         parent::__construct($context, $data);
+        $this->insuranceHelper = $insuranceHelper;
     }
     /**
      * Retrieve element HTML markup
@@ -27,13 +35,13 @@ class InsuranceWidget extends Field
      */
     protected function _getElementHtml(AbstractElement $element):string
     {
-
+        $iframeUrl = $this->insuranceHelper->getIframeUrlWithParams();
         $iframe = "<div id='alma-insurance-modal'></div>
                    <iframe id='config-alma-iframe'
                     class='alma-insurance-iframe'
                     width='100%'
                     height='100%'
-                    src='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html'>
+                    src='".$iframeUrl."'>
                    </iframe>
                    <script type='module' src='https://protect.staging.almapay.com/openInPageModal.js'></script>
                    <script>

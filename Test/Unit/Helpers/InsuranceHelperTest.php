@@ -91,7 +91,7 @@ class InsuranceHelperTest extends TestCase
      * @param $result
      * @param $dbValue
      * @return void
-     * @dataProvider isActiveDataProvider
+     * @dataProvider configObjectIsCreatedWithDbDataDataProvider
      */
     public function testConfigObjectIsCreatedWithDbData($activated, $pageActivated, $cartActivated,$popupActivated, $dbValue):void
     {
@@ -103,7 +103,7 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($popupActivated, $insuranceObject->isPopupActivated());
     }
 
-    private function isActiveDataProvider(): array
+    private function configObjectIsCreatedWithDbDataDataProvider(): array
     {
         return [
             'Return false if no data in DB'  => [
@@ -112,6 +112,13 @@ class InsuranceHelperTest extends TestCase
                 'cart_activated' => false,
                 'popup_activated' => false,
                 'db_value' => ''
+            ],
+            'Return false if null in DB'  => [
+                'activated' => false,
+                'page_activated' => false,
+                'cart_activated' => false,
+                'popup_activated' => false,
+                'db_value' => null
             ],
             'Return false if key is not present and ignore unknown keys '  => [
                 'activated' => false,
@@ -183,6 +190,60 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($result, $insuranceObject->getArrayConfig());
     }
 
+    /**
+     * @dataProvider iframeHasDbGetParamsDataProvider
+     * @return void
+     */
+    public function testIframeHasDbGetParams($dbValue, $expectedURL):void
+    {
+        $this->configHelper->expects($this->once())
+            ->method('getConfigByCode')
+            ->with(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE)
+            ->willReturn($dbValue);
+        $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams());
+    }
+    private function iframeHasDbGetParamsDataProvider():array
+    {
+        return [
+            'No params if config is empty' => [
+                'db_value' => '',
+                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL
+            ],
+            'all params are true if all is true in DB' => [
+                'db_value' => '{
+                    "is_insurance_activated":true,
+                    "is_insurance_on_product_page_activated":true,
+                    "is_insurance_on_cart_page_activated":true,
+                    "is_add_to_cart_popup_insurance_activated":true
+                    }',
+                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL.'?is_insurance_on_product_page_activated=true'.
+                '&is_insurance_on_cart_page_activated=true'.
+                '&is_add_to_cart_popup_insurance_activated=true'
+            ],
+            'all params are false if all is false in DB' => [
+                'db_value' => '{
+                    "is_insurance_activated":false,
+                    "is_insurance_on_product_page_activated":false,
+                    "is_insurance_on_cart_page_activated":false,
+                    "is_add_to_cart_popup_insurance_activated":false
+                    }',
+                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL.'?is_insurance_on_product_page_activated=false'.
+                    '&is_insurance_on_cart_page_activated=false'.
+                    '&is_add_to_cart_popup_insurance_activated=false'
+            ],
+            'params are good values' => [
+                'db_value' => '{
+                    "is_insurance_activated":true,
+                    "is_insurance_on_product_page_activated":false,
+                    "is_insurance_on_cart_page_activated":true,
+                    "is_add_to_cart_popup_insurance_activated":false
+                    }',
+                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL.'?is_insurance_on_product_page_activated=false'.
+                    '&is_insurance_on_cart_page_activated=true'.
+                    '&is_add_to_cart_popup_insurance_activated=false'
+            ],
+        ];
+    }
     private function createNewInsuranceHelper():InsuranceHelper
     {
         return new InsuranceHelper(...$this->getConstructorDependency());
