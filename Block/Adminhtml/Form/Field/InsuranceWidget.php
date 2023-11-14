@@ -38,13 +38,11 @@ class InsuranceWidget extends Field
                    <script type='module' src='https://protect.staging.almapay.com/openInPageModal.js'></script>
                    <script>
                        var btnSave = document.getElementById('save')
-
                        btnSave.addEventListener('click', function (e) {
-                           console.log('in my get Data');
-                           //var widgetData = getAlmaWidgetData();
-                           var widgetData = { is_insurance_activated: true, is_insurance_on_product_page_activated: true, is_insurance_on_cart_page_activated: true, is_add_to_cart_popup_insurance_activated: true}
+                           e.preventDefault();
+                           var widgetData = getAlmaWidgetData().then((data) => {
                            document.getElementById('alma_insurance_config').value = JSON.stringify(widgetData)
-                           return true;
+                            })
                        })
                    </script>
                    <input id='alma_insurance_config' name='groups[alma_insurance][fields][alma_insurance_config][value]' type='text' value='' />
