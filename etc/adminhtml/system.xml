@@ -29,6 +29,19 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
+            <group id="alma_insurance" translate="label comment" type="text" sortOrder="1" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer insurance with Alma <br> </div>]]></comment>
+                <fieldset_css>complex alma-section</fieldset_css>
+                <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Insurance</frontend_model>
+                <field id="alma_insurance_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <config_path>payment/alma_insurance/config</config_path>
+                    <label>Alma Insurance</label>
+                <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\InsuranceWidget</frontend_model>
+                <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\InsuranceWidgetBackendModel</backend_model>
+                </field>
+            </group>
             <group id="alma_monthly_payments" translate="label comment" type="text" sortOrder="1" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer installments payments with Alma and instantly boost your sales.<br>Increase average order value by 60% and your sales by 20%.<br>With no subscription fees and no commitment, it’s risk free: you are paid upfront while your customers pay later.</div>]]></comment>
@@ -347,6 +360,7 @@
                     </field>
                 </group>
             </group>
+
         </section>
     </system>
 </config>
