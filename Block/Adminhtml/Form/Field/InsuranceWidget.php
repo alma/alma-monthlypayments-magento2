@@ -7,7 +7,6 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-
 class InsuranceWidget extends Field
 {
     /**
@@ -41,19 +40,23 @@ class InsuranceWidget extends Field
                     class='alma-insurance-iframe'
                     width='100%'
                     height='100%'
-                    src='".$iframeUrl."'>
+                    src='" . $iframeUrl . "'>
                    </iframe>
                    <script type='module' src='https://protect.staging.almapay.com/openInPageModal.js'></script>
                    <script>
                        var btnSave = document.getElementById('save')
                        btnSave.addEventListener('click', function (e) {
-                           e.preventDefault();
-                           var widgetData = getAlmaWidgetData().then((data) => {
-                           document.getElementById('alma_insurance_config').value = JSON.stringify(widgetData)
-                            })
+                           var inputValue = document.getElementById('alma_insurance_config').value;
+                           if (inputValue == 'false'){
+                               e.stopImmediatePropagation();
+                               getAlmaWidgetData().then((data) => {
+                                    document.getElementById('alma_insurance_config').value = JSON.stringify(data)
+                                    document.getElementById('save').click();
+                               })
+                           }
                        })
                    </script>
-                   <input id='alma_insurance_config' name='groups[alma_insurance][fields][alma_insurance_config][value]' type='text' value='' />
+                   <input id='alma_insurance_config' name='groups[alma_insurance][fields][alma_insurance_config][value]' type='hidden' value='false' />
                    ";
         return $iframe;
     }
