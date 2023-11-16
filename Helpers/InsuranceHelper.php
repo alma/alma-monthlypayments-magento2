@@ -18,7 +18,7 @@ class InsuranceHelper extends AbstractHelper
 {
     const ALMA_INSURANCE_SKU = 'alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
-    const IFRAME_BASE_URL ='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
+    const CONFIG_IFRAME_URL ='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
 
     /**
      * @var ProductRepository
@@ -154,6 +154,6 @@ class InsuranceHelper extends AbstractHelper
             $uri .= ($paramNumber===0 ? '?' : '&').$key.'='.($value ? 'true' : 'false');
             $paramNumber++;
         }
-        return self::IFRAME_BASE_URL.$uri;
+        return self::CONFIG_IFRAME_URL.$uri;
     }
 }

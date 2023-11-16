@@ -207,7 +207,7 @@ class InsuranceHelperTest extends TestCase
         return [
             'No params if config is empty' => [
                 'db_value' => '',
-                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL
+                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL
             ],
             'all params are true if all is true in DB' => [
                 'db_value' => '{
@@ -216,7 +216,7 @@ class InsuranceHelperTest extends TestCase
                     "is_insurance_on_cart_page_activated":true,
                     "is_add_to_cart_popup_insurance_activated":true
                     }',
-                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL.'?is_insurance_on_product_page_activated=true'.
+                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL.'?is_insurance_on_product_page_activated=true'.
                 '&is_insurance_on_cart_page_activated=true'.
                 '&is_add_to_cart_popup_insurance_activated=true'
             ],
@@ -227,7 +227,7 @@ class InsuranceHelperTest extends TestCase
                     "is_insurance_on_cart_page_activated":false,
                     "is_add_to_cart_popup_insurance_activated":false
                     }',
-                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL.'?is_insurance_on_product_page_activated=false'.
+                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL.'?is_insurance_on_product_page_activated=false'.
                     '&is_insurance_on_cart_page_activated=false'.
                     '&is_add_to_cart_popup_insurance_activated=false'
             ],
@@ -238,7 +238,7 @@ class InsuranceHelperTest extends TestCase
                     "is_insurance_on_cart_page_activated":true,
                     "is_add_to_cart_popup_insurance_activated":false
                     }',
-                'expectedUrl' => InsuranceHelper::IFRAME_BASE_URL.'?is_insurance_on_product_page_activated=false'.
+                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL.'?is_insurance_on_product_page_activated=false'.
                     '&is_insurance_on_cart_page_activated=true'.
                     '&is_add_to_cart_popup_insurance_activated=false'
             ],
