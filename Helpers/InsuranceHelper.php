@@ -19,6 +19,13 @@ class InsuranceHelper extends AbstractHelper
     const ALMA_INSURANCE_SKU = 'alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
     const CONFIG_IFRAME_URL ='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
+    //TODO fix with ne final host
+    const SANDBOX_IFRAME_HOST_URL = 'https://protect.staging.almapay.com';
+    //TODO fix with ne final host
+    const PRODUCTION_IFRAME_HOST_URL = 'https://protect.almapay.com';
+    const SCRIPT_IFRAME_PATH = '/openInPageModal.js';
+    const CONFIG_IFRAME_PATH = '/almaBackOfficeConfiguration.html';
+    const FRONT_IFRAME_PATH = '/almaProductInPageWidget.html';
 
     /**
      * @var ProductRepository
