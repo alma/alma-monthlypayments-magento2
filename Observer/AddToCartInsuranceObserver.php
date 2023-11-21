@@ -69,16 +69,22 @@ class AddToCartInsuranceObserver implements ObserverInterface
         try {
             /** @var Item $addedItemToQuote */
             $addedItemToQuote = $observer->getData('quote_item');
+
             if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
                 $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()]);
                 return;
             }
+
             $insuranceObject = $this->insuranceHelper->getInsuranceParamsInRequest();
             if (!$insuranceObject) {
                 return;
             }
+
+            //TODO API CALL TO CHECK INSURANCE AVAILABILITY WITH ID AND SKU PRODUCT AND PRICE
+
             $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray());
+
             $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $addedItemToQuote);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray());
         } catch (\Exception $e) {
@@ -93,7 +99,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
      * @return Item
      * @throws AlmaInsuranceProductException
      */
-    public function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct, Item $addedItemToQuote): Item
+    private function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct, Item $addedItemToQuote): Item
     {
         try {
             $insuranceInQuote = $quote->addProduct($insuranceProduct, $this->makeAddRequest($insuranceProduct, $addedItemToQuote->getQty()));
