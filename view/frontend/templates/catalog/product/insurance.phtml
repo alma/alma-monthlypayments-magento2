@@ -1,6 +1,7 @@
 <?php
 /** @var $block \Alma\MonthlyPayments\Block\Catalog\Product\Insurance */
-    $widgetIsActive = $block->isAtciveWidgetInProductPage();
+    $widgetIsActive = $block->isAtciveWidgetInProductPage()
+
 ?>
 <?php if ($widgetIsActive) { ?>
     <script type="module" src="<?= $block->getIframeUrl('script')?>"></script>
@@ -17,35 +18,19 @@
         $
     ) {
         const almaInsuranceIframe = document.getElementById('insurance-alma-iframe').contentWindow
-        let currentResolve
         let selectedAlmaInsurance = null
-
-        const messageCallback = (e) => {
-            console.log('callback');
-            if (e.data.type === 'buttonClicked') {
-                selectedAlmaInsurance = e.data.buttonText
-                $('input[name=alma_insurance_id]').val(selectedAlmaInsurance.id);
-                $('input[name=alma_insurance_name]').val(selectedAlmaInsurance.name);
-                $('input[name=alma_insurance_price]').val(selectedAlmaInsurance.price);
-            } else if (currentResolve) {
-                currentResolve(e.data)
-            }
-        }
-
-        const getAlmaWidgetData = () => {
-            console.log('plopPlop');
-            const promise = new Promise((resolve) => {
-                currentResolve = resolve
-                window.addEventListener('message', messageCallback)
-                almaInsuranceIframe.postMessage('getData', '*')
-            }).then((e) => {
-                window.removeEventListener('message', messageCallback)
-            })
-        }
-
-        $("#alma_insurance_btn").on('click',function(){
-            console.log('coucou')
-            window.getAlmaWidgetData = getAlmaWidgetData()
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'getSelectedInsuranceData') {
+                selectedAlmaInsurance = e.data.selectedInsuranceData
+                if (selectedAlmaInsurance) {
+                    $('input[name=alma_insurance_id]').val(selectedAlmaInsurance.option.id);
+                    $('input[name=alma_insurance_name]').val(selectedAlmaInsurance.name);
+                    $('input[name=alma_insurance_price]').val(selectedAlmaInsurance.option.price);
+                } else {
+                    $('input[name=alma_insurance_id]').val('');
+                    $('input[name=alma_insurance_name]').val('');
+                    $('input[name=alma_insurance_price]').val('');
+                }
         });
     });
 </script>
