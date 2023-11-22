@@ -108,11 +108,17 @@ class InsuranceHelper extends AbstractHelper
      */
     public function getInsuranceParamsInRequest(): ?InsuranceProduct
     {
+        try {
+            $parentName = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getName();
+        } catch (NoSuchEntityException $e) {
+			$this->logger->error('Impossible to find product in DB', [$e->getMessage(),(int)$this->request->getParam('product')]);
+            return null;
+        }
         $insuranceId = $this->request->getParam('alma_insurance_id');
         $insuranceName = $this->request->getParam('alma_insurance_name');
         $insurancePrice = $this->request->getParam('alma_insurance_price');
-        if ($insuranceId && $insuranceName && $insurancePrice) {
-            return new InsuranceProduct((int)$insuranceId, $insuranceName, $this->formatPrice($insurancePrice));
+        if ($insuranceId && $insuranceName && $insurancePrice && $parentName) {
+            return new InsuranceProduct((int)$insuranceId, $insuranceName, $this->formatPrice($insurancePrice), $parentName);
         }
         return null;
     }
@@ -158,9 +164,9 @@ class InsuranceHelper extends AbstractHelper
         $paramNumber=0;
         $uri ='';
         foreach ($configArray as $key=>$value) {
-            $uri .= ($paramNumber===0 ? '?' : '&').$key.'='.($value ? 'true' : 'false');
+            $uri .= ($paramNumber===0 ? '?' : '&') . $key . '=' . ($value ? 'true' : 'false');
             $paramNumber++;
         }
-        return self::CONFIG_IFRAME_URL.$uri;
+        return self::CONFIG_IFRAME_URL . $uri;
     }
 }

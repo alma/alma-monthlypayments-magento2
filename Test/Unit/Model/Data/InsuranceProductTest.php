@@ -13,12 +13,15 @@ class InsuranceProductTest extends TestCase
         $id =1;
         $name ='insurance test';
         $price = 100;
+        $parentName = 'my parent name';
         $expectedReturn = [
             'id' => $id,
             'name' => $name,
             'price' => 100.0,
+			'link' => null,
+            'parent_name' => 'my parent name'
         ];
-        $insuranceProduct = New InsuranceProduct($id, $name, $price);
+        $insuranceProduct = New InsuranceProduct($id, $name, $price, $parentName);
         $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
     }
 
