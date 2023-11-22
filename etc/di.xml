@@ -37,8 +37,11 @@
                 type="Alma\MonthlyPayments\Model\Api\Data\EligiblePlansResult"/>
     <preference for="Alma\MonthlyPayments\Api\Data\InstallmentInterface"
                 type="Alma\MonthlyPayments\Model\Api\Data\Installment"/>
- <preference for="Magento\Quote\Model\Quote"
+    <preference for="Magento\Quote\Model\Quote"
                 type="Alma\MonthlyPayments\Model\Quote"/>
+    <preference for="Magento\Checkout\CustomerData\DefaultItem"
+                type="Alma\MonthlyPayments\CustomerData\DefaultItem"/>
+
 
     <!-- Eligibility injection in cart customer data -->
     <type name="Magento\Checkout\CustomerData\Cart">
