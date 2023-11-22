@@ -15,14 +15,14 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
 
         $result = parent::doGetItemData();
 
-        $result['hasInsurance'] = $this->hasInsurance();
-        $result['isProductWithInsurance'] = $this->isProductWithInsurance();
+		$result['hasInsurance'] = $this->hasInsurance();
+		$result['isInsuranceProduct'] = $this->isInsuranceProduct();
+		$result['isProductWithInsurance'] = $this->isProductWithInsurance();
 
         if ($this->isInsuranceProduct()) {
             $almaInsurance = json_decode($this->item->getAlmaInsurance(), true);
             $result['product_name'] = $result['product_name'] . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
         }
-
         return $result;
     }
 
