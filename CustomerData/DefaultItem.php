@@ -23,8 +23,6 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
             $result['product_name'] = $result['product_name'] . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
         }
 
-        $logger->info('Result doGetItemData', [$this->item->getData()]);
-
         return $result;
     }
 
