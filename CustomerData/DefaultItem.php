@@ -12,10 +12,19 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
     {
         $objectManager = ObjectManager::getInstance();
         $logger= $objectManager->get(Logger::class);
+
         $result = parent::doGetItemData();
+
         $result['hasInsurance'] = $this->hasInsurance();
-        $result['isProductWithInsurance'] = $this->isProductWitInsurance();
+        $result['isProductWithInsurance'] = $this->isProductWithInsurance();
+
+        if ($this->isInsuranceProduct()) {
+            $almaInsurance = json_decode($this->item->getAlmaInsurance(), true);
+            $result['product_name'] = $result['product_name'] . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
+        }
+
         $logger->info('Result doGetItemData', [$this->item->getData()]);
+
         return $result;
     }
 
@@ -24,9 +33,13 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
         return (bool)$this->item->getAlmaInsurance();
     }
 
-    protected function isProductWitInsurance(): bool
+    protected function isProductWithInsurance(): bool
     {
         return $this->hasInsurance() && $this->item->getProduct()->getSku() != InsuranceHelper::ALMA_INSURANCE_SKU;
     }
-	
+
+    protected function isInsuranceProduct(): bool
+    {
+        return $this->hasInsurance() && !$this->isProductWithInsurance();
+    }
 }
