@@ -111,7 +111,7 @@ class InsuranceHelper extends AbstractHelper
         try {
             $parentName = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getName();
         } catch (NoSuchEntityException $e) {
-			$this->logger->error('Impossible to find product in DB', [$e->getMessage(),(int)$this->request->getParam('product')]);
+            $this->logger->error('Impossible to find product in DB', [$e->getMessage(),(int)$this->request->getParam('product')]);
             return null;
         }
         $insuranceId = $this->request->getParam('alma_insurance_id');
@@ -168,5 +168,15 @@ class InsuranceHelper extends AbstractHelper
             $paramNumber++;
         }
         return self::CONFIG_IFRAME_URL . $uri;
+    }
+
+    public function reorderMiniCart(array $items):array
+    {
+		foreach ($items as $key=> $item) {
+			if ($item['isInsuranceProduct'] && $items[$key+1]){
+				[$items[$key], $items[$key+1]] = [$items[$key+1], $items[$key]];
+			}
+ 		}
+        return $items;
     }
 }

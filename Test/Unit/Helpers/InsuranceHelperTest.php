@@ -244,6 +244,74 @@ class InsuranceHelperTest extends TestCase
             ],
         ];
     }
+	public function testCartWithoutInsuranceDontChange():void
+	{
+		$result = [
+			[
+				'name'=> 'Product1',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Product2',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Product3',
+				'insInsuranceProduct' => false
+			],
+		];
+		$this->assertEquals($result,$this->insuranceHelper->reorderMiniCart($result));
+	}
+	public function testCartWithInsuranceProductChangePosition():void
+	{
+		$base = [
+			[
+				'name'=> 'Product1',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Alma insurance1',
+				'insInsuranceProduct' => true
+			],
+			[
+				'name'=> 'Product3',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Alma insurance2',
+				'insInsuranceProduct' => true
+			],
+			[
+				'name'=> 'Product4',
+				'insInsuranceProduct' => false
+			],
+		];
+		$result = [
+			[
+				'name'=> 'Product1',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Product3',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Alma insurance1',
+				'insInsuranceProduct' => true
+			],
+			[
+				'name'=> 'Product4',
+				'insInsuranceProduct' => false
+			],
+			[
+				'name'=> 'Alma insurance2',
+				'insInsuranceProduct' => true
+			]
+		];
+		$this->assertEquals($result,$this->insuranceHelper->reorderMiniCart($base));
+	}
+
+
     private function createNewInsuranceHelper():InsuranceHelper
     {
         return new InsuranceHelper(...$this->getConstructorDependency());

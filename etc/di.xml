@@ -41,6 +41,8 @@
                 type="Alma\MonthlyPayments\Model\Quote"/>
     <preference for="Magento\Checkout\CustomerData\DefaultItem"
                 type="Alma\MonthlyPayments\CustomerData\DefaultItem"/>
+    <preference for="Magento\Checkout\CustomerData\Cart"
+                type="Alma\MonthlyPayments\CustomerData\Cart"/>
 
 
     <!-- Eligibility injection in cart customer data -->
