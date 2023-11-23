@@ -12,6 +12,7 @@ use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\Item;
 
 class InsuranceHelper extends AbstractHelper
@@ -47,8 +48,12 @@ class InsuranceHelper extends AbstractHelper
      * @var ConfigHelper
      */
     private $configHelper;
+	/**
+	 * @var CartRepositoryInterface
+	 */
+	private $cartRepository;
 
-    /**
+	/**
      * @param Context $context
      * @param RequestInterface $request
      * @param ProductRepository $productRepository
@@ -61,7 +66,8 @@ class InsuranceHelper extends AbstractHelper
         ProductRepository $productRepository,
         Logger $logger,
         Json $json,
-        ConfigHelper $configHelper
+        ConfigHelper $configHelper,
+		CartRepositoryInterface $cartRepository
     ) {
         parent::__construct($context);
         $this->json = $json;
@@ -69,7 +75,8 @@ class InsuranceHelper extends AbstractHelper
         $this->productRepository = $productRepository;
         $this->logger = $logger;
         $this->configHelper = $configHelper;
-    }
+		$this->cartRepository = $cartRepository;
+	}
 
     /**
      * @return InsuranceConfig
@@ -86,7 +93,7 @@ class InsuranceHelper extends AbstractHelper
      * @param Item $quoteItem
      * @return string
      */
-    public function getQuoteItemAlmaInsurance(Item $quoteItem): ?string
+    public function getQuoteItemAlmaInsurance(Item $quoteItem):?string
     {
         return $quoteItem->getAlmaInsurance();
     }
@@ -172,11 +179,33 @@ class InsuranceHelper extends AbstractHelper
 
     public function reorderMiniCart(array $items):array
     {
-		foreach ($items as $key=> $item) {
-			if ($item['isInsuranceProduct'] && $items[$key+1]){
-				[$items[$key], $items[$key+1]] = [$items[$key+1], $items[$key]];
-			}
- 		}
+        foreach ($items as $key=> $item) {
+            if ($item['isInsuranceProduct'] && $items[$key+1]) {
+                [$items[$key], $items[$key+1]] = [$items[$key+1], $items[$key]];
+            }
+        }
         return $items;
     }
+
+    public function getInsuranceProductToRemove(string $linkToken, array $quoteItems): ?Item
+    {
+        /** @var Item $quoteItem */
+        foreach ($quoteItems as $quoteItem) {
+			if ($quoteItem->getSku() != self::ALMA_INSURANCE_SKU) {
+				continue;
+            }
+            $insuranceData = json_decode($quoteItem->getData(self::ALMA_INSURANCE_SKU), true);
+			if ($insuranceData && $linkToken === $insuranceData['link']) {
+                return $quoteItem;
+            }
+        }
+        return null;
+    }
+
+	public function removeQuoteItemFromCart(Item $quoteItem): void
+	{
+		$quote = $quoteItem->getQuote();
+		$quote->deleteItem($quoteItem);
+		$this->cartRepository->save($quote);
+	}
 }
