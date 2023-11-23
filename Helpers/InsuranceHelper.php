@@ -48,12 +48,12 @@ class InsuranceHelper extends AbstractHelper
      * @var ConfigHelper
      */
     private $configHelper;
-	/**
-	 * @var CartRepositoryInterface
-	 */
-	private $cartRepository;
+    /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
 
-	/**
+    /**
      * @param Context $context
      * @param RequestInterface $request
      * @param ProductRepository $productRepository
@@ -67,7 +67,7 @@ class InsuranceHelper extends AbstractHelper
         Logger $logger,
         Json $json,
         ConfigHelper $configHelper,
-		CartRepositoryInterface $cartRepository
+        CartRepositoryInterface $cartRepository
     ) {
         parent::__construct($context);
         $this->json = $json;
@@ -75,8 +75,8 @@ class InsuranceHelper extends AbstractHelper
         $this->productRepository = $productRepository;
         $this->logger = $logger;
         $this->configHelper = $configHelper;
-		$this->cartRepository = $cartRepository;
-	}
+        $this->cartRepository = $cartRepository;
+    }
 
     /**
      * @return InsuranceConfig
@@ -105,9 +105,12 @@ class InsuranceHelper extends AbstractHelper
      * @param array $data
      * @return Item
      */
-    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data): Item
+    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data =null): Item
     {
-        return $quoteItem->setAlmaInsurance($this->json->serialize($data));
+        if ($data) {
+            $data = $this->json->serialize($data);
+        }
+        return $quoteItem->setAlmaInsurance($data);
     }
 
     /**
@@ -191,21 +194,39 @@ class InsuranceHelper extends AbstractHelper
     {
         /** @var Item $quoteItem */
         foreach ($quoteItems as $quoteItem) {
-			if ($quoteItem->getSku() != self::ALMA_INSURANCE_SKU) {
-				continue;
+            if ($quoteItem->getSku() != self::ALMA_INSURANCE_SKU) {
+                continue;
             }
             $insuranceData = json_decode($quoteItem->getData(self::ALMA_INSURANCE_SKU), true);
-			if ($insuranceData && $linkToken === $insuranceData['link']) {
+            if ($insuranceData && $linkToken === $insuranceData['link']) {
+                return $quoteItem;
+            }
+        }
+        return null;
+    }
+    public function getProductLinkedToInsurance(string $linkToken, array $quoteItems): ?Item
+    {
+        /** @var Item $quoteItem */
+        foreach ($quoteItems as $quoteItem) {
+            if ($quoteItem->getSku() === self::ALMA_INSURANCE_SKU) {
+                continue;
+            }
+            $insuranceData = $quoteItem->getData(self::ALMA_INSURANCE_SKU);
+            if (!$insuranceData) {
+                continue;
+            }
+            $insuranceData = json_decode($quoteItem->getData(self::ALMA_INSURANCE_SKU), true);
+            if ($insuranceData && $linkToken === $insuranceData['link']) {
                 return $quoteItem;
             }
         }
         return null;
     }
 
-	public function removeQuoteItemFromCart(Item $quoteItem): void
-	{
-		$quote = $quoteItem->getQuote();
-		$quote->deleteItem($quoteItem);
-		$this->cartRepository->save($quote);
-	}
+    public function removeQuoteItemFromCart(Item $quoteItem): void
+    {
+        $quote = $quoteItem->getQuote();
+        $quote->deleteItem($quoteItem);
+        $this->cartRepository->save($quote);
+    }
 }

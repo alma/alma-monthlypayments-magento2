@@ -51,12 +51,12 @@ class InsuranceHelperTest extends TestCase
      *
      */
     private $configHelper;
-	/**
-	 * @var CartRepositoryInterface
-	 */
-	private $cartRepository;
+    /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
 
-	protected function setUp(): void
+    protected function setUp(): void
     {
         $this->contextMock = $this->createMock(Context::class);
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
@@ -64,9 +64,8 @@ class InsuranceHelperTest extends TestCase
         $this->logger = $this->createMock(Logger::class);
         $this->jsonMock = $this->createMock(Json::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
-		$this->cartRepository = $this->createMock(CartRepositoryInterface::class);
-		$this->insuranceHelper = $this->createNewInsuranceHelper();
-
+        $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
+        $this->insuranceHelper = $this->createNewInsuranceHelper();
     }
     private function getConstructorDependency(): array
     {
@@ -77,7 +76,7 @@ class InsuranceHelperTest extends TestCase
             $this->logger,
             $this->jsonMock,
             $this->configHelper,
-			$this->cartRepository
+            $this->cartRepository
         ];
     }
     //
@@ -319,14 +318,14 @@ class InsuranceHelperTest extends TestCase
         ];
         $this->assertEquals($result, $this->insuranceHelper->reorderMiniCart($base));
     }
-	public function testReturnNullWithEMptyQuoteItem()
-	{
-		$linkToken = 'toremove';
-		$quoteItems = [
-		];
-		$result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
-		$this->assertNull($result);
-	}
+    public function testReturnNullWithEMptyQuoteItem()
+    {
+        $linkToken = 'toremove';
+        $quoteItems = [
+        ];
+        $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
+        $this->assertNull($result);
+    }
     public function testIfNoInsuranceProductToRemoveReturnNull()
     {
         $linkToken = 'toremove';
@@ -341,33 +340,58 @@ class InsuranceHelperTest extends TestCase
         $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
         $this->assertNull($result);
     }
-	public function testGetInsuranceProductWithALinkToken()
+    public function testGetInsuranceProductWithALinkToken()
+    {
+        $linkToken = 'toremove';
+        $insuranceToKeep = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'tokeep');
+        $insuranceToRemove = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'toremove');
+        $productWithInsurance = $this->itemFactory('SKU1', 'toremove');
+        $productWithoutInsurance = $this->itemFactory('SKU2');
+        $quoteItems = [
+            $productWithInsurance,
+            $insuranceToKeep,
+            $productWithoutInsurance,
+            $insuranceToRemove
+        ];
+        $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
+        $this->assertSame($insuranceToRemove, $result);
+    }
+	public function testGetProductWithInsuranceWithALinkToken()
 	{
-		$linkToken = 'toremove';
-		$insuranceToKeep = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'tokeep');
-		$insuranceToRemove = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'toremove');
-		$productWithInsurance = $this->itemFactory('SKU1', 'toremove');
+		$linkToken = 'linkproduct';
+		$insuranceProduct = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'insurance_product');
+		$insurance = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'linkproduct');
+		$productWithInsurance = $this->itemFactory('SKU1', 'linkproduct');
 		$productWithoutInsurance = $this->itemFactory('SKU2');
 		$quoteItems = [
-			$productWithInsurance,
-			$insuranceToKeep,
 			$productWithoutInsurance,
-			$insuranceToRemove
+			$insurance,
+			$insuranceProduct,
+			$productWithInsurance
 		];
-		$result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
-		$this->assertSame($insuranceToRemove, $result);
+		$result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
+		$this->assertSame($productWithInsurance, $result);
 	}
 
-	public function testRemoveMustQuoteDeleteItemAndSave():void
+	public function testgetProductReturnNullWithEMptyQuoteItem()
 	{
-		$quoteMock = $this->createMock(Quote::class);
-		$itemToRemove = $this->createMock(Item::class);
-		$itemToRemove->method('getQuote')->willReturn($quoteMock);
-		$quoteMock->expects($this->once())->method('deleteItem')->with($itemToRemove);
-
-		$this->cartRepository->expects($this->once())->method('save')->with($quoteMock);
-		$this->assertNull($this->insuranceHelper->removeQuoteItemFromCart($itemToRemove));
+		$linkToken = 'toremove';
+		$quoteItems = [
+		];
+		$result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
+		$this->assertNull($result);
 	}
+    public function testRemoveMustCallDeleteItemAndSave():void
+    {
+        $quoteMock = $this->createMock(Quote::class);
+        $itemToRemove = $this->createMock(Item::class);
+        $itemToRemove->method('getQuote')->willReturn($quoteMock);
+        $quoteMock->expects($this->once())->method('deleteItem')->with($itemToRemove);
+
+        $this->cartRepository->expects($this->once())->method('save')->with($quoteMock);
+        $this->assertNull($this->insuranceHelper->removeQuoteItemFromCart($itemToRemove));
+    }
+
 
     private function getInsuranceData(string $linkToken = null):?string
     {
