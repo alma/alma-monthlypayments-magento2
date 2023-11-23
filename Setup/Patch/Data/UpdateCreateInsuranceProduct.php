@@ -9,6 +9,7 @@ use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 /**
@@ -71,7 +72,11 @@ class UpdateCreateInsuranceProduct implements DataPatchInterface
 
     public function apply()
     {
-        $this->state->setAreaCode('adminhtml');
+        try {
+            $this->state->setAreaCode('adminhtml');
+        } catch (LocalizedException $e) {
+            $this->logger->info('Area Code is already set continue', [$e->getMessage()]);
+        }
         /** @var Product $insuranceProduct */
         $insuranceProduct = $this->productFactory->create();
         $insuranceProduct->setSku(InsuranceHelper::ALMA_INSURANCE_SKU);
