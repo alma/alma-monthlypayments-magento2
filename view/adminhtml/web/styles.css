@@ -54,3 +54,6 @@
 #payment_us_alma_insurance td.value {
     height: 40em;
 }
+.alma-insurance-iframe {
+    border: none;
+}

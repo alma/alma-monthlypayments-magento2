@@ -64,3 +64,7 @@
     position:relative;
     bottom: 20px;
 }
+.alma-insurance-iframe {
+    height: 20rem;
+    border: none;
+}
