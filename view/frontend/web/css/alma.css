@@ -68,3 +68,12 @@
     height: 20rem;
     border: none;
 }
+.cart.table-wrapper .cart > .alma-cart-with-insurance {
+    border-bottom: none;
+}
+.table > tbody + tbody.alma-cart-insurance {
+    border-top: none;
+}
+.cart.table-wrapper .alma-cart-insurance .product-item-photo {
+    padding-left: 5rem;
+}
