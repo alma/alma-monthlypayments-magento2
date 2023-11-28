@@ -39,6 +39,8 @@
                 type="Alma\MonthlyPayments\Model\Api\Data\Installment"/>
     <preference for="Magento\Quote\Model\Quote"
                 type="Alma\MonthlyPayments\Model\Quote"/>
+    <preference for="Magento\Quote\Model\Quote\Item"
+                type="Alma\MonthlyPayments\Model\Quote\Item"/>
     <preference for="Magento\Checkout\CustomerData\DefaultItem"
                 type="Alma\MonthlyPayments\CustomerData\DefaultItem"/>
     <preference for="Magento\Checkout\CustomerData\Cart"
