@@ -18,6 +18,7 @@ use Magento\Quote\Model\Quote\Item;
 class InsuranceHelper extends AbstractHelper
 {
     const ALMA_INSURANCE_SKU = 'alma_insurance';
+    const ALMA_PRODUCT_WITH_INSURANCE_TYPE = 'product_with_alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
     const CONFIG_IFRAME_URL ='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
     //TODO fix with ne final host
@@ -105,12 +106,16 @@ class InsuranceHelper extends AbstractHelper
      * @param array $data
      * @return Item
      */
-    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data =null): Item
+    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data =null, string $type = null): Item
     {
+        if (!$type) {
+            $type = self::ALMA_INSURANCE_SKU;
+        }
         if ($data) {
+            $data['type'] = $type;
             $data = $this->json->serialize($data);
         }
-        return $quoteItem->setAlmaInsurance($data);
+        return $quoteItem->setData(self::ALMA_INSURANCE_SKU, $data);
     }
 
     /**

@@ -356,31 +356,31 @@ class InsuranceHelperTest extends TestCase
         $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
         $this->assertSame($insuranceToRemove, $result);
     }
-	public function testGetProductWithInsuranceWithALinkToken()
-	{
-		$linkToken = 'linkproduct';
-		$insuranceProduct = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'insurance_product');
-		$insurance = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'linkproduct');
-		$productWithInsurance = $this->itemFactory('SKU1', 'linkproduct');
-		$productWithoutInsurance = $this->itemFactory('SKU2');
-		$quoteItems = [
-			$productWithoutInsurance,
-			$insurance,
-			$insuranceProduct,
-			$productWithInsurance
-		];
-		$result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
-		$this->assertSame($productWithInsurance, $result);
-	}
+    public function testGetProductWithInsuranceWithALinkToken()
+    {
+        $linkToken = 'linkproduct';
+        $insuranceProduct = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'insurance_product');
+        $insurance = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'linkproduct');
+        $productWithInsurance = $this->itemFactory('SKU1', 'linkproduct');
+        $productWithoutInsurance = $this->itemFactory('SKU2');
+        $quoteItems = [
+            $productWithoutInsurance,
+            $insurance,
+            $insuranceProduct,
+            $productWithInsurance
+        ];
+        $result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
+        $this->assertSame($productWithInsurance, $result);
+    }
 
-	public function testgetProductReturnNullWithEMptyQuoteItem()
-	{
-		$linkToken = 'toremove';
-		$quoteItems = [
-		];
-		$result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
-		$this->assertNull($result);
-	}
+    public function testGetProductReturnNullWithEmptyQuoteItem()
+    {
+        $linkToken = 'toremove';
+        $quoteItems = [
+        ];
+        $result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
+        $this->assertNull($result);
+    }
     public function testRemoveMustCallDeleteItemAndSave():void
     {
         $quoteMock = $this->createMock(Quote::class);
@@ -392,6 +392,38 @@ class InsuranceHelperTest extends TestCase
         $this->assertNull($this->insuranceHelper->removeQuoteItemFromCart($itemToRemove));
     }
 
+    /**
+     * @dataProvider dataForSetAlmaInsurance
+     * @return void
+     */
+    public function testSetDataToAlmaInsurance($data, $type, $result):void
+    {
+        $quoteItem = $this->createMock(Item::class);
+        $this->jsonMock->expects($this->once())->method('serialize')->with(json_decode($result, true))->willReturn($result);
+        $quoteItem->expects($this->once())->method('setData')->with(InsuranceHelper::ALMA_INSURANCE_SKU, $result)->willReturn($quoteItem);
+        $this->insuranceHelper->setAlmaInsuranceToQuoteItem($quoteItem, $data, $type);
+    }
+
+    public function dataForSetAlmaInsurance():array
+    {
+        return [
+            'Default type returned for no type added' => [
+                'data' => json_decode($this->getInsuranceData('123456'), true),
+                'type' => null,
+                'result' => $this->getInsuranceDataWithType(InsuranceHelper::ALMA_INSURANCE_SKU, '123456')
+            ],
+            'Alma insurance type returned for no alma insurance type added' => [
+                'data' => json_decode($this->getInsuranceData('123456'), true),
+                'type' => InsuranceHelper::ALMA_INSURANCE_SKU,
+                'result' => $this->getInsuranceDataWithType(InsuranceHelper::ALMA_INSURANCE_SKU, '123456')
+            ],
+            'Product with insurance type returned for no alma insurance type added' => [
+                'data' => json_decode($this->getInsuranceData('123456'), true),
+                'type' => InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE,
+                'result' => $this->getInsuranceDataWithType(InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE, '123456')
+            ],
+        ];
+    }
 
     private function getInsuranceData(string $linkToken = null):?string
     {
@@ -400,7 +432,13 @@ class InsuranceHelperTest extends TestCase
         }
         return '{"id":1,"name":"Casse","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
     }
-
+    private function getInsuranceDataWithType(string $type, string $linkToken = null):?string
+    {
+        if (!$linkToken) {
+            return null;
+        }
+        return '{"id":1,"name":"Casse","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
+    }
     private function itemFactory(string $sku, string $linkToken = null):Item
     {
         $item = $this->createMock(Item::class);
