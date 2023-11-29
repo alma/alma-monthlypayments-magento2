@@ -8,8 +8,13 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Io\File;
+use Magento\Framework\Module\Dir;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 /**
@@ -39,19 +44,37 @@ class UpdateCreateInsuranceProduct implements DataPatchInterface
      * @var State
      */
     private $state;
+    /**
+     * @var Dir
+     */
+    private $directory;
+    /**
+     * @var File
+     */
+    private $fileProcessor;
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
 
     public function __construct(
         Logger $logger,
         ProductFactory $productFactory,
         ProductRepository $productRepository,
         State $state,
-        InsuranceHelper $insuranceHelper
+        InsuranceHelper $insuranceHelper,
+        Dir $directory,
+        File $fileProcessor,
+        Filesystem $filesystem
     ) {
         $this->logger = $logger;
         $this->productFactory = $productFactory;
         $this->insuranceHelper = $insuranceHelper;
         $this->productRepository = $productRepository;
         $this->state = $state;
+        $this->directory = $directory;
+        $this->fileProcessor = $fileProcessor;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -73,10 +96,11 @@ class UpdateCreateInsuranceProduct implements DataPatchInterface
     public function apply()
     {
         try {
-            $this->state->setAreaCode('adminhtml');
+            $this->state->setAreaCode(Area::AREA_GLOBAL);
         } catch (LocalizedException $e) {
             $this->logger->info('Area Code is already set continue', [$e->getMessage()]);
         }
+
         /** @var Product $insuranceProduct */
         $insuranceProduct = $this->productFactory->create();
         $insuranceProduct->setSku(InsuranceHelper::ALMA_INSURANCE_SKU);
@@ -98,9 +122,26 @@ class UpdateCreateInsuranceProduct implements DataPatchInterface
         $insuranceProduct->setDescription('Alma Insurance product');
         $insuranceProduct->setUrlKey('alma-insurance');
 
+        $fileName = 'alma_insurance_logo.jpg';
+        $insuranceLogo = $this->directory->getDir('Alma_MonthlyPayments') . '/view/adminhtml/web/images/' . $fileName;
+
+        $destinationPath = 'catalog/product/a/l/';
+        $folders = explode('/', $destinationPath);
+        try {
+            $path = '';
+            foreach ($folders as $folder) {
+                $path = $path . '/' . $folder;
+                $this->fileProcessor->checkAndCreateFolder($this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath($path));
+            }
+
+            $this->fileProcessor->cp($insuranceLogo, $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA)->getAbsolutePath($destinationPath . $fileName));
+            $insuranceProduct->addImageToMediaGallery($destinationPath . $fileName, ['image', 'small_image', 'thumbnail'], false, false);
+        } catch (LocalizedException $e) {
+            $this->logger->error('Impossible to add image to alma insurance product : ', [$e->getMessage()]);
+        }
         try {
             $newInsuranceProduct = $this->productRepository->save($insuranceProduct);
-            $this->logger->info('New alma insurance product is suceffuly create with id', [$newInsuranceProduct->getId()]);
+            $this->logger->info('New alma insurance product is successfully create with id', [$newInsuranceProduct->getId()]);
             $this->logger->info('New alma insurance product is salable : ', [$newInsuranceProduct->isSalable()]);
         } catch (\Exception $e) {
             $this->logger->error('Save insurance product failed with message : ', [$e->getMessage()]);
