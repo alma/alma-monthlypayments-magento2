@@ -52,36 +52,36 @@ class ConfigHelperTest extends TestCase
     {
         $merchant = $this->createMock(Merchant::class);
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . ConfigHelper::IS_ALLOWED_INSURANCE_PATH,
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/test',
             1,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance( $merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance('test', $merchant, 0, 1);
     }
     public function testCmsAllowInsuranceIsTrueSave1():void
     {
         $merchant = $this->createMock(Merchant::class);
         $merchant->cms_insurance = true;
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . ConfigHelper::IS_ALLOWED_INSURANCE_PATH,
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/test',
             1,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance( $merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance( 'test', $merchant, 0, 1);
     }
     public function testCmsAllowInsuranceIsFalseSave0():void
     {
         $merchant = $this->createMock(Merchant::class);
         $merchant->cms_insurance = false;
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . ConfigHelper::IS_ALLOWED_INSURANCE_PATH,
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/live' ,
             0,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance( $merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance('live', $merchant, 0, 1);
     }
 
     private function createConfigHelper(): ConfigHelper
