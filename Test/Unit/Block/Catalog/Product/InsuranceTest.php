@@ -6,6 +6,7 @@ use Alma\MonthlyPayments\Block\Catalog\Product\Insurance;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Helper\Product;
@@ -120,6 +121,30 @@ class InsuranceTest extends TestCase
     protected function createNewInsuranceBlock() : Insurance
     {
         return new Insurance(...$this->getConstructorDependency());
+    }
+    public function testReturnFalseIfInsuranceIsDisallow():void
+    {
+        $insuranceConfig = $this->createMock(InsuranceConfig::class);
+        $insuranceConfig->method('isAllowed')->willReturn(false);
+        $insuranceConfig->method('isPageActivated')->willReturn(true);
+        $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
+        $this->assertFalse($this->insuranceBlock->isAtciveWidgetInProductPage());
+    }
+    public function testReturnFalseIfInsuranceIsAllowedAndPageNotActivated():void
+    {
+        $insuranceConfig = $this->createMock(InsuranceConfig::class);
+        $insuranceConfig->method('isAllowed')->willReturn(true);
+        $insuranceConfig->method('isPageActivated')->willReturn(false);
+        $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
+        $this->assertFalse($this->insuranceBlock->isAtciveWidgetInProductPage());
+    }
+    public function testReturnTrueIfInsuranceIsAllowedAndPageActivated():void
+    {
+        $insuranceConfig = $this->createMock(InsuranceConfig::class);
+        $insuranceConfig->method('isAllowed')->willReturn(true);
+        $insuranceConfig->method('isPageActivated')->willReturn(true);
+        $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
+        $this->assertTrue($this->insuranceBlock->isAtciveWidgetInProductPage());
     }
     public function testIsStringIframeUrl():void
     {
