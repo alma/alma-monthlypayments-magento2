@@ -82,15 +82,15 @@ class InsuranceHelperTest extends TestCase
     //
     public function testInsuranceConfigIsAnInsuranceConfigObject():void
     {
-        $this->configHelper->expects($this->once())->method('getConfigByCode')->willReturn('');
+        $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturn('');
         $this->assertTrue(get_class($this->insuranceHelper->getConfig()) == InsuranceConfig::class);
     }
 
     public function testInsuranceConfigGetDataInDb():void
     {
-        $this->configHelper->expects($this->once())
+        $this->configHelper->expects($this->exactly(2))
             ->method('getConfigByCode')
-            ->with(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE)
+            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH],[InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
             ->willReturn('');
         $this->insuranceHelper->getConfig();
     }
@@ -101,14 +101,15 @@ class InsuranceHelperTest extends TestCase
       * @return void
       * @dataProvider configObjectIsCreatedWithDbDataDataProvider
       */
-    public function testConfigObjectIsCreatedWithDbData($activated, $pageActivated, $cartActivated, $popupActivated, $dbValue):void
+    public function testConfigObjectIsCreatedWithDbData($activated, $pageActivated, $cartActivated, $popupActivated, $isAllowed ,$dbValue):void
     {
-        $this->configHelper->expects($this->once())->method('getConfigByCode')->willReturn($dbValue);
+        $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturnOnConsecutiveCalls($isAllowed, $dbValue);
         $insuranceObject = $this->insuranceHelper->getConfig();
         $this->assertEquals($activated, $insuranceObject->isActivated());
         $this->assertEquals($pageActivated, $insuranceObject->isPageActivated());
         $this->assertEquals($cartActivated, $insuranceObject->isCartActivated());
         $this->assertEquals($popupActivated, $insuranceObject->isPopupActivated());
+        $this->assertEquals((bool)$isAllowed, $insuranceObject->isAllowed());
     }
 
     private function configObjectIsCreatedWithDbDataDataProvider(): array
@@ -119,6 +120,7 @@ class InsuranceHelperTest extends TestCase
                 'page_activated' => false,
                 'cart_activated' => false,
                 'popup_activated' => false,
+                'is_allowed' => '0',
                 'db_value' => ''
             ],
             'Return false if null in DB'  => [
@@ -126,6 +128,7 @@ class InsuranceHelperTest extends TestCase
                 'page_activated' => false,
                 'cart_activated' => false,
                 'popup_activated' => false,
+                'is_allowed' => '0',
                 'db_value' => null
             ],
             'Return false if key is not present and ignore unknown keys '  => [
@@ -133,6 +136,7 @@ class InsuranceHelperTest extends TestCase
                 'page_activated' => false,
                 'cart_activated' => false,
                 'popup_activated' => true,
+                'is_allowed' => '0',
                 'db_value' => '{
                     "is_activated":true,
                     "is_on_product_page_activated":true,
@@ -145,6 +149,7 @@ class InsuranceHelperTest extends TestCase
                'page_activated' => true,
                'cart_activated' => true,
                'popup_activated' => true,
+               'is_allowed' => '0',
                'db_value' => '{
                     "is_insurance_activated":true,
                     "is_insurance_on_product_page_activated":true,
@@ -157,6 +162,7 @@ class InsuranceHelperTest extends TestCase
                'page_activated' => false,
                'cart_activated' => false,
                'popup_activated' => false,
+               'is_allowed' => '0',
                'db_value' => '{
                     "is_insurance_activated":false,
                     "is_insurance_on_product_page_activated":false,
@@ -169,6 +175,7 @@ class InsuranceHelperTest extends TestCase
                 'page_activated' => false,
                 'cart_activated' => true,
                 'popup_activated' => false,
+                'is_allowed' => '0',
                 'db_value' => '{
                     "is_insurance_activated":true,
                     "is_insurance_on_product_page_activated":false,
@@ -193,7 +200,7 @@ class InsuranceHelperTest extends TestCase
             'is_insurance_on_cart_page_activated' => true,
             'is_add_to_cart_popup_insurance_activated' => false,
             ];
-        $this->configHelper->expects($this->once())->method('getConfigByCode')->willReturn($dbValue);
+        $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturn($dbValue);
         $insuranceObject = $this->insuranceHelper->getConfig();
         $this->assertEquals($result, $insuranceObject->getArrayConfig());
     }
@@ -204,9 +211,9 @@ class InsuranceHelperTest extends TestCase
      */
     public function testIframeHasDbGetParams($dbValue, $expectedURL):void
     {
-        $this->configHelper->expects($this->once())
+        $this->configHelper->expects($this->exactly(2))
             ->method('getConfigByCode')
-            ->with(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE)
+            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH],[InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
             ->willReturn($dbValue);
         $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams());
     }
