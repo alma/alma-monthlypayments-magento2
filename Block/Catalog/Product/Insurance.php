@@ -84,7 +84,8 @@ class Insurance extends ProductView
 
     public function isAtciveWidgetInProductPage():bool
     {
-        return $this->insuranceHelper->getConfig()->isPageActivated();
+        $config = $this->insuranceHelper->getConfig();
+        return $config->isAllowed() && $config->isPageActivated() ;
     }
 
     public function getIframeUrl(string $type = 'frontWidget'):string
