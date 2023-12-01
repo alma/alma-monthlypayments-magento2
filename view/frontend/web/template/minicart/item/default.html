@@ -56,7 +56,9 @@
                 </div>
             </div>
             <!-- /ko -->
-
+            <!-- ko if: isProductWithInsurance -->
+            <div>Protected By Alma Insurance</div>
+            <!-- /ko -->
             <div class="product-item-pricing">
                 <!-- ko if: canApplyMsrp -->
 
@@ -70,35 +72,11 @@
                     <!-- ko template: {name: getTemplate(), data: item.product_price, as: 'price'} --><!-- /ko -->
                 <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko ifnot: hasInsurance -->
                 <div class="details-qty qty">
                     <label class="label" data-bind="i18n: 'Qty', attr: {
                            for: 'cart-item-'+item_id+'-qty'}"></label>
-                    <input data-bind="attr: {
-                           id: 'cart-item-'+item_id+'-qty',
-                           'data-cart-item': item_id,
-                           'data-item-qty': qty,
-                           'data-cart-item-id': product_sku
-                           }, value: qty"
-                           type="number"
-                           min="0"
-                           size="4"
-                           class="item-qty cart-item-qty">
-                <button data-bind="attr: {
-                           id: 'update-cart-item-'+item_id,
-                           'data-cart-item': item_id,
-                           title: $t('Update')
-                           }"
-                            class="update-cart-item"
-                            style="display: none">
-                        <span data-bind="i18n: 'Update'"></span>
-                    </button>
+                    <div  style ="display: inline; padding-left: 1.8em" data-bind="text: qty"></div>
                 </div>
-                <!-- /ko -->
-                <!-- ko if: isProductWithInsurance -->
-                <div>Protected By Alma Insurance</div>
-                <!-- /ko -->
-
             </div>
 
             <div class="product actions">

@@ -99,7 +99,7 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
                 <div class="control qty">
                     <label for="cart-<?= $block->escapeHtmlAttr($_item->getId()) ?>-qty">
                         <span class="label"><?= $block->escapeHtml(__('Qty')) ?></span>
-                        <div><?= $block->escapeHtmlAttr($block->getQty()) ?></div>
+                        <div class="insuranceqty"><?= $block->escapeHtmlAttr($block->getQty()) ?></div>
                     </label>
                 </div>
             </div>
