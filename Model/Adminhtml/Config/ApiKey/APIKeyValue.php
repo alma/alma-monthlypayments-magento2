@@ -44,7 +44,7 @@ class APIKeyValue extends Encrypted
 {
     protected $apiKeyType = '';
     protected $merchantIdPath = '';
-    protected $merchantIsAllowedInPagePath = '';
+    protected $merchantIsAllowedInsurance = '';
 
     /**
      * @var Availability
@@ -186,6 +186,12 @@ class APIKeyValue extends Encrypted
             $this->getScope(),
             $this->getScopeId()
         );
+        $this->configHelper->saveIsAllowedInsurance(
+            $this->getMerchantIsAllowedInsurance(),
+            $merchant,
+            $this->getScope(),
+            $this->getScopeId()
+        );
     }
 
     /**
@@ -250,5 +256,13 @@ class APIKeyValue extends Encrypted
         }
 
         return $this->apiConfigHelper->getTestKey();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMerchantIsAllowedInsurance(): string
+    {
+        return $this->merchantIsAllowedInsurance;
     }
 }
