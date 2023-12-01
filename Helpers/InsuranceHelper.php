@@ -87,8 +87,9 @@ class InsuranceHelper extends AbstractHelper
      */
     public function getConfig():InsuranceConfig
     {
+        $isAllowed = (bool)$this->configHelper->getConfigByCode(self::IS_ALLOWED_INSURANCE_PATH);
         $configData = (string)$this->configHelper->getConfigByCode(self::ALMA_INSURANCE_CONFIG_CODE);
-        return new InsuranceConfig($configData);
+        return new InsuranceConfig($isAllowed, $configData);
     }
 
     /**
