@@ -35,10 +35,16 @@ class InsuranceConfig
      * @var string
      */
     private $arrayData;
+    /**
+     * @var bool
+     */
+    private $isAllowed;
 
     public function __construct(
+        bool $isAllowed,
         string $jsonData
     ) {
+        $this->isAllowed =$isAllowed;
         $this->activated = false;
         $this->pageActivated = false;
         $this->cartActivated = false;
@@ -87,5 +93,10 @@ class InsuranceConfig
     public function getArrayConfig():array
     {
         return (array)$this->arrayData;
+    }
+
+    public function isAllowed(): bool
+    {
+        return $this->isAllowed;
     }
 }
