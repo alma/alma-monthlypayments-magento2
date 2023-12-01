@@ -24,6 +24,8 @@ class ConfigHelper extends AbstractHelper
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
     const BASE_PLANS_CONFIG = 'base_config_plans';
 
+    const IS_ALLOWED_INSURANCE_PATH = 'is_allowed_insurance';
+
     /**
      * @var WriterInterface
      */
@@ -221,6 +223,16 @@ class ConfigHelper extends AbstractHelper
     {
         $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
         $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
+    }
+
+
+    public function saveIsAllowedInsurance($merchant, $scope, $storeId):void
+    {
+        $isAllowedInsurance = 1;
+        if($merchant && isset($merchant->cms_insurance) ){
+            $isAllowedInsurance = $merchant->cms_insurance;
+        }
+        $this->saveConfig(ConfigHelper::IS_ALLOWED_INSURANCE_PATH, $isAllowedInsurance, $scope, $storeId);
     }
 
     /**
