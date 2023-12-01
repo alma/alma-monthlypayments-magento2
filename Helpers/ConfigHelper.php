@@ -224,9 +224,12 @@ class ConfigHelper extends AbstractHelper
 
     public function saveIsAllowedInsurance(string $path, $merchant, $scope, $storeId):void
     {
-        $isAllowedInsurance = 1;
-        if ($merchant && isset($merchant->cms_insurance)) {
-            $isAllowedInsurance = $merchant->cms_insurance ? 1 : 0;
+        $isAllowedInsurance = 0;
+        if ($merchant) {
+            $isAllowedInsurance = 1;
+            if (isset($merchant->cms_insurance)) {
+                $isAllowedInsurance = $merchant->cms_insurance ? 1 : 0;
+            }
         }
         $this->saveConfig($path, $isAllowedInsurance, $scope, $storeId);
     }

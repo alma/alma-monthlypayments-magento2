@@ -5,7 +5,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 use Alma\API\Entities\FeePlan;
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -83,6 +82,17 @@ class ConfigHelperTest extends TestCase
         );
         $this->createConfigHelper()->saveIsAllowedInsurance('live', $merchant, 0, 1);
     }
+    public function testIfNoMerchantSave0():void
+    {
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/live' ,
+            0,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsurance('live', null, 0, 1);
+    }
+
 
     private function createConfigHelper(): ConfigHelper
     {
