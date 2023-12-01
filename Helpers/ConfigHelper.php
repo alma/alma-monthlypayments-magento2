@@ -222,7 +222,7 @@ class ConfigHelper extends AbstractHelper
         $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
 
-    public function saveIsAllowedInsurance(string $path, $merchant, $scope, $storeId):void
+    public function saveIsAllowedInsurance($merchant, $scope, $storeId):void
     {
         $isAllowedInsurance = 0;
         if ($merchant) {
@@ -231,7 +231,7 @@ class ConfigHelper extends AbstractHelper
                 $isAllowedInsurance = $merchant->cms_insurance ? 1 : 0;
             }
         }
-        $this->saveConfig($path, $isAllowedInsurance, $scope, $storeId);
+        $this->saveConfig(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH, $isAllowedInsurance, $scope, $storeId);
     }
 
     /**

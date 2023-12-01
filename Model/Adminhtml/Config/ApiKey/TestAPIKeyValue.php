@@ -31,7 +31,6 @@ class TestAPIKeyValue extends APIKeyValue
 {
     protected $apiKeyType = 'test';
     protected $merchantIdPath = 'test_merchant_id';
-    protected $merchantInsuranceAllowedPath = 'alma_test_insurance_allowed';
 
 
     /**

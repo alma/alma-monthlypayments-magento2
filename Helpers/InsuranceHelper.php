@@ -29,6 +29,9 @@ class InsuranceHelper extends AbstractHelper
     const CONFIG_IFRAME_PATH = '/almaBackOfficeConfiguration.html';
     const FRONT_IFRAME_PATH = '/almaProductInPageWidget.html';
 
+    const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
+
+
     /**
      * @var ProductRepository
      */

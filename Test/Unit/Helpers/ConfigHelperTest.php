@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 use Alma\API\Entities\FeePlan;
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
+use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -51,46 +52,46 @@ class ConfigHelperTest extends TestCase
     {
         $merchant = $this->createMock(Merchant::class);
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/test',
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/'.InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             1,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance('test', $merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
     }
     public function testCmsAllowInsuranceIsTrueSave1():void
     {
         $merchant = $this->createMock(Merchant::class);
         $merchant->cms_insurance = true;
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/test',
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/'.InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             1,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance( 'test', $merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance( $merchant, 0, 1);
     }
     public function testCmsAllowInsuranceIsFalseSave0():void
     {
         $merchant = $this->createMock(Merchant::class);
         $merchant->cms_insurance = false;
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/live' ,
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/'.InsuranceHelper::IS_ALLOWED_INSURANCE_PATH ,
             0,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance('live', $merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
     }
     public function testIfNoMerchantSave0():void
     {
         $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/live' ,
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/'.InsuranceHelper::IS_ALLOWED_INSURANCE_PATH ,
             0,
             0,
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance('live', null, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance(null, 0, 1);
     }
 
 
