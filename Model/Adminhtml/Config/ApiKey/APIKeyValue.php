@@ -44,7 +44,6 @@ class APIKeyValue extends Encrypted
 {
     protected $apiKeyType = '';
     protected $merchantIdPath = '';
-    protected $merchantInsuranceAllowedPath = '';
 
     /**
      * @var Availability
@@ -187,7 +186,6 @@ class APIKeyValue extends Encrypted
             $this->getScopeId()
         );
         $this->configHelper->saveIsAllowedInsurance(
-            $this->getMerchantIsAllowedInsurancePath(),
             $merchant,
             $this->getScope(),
             $this->getScopeId()
@@ -256,13 +254,5 @@ class APIKeyValue extends Encrypted
         }
 
         return $this->apiConfigHelper->getTestKey();
-    }
-
-    /**
-     * @return string
-     */
-    public function getMerchantIsAllowedInsurancePath(): string
-    {
-        return $this->merchantInsuranceAllowedPath;
     }
 }
