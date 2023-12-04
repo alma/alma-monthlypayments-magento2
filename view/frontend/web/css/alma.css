@@ -80,3 +80,6 @@
 .insuranceqty {
     padding-right: 1.8em;
 }
+.checkout-agreements .alma-validation-input {
+    align-items: start;
+}
