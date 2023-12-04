@@ -128,7 +128,7 @@ class InsuranceTest extends TestCase
         $insuranceConfig->method('isAllowed')->willReturn(false);
         $insuranceConfig->method('isPageActivated')->willReturn(true);
         $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
-        $this->assertFalse($this->insuranceBlock->isAtciveWidgetInProductPage());
+        $this->assertFalse($this->insuranceBlock->isActivatedWidgetInProductPage());
     }
     public function testReturnFalseIfInsuranceIsAllowedAndPageNotActivated():void
     {
@@ -136,7 +136,7 @@ class InsuranceTest extends TestCase
         $insuranceConfig->method('isAllowed')->willReturn(true);
         $insuranceConfig->method('isPageActivated')->willReturn(false);
         $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
-        $this->assertFalse($this->insuranceBlock->isAtciveWidgetInProductPage());
+        $this->assertFalse($this->insuranceBlock->isActivatedWidgetInProductPage());
     }
     public function testReturnTrueIfInsuranceIsAllowedAndPageActivated():void
     {
@@ -144,7 +144,16 @@ class InsuranceTest extends TestCase
         $insuranceConfig->method('isAllowed')->willReturn(true);
         $insuranceConfig->method('isPageActivated')->willReturn(true);
         $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
-        $this->assertTrue($this->insuranceBlock->isAtciveWidgetInProductPage());
+        $this->assertTrue($this->insuranceBlock->isActivatedWidgetInProductPage());
+    }
+
+    public function testReturnPopUpDisplayFalseIfInsuranceIsDisallow():void
+    {
+        $insuranceConfig = $this->createMock(InsuranceConfig::class);
+        $insuranceConfig->method('isAllowed')->willReturn(false);
+        $insuranceConfig->method('isPopupActivated')->willReturn(true);
+        $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
+        $this->assertFalse($this->insuranceBlock->isActivatedWidgetInProductPage());
     }
     public function testIsStringIframeUrl():void
     {

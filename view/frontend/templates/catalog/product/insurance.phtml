@@ -1,9 +1,10 @@
 <?php
 /** @var $block \Alma\MonthlyPayments\Block\Catalog\Product\Insurance */
-    $widgetIsActive = $block->isAtciveWidgetInProductPage()
+    $widgetIsActivated = $block->isActivatedWidgetInProductPage();
+    $popupIsActivated = $block->isActivatedPopupInProductPage();
 
 ?>
-<?php if ($widgetIsActive) { ?>
+<?php if ($widgetIsActivated) { ?>
     <script type="module" src="<?= $block->getIframeUrl('script')?>"></script>
     <iframe id="insurance-alma-iframe" class="alma-insurance-iframe" width="100%" height="100%" src="<?= $block->getIframeUrl()?>"></iframe>
     <input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="">
@@ -13,11 +14,14 @@
 <?php } ?>
 <script>
     require([
-        'jquery'
+        'jquery',
+        'Magento_Customer/js/customer-data'
     ], function (
-        $
+        $,
+        customerData
     ) {
-        const almaInsuranceIframe = document.getElementById('insurance-alma-iframe').contentWindow
+        var madeChoiceForInsurance = false;
+        var isAddToCartFlow = false;
         let selectedAlmaInsurance = null
         window.addEventListener('message', (e) => {
             if (e.data.type === 'getSelectedInsuranceData') {
@@ -31,7 +35,22 @@
                     $('input[name=alma_insurance_name]').val('');
                     $('input[name=alma_insurance_price]').val('');
                 }
+                if(isAddToCartFlow){
+                    customerData.invalidate(['cart','alma_section']);
+                    document.getElementById('product_addtocart_form').submit()
+                }
+                madeChoiceForInsurance = true;
             }
         })
+        <?php if ($popupIsActivated) { ?>
+        document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
+            if (!madeChoiceForInsurance){
+                e.preventDefault();
+                openModal('popupModal');
+                madeChoiceForInsurance = true;
+                isAddToCartFlow = true;
+            }
+        })
+        <?php } ?>
     });
 </script>

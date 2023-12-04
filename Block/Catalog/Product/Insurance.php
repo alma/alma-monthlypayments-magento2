@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
-use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -82,10 +81,16 @@ class Insurance extends ProductView
         $this->apiConfigHelper = $apiConfigHelper;
     }
 
-    public function isAtciveWidgetInProductPage():bool
+    public function isActivatedWidgetInProductPage():bool
     {
         $config = $this->insuranceHelper->getConfig();
-        return $config->isAllowed() && $config->isPageActivated() ;
+        return $config->isAllowed() && $config->isPageActivated();
+    }
+
+    public function isActivatedPopupInProductPage():bool
+    {
+        $config = $this->insuranceHelper->getConfig();
+        return $config->isAllowed() && $config->isPopupActivated();
     }
 
     public function getIframeUrl(string $type = 'frontWidget'):string
@@ -104,9 +109,9 @@ class Insurance extends ProductView
                 break;
         }
         $activeMode =  $this->apiConfigHelper->getActiveMode();
-        if($activeMode === ApiConfigHelper::LIVE_MODE_KEY){
+        if ($activeMode === ApiConfigHelper::LIVE_MODE_KEY) {
             $host = InsuranceHelper::PRODUCTION_IFRAME_HOST_URL;
         }
-        return $host.$path;
+        return $host . $path;
     }
 }
