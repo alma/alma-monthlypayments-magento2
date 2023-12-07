@@ -51,7 +51,7 @@
                                                                 </item>
                                                             </item>
                                                         </item>
-                                                        <item name="additional-payment-validators" xsi:type="array">
+                                                        <item name="alma-additional-payment-validators" xsi:type="array">
                                                             <item name="children" xsi:type="array">
                                                                 <item name="agreements-validator" xsi:type="array">
                                                                     <item name="component" xsi:type="string">Alma_MonthlyPayments/js/view/checkout/agreement-validation</item>
