@@ -34,7 +34,7 @@
                 <depends>
                     <field id="*/alma_monthly_payments/alma_api_config/insurance_allowed">1</field>
                 </depends>
-                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer insurance with Alma <br> test </div>]]></comment>
+                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer insurance with Alma</div>]]></comment>
                 <fieldset_css>complex alma-section</fieldset_css>
                 <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Insurance</frontend_model>
                 <field id="alma_insurance_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
