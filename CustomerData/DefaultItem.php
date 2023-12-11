@@ -12,6 +12,7 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
     {
         $objectManager = ObjectManager::getInstance();
         $logger= $objectManager->get(Logger::class);
+        $insuranceHelper= $objectManager->get(InsuranceHelper::class);
 
         $result = parent::doGetItemData();
 
@@ -20,8 +21,7 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
 		$result['isProductWithInsurance'] = $this->isProductWithInsurance();
 
         if ($this->isInsuranceProduct()) {
-            $almaInsurance = json_decode($this->item->getAlmaInsurance(), true);
-            $result['product_name'] = $result['product_name'] . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
+            $result['product_name'] = $insuranceHelper->getInsuranceName($result['product_name'], $this->item);
         }
         return $result;
     }

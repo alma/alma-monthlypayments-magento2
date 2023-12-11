@@ -238,4 +238,9 @@ class InsuranceHelper extends AbstractHelper
         $quote->deleteItem($quoteItem);
         $this->cartRepository->save($quote);
     }
+    public function getInsuranceName(string $baseName, Item $quoteItem):string
+    {
+        $almaInsurance = json_decode($quoteItem->getData('alma_insurance'), true);
+        return $baseName. ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
+    }
 }

@@ -431,6 +431,13 @@ class InsuranceHelperTest extends TestCase
             ],
         ];
     }
+    public function testGetInsuranceName():void
+    {
+        $baseName = 'Alma Insurance';
+        $quoteItem = $this->createMock(Item::class);
+        $quoteItem->method('getData')->willReturn($this->getInsuranceData('abcd'));
+        $this->assertEquals('Alma Insurance - Casse - Fusion Backpack', $this->insuranceHelper->getInsuranceName($baseName, $quoteItem));
+    }
 
     private function getInsuranceData(string $linkToken = null):?string
     {
