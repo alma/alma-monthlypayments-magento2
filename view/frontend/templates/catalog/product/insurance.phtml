@@ -14,14 +14,32 @@
 <?php } ?>
 <script>
     require([
-        'jquery'
+        'jquery',
+        'Magento_Customer/js/customer-data'
     ], function (
-        $
+        $,
+        customerData
     ) {
+        var cart = customerData.get('cart');
+        var count = cart().summary_count;
+        cart.subscribe(function () {
+            if (cart().summary_count !== count) {
+                resetInsurance();
+            }
+        });
         var madeChoiceForInsurance = false;
         var isAddToCartFlow = false;
         let selectedAlmaInsurance = null
         window.addEventListener('message', (e) => {
+
+            if(e.data.type === 'getResetInsuranceData'){
+                $('input[name=alma_insurance_id]').val('');
+                $('input[name=alma_insurance_name]').val('');
+                $('input[name=alma_insurance_price]').val('')
+                isAddToCartFlow = false;
+                madeChoiceForInsurance = false;
+            }
+
             if (e.data.type === 'getSelectedInsuranceData') {
                 madeChoiceForInsurance = true;
                 selectedAlmaInsurance = e.data.selectedInsuranceData
@@ -36,8 +54,6 @@
                 }
                 if(isAddToCartFlow){
                     document.getElementById('product-addtocart-button').click()
-                    isAddToCartFlow = false;
-                    madeChoiceForInsurance = false;
                 }
                 madeChoiceForInsurance = true;
             }
