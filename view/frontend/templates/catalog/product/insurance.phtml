@@ -5,7 +5,7 @@
 
 ?>
 <?php if ($widgetIsActivated) { ?>
-    <script type="module" src="<?= $block->getIframeUrl('script')?>"></script>
+<script type="module" src="<?= $block->getScriptUrl()?>"></script>
     <iframe id="product-alma-iframe" class="alma-insurance-iframe" width="100%" height="100%" src="<?= $block->getIframeUrl()?>"></iframe>
     <input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="">
     <input type="hidden" name="alma_insurance_name" form="product_addtocart_form" value="">

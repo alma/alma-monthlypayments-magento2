@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Block\Catalog\Product;
 
+use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
@@ -31,6 +32,10 @@ class Insurance extends ProductView
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * @param Context $context
@@ -61,6 +66,7 @@ class Insurance extends ProductView
         Logger                     $logger,
         InsuranceHelper            $insuranceHelper,
         ApiConfigHelper            $apiConfigHelper,
+        Config                     $config,
         array                      $data = []
     ) {
         parent::__construct(
@@ -79,6 +85,7 @@ class Insurance extends ProductView
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
         $this->apiConfigHelper = $apiConfigHelper;
+        $this->config = $config;
     }
 
     public function isActivatedWidgetInProductPage():bool
@@ -93,25 +100,30 @@ class Insurance extends ProductView
         return $config->isAllowed() && $config->isPopupActivated();
     }
 
-    public function getIframeUrl(string $type = 'frontWidget'):string
+    public function getIframeUrl():string
+    {
+        $path = InsuranceHelper::FRONT_IFRAME_PATH;
+        $productPrice = $this->getProduct()->getPrice() * 100;
+        return $this->getHost() .
+            $path . '?' .
+            InsuranceHelper::MERCHANT_ID_PARAM_KEY. '=' .$this->config->getMerchantId(). '&' .
+            InsuranceHelper::CMS_REF_PARAM_KEY. '=' .$this->getProduct()->getSku() . '&' .
+            InsuranceHelper::PRODUCT_PRICE_PARAM_KEY. '=' .$productPrice;
+    }
+
+    public function getScriptUrl(): string
+    {
+        $path = InsuranceHelper::SCRIPT_IFRAME_PATH;
+        return $this->getHost() . $path;
+    }
+
+    private function getHost():string
     {
         $host = InsuranceHelper::SANDBOX_IFRAME_HOST_URL;
-        $path = '';
-        switch ($type) {
-            case 'frontWidget':
-                $path = InsuranceHelper::FRONT_IFRAME_PATH;
-                break;
-            case 'script':
-                $path = InsuranceHelper::SCRIPT_IFRAME_PATH;
-                break;
-            default:
-                $this->logger->info('Unknow url type :', [$type]);
-                break;
-        }
         $activeMode =  $this->apiConfigHelper->getActiveMode();
         if ($activeMode === ApiConfigHelper::LIVE_MODE_KEY) {
             $host = InsuranceHelper::PRODUCTION_IFRAME_HOST_URL;
         }
-        return $host . $path;
+        return $host;
     }
 }

@@ -28,6 +28,9 @@ class InsuranceHelper extends AbstractHelper
     const SCRIPT_IFRAME_PATH = '/openInPageModal.js';
     const CONFIG_IFRAME_PATH = '/almaBackOfficeConfiguration.html';
     const FRONT_IFRAME_PATH = '/almaProductInPageWidget.html';
+    const MERCHANT_ID_PARAM_KEY = 'merchant_id';
+    const CMS_REF_PARAM_KEY = 'cms_reference';
+    const PRODUCT_PRICE_PARAM_KEY = 'product_price';
 
     const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
 
