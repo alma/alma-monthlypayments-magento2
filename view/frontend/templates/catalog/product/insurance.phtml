@@ -12,62 +12,64 @@
     <input type="hidden" name="alma_insurance_price" form="product_addtocart_form" value="">
     <div id="alma-insurance-modal"></div>
 <?php } ?>
-<script>
-    require([
-        'jquery',
-        'Magento_Customer/js/customer-data'
-    ], function (
-        $,
-        customerData
-    ) {
-        var cart = customerData.get('cart');
-        var count = cart().summary_count;
-        cart.subscribe(function () {
-            if (cart().summary_count !== count) {
-                resetInsurance();
-            }
-        });
-        var madeChoiceForInsurance = false;
-        var isAddToCartFlow = false;
-        let selectedAlmaInsurance = null
-        window.addEventListener('message', (e) => {
+<?php if ($widgetIsActivated) { ?>
+    <script>
+        require([
+            'jquery',
+            'Magento_Customer/js/customer-data'
+        ], function (
+            $,
+            customerData
+        ) {
+            var cart = customerData.get('cart');
+            var count = cart().summary_count;
+            cart.subscribe(function () {
+                if (cart().summary_count !== count) {
+                    resetInsurance();
+                }
+            });
+            var madeChoiceForInsurance = false;
+            var isAddToCartFlow = false;
+            let selectedAlmaInsurance = null
+            window.addEventListener('message', (e) => {
 
-            if(e.data.type === 'getResetInsuranceData'){
-                $('input[name=alma_insurance_id]').val('');
-                $('input[name=alma_insurance_name]').val('');
-                $('input[name=alma_insurance_price]').val('')
-                isAddToCartFlow = false;
-                madeChoiceForInsurance = false;
-            }
-
-            if (e.data.type === 'getSelectedInsuranceData') {
-                madeChoiceForInsurance = true;
-                selectedAlmaInsurance = e.data.selectedInsuranceData
-                if (selectedAlmaInsurance) {
-                    $('input[name=alma_insurance_id]').val(selectedAlmaInsurance.option.id);
-                    $('input[name=alma_insurance_name]').val(selectedAlmaInsurance.name);
-                    $('input[name=alma_insurance_price]').val(selectedAlmaInsurance.option.price);
-                } else {
+                if(e.data.type === 'getResetInsuranceData'){
                     $('input[name=alma_insurance_id]').val('');
                     $('input[name=alma_insurance_name]').val('');
-                    $('input[name=alma_insurance_price]').val('');
+                    $('input[name=alma_insurance_price]').val('')
+                    isAddToCartFlow = false;
+                    madeChoiceForInsurance = false;
                 }
-                if(isAddToCartFlow){
-                    document.getElementById('product-addtocart-button').click()
-                }
-                madeChoiceForInsurance = true;
-            }
-        })
 
-        <?php if ($widgetIsActivated && $popupIsActivated) { ?>
-        document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
-            if (!madeChoiceForInsurance){
-                e.preventDefault();
-                openModal('popupModal');
-                madeChoiceForInsurance = true;
-                isAddToCartFlow = true;
-            }
-        })
-        <?php } ?>
-    });
-</script>
+                if (e.data.type === 'getSelectedInsuranceData') {
+                    madeChoiceForInsurance = true;
+                    selectedAlmaInsurance = e.data.selectedInsuranceData
+                    if (selectedAlmaInsurance) {
+                        $('input[name=alma_insurance_id]').val(selectedAlmaInsurance.option.id);
+                        $('input[name=alma_insurance_name]').val(selectedAlmaInsurance.name);
+                        $('input[name=alma_insurance_price]').val(selectedAlmaInsurance.option.price);
+                    } else {
+                        $('input[name=alma_insurance_id]').val('');
+                        $('input[name=alma_insurance_name]').val('');
+                        $('input[name=alma_insurance_price]').val('');
+                    }
+                    if(isAddToCartFlow){
+                        document.getElementById('product-addtocart-button').click()
+                    }
+                    madeChoiceForInsurance = true;
+                }
+            })
+
+            <?php if ($popupIsActivated) { ?>
+            document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
+                if (!madeChoiceForInsurance){
+                    e.preventDefault();
+                    openModal('popupModal');
+                    madeChoiceForInsurance = true;
+                    isAddToCartFlow = true;
+                }
+            })
+            <?php } ?>
+        });
+    </script>
+<?php } ?>
