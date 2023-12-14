@@ -103,12 +103,11 @@ class Insurance extends ProductView
     public function getIframeUrl():string
     {
         $path = InsuranceHelper::FRONT_IFRAME_PATH;
-        $productPrice = $this->getProduct()->getPrice() * 100;
         return $this->getHost() .
             $path . '?' .
-            InsuranceHelper::MERCHANT_ID_PARAM_KEY. '=' .$this->config->getMerchantId(). '&' .
+            InsuranceHelper::MERCHANT_ID_PARAM_KEY. '=' .$this->getMerchantId(). '&' .
             InsuranceHelper::CMS_REF_PARAM_KEY. '=' .$this->getProduct()->getSku() . '&' .
-            InsuranceHelper::PRODUCT_PRICE_PARAM_KEY. '=' .$productPrice;
+            InsuranceHelper::PRODUCT_PRICE_PARAM_KEY. '=' .$this->getProductPriceInCent();
     }
 
     public function getScriptUrl(): string
@@ -125,5 +124,22 @@ class Insurance extends ProductView
             $host = InsuranceHelper::PRODUCTION_IFRAME_HOST_URL;
         }
         return $host;
+    }
+    public function getMerchantId():string
+    {
+        return $this->config->getMerchantId();
+    }
+    public function getProductPriceInCent():int
+    {
+        return (int)($this->getProduct()->getPrice() * 100);
+    }
+
+    public function getBaseProductSku():string
+    {
+        return $this->getProduct()->getSku();
+    }
+    public function getBaseProductId():string
+    {
+        return $this->getProduct()->getId();
     }
 }

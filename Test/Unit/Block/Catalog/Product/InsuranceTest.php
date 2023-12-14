@@ -95,7 +95,7 @@ class InsuranceTest extends TestCase
         $this->contextMock = $this->createMock(Context::class);
         $productMock = $this->createMock(\Magento\Catalog\Model\Product::class);
         $productMock->method('getSku')->willReturn('mysku');
-        $productMock->method('getPrice')->willReturn(100);
+        $productMock->method('getPrice')->willReturn(100.10);
         $registry = $this->createMock(Registry::class);
         $registry->method('registry')->willReturn($productMock);
         $this->contextMock->method('getRegistry')->willReturn($registry);
@@ -112,6 +112,7 @@ class InsuranceTest extends TestCase
         $this->insuranceHelper = $this->createMock(InsuranceHelper::class);
         $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
         $this->config = $this->createMock(Config::class);
+        $this->config->method('getMerchantId')->willReturn('merchant_123456');
         $this->insuranceBlock = $this->createNewInsuranceBlock();
     }
     protected function getConstructorDependency():array
@@ -188,7 +189,7 @@ class InsuranceTest extends TestCase
      */
     public function testReturnExpectedUrlDependingMode($activeMode, $expectedUrl):void
     {
-        $this->config->expects($this->once())->method('getMerchantId')->willReturn('merchant_123456');
+        $this->config->expects($this->once())->method('getMerchantId')->willReturn('');
         $this->apiConfigHelper->method('getActiveMode')->willReturn($activeMode);
         $this->assertEquals($expectedUrl, $this->insuranceBlock->getIframeUrl());
     }
@@ -198,11 +199,11 @@ class InsuranceTest extends TestCase
         return [
             'Return sandbox front widget Url for sandbox Mode' => [
                 'activeMode' => ApiConfigHelper::TEST_MODE_KEY,
-                'expectedUrl' => 'https://protect.staging.almapay.com/almaProductInPageWidget.html?merchant_id=merchant_123456&cms_reference=mysku&product_price=10000',
+                'expectedUrl' => 'https://protect.staging.almapay.com/almaProductInPageWidget.html?merchant_id=merchant_123456&cms_reference=mysku&product_price=10010',
             ],
             'Return Prod front widget Url for Prod Mode' => [
                 'activeMode' => ApiConfigHelper::LIVE_MODE_KEY,
-                'expectedUrl' => 'https://protect.almapay.com/almaProductInPageWidget.html?merchant_id=merchant_123456&cms_reference=mysku&product_price=10000',
+                'expectedUrl' => 'https://protect.almapay.com/almaProductInPageWidget.html?merchant_id=merchant_123456&cms_reference=mysku&product_price=10010',
             ],
         ];
     }

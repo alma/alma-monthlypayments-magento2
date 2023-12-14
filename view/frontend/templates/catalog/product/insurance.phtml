@@ -16,10 +16,12 @@
     <script>
         require([
             'jquery',
-            'Magento_Customer/js/customer-data'
+            'Magento_Customer/js/customer-data',
+            'Alma_MonthlyPayments/js/model/front-price-calculation'
         ], function (
             $,
-            customerData
+            customerData,
+            utils
         ) {
             var cart = customerData.get('cart');
             var count = cart().summary_count;
@@ -32,7 +34,6 @@
             var isAddToCartFlow = false;
             let selectedAlmaInsurance = null
             window.addEventListener('message', (e) => {
-
                 if(e.data.type === 'getResetInsuranceData'){
                     $('input[name=alma_insurance_id]').val('');
                     $('input[name=alma_insurance_name]').val('');
@@ -60,10 +61,35 @@
                 }
             })
 
+            function sendDataToWidget() {
+                console.log('<?= $block->getBaseProductSku() ?>')
+                console.log('<?= $block->getMerchantId() ?>')
+                console.log(getProductRegularPrice())
+                getproductDataForApiCall('<?= $block->getBaseProductSku() ?>', '<?= $block->getMerchantId() ?>', getProductRegularPrice())
+            }
+
+            function getProductRegularPrice() {
+                var regularPrice =  <?= $block->getProductPriceInCent() ?>;
+                const productId = <?= $block->getBaseProductId() ?>;
+
+                const productPriceBlock = $('#product-price-' +productId +' .price');
+                if (productPriceBlock.length){
+                    regularPrice = utils.convertHtmlPriceToCent(productPriceBlock.html())
+                }
+
+                const regularPriceBlock = $('#old-price-' +productId +' .price');
+                if (regularPriceBlock.length){
+                    regularPrice = utils.convertHtmlPriceToCent(regularPriceBlock.html())
+                }
+                return regularPrice.toString();
+            }
+
+
             <?php if ($popupIsActivated) { ?>
             document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
                 if (!madeChoiceForInsurance){
                     e.preventDefault();
+                    //sendDataToWidget()
                     openModal('popupModal');
                     madeChoiceForInsurance = true;
                     isAddToCartFlow = true;

@@ -5,11 +5,8 @@
 
 define([
     'jquery',
-    'mage/validation'
 ], function ($) {
     'use strict';
-
-    var agreementsInputPath = '.payment-method._active .alma-validation-input input';
 
     /**
      *
@@ -35,6 +32,6 @@ define([
         var centMultiplier = getCentMultiplier(priceHtml);
         var price = priceHtml.replace(/[^\d]/g,"");
         return price * centMultiplier;
-        },
+        }
     };
 });
