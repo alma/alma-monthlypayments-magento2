@@ -25,7 +25,7 @@ class InsuranceHelper extends AbstractHelper
     const SANDBOX_IFRAME_HOST_URL = 'https://protect.staging.almapay.com';
     //TODO fix with ne final host
     const PRODUCTION_IFRAME_HOST_URL = 'https://protect.almapay.com';
-    const SCRIPT_IFRAME_PATH = '/openInPageModal.js';
+    const SCRIPT_IFRAME_PATH = '/displayModal.js';
     const CONFIG_IFRAME_PATH = '/almaBackOfficeConfiguration.html';
     const FRONT_IFRAME_PATH = '/almaProductInPageWidget.html';
     const MERCHANT_ID_PARAM_KEY = 'merchant_id';

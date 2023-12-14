@@ -23,6 +23,8 @@
             customerData,
             utils
         ) {
+            getproductDataForApiCall('18-36', '2000', 'merchant_11woqqP4eW51Tk7KI66lT72wG9iu95Aoyf')
+
             var cart = customerData.get('cart');
             var count = cart().summary_count;
             cart.subscribe(function () {
@@ -34,6 +36,16 @@
             var isAddToCartFlow = false;
             let selectedAlmaInsurance = null
             window.addEventListener('message', (e) => {
+                if(e.data.type === 'almaEligibilityAnswer'){
+                    let insuranceData = e.data.eligibilityCallResult
+                    console.log(insuranceData);
+                    if (insuranceData) {
+                        let height = e.data.widgetSize + 10
+                        let iframe = document.getElementById('product-alma-iframe')
+                        iframe.style.height = height + 'px'
+                    }
+                }
+
                 if(e.data.type === 'getResetInsuranceData'){
                     $('input[name=alma_insurance_id]').val('');
                     $('input[name=alma_insurance_name]').val('');

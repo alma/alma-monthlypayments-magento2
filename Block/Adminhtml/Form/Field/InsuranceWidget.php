@@ -42,7 +42,7 @@ class InsuranceWidget extends Field
                     height='100%'
                     src='" . $iframeUrl . "'>
                    </iframe>
-                   <script type='module' src='https://protect.staging.almapay.com/openInPageModal.js'></script>
+                   <script type='module' src='https://protect.staging.almapay.com/displayModal.js'></script>
                    <script>
                        var btnSave = document.getElementById('save')
                        btnSave.addEventListener('click', function (e) {

@@ -224,11 +224,11 @@ class InsuranceTest extends TestCase
         return [
             'Return sandbox script Url for sandbox Mode' => [
                 'activeMode' => ApiConfigHelper::TEST_MODE_KEY,
-                'expectedUrl' => 'https://protect.staging.almapay.com/openInPageModal.js',
+                'expectedUrl' => 'https://protect.staging.almapay.com/displayModal.js',
             ],
             'Return Prod script Url for Prod Mode' => [
                 'activeMode' => ApiConfigHelper::LIVE_MODE_KEY,
-                'expectedUrl' => 'https://protect.almapay.com/openInPageModal.js',
+                'expectedUrl' => 'https://protect.almapay.com/displayModal.js',
             ],
         ];
     }
