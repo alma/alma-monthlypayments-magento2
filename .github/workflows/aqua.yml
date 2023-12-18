@@ -1,10 +1,13 @@
 name: Aqua
-on: pull_request
+on:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   aqua:
     name: Aqua scanner
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,5 +26,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           AQUA_URL: https://api.eu-1.supply-chain.cloud.aquasec.com
           CSPM_URL: https://eu-1.api.cloudsploit.com
-          TRIVY_RUN_AS_PLUGIN: 'aqua'
+          TRIVY_RUN_AS_PLUGIN: "aqua"
           # For http/https proxy configuration add env vars: HTTP_PROXY/HTTPS_PROXY, CA-CRET (path to CA certificate)
