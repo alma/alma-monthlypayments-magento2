@@ -6,7 +6,9 @@ use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -55,6 +57,11 @@ class InsuranceHelperTest extends TestCase
      * @var CartRepositoryInterface
      */
     private $cartRepository;
+    /**
+     * @var Configurable
+     *
+     */
+    private $configurable;
 
     protected function setUp(): void
     {
@@ -65,8 +72,10 @@ class InsuranceHelperTest extends TestCase
         $this->jsonMock = $this->createMock(Json::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
+        $this->configurable = $this->createMock(Configurable::class);
         $this->insuranceHelper = $this->createNewInsuranceHelper();
     }
+
     private function getConstructorDependency(): array
     {
         return [
@@ -76,32 +85,34 @@ class InsuranceHelperTest extends TestCase
             $this->logger,
             $this->jsonMock,
             $this->configHelper,
-            $this->cartRepository
+            $this->cartRepository,
+            $this->configurable
         ];
     }
+
     //
-    public function testInsuranceConfigIsAnInsuranceConfigObject():void
+    public function testInsuranceConfigIsAnInsuranceConfigObject(): void
     {
         $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturn('');
         $this->assertTrue(get_class($this->insuranceHelper->getConfig()) == InsuranceConfig::class);
     }
 
-    public function testInsuranceConfigGetDataInDb():void
+    public function testInsuranceConfigGetDataInDb(): void
     {
         $this->configHelper->expects($this->exactly(2))
             ->method('getConfigByCode')
-            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH],[InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
+            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH], [InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
             ->willReturn('');
         $this->insuranceHelper->getConfig();
     }
 
     /**
-      * @param $result
-      * @param $dbValue
-      * @return void
-      * @dataProvider configObjectIsCreatedWithDbDataDataProvider
-      */
-    public function testConfigObjectIsCreatedWithDbData($activated, $pageActivated, $cartActivated, $popupActivated, $isAllowed ,$dbValue):void
+     * @param $result
+     * @param $dbValue
+     * @return void
+     * @dataProvider configObjectIsCreatedWithDbDataDataProvider
+     */
+    public function testConfigObjectIsCreatedWithDbData($activated, $pageActivated, $cartActivated, $popupActivated, $isAllowed, $dbValue): void
     {
         $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturnOnConsecutiveCalls($isAllowed, $dbValue);
         $insuranceObject = $this->insuranceHelper->getConfig();
@@ -115,7 +126,7 @@ class InsuranceHelperTest extends TestCase
     private function configObjectIsCreatedWithDbDataDataProvider(): array
     {
         return [
-            'Return false if no data in DB'  => [
+            'Return false if no data in DB' => [
                 'activated' => false,
                 'page_activated' => false,
                 'cart_activated' => false,
@@ -123,7 +134,7 @@ class InsuranceHelperTest extends TestCase
                 'is_allowed' => '0',
                 'db_value' => ''
             ],
-            'Return false if null in DB'  => [
+            'Return false if null in DB' => [
                 'activated' => false,
                 'page_activated' => false,
                 'cart_activated' => false,
@@ -131,7 +142,7 @@ class InsuranceHelperTest extends TestCase
                 'is_allowed' => '0',
                 'db_value' => null
             ],
-            'Return false if key is not present and ignore unknown keys '  => [
+            'Return false if key is not present and ignore unknown keys ' => [
                 'activated' => false,
                 'page_activated' => false,
                 'cart_activated' => false,
@@ -144,33 +155,33 @@ class InsuranceHelperTest extends TestCase
                     "is_add_to_cart_popup_insurance_activated":true
                     }'
             ],
-           'Return true all is true in DB'  => [
-               'activated' => true,
-               'page_activated' => true,
-               'cart_activated' => true,
-               'popup_activated' => true,
-               'is_allowed' => '0',
-               'db_value' => '{
+            'Return true all is true in DB' => [
+                'activated' => true,
+                'page_activated' => true,
+                'cart_activated' => true,
+                'popup_activated' => true,
+                'is_allowed' => '0',
+                'db_value' => '{
                     "is_insurance_activated":true,
                     "is_insurance_on_product_page_activated":true,
                     "is_insurance_on_cart_page_activated":true,
                     "is_add_to_cart_popup_insurance_activated":true
                     }'
-           ],
-           'Return false if all is false in DB'  => [
-               'activated' => false,
-               'page_activated' => false,
-               'cart_activated' => false,
-               'popup_activated' => false,
-               'is_allowed' => '0',
-               'db_value' => '{
+            ],
+            'Return false if all is false in DB' => [
+                'activated' => false,
+                'page_activated' => false,
+                'cart_activated' => false,
+                'popup_activated' => false,
+                'is_allowed' => '0',
+                'db_value' => '{
                     "is_insurance_activated":false,
                     "is_insurance_on_product_page_activated":false,
                     "is_insurance_on_cart_page_activated":false,
                     "is_add_to_cart_popup_insurance_activated":false
                     }'
-           ],
-            'Return good values'  => [
+            ],
+            'Return good values' => [
                 'activated' => true,
                 'page_activated' => false,
                 'cart_activated' => true,
@@ -186,7 +197,7 @@ class InsuranceHelperTest extends TestCase
         ];
     }
 
-    public function testReturnArrayValueInDb():void
+    public function testReturnArrayValueInDb(): void
     {
         $dbValue = '{
                     "is_insurance_activated":true,
@@ -199,7 +210,7 @@ class InsuranceHelperTest extends TestCase
             'is_insurance_on_product_page_activated' => false,
             'is_insurance_on_cart_page_activated' => true,
             'is_add_to_cart_popup_insurance_activated' => false,
-            ];
+        ];
         $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturn($dbValue);
         $insuranceObject = $this->insuranceHelper->getConfig();
         $this->assertEquals($result, $insuranceObject->getArrayConfig());
@@ -209,15 +220,16 @@ class InsuranceHelperTest extends TestCase
      * @dataProvider iframeHasDbGetParamsDataProvider
      * @return void
      */
-    public function testIframeHasDbGetParams($dbValue, $expectedURL):void
+    public function testIframeHasDbGetParams($dbValue, $expectedURL): void
     {
         $this->configHelper->expects($this->exactly(2))
             ->method('getConfigByCode')
-            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH],[InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
+            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH], [InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
             ->willReturn($dbValue);
         $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams());
     }
-    private function iframeHasDbGetParamsDataProvider():array
+
+    private function iframeHasDbGetParamsDataProvider(): array
     {
         return [
             'No params if config is empty' => [
@@ -232,8 +244,8 @@ class InsuranceHelperTest extends TestCase
                     "is_add_to_cart_popup_insurance_activated":true
                     }',
                 'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL . '?is_insurance_on_product_page_activated=true' .
-                '&is_insurance_on_cart_page_activated=true' .
-                '&is_add_to_cart_popup_insurance_activated=true'
+                    '&is_insurance_on_cart_page_activated=true' .
+                    '&is_add_to_cart_popup_insurance_activated=true'
             ],
             'all params are false if all is false in DB' => [
                 'db_value' => '{
@@ -259,72 +271,75 @@ class InsuranceHelperTest extends TestCase
             ],
         ];
     }
-    public function testCartWithoutInsuranceDontChange():void
+
+    public function testCartWithoutInsuranceDontChange(): void
     {
         $result = [
             [
-                'name'=> 'Product1',
+                'name' => 'Product1',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Product2',
+                'name' => 'Product2',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Product3',
+                'name' => 'Product3',
                 'isInsuranceProduct' => false
             ],
         ];
         $this->assertEquals($result, $this->insuranceHelper->reorderMiniCart($result));
     }
-    public function testCartWithInsuranceProductChangePosition():void
+
+    public function testCartWithInsuranceProductChangePosition(): void
     {
         $base = [
             [
-                'name'=> 'Product1',
+                'name' => 'Product1',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Alma insurance1',
+                'name' => 'Alma insurance1',
                 'isInsuranceProduct' => true
             ],
             [
-                'name'=> 'Product3',
+                'name' => 'Product3',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Alma insurance2',
+                'name' => 'Alma insurance2',
                 'isInsuranceProduct' => true
             ],
             [
-                'name'=> 'Product4',
+                'name' => 'Product4',
                 'isInsuranceProduct' => false
             ],
         ];
         $result = [
             [
-                'name'=> 'Product1',
+                'name' => 'Product1',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Product3',
+                'name' => 'Product3',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Alma insurance1',
+                'name' => 'Alma insurance1',
                 'isInsuranceProduct' => true
             ],
             [
-                'name'=> 'Product4',
+                'name' => 'Product4',
                 'isInsuranceProduct' => false
             ],
             [
-                'name'=> 'Alma insurance2',
+                'name' => 'Alma insurance2',
                 'isInsuranceProduct' => true
             ]
         ];
         $this->assertEquals($result, $this->insuranceHelper->reorderMiniCart($base));
     }
+
     public function testReturnNullWithEMptyQuoteItem()
     {
         $linkToken = 'toremove';
@@ -333,6 +348,7 @@ class InsuranceHelperTest extends TestCase
         $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
         $this->assertNull($result);
     }
+
     public function testIfNoInsuranceProductToRemoveReturnNull()
     {
         $linkToken = 'toremove';
@@ -347,6 +363,7 @@ class InsuranceHelperTest extends TestCase
         $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
         $this->assertNull($result);
     }
+
     public function testGetInsuranceProductWithALinkToken()
     {
         $linkToken = 'toremove';
@@ -363,6 +380,7 @@ class InsuranceHelperTest extends TestCase
         $result = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
         $this->assertSame($insuranceToRemove, $result);
     }
+
     public function testGetProductWithInsuranceWithALinkToken()
     {
         $linkToken = 'linkproduct';
@@ -388,7 +406,8 @@ class InsuranceHelperTest extends TestCase
         $result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
         $this->assertNull($result);
     }
-    public function testRemoveMustCallDeleteItemAndSave():void
+
+    public function testRemoveMustCallDeleteItemAndSave(): void
     {
         $quoteMock = $this->createMock(Quote::class);
         $itemToRemove = $this->createMock(Item::class);
@@ -403,7 +422,7 @@ class InsuranceHelperTest extends TestCase
      * @dataProvider dataForSetAlmaInsurance
      * @return void
      */
-    public function testSetDataToAlmaInsurance($data, $type, $result):void
+    public function testSetDataToAlmaInsurance($data, $type, $result): void
     {
         $quoteItem = $this->createMock(Item::class);
         $this->jsonMock->expects($this->once())->method('serialize')->with(json_decode($result, true))->willReturn($result);
@@ -411,7 +430,7 @@ class InsuranceHelperTest extends TestCase
         $this->insuranceHelper->setAlmaInsuranceToQuoteItem($quoteItem, $data, $type);
     }
 
-    public function dataForSetAlmaInsurance():array
+    public function dataForSetAlmaInsurance(): array
     {
         return [
             'Default type returned for no type added' => [
@@ -431,7 +450,8 @@ class InsuranceHelperTest extends TestCase
             ],
         ];
     }
-    public function testGetInsuranceName():void
+
+    public function testGetInsuranceName(): void
     {
         $baseName = 'Alma Insurance';
         $quoteItem = $this->createMock(Item::class);
@@ -439,21 +459,24 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals('Alma Insurance - Casse - Fusion Backpack', $this->insuranceHelper->getInsuranceName($baseName, $quoteItem));
     }
 
-    private function getInsuranceData(string $linkToken = null):?string
+    private function getInsuranceData(string $linkToken = null): ?string
     {
         if (!$linkToken) {
             return null;
         }
         return '{"id":1,"name":"Casse","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
     }
-    private function getInsuranceDataWithType(string $type, string $linkToken = null):?string
+
+    private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string
     {
         if (!$linkToken) {
             return null;
         }
         return '{"id":1,"name":"Casse","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
     }
-    private function itemFactory(string $sku, string $linkToken = null):Item
+
+
+    private function itemFactory(string $sku, string $linkToken = null): Item
     {
         $item = $this->createMock(Item::class);
         $item->method('getSku')->willReturn($sku);
@@ -461,7 +484,7 @@ class InsuranceHelperTest extends TestCase
         return $item;
     }
 
-    private function createNewInsuranceHelper():InsuranceHelper
+    private function createNewInsuranceHelper(): InsuranceHelper
     {
         return new InsuranceHelper(...$this->getConstructorDependency());
     }

@@ -68,14 +68,15 @@ class InsuranceHelper extends AbstractHelper
      * @param Json $json
      */
     public function __construct(
-        Context $context,
-        RequestInterface $request,
-        ProductRepository $productRepository,
-        Logger $logger,
-        Json $json,
-        ConfigHelper $configHelper,
+        Context                 $context,
+        RequestInterface        $request,
+        ProductRepository       $productRepository,
+        Logger                  $logger,
+        Json                    $json,
+        ConfigHelper            $configHelper,
         CartRepositoryInterface $cartRepository
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -88,7 +89,7 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return InsuranceConfig
      */
-    public function getConfig():InsuranceConfig
+    public function getConfig(): InsuranceConfig
     {
         $isAllowed = (bool)$this->configHelper->getConfigByCode(self::IS_ALLOWED_INSURANCE_PATH);
         $configData = (string)$this->configHelper->getConfigByCode(self::ALMA_INSURANCE_CONFIG_CODE);
@@ -101,7 +102,7 @@ class InsuranceHelper extends AbstractHelper
      * @param Item $quoteItem
      * @return string
      */
-    public function getQuoteItemAlmaInsurance(Item $quoteItem):?string
+    public function getQuoteItemAlmaInsurance(Item $quoteItem): ?string
     {
         return $quoteItem->getAlmaInsurance();
     }
@@ -113,7 +114,7 @@ class InsuranceHelper extends AbstractHelper
      * @param array $data
      * @return Item
      */
-    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data =null, string $type = null): Item
+    public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data = null, string $type = null): Item
     {
         if (!$type) {
             $type = self::ALMA_INSURANCE_SKU;
@@ -133,7 +134,7 @@ class InsuranceHelper extends AbstractHelper
         try {
             $parentName = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getName();
         } catch (NoSuchEntityException $e) {
-            $this->logger->error('Impossible to find product in DB', [$e->getMessage(),(int)$this->request->getParam('product')]);
+            $this->logger->error('Impossible to find product in DB', [$e->getMessage(), (int)$this->request->getParam('product')]);
             return null;
         }
         $insuranceId = $this->request->getParam('alma_insurance_id');
@@ -149,7 +150,7 @@ class InsuranceHelper extends AbstractHelper
      * @param string $price
      * @return float
      */
-    public function formatPrice(string $price):float
+    public function formatPrice(string $price): float
     {
         return (float)substr($price, 0, -1);
     }
@@ -179,24 +180,24 @@ class InsuranceHelper extends AbstractHelper
         return (hash('sha256', $productId . time() . $insuranceId));
     }
 
-    public function getIframeUrlWithParams():string
+    public function getIframeUrlWithParams(): string
     {
         $configArray = $this->getConfig()->getArrayConfig();
         unset($configArray['is_insurance_activated']);
-        $paramNumber=0;
-        $uri ='';
-        foreach ($configArray as $key=>$value) {
-            $uri .= ($paramNumber===0 ? '?' : '&') . $key . '=' . ($value ? 'true' : 'false');
+        $paramNumber = 0;
+        $uri = '';
+        foreach ($configArray as $key => $value) {
+            $uri .= ($paramNumber === 0 ? '?' : '&') . $key . '=' . ($value ? 'true' : 'false');
             $paramNumber++;
         }
         return self::CONFIG_IFRAME_URL . $uri;
     }
 
-    public function reorderMiniCart(array $items):array
+    public function reorderMiniCart(array $items): array
     {
-        foreach ($items as $key=> $item) {
-            if ($item['isInsuranceProduct'] && $items[$key+1]) {
-                [$items[$key], $items[$key+1]] = [$items[$key+1], $items[$key]];
+        foreach ($items as $key => $item) {
+            if ($item['isInsuranceProduct'] && $items[$key + 1]) {
+                [$items[$key], $items[$key + 1]] = [$items[$key + 1], $items[$key]];
             }
         }
         return $items;
@@ -216,6 +217,7 @@ class InsuranceHelper extends AbstractHelper
         }
         return null;
     }
+
     public function getProductLinkedToInsurance(string $linkToken, array $quoteItems): ?Item
     {
         /** @var Item $quoteItem */
@@ -241,9 +243,10 @@ class InsuranceHelper extends AbstractHelper
         $quote->deleteItem($quoteItem);
         $this->cartRepository->save($quote);
     }
-    public function getInsuranceName(string $baseName, Item $quoteItem):string
+
+    public function getInsuranceName(string $baseName, Item $quoteItem): string
     {
         $almaInsurance = json_decode($quoteItem->getData('alma_insurance'), true);
-        return $baseName. ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
+        return $baseName . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
     }
 }

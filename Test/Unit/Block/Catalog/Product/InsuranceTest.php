@@ -12,6 +12,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Helper\Product;
 use Magento\Catalog\Model\ProductTypes\ConfigInterface;
+use Magento\ConfigurableProduct\Helper\Data;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Json\EncoderInterface as jsonEncoderInterface;
 use Magento\Framework\Locale\FormatInterface;
@@ -113,6 +114,7 @@ class InsuranceTest extends TestCase
         $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
         $this->config = $this->createMock(Config::class);
         $this->config->method('getMerchantId')->willReturn('merchant_123456');
+        $this->configurableHelper = $this->createMock(Data::class);
         $this->insuranceBlock = $this->createNewInsuranceBlock();
     }
     protected function getConstructorDependency():array
@@ -131,7 +133,8 @@ class InsuranceTest extends TestCase
             $this->logger,
             $this->insuranceHelper,
             $this->apiConfigHelper,
-            $this->config
+            $this->config,
+            $this->configurableHelper
         ];
     }
     protected function createNewInsuranceBlock() : Insurance
@@ -199,11 +202,11 @@ class InsuranceTest extends TestCase
         return [
             'Return sandbox front widget Url for sandbox Mode' => [
                 'activeMode' => ApiConfigHelper::TEST_MODE_KEY,
-                'expectedUrl' => 'https://protect.staging.almapay.com/almaProductInPageWidget.html?merchant_id=merchant_123456&cms_reference=mysku&product_price=10010',
+                'expectedUrl' => 'https://protect.staging.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456',
             ],
             'Return Prod front widget Url for Prod Mode' => [
                 'activeMode' => ApiConfigHelper::LIVE_MODE_KEY,
-                'expectedUrl' => 'https://protect.almapay.com/almaProductInPageWidget.html?merchant_id=merchant_123456&cms_reference=mysku&product_price=10010',
+                'expectedUrl' => 'https://protect.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456',
             ],
         ];
     }

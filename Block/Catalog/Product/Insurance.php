@@ -11,7 +11,10 @@ use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View as ProductView;
 use Magento\Catalog\Helper\Product;
 use Magento\Catalog\Model\ProductTypes\ConfigInterface;
+use Magento\ConfigurableProduct\Helper\Data;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Json\EncoderInterface as jsonEncoderInterface;
 use Magento\Framework\Locale\FormatInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface as PriceCurrencyInterface;
@@ -36,6 +39,10 @@ class Insurance extends ProductView
      * @var Config
      */
     private $config;
+    /**
+     * @var Data
+     */
+    private $configurableHelper;
 
     /**
      * @param Context $context
@@ -67,8 +74,10 @@ class Insurance extends ProductView
         InsuranceHelper            $insuranceHelper,
         ApiConfigHelper            $apiConfigHelper,
         Config                     $config,
+        Data                       $configurableHelper,
         array                      $data = []
-    ) {
+    )
+    {
         parent::__construct(
             $context,
             $urlEncoder,
@@ -86,28 +95,29 @@ class Insurance extends ProductView
         $this->insuranceHelper = $insuranceHelper;
         $this->apiConfigHelper = $apiConfigHelper;
         $this->config = $config;
+        $this->configurableHelper = $configurableHelper;
     }
 
-    public function isActivatedWidgetInProductPage():bool
+    public function isActivatedWidgetInProductPage(): bool
     {
         $config = $this->insuranceHelper->getConfig();
         return $config->isAllowed() && $config->isPageActivated();
     }
 
-    public function isActivatedPopupInProductPage():bool
+    public function isActivatedPopupInProductPage(): bool
     {
         $config = $this->insuranceHelper->getConfig();
         return $config->isAllowed() && $config->isPopupActivated();
     }
 
-    public function getIframeUrl():string
+    public function getIframeUrl(): string
     {
         $path = InsuranceHelper::FRONT_IFRAME_PATH;
         return $this->getHost() .
             $path . '?' .
-            InsuranceHelper::MERCHANT_ID_PARAM_KEY. '=' .$this->getMerchantId(). '&' .
-            InsuranceHelper::CMS_REF_PARAM_KEY. '=' .$this->getProduct()->getSku() . '&' .
-            InsuranceHelper::PRODUCT_PRICE_PARAM_KEY. '=' .$this->getProductPriceInCent();
+            InsuranceHelper::CMS_REF_PARAM_KEY . '=' . $this->getBaseProductSku() . '&' .
+            InsuranceHelper::PRODUCT_PRICE_PARAM_KEY . '=' . $this->getProductPriceInCent() . '&' .
+            InsuranceHelper::MERCHANT_ID_PARAM_KEY . '=' . $this->getMerchantId();
     }
 
     public function getScriptUrl(): string
@@ -116,30 +126,52 @@ class Insurance extends ProductView
         return $this->getHost() . $path;
     }
 
-    private function getHost():string
+    private function getHost(): string
     {
         $host = InsuranceHelper::SANDBOX_IFRAME_HOST_URL;
-        $activeMode =  $this->apiConfigHelper->getActiveMode();
+        $activeMode = $this->apiConfigHelper->getActiveMode();
         if ($activeMode === ApiConfigHelper::LIVE_MODE_KEY) {
             $host = InsuranceHelper::PRODUCTION_IFRAME_HOST_URL;
         }
         return $host;
     }
-    public function getMerchantId():string
+
+    public function getMerchantId(): string
     {
         return $this->config->getMerchantId();
     }
-    public function getProductPriceInCent():int
+
+    public function getProductPriceInCent(): int
     {
+        if ($this->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
+            return (int)($this->getProduct()->getPriceInfo()->getPrice('regular_price')->getMinRegularAmount()->getValue() * 100);
+        }
         return (int)($this->getProduct()->getPrice() * 100);
     }
 
-    public function getBaseProductSku():string
+    public function getBaseProductSku(): string
     {
         return $this->getProduct()->getSku();
     }
-    public function getBaseProductId():string
+
+    public function getBaseProductId(): string
     {
         return $this->getProduct()->getId();
+    }
+
+    public function getProductChild(): string
+    {
+        $childProducts = $this->getProduct()->getTypeInstance()->getUsedProducts($this->getProduct());
+        $arrayOptions = $this->configurableHelper->getOptions($this->getProduct(), $childProducts);
+        $productsAttributes = [];
+        foreach ($arrayOptions['index'] as $id => $options) {
+            try {
+                $product = $this->productRepository->getById($id);
+            } catch (NoSuchEntityException $e) {
+                $this->logger->error('NoSuchEntityException in get Child Product', [$e->getMessage()]);
+            }
+            $productsAttributes[] = ['sku' => $product->getSku(), 'attributes' => $options];
+        }
+        return json_encode($productsAttributes);
     }
 }
