@@ -4,6 +4,7 @@ Changelog
 v4.1.1
 ------
 * fix : Remove duplicate font src in csp whitelist
+* fix : Replace grand_total by base_grand_total for In Page
 
 v4.1.0
 ------

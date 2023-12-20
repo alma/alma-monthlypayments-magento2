@@ -230,7 +230,7 @@ define(
                 }
                 self.unMountInPage();
                 const merchantId = self.config.merchantId
-                const totalInCent = self.totals().grand_total * 100
+                const totalInCent = self.totals().base_grand_total * 100
                 const installmentsCount = plan.installmentsCount
                 const environment = self.config.activeMode
                 const locale = self.config.locale
