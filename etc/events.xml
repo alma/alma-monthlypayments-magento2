@@ -27,4 +27,10 @@
         <observer name="alma_monthly_payments_gateway_data_assign"
                   instance="Alma\MonthlyPayments\Observer\PaymentDataAssignObserver"/>
     </event>
+    <event name="checkout_cart_product_add_after">
+        <observer name="checkout_cart_product_add_after_alma_insurance" instance="Alma\MonthlyPayments\Observer\AddToCartInsuranceObserver" />
+    </event>
+    <event name="sales_quote_remove_item">
+        <observer name="checkout_cart_product_remove_after_alma_insurance" instance="Alma\MonthlyPayments\Observer\RemoveToCartInsuranceObserver" />
+    </event>
 </config>

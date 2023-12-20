@@ -38,3 +38,20 @@
     vertical-align: middle;
     width: 50%
 }
+#payment_us_alma_insurance colgroup.label {
+    width: 10%;
+}
+#payment_us_alma_insurance colgroup.scope-label {
+    width: 10%;
+}
+#payment_us_alma_insurance colgroup.value {
+    width: 80%;
+}
+
+#payment_us_alma_insurance td {
+    width: 0;
+}
+#payment_us_alma_insurance td.value {
+    height: 40em;
+}
+

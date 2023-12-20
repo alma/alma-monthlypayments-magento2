@@ -29,12 +29,26 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
+            <group id="alma_insurance" translate="label comment" type="text" sortOrder="2" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <depends>
+                    <field id="*/alma_monthly_payments/alma_api_config/insurance_allowed">1</field>
+                </depends>
+                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer insurance with Alma</div>]]></comment>
+                <fieldset_css>complex alma-section</fieldset_css>
+                <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Insurance</frontend_model>
+                <field id="alma_insurance_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <config_path>payment/alma_monthly_payments/insurance_config</config_path>
+                    <label>Alma Insurance</label>
+                <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\InsuranceWidget</frontend_model>
+                </field>
+            </group>
             <group id="alma_monthly_payments" translate="label comment" type="text" sortOrder="1" showInDefault="1"
                    showInWebsite="1" showInStore="1">
                 <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer installments payments with Alma and instantly boost your sales.<br>Increase average order value by 60% and your sales by 20%.<br>With no subscription fees and no commitment, it’s risk free: you are paid upfront while your customers pay later.</div>]]></comment>
                 <fieldset_css>complex alma-section</fieldset_css>
                 <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
-
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                     <label>Enabled</label>
@@ -345,8 +359,16 @@
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>failure_return_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/failure_return_url</config_path>
                     </field>
+                    <field id="insurance_allowed" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="0"
+                           showInStore="0">
+                        <label>Beta features</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\InsuranceAllowed</frontend_model>
+                        <config_path>payment/alma_monthly_payments/insurance_allowed</config_path>
+                    </field>
                 </group>
             </group>
+
         </section>
     </system>
 </config>
