@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v4.1.1
+------
+* fix : Remove duplicate font src in csp whitelist
+
 v4.1.0
 ------
 
