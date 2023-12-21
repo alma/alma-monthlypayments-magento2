@@ -12,6 +12,7 @@ use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
@@ -475,7 +476,7 @@ class InsuranceHelperTest extends TestCase
     public function testGetInsuranceProductReturnNullIfPhpClientTrownException():void
     {
         $insuranceId = 'alm_insurance_id123456789';
-        $item = $this->createMock(Item::class);
+        $item = $this->createMock(Product::class);
 
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $insuranceEndpoint->method('getInsuranceContract')->willThrowException(new AlmaException());
@@ -490,7 +491,7 @@ class InsuranceHelperTest extends TestCase
     {
         $insuranceId = 'alm_insurance_id123456789';
         $parentName = 'fusion back pack';
-        $item = $this->createMock(Item::class);
+        $item = $this->createMock(Product::class);
         $item->method('getName')->willReturn($parentName);
         $contract = new Contract(
             "alm_insurance_id123456789",

@@ -6,6 +6,7 @@ use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -136,7 +137,7 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return InsuranceProduct|null
      */
-    public function getInsuranceProduct(Item $addedItemToQuote, string $insuranceId): ?InsuranceProduct
+    public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId): ?InsuranceProduct
     {
         $parentName = $addedItemToQuote->getName();
         $parentSku = $addedItemToQuote->getSku();

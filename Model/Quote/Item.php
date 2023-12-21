@@ -15,7 +15,6 @@ class Item extends \Magento\Quote\Model\Quote\Item
         $parentType = parent::getProductType();
         $insuranceData = $this->getData(InsuranceHelper::ALMA_INSURANCE_SKU);
         if (!$insuranceData) {
-            $logger->info('Returned type for product without insurance ', [$this->getSku(),parent::getProductType() ]);
             return $parentType;
         }
         $insuranceData = json_decode($insuranceData, true);

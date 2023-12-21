@@ -29,6 +29,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Configuration\Item\ItemProductResolver;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
@@ -47,6 +48,14 @@ class AddToCartInsuranceObserver implements ObserverInterface
      * @var Logger
      */
     private $logger;
+    /**
+     * @var ItemProductResolver
+     */
+    private $configurableItemProductResolver;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
 
     /**
      * @param InsuranceHelper $insuranceHelper
@@ -54,12 +63,13 @@ class AddToCartInsuranceObserver implements ObserverInterface
      */
     public function __construct(
         InsuranceHelper $insuranceHelper,
-        Logger $logger
         Logger $logger,
         RequestInterface $request,
+        ItemProductResolver $configurableItemProductResolver
     ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
+        $this->configurableItemProductResolver = $configurableItemProductResolver;
         $this->request = $request;
     }
 
@@ -76,18 +86,16 @@ class AddToCartInsuranceObserver implements ObserverInterface
             $addedItemToQuote = $observer->getData('quote_item');
 
             if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
-                $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()]);
+                $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()->getSku()]);
                 return;
             }
 
-            $insuranceObject = $this->insuranceHelper->getInsuranceProduct();
             $insuranceId = $this->request->getParam('alma_insurance_id');
             if (!$insuranceId) {
                 return;
             }
 
-
-            $insuranceObject = $this->insuranceHelper->getInsuranceProduct($addedItemToQuote, $insuranceId);
+            $insuranceObject = $this->insuranceHelper->getInsuranceProduct($this->configurableItemProductResolver->getFinalProduct($addedItemToQuote), $insuranceId);
             if (!$insuranceObject) {
                 return;
             }
