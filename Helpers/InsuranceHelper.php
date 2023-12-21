@@ -136,24 +136,17 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return InsuranceProduct|null
      */
-    public function getInsuranceProduct(): ?InsuranceProduct
+    public function getInsuranceProduct(Item $addedItemToQuote, string $insuranceId): ?InsuranceProduct
     {
+        $parentName = $addedItemToQuote->getName();
+        $parentSku = $addedItemToQuote->getSku();
+        $parentRegularPrice = $addedItemToQuote->getPrice();
+
         try {
-            $parentName = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getName();
-            $parentSku = $this->productRepository->getById((int)$this->request->getParam('product'))->getSku();
-            $parentRegularPrice = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getPrice();
-        } catch (NoSuchEntityException $e) {
-            $this->logger->error('Impossible to find product in DB', [$e->getMessage(), (int)$this->request->getParam('product')]);
-            return null;
-        }
-        $insuranceId = $this->request->getParam('alma_insurance_id');
-        if (!$insuranceId) {
-            return null;
-        }
-        try {
-            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract($this->request->getParam('alma_insurance_id'), $parentSku, Functions::priceToCents($parentRegularPrice));
+            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract($insuranceId, $parentSku, Functions::priceToCents($parentRegularPrice));
         } catch (AlmaException $e) {
             $this->logger->error('Get insurance Exception', [$e, $e->getMessage()]);
+            return null;
         }
 
         $this->logger->info('New insurance Product', []);

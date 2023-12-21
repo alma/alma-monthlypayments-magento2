@@ -29,6 +29,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -54,9 +55,12 @@ class AddToCartInsuranceObserver implements ObserverInterface
     public function __construct(
         InsuranceHelper $insuranceHelper,
         Logger $logger
+        Logger $logger,
+        RequestInterface $request,
     ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
+        $this->request = $request;
     }
 
     public function execute(Observer $observer)
@@ -77,6 +81,13 @@ class AddToCartInsuranceObserver implements ObserverInterface
             }
 
             $insuranceObject = $this->insuranceHelper->getInsuranceProduct();
+            $insuranceId = $this->request->getParam('alma_insurance_id');
+            if (!$insuranceId) {
+                return;
+            }
+
+
+            $insuranceObject = $this->insuranceHelper->getInsuranceProduct($addedItemToQuote, $insuranceId);
             if (!$insuranceObject) {
                 return;
             }

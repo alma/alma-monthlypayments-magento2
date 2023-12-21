@@ -2,11 +2,16 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
+use Alma\API\Client;
+use Alma\API\Endpoints\Insurance;
+use Alma\API\Entities\Insurance\Contract;
+use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
+use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
@@ -465,6 +470,48 @@ class InsuranceHelperTest extends TestCase
     {
         $this->requestInterfaceMock->method('getParam')->willReturn($insurandId);
         $this->assertEquals($expected, $this->insuranceHelper->hasInsuranceInRequest());
+    }
+
+    public function testGetInsuranceProductReturnNullIfPhpClientTrownException():void
+    {
+        $insuranceId = 'alm_insurance_id123456789';
+        $item = $this->createMock(Item::class);
+
+        $insuranceEndpoint = $this->createMock(Insurance::class);
+        $insuranceEndpoint->method('getInsuranceContract')->willThrowException(new AlmaException());
+        $almaClient = $this->createMock(Client::class);
+        $almaClient->insurance = $insuranceEndpoint;
+        $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
+
+        $this->assertNull($this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
+    }
+
+    public function testGetInsuranceProductReturnInsuranceProduct():void
+    {
+        $insuranceId = 'alm_insurance_id123456789';
+        $parentName = 'fusion back pack';
+        $item = $this->createMock(Item::class);
+        $item->method('getName')->willReturn($parentName);
+        $contract = new Contract(
+            "alm_insurance_id123456789",
+            "Alma outillage thermique 3 ans (Vol + casse)",
+            365,
+            null,
+            null,
+            null,
+            null,
+            null,
+            500,
+            []
+        );
+        $insuranceProductExpected = new InsuranceProduct($contract, $parentName);
+        $insuranceEndpoint = $this->createMock(Insurance::class);
+        $insuranceEndpoint->method('getInsuranceContract')->willReturn($contract);
+        $almaClient = $this->createMock(Client::class);
+        $almaClient->insurance = $insuranceEndpoint;
+        $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
+
+        $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
     }
 
     public function insuranceInRequest():array
