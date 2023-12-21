@@ -25,11 +25,14 @@
         ) {
             utils.setSkuForWifget('<?= $block->getBaseProductSku() ?>')
             var cart = customerData.get('cart');
-            var count = cart().summary_count;
+            var baseCount = null;
             cart.subscribe(function () {
-                if (cart().summary_count !== count) {
+                if (baseCount !== null && cart().summary_count !== baseCount) {
                     resetInsurance();
+                    baseCount = cart().summary_count;
+                    console.log('reset insurance')
                 }
+                baseCount = cart().summary_count;
             });
             var madeChoiceForInsurance = false;
             var isAddToCartFlow = false;
@@ -38,7 +41,7 @@
                 if(e.data.type === 'almaEligibilityAnswer'){
                     let insuranceData = e.data.eligibilityCallResult
                     if (insuranceData) {
-                        let height = e.data.widgetSize + 10
+                        let height = e.data.widgetSize.height + 55
                         let iframe = document.getElementById('product-alma-iframe')
                         iframe.style.height = height + 'px'
                     }
