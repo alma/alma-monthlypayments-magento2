@@ -16,7 +16,7 @@ class Quote extends BaseQuote
         $insuranceHelper= $objectManager->get(InsuranceHelper::class);
 
         $almaInsuranceProduct = $insuranceHelper->getAlmaInsuranceProduct();
-        $almaProductInRequest = $insuranceHelper->getInsuranceParamsInRequest();
+        $almaProductInRequest = $insuranceHelper->getInsuranceProduct();
 
         if ($almaProductInRequest) {
             return false;

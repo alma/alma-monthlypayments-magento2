@@ -129,7 +129,7 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return InsuranceProduct|null
      */
-    public function getInsuranceParamsInRequest(): ?InsuranceProduct
+    public function getInsuranceProduct(): ?InsuranceProduct
     {
         try {
             $parentName = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getName();

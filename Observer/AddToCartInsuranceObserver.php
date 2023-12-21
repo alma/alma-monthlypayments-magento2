@@ -75,12 +75,11 @@ class AddToCartInsuranceObserver implements ObserverInterface
                 return;
             }
 
-            $insuranceObject = $this->insuranceHelper->getInsuranceParamsInRequest();
+            $insuranceObject = $this->insuranceHelper->getInsuranceProduct();
             if (!$insuranceObject) {
                 return;
             }
 
-            //TODO API CALL TO CHECK INSURANCE AVAILABILITY WITH ID AND SKU PRODUCT AND PRICE
 
             $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE);
