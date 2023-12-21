@@ -17,6 +17,6 @@ class Renderer extends \Magento\Checkout\Block\Cart\Item\Renderer
             return $this->getData('product_name');
         }
         $almaInsurance = json_decode($this->_item->getData(InsuranceHelper::ALMA_INSURANCE_SKU), true);
-        return $this->getProduct()->getName() . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
+        return $almaInsurance['name'];
     }
 }
