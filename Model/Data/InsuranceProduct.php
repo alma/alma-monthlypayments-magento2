@@ -2,20 +2,10 @@
 
 namespace Alma\MonthlyPayments\Model\Data;
 
+use Alma\API\Entities\Insurance\Contract;
+
 class InsuranceProduct
 {
-    /**
-     * @var int
-     */
-    private $id;
-    /**
-     * @var string
-     */
-    private $name;
-    /**
-     * @var float
-     */
-    private $price;
     /**
      * @var mixed
      */
@@ -24,27 +14,32 @@ class InsuranceProduct
      * @var string
      */
     private $parentName;
+    /**
+     * @var Contract
+     */
+    private $contract;
 
+    /**
+     * @param Contract $contract
+     * @param string $parentName
+     * @param int|null $linkToken
+     */
     public function __construct(
-        int $id,
-        string $name,
-        float $price,
+        Contract $contract,
         string $parentName,
-        int $linkToken = null
+        int    $linkToken = null
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->price = $price;
         $this->linkToken = $linkToken;
         $this->parentName = $parentName;
+        $this->contract = $contract;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId(): int
+    public function getId(): string
     {
-        return $this->id;
+        return $this->contract->getId();
     }
 
     /**
@@ -52,26 +47,27 @@ class InsuranceProduct
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->contract->getName();
     }
 
     /**
-     * @return float
+     * @return int
      */
-    public function getPrice(): float
+    public function getPrice():int
     {
-        return $this->price;
+        return $this->contract->getPrice();
     }
 
     /**
      * @return array
      */
-    public function toArray():array
+    public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'price' => $this->price,
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'price' => $this->getPrice(),
+            'duration_year' => $this->getDurationYear(),
             'link' => $this->linkToken,
             'parent_name' => $this->parentName
         ];
@@ -100,5 +96,15 @@ class InsuranceProduct
     public function getParentName(): string
     {
         return $this->parentName;
+    }
+
+    public function getDurationYear(): int
+    {
+        return $this->contract->getProtectionDurationInYear();
+    }
+
+    public function getContract(): Contract
+    {
+        return $this->contract;
     }
 }
