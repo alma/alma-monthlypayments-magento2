@@ -63,15 +63,15 @@ class AlmaInsuranceRenderer extends DefaultRenderer
                 ->addFieldToFilter('item_id', [$item->getQuoteItemId()])
                 ->getFirstItem();
 
-            $item->setName($this->insuranceHelper->getInsuranceName($item->getName(), $quoteItem));
+            $item->setName($this->insuranceHelper->getInsuranceName($quoteItem));
 
         }
         return parent::getItem();
     }
 
-    protected function getInsuranceName(Item $item, \Magento\Quote\Model\Quote\Item $quoteItem){
+    protected function getInsuranceName(\Magento\Quote\Model\Quote\Item $quoteItem){
         $almaInsurance = json_decode($quoteItem->getAlmaInsurance(), true);
-        return $item->getName() . ' - ' . $almaInsurance['name'] . ' - ' . $almaInsurance['parent_name'];
+        return $almaInsurance['name'];
     }
 
 }

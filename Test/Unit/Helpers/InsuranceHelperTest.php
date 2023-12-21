@@ -452,10 +452,9 @@ class InsuranceHelperTest extends TestCase
 
     public function testGetInsuranceName(): void
     {
-        $baseName = 'Alma Insurance';
         $quoteItem = $this->createMock(Item::class);
         $quoteItem->method('getData')->willReturn($this->getInsuranceData('abcd'));
-        $this->assertEquals('Alma Insurance - Casse - Fusion Backpack', $this->insuranceHelper->getInsuranceName($baseName, $quoteItem));
+        $this->assertEquals('Alma outillage thermique 3 ans (Vol + casse)', $this->insuranceHelper->getInsuranceName($quoteItem));
     }
 
     private function getInsuranceData(string $linkToken = null): ?string
@@ -463,7 +462,7 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":1,"name":"Casse","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
+        return '{"id":1,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
     }
 
     private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string
@@ -471,7 +470,7 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":1,"name":"Casse","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
+        return '{"id":1,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
     }
 
 
