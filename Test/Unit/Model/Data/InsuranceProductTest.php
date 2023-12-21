@@ -13,15 +13,43 @@ class InsuranceProductTest extends TestCase
     {
         $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
         $name = 'insurance test';
+        $insuranceContract = $this->contractFactory($id, $name);
+
+        $parentName = 'my parent name';
+        $expectedReturn = [
+            'id' => $id,
+            'name' => $name,
+            'price' => 10023,
+            'duration_year' => 1,
+            'link' => null,
+            'parent_name' => 'my parent name'
+        ];
+        $insuranceProduct = new InsuranceProduct($insuranceContract, $parentName);
+        $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
+    }
+
+    public function testGetFloatPrice():void
+    {
+        $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
+        $name = 'insurance test';
+        $insuranceContract = $this->contractFactory($id, $name);
+        $parentName = 'my parent name';
+
+        $insuranceProduct = new InsuranceProduct($insuranceContract, $parentName);
+
+        $this->assertEquals(100.23, $insuranceProduct->getFloatPrice());
+    }
+
+    private function contractFactory(string $id, string $name):Contract
+    {
         $protectionDays = 365;
         $description = null;
         $coverArea = null;
         $compensationArea = null;
         $exclusionArea = null;
         $uncoveredArea = null;
-        $price = 10000;
+        $price = 10023;
         $files = [];
-        $parentName = 'my parent name';
         $insuranceContract = new Contract(
             $id,
             $name,
@@ -34,16 +62,7 @@ class InsuranceProductTest extends TestCase
             $price,
             $files
         );
-        $expectedReturn = [
-            'id' => $id,
-            'name' => $name,
-            'price' => 10000,
-            'duration_year' => 1,
-            'link' => null,
-            'parent_name' => 'my parent name'
-        ];
-        $insuranceProduct = new InsuranceProduct($insuranceContract, $parentName);
-        $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
+        return $insuranceContract;
     }
 
 }

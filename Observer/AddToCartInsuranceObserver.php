@@ -26,6 +26,7 @@ namespace Alma\MonthlyPayments\Observer;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\DataObject;
@@ -83,7 +84,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
 
             $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE);
-            $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $addedItemToQuote);
+            $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $addedItemToQuote, $insuranceObject);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_INSURANCE_SKU);
         } catch (\Exception $e) {
             $this->logger->info('Error', [$e->getMessage()]);
@@ -92,19 +93,18 @@ class AddToCartInsuranceObserver implements ObserverInterface
 
     /**
      * @param Quote $quote
-     * @param Product $insuranceProduct
+     * @param Product $magentoInsuranceProduct
      * @param Item $addedItemToQuote
      * @return Item
      * @throws AlmaInsuranceProductException
      */
-    private function addInsuranceProductToQuote(Quote $quote, Product $insuranceProduct, Item $addedItemToQuote): Item
+    private function addInsuranceProductToQuote(Quote $quote, Product $magentoInsuranceProduct, Item $addedItemToQuote, InsuranceProduct $insuranceProduct): Item
     {
         try {
-            $insuranceInQuote = $quote->addProduct($insuranceProduct, $this->makeAddRequest($insuranceProduct, $addedItemToQuote->getQty()));
-            $price = rand(100, 200);
-            $insuranceInQuote->setName($insuranceInQuote->getName() . ' - ' . $addedItemToQuote->getName());
-            $insuranceInQuote->setCustomPrice($price);
-            $insuranceInQuote->setOriginalCustomPrice($price);
+            $insuranceInQuote = $quote->addProduct($magentoInsuranceProduct, $this->makeAddRequest($magentoInsuranceProduct, $addedItemToQuote->getQty()));
+            $insuranceInQuote->setName($insuranceProduct->getName());
+            $insuranceInQuote->setCustomPrice($insuranceProduct->getFloatPrice());
+            $insuranceInQuote->setOriginalCustomPrice($insuranceProduct->getFloatPrice());
             $insuranceInQuote->getProduct()->setIsSuperMode(true);
             return $insuranceInQuote;
         } catch (LocalizedException $e) {

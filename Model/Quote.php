@@ -15,10 +15,13 @@ class Quote extends BaseQuote
 
         $insuranceHelper= $objectManager->get(InsuranceHelper::class);
 
-        $almaInsuranceProduct = $insuranceHelper->getAlmaInsuranceProduct();
-        $almaProductInRequest = $insuranceHelper->getInsuranceProduct();
+        try {
+            $almaInsuranceProduct = $insuranceHelper->getAlmaInsuranceProduct();
+        } catch (Exceptions\AlmaInsuranceProductException $e) {
+            return false;
+        }
 
-        if ($almaProductInRequest) {
+        if ($insuranceHelper->hasInsuranceInRequest()) {
             return false;
         }
 

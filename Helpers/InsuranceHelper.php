@@ -151,7 +151,7 @@ class InsuranceHelper extends AbstractHelper
             return null;
         }
         try {
-            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract($this->request->getParam('alma_insurance_id'), $parentSku, $this->formatPrice($parentRegularPrice));
+            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract($this->request->getParam('alma_insurance_id'), $parentSku, Functions::priceToCents($parentRegularPrice));
         } catch (AlmaException $e) {
             $this->logger->error('Get insurance Exception', [$e, $e->getMessage()]);
         }
@@ -160,13 +160,9 @@ class InsuranceHelper extends AbstractHelper
         return new InsuranceProduct($insuranceContract, $parentName);
     }
 
-    /**
-     * @param string $price
-     * @return float
-     */
-    public function formatPrice(string $price): float
+    public function hasInsuranceInRequest():bool
     {
-        return (float)substr($price, 0, -1);
+        return  (bool)$this->request->getParam('alma_insurance_id');
     }
 
     /**

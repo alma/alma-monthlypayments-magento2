@@ -57,6 +57,10 @@ class InsuranceProduct
     {
         return $this->contract->getPrice();
     }
+    public function getFloatPrice(): float
+    {
+        return (float)($this->getPrice()/100);
+    }
 
     /**
      * @return array

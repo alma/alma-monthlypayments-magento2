@@ -457,6 +457,34 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals('Alma outillage thermique 3 ans (Vol + casse)', $this->insuranceHelper->getInsuranceName($quoteItem));
     }
 
+    /**
+     * @dataProvider insuranceInRequest
+     * @return void
+     */
+    public function testHasInsuranceInRequest($insurandId, $expected): void
+    {
+        $this->requestInterfaceMock->method('getParam')->willReturn($insurandId);
+        $this->assertEquals($expected, $this->insuranceHelper->hasInsuranceInRequest());
+    }
+
+    public function insuranceInRequest():array
+    {
+        return [
+            'No insurance in request' => [
+                'insurance_id' => 'insurance_id_23456789',
+                'expected' => true
+            ],
+            'Null insurance in request' => [
+                'insurance_id' => null,
+                'expected' => false
+            ],
+            'Insurance in request' => [
+                'insurance_id' => '',
+                'expected' => false
+            ]
+        ];
+    }
+
     private function getInsuranceData(string $linkToken = null): ?string
     {
         if (!$linkToken) {
