@@ -25,6 +25,7 @@
         <policy id="connect-src">
             <values>
                 <value id="alma_api" type="host">*.getalma.eu</value>
+                <value id="almapay_api" type="host">*.almapay.com</value>
             </values>
         </policy>
         <policy id="img-src">
