@@ -2,13 +2,12 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
+use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -58,10 +57,10 @@ class InsuranceHelperTest extends TestCase
      */
     private $cartRepository;
     /**
-     * @var Configurable
+     * @var AlmaClient
      *
      */
-    private $configurable;
+    private $almaClient;
 
     protected function setUp(): void
     {
@@ -72,7 +71,7 @@ class InsuranceHelperTest extends TestCase
         $this->jsonMock = $this->createMock(Json::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
-        $this->configurable = $this->createMock(Configurable::class);
+        $this->almaClient = $this->createMock(AlmaClient::class);
         $this->insuranceHelper = $this->createNewInsuranceHelper();
     }
 
@@ -86,7 +85,7 @@ class InsuranceHelperTest extends TestCase
             $this->jsonMock,
             $this->configHelper,
             $this->cartRepository,
-            $this->configurable
+            $this->almaClient
         ];
     }
 

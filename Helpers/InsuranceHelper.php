@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
@@ -20,7 +21,7 @@ class InsuranceHelper extends AbstractHelper
     const ALMA_INSURANCE_SKU = 'alma_insurance';
     const ALMA_PRODUCT_WITH_INSURANCE_TYPE = 'product_with_alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
-    const CONFIG_IFRAME_URL ='https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
+    const CONFIG_IFRAME_URL = 'https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
     //TODO fix with ne final host
     const SANDBOX_IFRAME_HOST_URL = 'https://protect.staging.almapay.com';
     //TODO fix with ne final host
@@ -59,6 +60,10 @@ class InsuranceHelper extends AbstractHelper
      * @var CartRepositoryInterface
      */
     private $cartRepository;
+    /**
+     * @var AlmaClient
+     */
+    private $almaClient;
 
     /**
      * @param Context $context
@@ -74,7 +79,8 @@ class InsuranceHelper extends AbstractHelper
         Logger                  $logger,
         Json                    $json,
         ConfigHelper            $configHelper,
-        CartRepositoryInterface $cartRepository
+        CartRepositoryInterface $cartRepository,
+        AlmaClient              $almaClient
     )
     {
         parent::__construct($context);
@@ -84,6 +90,7 @@ class InsuranceHelper extends AbstractHelper
         $this->logger = $logger;
         $this->configHelper = $configHelper;
         $this->cartRepository = $cartRepository;
+        $this->almaClient = $almaClient;
     }
 
     /**
@@ -133,17 +140,24 @@ class InsuranceHelper extends AbstractHelper
     {
         try {
             $parentName = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getName();
+            $parentSku = $this->productRepository->getById((int)$this->request->getParam('product'))->getSku();
+            $parentRegularPrice = (string)$this->productRepository->getById((int)$this->request->getParam('product'))->getPrice();
         } catch (NoSuchEntityException $e) {
             $this->logger->error('Impossible to find product in DB', [$e->getMessage(), (int)$this->request->getParam('product')]);
             return null;
         }
         $insuranceId = $this->request->getParam('alma_insurance_id');
-        $insuranceName = $this->request->getParam('alma_insurance_name');
-        $insurancePrice = $this->request->getParam('alma_insurance_price');
-        if ($insuranceId && $insuranceName && $insurancePrice && $parentName) {
-            return new InsuranceProduct((int)$insuranceId, $insuranceName, $this->formatPrice($insurancePrice), $parentName);
+        if (!$insuranceId) {
+            return null;
         }
-        return null;
+        try {
+            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract($this->request->getParam('alma_insurance_id'), $parentSku, $this->formatPrice($parentRegularPrice));
+        } catch (AlmaException $e) {
+            $this->logger->error('Get insurance Exception', [$e, $e->getMessage()]);
+        }
+
+        $this->logger->info('New insurance Product', []);
+        return new InsuranceProduct($insuranceContract, $parentName);
     }
 
     /**
@@ -172,10 +186,10 @@ class InsuranceHelper extends AbstractHelper
 
     /**
      * @param int $productId
-     * @param int $insuranceId
+     * @param string $insuranceId
      * @return string
      */
-    public function createLinkToken(int $productId, int $insuranceId): string
+    public function createLinkToken(int $productId, string $insuranceId): string
     {
         return (hash('sha256', $productId . time() . $insuranceId));
     }
