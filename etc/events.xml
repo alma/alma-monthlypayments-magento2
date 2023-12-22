@@ -33,4 +33,7 @@
     <event name="sales_quote_remove_item">
         <observer name="checkout_cart_product_remove_after_alma_insurance" instance="Alma\MonthlyPayments\Observer\RemoveToCartInsuranceObserver" />
     </event>
+    <event name="checkout_submit_all_after">
+        <observer name="alma_insurance_checkout_submit_all_after" instance="Alma\MonthlyPayments\Observer\CheckoutSubmitAllAfter" />
+    </event>
 </config>
