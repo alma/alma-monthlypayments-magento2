@@ -4,5 +4,8 @@
     <table name="quote_item" resource="checkout" comment="Sales Flat Quote Item">
         <column xsi:type="varchar" length="1024" name="alma_insurance" nullable="true" comment="Alma insurance"/>
     </table>
+    <table name="sales_order_item" resource="sales" comment="Sales Flat Quote Item">
+        <column xsi:type="varchar" length="1024" name="alma_insurance" nullable="true" comment="Alma insurance"/>
+    </table>
 
 </schema>
