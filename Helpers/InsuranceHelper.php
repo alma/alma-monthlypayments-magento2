@@ -20,6 +20,7 @@ use Magento\Quote\Model\Quote\Item;
 class InsuranceHelper extends AbstractHelper
 {
     const ALMA_INSURANCE_SKU = 'alma_insurance';
+    const ALMA_INSURANCE_DB_KEY = 'alma_insurance';
     const ALMA_PRODUCT_WITH_INSURANCE_TYPE = 'product_with_alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
     const CONFIG_IFRAME_URL = 'https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
