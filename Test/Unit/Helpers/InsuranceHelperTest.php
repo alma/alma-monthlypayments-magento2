@@ -5,6 +5,8 @@ namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 use Alma\API\Client;
 use Alma\API\Endpoints\Insurance;
 use Alma\API\Entities\Insurance\Contract;
+use Alma\API\Entities\Insurance\Subscriber;
+use Alma\API\Entities\Insurance\Subscription;
 use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
@@ -20,6 +22,9 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
+use Magento\Sales\Model\Order\Item as OrderItem;
+use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 use PHPUnit\Framework\TestCase;
 
 class InsuranceHelperTest extends TestCase
@@ -357,9 +362,9 @@ class InsuranceHelperTest extends TestCase
     public function testIfNoInsuranceProductToRemoveReturnNull()
     {
         $linkToken = 'toremove';
-        $insuranceToKeep = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'tokeep');
-        $productWithInsurance = $this->itemFactory('SKU1', 'toremove');
-        $productWithoutInsurance = $this->itemFactory('SKU2');
+        $insuranceToKeep = $this->quoteItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'tokeep');
+        $productWithInsurance = $this->quoteItemFactory('SKU1', 'toremove');
+        $productWithoutInsurance = $this->quoteItemFactory('SKU2');
         $quoteItems = [
             $productWithInsurance,
             $insuranceToKeep,
@@ -372,10 +377,10 @@ class InsuranceHelperTest extends TestCase
     public function testGetInsuranceProductWithALinkToken()
     {
         $linkToken = 'toremove';
-        $insuranceToKeep = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'tokeep');
-        $insuranceToRemove = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'toremove');
-        $productWithInsurance = $this->itemFactory('SKU1', 'toremove');
-        $productWithoutInsurance = $this->itemFactory('SKU2');
+        $insuranceToKeep = $this->quoteItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'tokeep');
+        $insuranceToRemove = $this->quoteItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'toremove');
+        $productWithInsurance = $this->quoteItemFactory('SKU1', 'toremove');
+        $productWithoutInsurance = $this->quoteItemFactory('SKU2');
         $quoteItems = [
             $productWithInsurance,
             $insuranceToKeep,
@@ -389,10 +394,10 @@ class InsuranceHelperTest extends TestCase
     public function testGetProductWithInsuranceWithALinkToken()
     {
         $linkToken = 'linkproduct';
-        $insuranceProduct = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'insurance_product');
-        $insurance = $this->itemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'linkproduct');
-        $productWithInsurance = $this->itemFactory('SKU1', 'linkproduct');
-        $productWithoutInsurance = $this->itemFactory('SKU2');
+        $insuranceProduct = $this->quoteItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'insurance_product');
+        $insurance = $this->quoteItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, 'linkproduct');
+        $productWithInsurance = $this->quoteItemFactory('SKU1', 'linkproduct');
+        $productWithoutInsurance = $this->quoteItemFactory('SKU2');
         $quoteItems = [
             $productWithoutInsurance,
             $insurance,
@@ -406,8 +411,7 @@ class InsuranceHelperTest extends TestCase
     public function testGetProductReturnNullWithEmptyQuoteItem()
     {
         $linkToken = 'toremove';
-        $quoteItems = [
-        ];
+        $quoteItems = [];
         $result = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
         $this->assertNull($result);
     }
@@ -473,7 +477,7 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($expected, $this->insuranceHelper->hasInsuranceInRequest());
     }
 
-    public function testGetInsuranceProductReturnNullIfPhpClientTrownException():void
+    public function testGetInsuranceProductReturnNullIfPhpClientThrowException(): void
     {
         $insuranceId = 'alm_insurance_id123456789';
         $item = $this->createMock(Product::class);
@@ -487,7 +491,7 @@ class InsuranceHelperTest extends TestCase
         $this->assertNull($this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
     }
 
-    public function testGetInsuranceProductReturnInsuranceProduct():void
+    public function testGetInsuranceProductReturnInsuranceProduct(): void
     {
         $insuranceId = 'alm_insurance_id123456789';
         $parentName = 'fusion back pack';
@@ -515,7 +519,86 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
     }
 
-    public function insuranceInRequest():array
+    public function testGetSubscriptionDataReturnMustBeAnArray(): void
+    {
+        $itemWithoutInsurance1 = $this->invoiceItemFactory('mySku1');
+        $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
+        $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithoutInsurance1, $itemWithoutInsurance2]);
+        $this->assertIsArray($this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $this->subscriberFactory()));
+    }
+
+    public function testForCollectionWithoutProductWithInsuranceReturnMustBeAnEmptyArray(): void
+    {
+        $itemWithoutInsurance1 = $this->invoiceItemFactory('mySku1');
+        $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
+        $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithoutInsurance1, $itemWithoutInsurance2]);
+        $this->assertEmpty($this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $this->subscriberFactory()));
+    }
+
+    public function testForCollectionProductWithInsuranceReturnSubscriptionArray(): void
+    {
+        $subscriber = $this->subscriberFactory();
+        $itemWithInsurance1 = $this->invoiceItemFactory('mySku', true);
+        $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
+        $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true);
+        $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithInsurance1,$itemInsurance, $itemWithoutInsurance2]);
+        $subscription = $this->subscriptionFactory($subscriber);
+        $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
+        $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
+        $this->assertEquals([$subscription], $subscriptionArray);
+    }
+
+    private function subscriptionFactory(Subscriber $subscriber): Subscription
+    {
+        return new Subscription(
+            'contract_id_123',
+            'mySku',
+            '12012',
+            $subscriber
+        );
+    }
+
+    private function newCollectionFactory(array $items): Collection
+    {
+        $itemsCollection = $this->createMock(Collection::class);
+        $iterator = new \ArrayIterator($items);
+        $itemsCollection->method('getIterator')->willReturn($iterator);
+        return $itemsCollection;
+    }
+
+    /**
+     * @return InvoiceItem
+     */
+    private function invoiceItemFactory(string $sku, bool $hasInsuranceData = false): InvoiceItem
+    {
+        $invoiceItem = $this->createMock(InvoiceItem::class);
+        $orderItem = $this->createMock(OrderItem::class);
+        if ($hasInsuranceData) {
+            $orderItem->method('getData')->willReturn($this->getInsuranceData('1234'));
+            $orderItem->method('getOriginalPrice')->willReturn(120.12);
+        }
+        $invoiceItem->method('getSku')->willReturn($sku);
+        $invoiceItem->method('getOrderItem')->willReturn($orderItem);
+        return $invoiceItem;
+    }
+
+    private function subscriberFactory(): Subscriber
+    {
+        return new Subscriber(
+            'test@almapay.com',
+            '0601020304',
+            'John',
+            'Doe',
+            'Rue des petites ecuries',
+            '',
+            '75010',
+            'Paris',
+            'France',
+            ''
+        );
+    }
+
+    public function insuranceInRequest(): array
     {
         return [
             'No insurance in request' => [
@@ -538,7 +621,7 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":1,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
+        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
     }
 
     private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string
@@ -546,17 +629,18 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":1,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
+        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
     }
 
 
-    private function itemFactory(string $sku, string $linkToken = null): Item
+    private function quoteItemFactory(string $sku, string $linkToken = null): Item
     {
         $item = $this->createMock(Item::class);
         $item->method('getSku')->willReturn($sku);
         $item->method('getData')->willReturn($this->getInsuranceData($linkToken));
         return $item;
     }
+
 
     private function createNewInsuranceHelper(): InsuranceHelper
     {

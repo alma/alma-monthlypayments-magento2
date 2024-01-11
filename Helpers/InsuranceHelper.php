@@ -2,6 +2,8 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\API\Entities\Insurance\Subscriber;
+use Alma\API\Entities\Insurance\Subscription;
 use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
@@ -16,6 +18,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 
 class InsuranceHelper extends AbstractHelper
 {
@@ -36,7 +39,6 @@ class InsuranceHelper extends AbstractHelper
     const PRODUCT_PRICE_PARAM_KEY = 'product_price';
 
     const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
-
 
     /**
      * @var ProductRepository
@@ -83,8 +85,7 @@ class InsuranceHelper extends AbstractHelper
         ConfigHelper            $configHelper,
         CartRepositoryInterface $cartRepository,
         AlmaClient              $almaClient
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -120,7 +121,8 @@ class InsuranceHelper extends AbstractHelper
      * Set alma_insurance in DB
      *
      * @param Item $quoteItem
-     * @param array $data
+     * @param array|null $data
+     * @param string|null $type
      * @return Item
      */
     public function setAlmaInsuranceToQuoteItem(Item $quoteItem, array $data = null, string $type = null): Item
@@ -136,6 +138,8 @@ class InsuranceHelper extends AbstractHelper
     }
 
     /**
+     * @param ProductInterface $addedItemToQuote
+     * @param string $insuranceId
      * @return InsuranceProduct|null
      */
     public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId): ?InsuranceProduct
@@ -155,9 +159,12 @@ class InsuranceHelper extends AbstractHelper
         return new InsuranceProduct($insuranceContract, $parentName);
     }
 
-    public function hasInsuranceInRequest():bool
+    /**
+     * @return bool
+     */
+    public function hasInsuranceInRequest(): bool
     {
-        return  (bool)$this->request->getParam('alma_insurance_id');
+        return (bool)$this->request->getParam('alma_insurance_id');
     }
 
     /**
@@ -185,6 +192,9 @@ class InsuranceHelper extends AbstractHelper
         return (hash('sha256', $productId . time() . $insuranceId));
     }
 
+    /**
+     * @return string
+     */
     public function getIframeUrlWithParams(): string
     {
         $configArray = $this->getConfig()->getArrayConfig();
@@ -198,6 +208,10 @@ class InsuranceHelper extends AbstractHelper
         return self::CONFIG_IFRAME_URL . $uri;
     }
 
+    /**
+     * @param array $items
+     * @return array
+     */
     public function reorderMiniCart(array $items): array
     {
         foreach ($items as $key => $item) {
@@ -208,6 +222,11 @@ class InsuranceHelper extends AbstractHelper
         return $items;
     }
 
+    /**
+     * @param string $linkToken
+     * @param array $quoteItems
+     * @return Item|null
+     */
     public function getInsuranceProductToRemove(string $linkToken, array $quoteItems): ?Item
     {
         /** @var Item $quoteItem */
@@ -223,6 +242,11 @@ class InsuranceHelper extends AbstractHelper
         return null;
     }
 
+    /**
+     * @param string $linkToken
+     * @param array $quoteItems
+     * @return Item|null
+     */
     public function getProductLinkedToInsurance(string $linkToken, array $quoteItems): ?Item
     {
         /** @var Item $quoteItem */
@@ -242,6 +266,10 @@ class InsuranceHelper extends AbstractHelper
         return null;
     }
 
+    /**
+     * @param Item $quoteItem
+     * @return void
+     */
     public function removeQuoteItemFromCart(Item $quoteItem): void
     {
         $quote = $quoteItem->getQuote();
@@ -249,9 +277,40 @@ class InsuranceHelper extends AbstractHelper
         $this->cartRepository->save($quote);
     }
 
+    /**
+     * @param Item $quoteItem
+     * @return string
+     */
     public function getInsuranceName(Item $quoteItem): string
     {
         $almaInsurance = json_decode($quoteItem->getData('alma_insurance'), true);
         return $almaInsurance['name'];
+    }
+
+    /**
+     * @param Collection $itemsCollection
+     * @param Subscriber $subscriber
+     * @return array
+     */
+    public function getSubscriptionData(Collection $itemsCollection, Subscriber $subscriber): array
+    {
+        $subscriptionArray = [];
+        /** @var \Magento\Sales\Model\Order\Invoice\Item $item */
+        foreach ($itemsCollection as $item) {
+            /** @var \Magento\Sales\Model\Order\Item $orderItem */
+            $orderItem = $item->getOrderItem();
+            $insuranceData = $orderItem->getData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
+            if (!$insuranceData || $item->getSku() === InsuranceHelper::ALMA_INSURANCE_SKU) {
+                continue;
+            }
+            $insuranceData = json_decode($insuranceData, true);
+            $subscriptionArray[] = new Subscription(
+                $insuranceData['id'],
+                $item->getSku(),
+                Functions::priceToCents($orderItem->getOriginalPrice()),
+                $subscriber
+            );
+        }
+        return $subscriptionArray;
     }
 }
