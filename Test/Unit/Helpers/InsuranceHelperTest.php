@@ -22,6 +22,8 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Sales\Model\Order\Address;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 use Magento\Sales\Model\Order\Item as OrderItem;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
@@ -548,6 +550,21 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals([$subscription], $subscriptionArray);
     }
 
+    public function testGetSubscriberWithInvoice(): void
+    {
+        $subscriber = $this->subscriberFactory();
+        $billingAddress = $this->createMock(Address::class);
+        $billingAddress->method('getEmail')->willReturn('test@almapay.com');
+        $billingAddress->method('getTelephone')->willReturn('0601020304');
+        $billingAddress->method('getFirstname')->willReturn('Doe');
+        $billingAddress->method('getLastname')->willReturn('John');
+        $billingAddress->method('getStreet')->willReturn(['Rue des petites ecuries','ligne 2']);
+        $billingAddress->method('getPostcode')->willReturn('75010');
+        $billingAddress->method('getCity')->willReturn('Paris');
+        $billingAddress->method('getCountryId')->willReturn('FR');
+        $this->assertEquals($subscriber, $this->insuranceHelper->getSubscriberByAddress($billingAddress));
+    }
+
     private function subscriptionFactory(Subscriber $subscriber): Subscription
     {
         return new Subscription(
@@ -590,11 +607,11 @@ class InsuranceHelperTest extends TestCase
             'John',
             'Doe',
             'Rue des petites ecuries',
-            '',
+            'ligne 2',
             '75010',
             'Paris',
-            'France',
-            ''
+            'FR',
+            null
         );
     }
 

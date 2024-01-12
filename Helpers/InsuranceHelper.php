@@ -18,6 +18,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Sales\Model\Order\Address;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 
 class InsuranceHelper extends AbstractHelper
@@ -85,7 +87,8 @@ class InsuranceHelper extends AbstractHelper
         ConfigHelper            $configHelper,
         CartRepositoryInterface $cartRepository,
         AlmaClient              $almaClient
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -285,6 +288,27 @@ class InsuranceHelper extends AbstractHelper
     {
         $almaInsurance = json_decode($quoteItem->getData('alma_insurance'), true);
         return $almaInsurance['name'];
+    }
+
+    /**
+     * @param Address $billingAddress
+     * @return Subscriber
+     */
+    public function getSubscriberByAddress(Address $billingAddress): Subscriber
+    {
+        $streetArray = $billingAddress->getStreet();
+        return new Subscriber(
+            $billingAddress->getEmail(),
+            $billingAddress->getTelephone(),
+            $billingAddress->getLastname(),
+            $billingAddress->getFirstname(),
+            array_key_exists(0, $streetArray) ? $streetArray[0] : '',
+            array_key_exists(0, $streetArray) ? $streetArray[1] : '',
+            $billingAddress->getPostcode(),
+            $billingAddress->getCity(),
+            $billingAddress->getCountryId()
+        );
+
     }
 
     /**
