@@ -92,7 +92,7 @@
                 if (!madeChoiceForInsurance){
                     e.preventDefault();
                     //sendDataToWidget()
-                    openModal('popupModal');
+                    openModal('popupModal', document.getElementById('qty').value);
                     madeChoiceForInsurance = true;
                     isAddToCartFlow = true;
                 }
