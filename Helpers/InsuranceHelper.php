@@ -303,7 +303,7 @@ class InsuranceHelper extends AbstractHelper
             $billingAddress->getLastname(),
             $billingAddress->getFirstname(),
             array_key_exists(0, $streetArray) ? $streetArray[0] : '',
-            array_key_exists(0, $streetArray) ? $streetArray[1] : '',
+            array_key_exists(1, $streetArray) ? $streetArray[1] : '',
             $billingAddress->getPostcode(),
             $billingAddress->getCity(),
             $billingAddress->getCountryId()

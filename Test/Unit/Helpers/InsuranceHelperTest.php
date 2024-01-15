@@ -558,7 +558,7 @@ class InsuranceHelperTest extends TestCase
         $billingAddress->method('getTelephone')->willReturn('0601020304');
         $billingAddress->method('getFirstname')->willReturn('Doe');
         $billingAddress->method('getLastname')->willReturn('John');
-        $billingAddress->method('getStreet')->willReturn(['Rue des petites ecuries','ligne 2']);
+        $billingAddress->method('getStreet')->willReturn(['Rue des petites ecuries']);
         $billingAddress->method('getPostcode')->willReturn('75010');
         $billingAddress->method('getCity')->willReturn('Paris');
         $billingAddress->method('getCountryId')->willReturn('FR');
@@ -607,7 +607,7 @@ class InsuranceHelperTest extends TestCase
             'John',
             'Doe',
             'Rue des petites ecuries',
-            'ligne 2',
+            '',
             '75010',
             'Paris',
             'FR',

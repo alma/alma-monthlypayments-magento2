@@ -36,4 +36,7 @@
     <event name="checkout_submit_all_after">
         <observer name="alma_insurance_checkout_submit_all_after" instance="Alma\MonthlyPayments\Observer\CheckoutSubmitAllAfter" />
     </event>
+    <event name="sales_order_invoice_pay">
+        <observer name="alma_insurance_sales_order_invoice_pay" instance="Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver" />
+    </event>
 </config>
