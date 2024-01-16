@@ -54,10 +54,6 @@ define([
         },
         refreshWidget: function (basePrice, productID, merchantId){
             var regularPrice = getProductRegularPrice(basePrice, productID);
-            console.log('widgetSku' + widgetSku)
-            console.log('regularPrice' + regularPrice)
-            console.log('merchantId' + merchantId)
-            console.log('qty' + qty)
             getproductDataForApiCall(widgetSku,regularPrice, merchantId, qty)
         }
     };
