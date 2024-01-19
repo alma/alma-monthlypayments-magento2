@@ -29,6 +29,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
+use Magento\Checkout\Model\Session;
 use Magento\ConfigurableProduct\Model\Product\Configuration\Item\ItemProductResolver;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
@@ -56,6 +57,10 @@ class AddToCartInsuranceObserver implements ObserverInterface
      * @var RequestInterface
      */
     private $request;
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
 
     /**
      * @param InsuranceHelper $insuranceHelper
@@ -65,12 +70,14 @@ class AddToCartInsuranceObserver implements ObserverInterface
         InsuranceHelper $insuranceHelper,
         Logger $logger,
         RequestInterface $request,
-        ItemProductResolver $configurableItemProductResolver
+        ItemProductResolver $configurableItemProductResolver,
+        Session $checkoutSession
     ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
         $this->configurableItemProductResolver = $configurableItemProductResolver;
         $this->request = $request;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function execute(Observer $observer)
@@ -84,6 +91,8 @@ class AddToCartInsuranceObserver implements ObserverInterface
         try {
             /** @var Item $addedItemToQuote */
             $addedItemToQuote = $observer->getData('quote_item');
+            $this->logger->info(' $this->checkoutSession->getQuoteId()->getEntityId();', [ $this->checkoutSession->getQuote()->getEntityId()]);
+            $this->logger->info('$addedItemToQuote->getQuoteId()', [$addedItemToQuote->getQuoteId()]);
 
             if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
                 $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()->getSku()]);
@@ -94,8 +103,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
             if (!$insuranceId) {
                 return;
             }
-
-            $insuranceObject = $this->insuranceHelper->getInsuranceProduct($this->configurableItemProductResolver->getFinalProduct($addedItemToQuote), $insuranceId);
+            $insuranceObject = $this->insuranceHelper->getInsuranceProduct($this->configurableItemProductResolver->getFinalProduct($addedItemToQuote), $insuranceId, $addedItemToQuote->getQuoteId());
             if (!$insuranceObject) {
                 return;
             }

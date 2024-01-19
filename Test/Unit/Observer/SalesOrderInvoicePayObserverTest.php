@@ -9,8 +9,10 @@ use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver;
+use Magento\Customer\Model\Session;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Invoice;
 use PHPUnit\Framework\TestCase;
@@ -31,12 +33,18 @@ class SalesOrderInvoicePayObserverTest extends TestCase
      * @var AlmaClient
      */
     private $almaClient;
+    /**
+     * @var Session
+     */
+    private $session;
 
     protected function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
         $this->insuranceHelper = $this->createMock(InsuranceHelper::class);
         $this->almaClient = $this->createMock(AlmaClient::class);
+        $this->session = $this->createMock(Session::class);
+
     }
 
     public function testObserverMustCallGetSubscriberAndSubscriptionDataAndNullSubscriptionNotCallAlmaClient(): void
@@ -55,23 +63,35 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->almaClient->expects($this->never())->method('getDefaultClient');
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
     }
+
     public function testObserverMustCallGetSubscriberAndSubscriptionDataAndCallAlmaClient(): void
     {
         $billingAddress = $this->createMock(Address::class);
         $itemsInvoiceCollection = $this->createMock(Collection::class);
+
         $invoice = $this->createMock(Invoice::class);
         $invoice->method('getBillingAddress')->willReturn($billingAddress);
         $invoice->method('getItems')->willReturn($itemsInvoiceCollection);
+
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getQuoteId')->willReturn('42');
+        $invoice->method('getOrder')->willReturn($orderMock);
+
         $event = $this->createMock(Event::class);
         $event->method('getData')->willReturn($invoice);
+
         $observer = $this->createMock(Observer::class);
         $observer->method('getEvent')->willReturn($event);
+
         $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress');
         $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([$this->subscriberFactory()]);
+
         $insuranceEndpoint = $this->createMock(Insurance::class);
-        $insuranceEndpoint->expects($this->once())->method('subscription');
+        $insuranceEndpoint->expects($this->once())->method('subscription')->with([$this->subscriberFactory()], null, null, '42');
+
         $client = $this->createMock(Client::class);
         $client->insurance = $insuranceEndpoint;
+
         $this->almaClient->expects($this->once())->method('getDefaultClient')->willReturn($client);
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
     }
@@ -86,9 +106,11 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         return [
             $this->logger,
             $this->insuranceHelper,
-            $this->almaClient
+            $this->almaClient,
+            $this->session
         ];
     }
+
     private function subscriberFactory(): Subscriber
     {
         return new Subscriber(

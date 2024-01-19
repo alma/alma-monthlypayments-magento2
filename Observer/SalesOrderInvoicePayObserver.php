@@ -27,9 +27,9 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
     private $almaClient;
 
     public function __construct(
-        Logger $logger,
+        Logger          $logger,
         InsuranceHelper $insuranceHelper,
-        AlmaClient $almaClient
+        AlmaClient      $almaClient
     )
     {
         $this->logger = $logger;
@@ -58,8 +58,8 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
         $this->logger->info('$subscriptionArray', [$subscriptionArray]);
         try {
-            if(count($subscriptionArray) > 0) {
-               $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray);
+            if (count($subscriptionArray) > 0) {
+                $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
                 $this->logger->info('$return', [$return]);
             }
         } catch (AlmaException $e) {

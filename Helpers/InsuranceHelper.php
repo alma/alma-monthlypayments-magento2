@@ -11,6 +11,7 @@ use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
+use Magento\Customer\Model\Session;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
@@ -19,7 +20,6 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Model\Order\Address;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 
 class InsuranceHelper extends AbstractHelper
@@ -39,7 +39,8 @@ class InsuranceHelper extends AbstractHelper
     const MERCHANT_ID_PARAM_KEY = 'merchant_id';
     const CMS_REF_PARAM_KEY = 'cms_reference';
     const PRODUCT_PRICE_PARAM_KEY = 'product_price';
-
+    const CUSTOMER_SESSION_ID_PARAM_KEY = 'customer_session_id';
+    const CUSTOMER_CART_ID_PARAM_KEY = 'cart_id';
     const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
 
     /**
@@ -70,6 +71,10 @@ class InsuranceHelper extends AbstractHelper
      * @var AlmaClient
      */
     private $almaClient;
+    /**
+     * @var Session
+     */
+    private $session;
 
     /**
      * @param Context $context
@@ -77,6 +82,10 @@ class InsuranceHelper extends AbstractHelper
      * @param ProductRepository $productRepository
      * @param Logger $logger
      * @param Json $json
+     * @param ConfigHelper $configHelper
+     * @param CartRepositoryInterface $cartRepository
+     * @param AlmaClient $almaClient
+     * @param Session $session
      */
     public function __construct(
         Context                 $context,
@@ -86,9 +95,9 @@ class InsuranceHelper extends AbstractHelper
         Json                    $json,
         ConfigHelper            $configHelper,
         CartRepositoryInterface $cartRepository,
-        AlmaClient              $almaClient
-    )
-    {
+        AlmaClient              $almaClient,
+        Session                 $session
+    ) {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -97,6 +106,7 @@ class InsuranceHelper extends AbstractHelper
         $this->configHelper = $configHelper;
         $this->cartRepository = $cartRepository;
         $this->almaClient = $almaClient;
+        $this->session = $session;
     }
 
     /**
@@ -143,16 +153,22 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @param ProductInterface $addedItemToQuote
      * @param string $insuranceId
+     * @param string|null $quoteId
      * @return InsuranceProduct|null
      */
-    public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId): ?InsuranceProduct
+    public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId, ?string $quoteId = null): ?InsuranceProduct
     {
         $parentName = $addedItemToQuote->getName();
         $parentSku = $addedItemToQuote->getSku();
         $parentRegularPrice = $addedItemToQuote->getPrice();
-
         try {
-            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract($insuranceId, $parentSku, Functions::priceToCents($parentRegularPrice));
+            $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract(
+                $insuranceId,
+                $parentSku,
+                Functions::priceToCents($parentRegularPrice),
+                $this->session->getSessionId(),
+                $quoteId
+            );
         } catch (AlmaException $e) {
             $this->logger->error('Get insurance Exception', [$e, $e->getMessage()]);
             return null;
@@ -308,7 +324,6 @@ class InsuranceHelper extends AbstractHelper
             $billingAddress->getCity(),
             $billingAddress->getCountryId()
         );
-
     }
 
     /**

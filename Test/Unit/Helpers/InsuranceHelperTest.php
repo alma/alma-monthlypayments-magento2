@@ -16,6 +16,7 @@ use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
+use Magento\Customer\Model\Session;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -23,7 +24,6 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Model\Order\Address;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 use Magento\Sales\Model\Order\Item as OrderItem;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
@@ -74,6 +74,7 @@ class InsuranceHelperTest extends TestCase
      *
      */
     private $almaClient;
+    private $session;
 
     protected function setUp(): void
     {
@@ -85,6 +86,7 @@ class InsuranceHelperTest extends TestCase
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
         $this->almaClient = $this->createMock(AlmaClient::class);
+        $this->session = $this->createMock(Session::class);
         $this->insuranceHelper = $this->createNewInsuranceHelper();
     }
 
@@ -98,7 +100,8 @@ class InsuranceHelperTest extends TestCase
             $this->jsonMock,
             $this->configHelper,
             $this->cartRepository,
-            $this->almaClient
+            $this->almaClient,
+            $this->session
         ];
     }
 
@@ -489,7 +492,6 @@ class InsuranceHelperTest extends TestCase
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
-
         $this->assertNull($this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
     }
 
@@ -517,8 +519,8 @@ class InsuranceHelperTest extends TestCase
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
-
-        $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
+        $quoteId  = '42';
+        $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct($item, $insuranceId, $quoteId));
     }
 
     public function testGetSubscriptionDataReturnMustBeAnArray(): void
