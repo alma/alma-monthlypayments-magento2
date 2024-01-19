@@ -6,6 +6,9 @@
 ?>
 <?php if ($widgetIsActivated) { ?>
 <script type="module" src="<?= $block->getScriptUrl()?>"></script>
+    <div> <?= $block->getQuoteId()?></div>
+    <div> <?= $block->getCustomerSessionId()?></div>
+    <div> <?= $block->getCustomerSessionDuration()?></div>
     <iframe id="product-alma-iframe" class="alma-insurance-iframe" scrolling="no" src="<?= $block->getIframeUrl()?>"></iframe>
     <input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="">
     <input type="hidden" name="alma_insurance_name" form="product_addtocart_form" value="">
@@ -25,6 +28,7 @@
         ) {
             utils.setSkuForWifget('<?= $block->getBaseProductSku() ?>')
             var cart = customerData.get('cart');
+            console.log(customerData.sessionId);
             var baseCount = null;
             cart.subscribe(function () {
                 if (baseCount !== null && cart().summary_count !== baseCount) {
@@ -82,7 +86,9 @@
                     utils.refreshWidget(
                         '<?= $block->getProductPriceInCent() ?>',
                         '<?= $block->getBaseProductId() ?>',
-                        '<?= $block->getMerchantId()?>'
+                        '<?= $block->getMerchantId()?>',
+                        '<?= $block->getQuoteId()?>',
+                        '<?= $block->getCustomerSessionId()?>'
                     );
                 }
             });

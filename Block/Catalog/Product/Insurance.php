@@ -43,6 +43,10 @@ class Insurance extends ProductView
      * @var Data
      */
     private $configurableHelper;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutSession;
 
     /**
      * @param Context $context
@@ -60,24 +64,24 @@ class Insurance extends ProductView
      * @param array $data
      */
     public function __construct(
-        Context                    $context,
-        EncoderInterface           $urlEncoder,
-        jsonEncoderInterface       $jsonEncoder,
-        StringUtils                $string,
-        Product                    $productHelper,
-        ConfigInterface            $productTypeConfig,
-        FormatInterface            $localeFormat,
-        Session                    $customerSession,
-        ProductRepositoryInterface $productRepository,
-        PriceCurrencyInterface     $priceCurrency,
-        Logger                     $logger,
-        InsuranceHelper            $insuranceHelper,
-        ApiConfigHelper            $apiConfigHelper,
-        Config                     $config,
-        Data                       $configurableHelper,
-        array                      $data = []
-    )
-    {
+        Context                         $context,
+        EncoderInterface                $urlEncoder,
+        jsonEncoderInterface            $jsonEncoder,
+        StringUtils                     $string,
+        Product                         $productHelper,
+        ConfigInterface                 $productTypeConfig,
+        FormatInterface                 $localeFormat,
+        Session                         $customerSession,
+        ProductRepositoryInterface      $productRepository,
+        PriceCurrencyInterface          $priceCurrency,
+        Logger                          $logger,
+        InsuranceHelper                 $insuranceHelper,
+        ApiConfigHelper                 $apiConfigHelper,
+        Config                          $config,
+        Data                            $configurableHelper,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        array                           $data = []
+    ) {
         parent::__construct(
             $context,
             $urlEncoder,
@@ -96,6 +100,8 @@ class Insurance extends ProductView
         $this->apiConfigHelper = $apiConfigHelper;
         $this->config = $config;
         $this->configurableHelper = $configurableHelper;
+        $this->customerSession = $customerSession;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function isActivatedWidgetInProductPage(): bool
@@ -117,7 +123,9 @@ class Insurance extends ProductView
             $path . '?' .
             InsuranceHelper::CMS_REF_PARAM_KEY . '=' . $this->getBaseProductSku() . '&' .
             InsuranceHelper::PRODUCT_PRICE_PARAM_KEY . '=' . $this->getProductPriceInCent() . '&' .
-            InsuranceHelper::MERCHANT_ID_PARAM_KEY . '=' . $this->getMerchantId();
+            InsuranceHelper::MERCHANT_ID_PARAM_KEY . '=' . $this->getMerchantId() . '&' .
+            InsuranceHelper::CUSTOMER_SESSION_ID_PARAM_KEY . '=' . $this->getCustomerSessionId() . '&' .
+            InsuranceHelper::CUSTOMER_CART_ID_PARAM_KEY . '=' . $this->getQuoteId();
     }
 
     public function getScriptUrl(): string
@@ -134,6 +142,22 @@ class Insurance extends ProductView
             $host = InsuranceHelper::PRODUCTION_IFRAME_HOST_URL;
         }
         return $host;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCustomerSessionId(): ?string
+    {
+        return $this->customerSession->getSessionId();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getQuoteId(): ?string
+    {
+        return $this->checkoutSession->getQuoteId();
     }
 
     public function getMerchantId(): string
