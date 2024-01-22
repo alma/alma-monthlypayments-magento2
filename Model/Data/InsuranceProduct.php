@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Model\Data;
 
 use Alma\API\Entities\Insurance\Contract;
+use Alma\API\Entities\Insurance\File;
 
 class InsuranceProduct
 {
@@ -73,7 +74,8 @@ class InsuranceProduct
             'price' => $this->getPrice(),
             'duration_year' => $this->getDurationYear(),
             'link' => $this->linkToken,
-            'parent_name' => $this->parentName
+            'parent_name' => $this->parentName,
+            'files' => $this->getFiles()
         ];
     }
 
@@ -110,5 +112,18 @@ class InsuranceProduct
     public function getContract(): Contract
     {
         return $this->contract;
+    }
+
+    public function getFiles(): array
+    {
+        $filesArray= [];
+        /** @var File $file */
+        foreach ($this->contract->getFiles() as $file) {
+            $fileArray['name'] = $file->getName();
+            $fileArray['type'] = $file->getType();
+            $fileArray['url'] = $file->getPublicUrl();
+            $filesArray[] = $fileArray;
+        }
+        return $filesArray;
     }
 }

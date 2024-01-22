@@ -16,7 +16,7 @@
                                     'value': agreementId
                                     }"/>
                 <label class="label" data-bind="attr: {'for': $parent.getCheckboxId($parentContext, agreementId)}">
-                        <span data-bind="html: checkboxText"></span>
+                        <span data-bind="html: $parent.getCheckboxesText()"></span>
                 </label>
             </div>
             <!-- /ko -->

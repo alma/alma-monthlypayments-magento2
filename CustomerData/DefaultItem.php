@@ -19,7 +19,11 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
 		$result['hasInsurance'] = $this->hasInsurance();
 		$result['isInsuranceProduct'] = $this->isInsuranceProduct();
 		$result['isProductWithInsurance'] = $this->isProductWithInsurance();
+        if ($this->hasInsurance()){
 
+            $insuranceData = json_decode($this->item->getAlmaInsurance(),true);
+            $result['insuranceFiles'] = $insuranceData['files'];
+        }
         if ($this->isInsuranceProduct()) {
             $result['product_name'] = $insuranceHelper->getInsuranceName($this->item);
         }
