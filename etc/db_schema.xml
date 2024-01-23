@@ -7,4 +7,26 @@
     <table name="sales_order_item" resource="sales" comment="Alma insurance Data in Order Item">
         <column xsi:type="blob" name="alma_insurance" nullable="true" comment="Alma insurance"/>
     </table>
+
+    <table name="alma_insurance_subscription" resource="checkout" comment="Alma insurance subscriptions">
+        <column xsi:type="int" name="entity_id" identity="true" comment="Auto increment ID"/>
+        <column xsi:type="int" name="order_id" nullable="false" unsigned="true" comment="Subscription Order id"/>
+        <column xsi:type="varchar" name="subscription_id" nullable="false" length="255" comment="Alma subscription ID"/>
+        <column xsi:type="int" name="subscription_price" nullable="false" unsigned="true" comment="Alma subscription ID"/>
+        <column xsi:type="varchar" name="contract_id" nullable="false" length="255"  comment="Alma subscription ID"/>
+        <column xsi:type="varchar" name="cms_reference" nullable="false" length="255" comment="Alma subscription ID"/>
+        <column xsi:type="varchar" name="state" nullable="false" length="255" comment="Subscription state"/>
+        <column xsi:type="varchar" name="mode" nullable="false" length="10" comment="Subscription mode live/test"/>
+        <column xsi:type="datetime" name="cancellation_date" nullable="true" comment="Cancellation date"/>
+        <column xsi:type="varchar" name="cancellation_reason" nullable="true" length="255" comment="Cancellation reason"/>
+        <column xsi:type="boolean" name="is_refunded" default="false" comment="Confirm subscription refund"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="ALMA_SUBSCRIPTION_ORDER_ID_SALES_ORDER_ENTITY_ID" table="alma_insurance_subscription" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="SUBSCRIPTION_EXTERNAL_ID" indexType="btree">
+            <column name="subscription_id" />
+        </index>
+
+    </table>
 </schema>
