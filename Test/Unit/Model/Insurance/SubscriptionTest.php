@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 class SubscriptionTest extends TestCase
 {
 
-    const SUBSCRIPTION_ID = 'subscription_123';
     const ORDER_ID = 123;
+    const SUBSCRIPTION_ID = 'subscription_123';
     const SUBSCRIPTION_PRICE = 12300;
     const CONTRACT_ID = 'contract_1234';
     const CMS_REFERENCE = 'M24-045';

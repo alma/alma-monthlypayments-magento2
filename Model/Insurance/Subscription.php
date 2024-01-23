@@ -8,7 +8,7 @@ use Magento\Framework\Model\AbstractModel;
 class Subscription extends AbstractModel implements IdentityInterface
 {
     const ID_KEY = 'entity_id';
-    const ORDER_ID_KEY = 'entity_id';
+    const ORDER_ID_KEY = 'order_id';
     const SUBSCRIPTION_ID_KEY = 'subscription_id';
     const SUBSCRIPTION_PRICE_KEY = 'subscription_price';
     const CONTRACT_ID_KEY = 'contract_id';
