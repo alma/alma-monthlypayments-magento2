@@ -8,6 +8,7 @@ use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
+use Alma\MonthlyPayments\Model\Insurance\SubscriptionFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
@@ -75,6 +76,10 @@ class InsuranceHelper extends AbstractHelper
      * @var Session
      */
     private $session;
+    /**
+     * @var SubscriptionFactory
+     */
+    private $subscriptionFactory;
 
     /**
      * @param Context $context
@@ -96,6 +101,7 @@ class InsuranceHelper extends AbstractHelper
         ConfigHelper            $configHelper,
         CartRepositoryInterface $cartRepository,
         AlmaClient              $almaClient,
+        SubscriptionFactory     $subscriptionFactory,
         Session                 $session
     ) {
         parent::__construct($context);
@@ -107,6 +113,7 @@ class InsuranceHelper extends AbstractHelper
         $this->cartRepository = $cartRepository;
         $this->almaClient = $almaClient;
         $this->session = $session;
+        $this->subscriptionFactory = $subscriptionFactory;
     }
 
     /**
@@ -351,5 +358,49 @@ class InsuranceHelper extends AbstractHelper
             );
         }
         return $subscriptionArray;
+    }
+
+    /**
+     * @param Collection $itemsCollection
+     * @param array $subscriptionResult
+     * @param int $orderId // same for all subscription
+     * @param string $mode // same for all subscription
+     * @return \Alma\MonthlyPayments\Model\Insurance\Subscription[]
+     */
+    public function createDbSubscriptionArrayFromItemsAndApiResult(Collection $itemsCollection, array $subscriptionResult, string $mode): array
+    {
+        $dbSubscriptionArray = [];
+        /** @var \Magento\Sales\Model\Order\Invoice\Item $item */
+        foreach ($itemsCollection as $item) {
+            if (self::ALMA_INSURANCE_SKU !== $item->getSku()) {
+                var_dump('Not insurance item continue');
+                continue;
+            }
+            $dbSubscriptionData = [];
+
+            /** @var \Alma\MonthlyPayments\Model\Insurance\Subscription $dbSubscription */
+            $dbSubscription = $this->subscriptionFactory->create();
+            $orderItem = $item->getOrderItem();
+            $orderItemInsuranceData = json_decode($orderItem->getData(self::ALMA_INSURANCE_DB_KEY), true);
+            $subscriptionResultContractData = [];
+            foreach ($subscriptionResult as $key => $result) {
+                if (array_search($orderItemInsuranceData['id'], $result)) {
+                    $subscriptionResultContractData = $result;
+                    unset($subscriptionResult[$key]);
+                    break;
+                }
+            }
+            $dbSubscription->setOrderId($orderItem->getOrderId());
+            $dbSubscription->setOrderItemId($orderItem->getItemId());
+            $dbSubscription->setName($orderItemInsuranceData['name']);
+            $dbSubscription->setSubscriptionId($subscriptionResultContractData['subscription_id']);
+            $dbSubscription->setSubscriptionPrice(intval($orderItemInsuranceData['price']));
+            $dbSubscription->setContractId($orderItemInsuranceData['id']);
+            $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
+            $dbSubscription->setSubscriptionState('Active');
+            $dbSubscription->setSubscriptionMode($mode);
+            $dbSubscriptionArray[] = clone $dbSubscription;
+        }
+        return $dbSubscriptionArray;
     }
 }

@@ -9,7 +9,9 @@ class Subscription extends AbstractModel implements IdentityInterface
 {
     const ID_KEY = 'entity_id';
     const ORDER_ID_KEY = 'order_id';
+    const ORDER_ITEM_ID_KEY = 'order_item_id';
     const SUBSCRIPTION_ID_KEY = 'subscription_id';
+    const SUBSCRIPTION_NAME_KEY = 'name';
     const SUBSCRIPTION_PRICE_KEY = 'subscription_price';
     const CONTRACT_ID_KEY = 'contract_id';
     const CMS_REFERENCE_KEY = 'cms_reference';
@@ -61,12 +63,42 @@ class Subscription extends AbstractModel implements IdentityInterface
     }
 
     /**
-     * @param string $orderId
+     * @param int $orderId
      * @return void
      */
-    public function setOrderId(string $orderId): void
+    public function setOrderId(int $orderId): void
     {
         $this->setData(self::ORDER_ID_KEY, $orderId);
+    }
+    /**
+     * @return int
+     */
+    public function getOrderItemId(): int
+    {
+        return $this->getDataByKey(self::ORDER_ITEM_ID_KEY);
+    }
+
+    /**
+     * @param int $orderItemId
+     * @return void
+     */
+    public function setOrderItemId(int $orderItemId): void
+    {
+        $this->setData(self::ORDER_ITEM_ID_KEY, $orderItemId);
+    }
+
+    public function getName(): string
+    {
+        return $this->getDataByKey(self::SUBSCRIPTION_NAME_KEY);
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function setName(string $name): void
+    {
+        $this->setData(self::SUBSCRIPTION_NAME_KEY, $name);
     }
 
     public function getSubscriptionId(): string

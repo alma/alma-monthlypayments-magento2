@@ -14,6 +14,7 @@ use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
+use Alma\MonthlyPayments\Model\Insurance\SubscriptionFactory;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Customer\Model\Session;
@@ -74,6 +75,11 @@ class InsuranceHelperTest extends TestCase
      *
      */
     private $almaClient;
+    /**
+     * @var \Alma\MonthlyPayments\Model\Insurance\SubscriptionFactory
+     *
+     */
+    private $dbSubscriptionFactory;
     private $session;
 
     protected function setUp(): void
@@ -87,6 +93,9 @@ class InsuranceHelperTest extends TestCase
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
         $this->almaClient = $this->createMock(AlmaClient::class);
         $this->session = $this->createMock(Session::class);
+        $this->dbSubscriptionFactory = $this->createMock(SubscriptionFactory::class);
+        $subscriptionMock = $this->createPartialMock(\Alma\MonthlyPayments\Model\Insurance\Subscription::class, []);
+        $this->dbSubscriptionFactory->method('create')->willReturn($subscriptionMock);
         $this->insuranceHelper = $this->createNewInsuranceHelper();
     }
 
@@ -101,6 +110,7 @@ class InsuranceHelperTest extends TestCase
             $this->configHelper,
             $this->cartRepository,
             $this->almaClient,
+            $this->dbSubscriptionFactory,
             $this->session
         ];
     }
@@ -476,9 +486,9 @@ class InsuranceHelperTest extends TestCase
      * @dataProvider insuranceInRequest
      * @return void
      */
-    public function testHasInsuranceInRequest($insurandId, $expected): void
+    public function testHasInsuranceInRequest($insuranceId, $expected): void
     {
-        $this->requestInterfaceMock->method('getParam')->willReturn($insurandId);
+        $this->requestInterfaceMock->method('getParam')->willReturn($insuranceId);
         $this->assertEquals($expected, $this->insuranceHelper->hasInsuranceInRequest());
     }
 
@@ -519,7 +529,7 @@ class InsuranceHelperTest extends TestCase
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
-        $quoteId  = '42';
+        $quoteId = '42';
         $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct($item, $insuranceId, $quoteId));
     }
 
@@ -545,7 +555,7 @@ class InsuranceHelperTest extends TestCase
         $itemWithInsurance1 = $this->invoiceItemFactory('mySku', true);
         $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
         $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true);
-        $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithInsurance1,$itemInsurance, $itemWithoutInsurance2]);
+        $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2]);
         $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
@@ -567,11 +577,57 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($subscriber, $this->insuranceHelper->getSubscriberByAddress($billingAddress));
     }
 
-    private function subscriptionFactory(Subscriber $subscriber): Subscription
+    public function testCreateDbSubscriptionWithItemCollectionAndSubscriptionApiResult(): void
+    {
+        $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
+        $itemWithInsurance1 = $this->invoiceItemFactory('mySku', true, 2, 22);
+        $itemWithInsurance2 = $this->invoiceItemFactory('mySku', true, 2, 24);
+        $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 23, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300');
+        $itemInsurance2 = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 25, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300');
+        $collectionWithInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2, $itemWithInsurance2, $itemInsurance2]);
+
+            $subscriptionResult = '{"subscriptions":[{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_298QYLM3q94luQSD34LDlr","cms_reference":"24-MB02"},{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_2333333333333333333333","cms_reference":"24-MB02"}]}';
+        $mode = 'test';
+        $expected = [
+            [
+                'order_id' => 2,
+                'order_item_id' => 23,
+                'name' => 'Alma outillage thermique 3 ans (Vol + casse)',
+                'subscription_id' => 'subscription_298QYLM3q94luQSD34LDlr',
+                'subscription_price' => 12300,
+                'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
+                'cms_reference' => '24-MB02',
+                'state' => 'Active',
+                'mode' => 'test'
+            ],
+            [
+                'order_id' => 2,
+                'order_item_id' => 25,
+                'name' => 'Alma outillage thermique 3 ans (Vol + casse)',
+                'subscription_id' => 'subscription_2333333333333333333333',
+                'subscription_price' => 12300,
+                'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
+                'cms_reference' => '24-MB02',
+                'state' => 'Active',
+                'mode' => 'test'
+            ],
+        ];
+        $arraySubscriptionResult = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult(
+            $collectionWithInsurance,
+            json_decode($subscriptionResult, true)['subscriptions'],
+            $mode
+        );
+
+        foreach ($arraySubscriptionResult as $key => $subscription) {
+            $this->assertEquals($expected[$key], $subscription->getData());
+        }
+    }
+
+    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku'): Subscription
     {
         return new Subscription(
-            'contract_id_123',
-            'mySku',
+            $contractId,
+            $sku,
             '12012',
             $subscriber
         );
@@ -588,13 +644,16 @@ class InsuranceHelperTest extends TestCase
     /**
      * @return InvoiceItem
      */
-    private function invoiceItemFactory(string $sku, bool $hasInsuranceData = false): InvoiceItem
+    private function invoiceItemFactory(string $sku, bool $hasInsuranceData = false, int $orderId = 1, int $orderItemId = 1, string $contractId = 'contract_id_123', string $price = '11'): InvoiceItem
     {
         $invoiceItem = $this->createMock(InvoiceItem::class);
         $orderItem = $this->createMock(OrderItem::class);
         if ($hasInsuranceData) {
-            $orderItem->method('getData')->willReturn($this->getInsuranceData('1234'));
+            $orderItem->method('getData')->willReturn($this->getInsuranceData('1234', $contractId, $price));
             $orderItem->method('getOriginalPrice')->willReturn(120.12);
+            $orderItem->method('getOrderId')->willReturn($orderId);
+            $orderItem->method('getItemId')->willReturn($orderItemId);
+            $orderItem->method('getSku')->willReturn($sku);
         }
         $invoiceItem->method('getSku')->willReturn($sku);
         $invoiceItem->method('getOrderItem')->willReturn($orderItem);
@@ -635,12 +694,12 @@ class InsuranceHelperTest extends TestCase
         ];
     }
 
-    private function getInsuranceData(string $linkToken = null): ?string
+    private function getInsuranceData(string $linkToken = null, string $contractId = 'contract_id_123', string $price = '11'): ?string
     {
         if (!$linkToken) {
             return null;
         }
-        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
+        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
     }
 
     private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string
