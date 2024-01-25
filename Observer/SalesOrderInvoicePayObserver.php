@@ -4,10 +4,13 @@ namespace Alma\MonthlyPayments\Observer;
 
 use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 
@@ -25,16 +28,27 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      * @var AlmaClient
      */
     private $almaClient;
+    /**
+     * @var Subscription
+     */
+    private $subscriptionResourceModel;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
 
     public function __construct(
         Logger          $logger,
         InsuranceHelper $insuranceHelper,
-        AlmaClient      $almaClient
-    )
-    {
+        AlmaClient      $almaClient,
+        Subscription    $subscriptionResourceModel,
+        ApiConfigHelper $apiConfigHelper
+    ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
         $this->almaClient = $almaClient;
+        $this->subscriptionResourceModel = $subscriptionResourceModel;
+        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -56,12 +70,28 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         $this->logger->info('$invoicedItems', [$invoicedItems]);
 
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
+
+        // Exit if no subscription in invoice
+        if (!count($subscriptionArray) > 0) {
+            return;
+        }
+
         $this->logger->info('$subscriptionArray', [$subscriptionArray]);
         try {
-            if (count($subscriptionArray) > 0) {
-                $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
-                $this->logger->info('$return', [$return]);
+            $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
+            $this->logger->info('$return', [$return]);
+            $subscriptionReturnData = json_decode($return, true);
+            if (!$subscriptionReturnData['subscriptions']) {
+                $this->logger->error('Warning No subscription data in Alma return', [$subscriptionReturnData]);
+                return;
             }
+            $subscriptionReturnData = $subscriptionReturnData['subscriptions'];
+            $dbSubscriptionToSave = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult($invoicedItems, $subscriptionReturnData, $this->apiConfigHelper->getActiveMode());
+            foreach ($dbSubscriptionToSave as $dbSubscription) {
+                $this->subscriptionResourceModel->save($dbSubscription);
+            }
+        } catch (AlreadyExistsException $e) {
+            $this->logger->error('Subscription Already Exists in Database', [$e->getMessage()]);
         } catch (AlmaException $e) {
             $this->logger->error('Impossible to Subscribe', [$e->getMessage()]);
         }

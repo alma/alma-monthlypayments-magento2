@@ -6,10 +6,11 @@ use Alma\API\Client;
 use Alma\API\Endpoints\Insurance;
 use Alma\API\Entities\Insurance\Subscriber;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Insurance\Subscription;
 use Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver;
-use Magento\Customer\Model\Session;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Model\Order;
@@ -34,16 +35,22 @@ class SalesOrderInvoicePayObserverTest extends TestCase
      */
     private $almaClient;
     /**
-     * @var Session
+     * @var ApiConfigHelper
      */
-    private $session;
+    private $apiConfigHelper;
+    /**
+     * @var \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription
+     */
+    private $subscriptionResourceModel;
+
 
     protected function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
         $this->insuranceHelper = $this->createMock(InsuranceHelper::class);
         $this->almaClient = $this->createMock(AlmaClient::class);
-        $this->session = $this->createMock(Session::class);
+        $this->subscriptionResourceModel = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription::class);
+        $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
 
     }
 
@@ -64,7 +71,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
     }
 
-    public function testObserverMustCallGetSubscriberAndSubscriptionDataAndCallAlmaClient(): void
+    public function testObserverMustCallGetSubscriberAndSubscriptionDataAndCallAlmaClientInsuranceSubscriptionAndPointAndSaveDataInDb(): void
     {
         $billingAddress = $this->createMock(Address::class);
         $itemsInvoiceCollection = $this->createMock(Collection::class);
@@ -87,12 +94,19 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([$this->subscriberFactory()]);
 
         $insuranceEndpoint = $this->createMock(Insurance::class);
-        $insuranceEndpoint->expects($this->once())->method('subscription')->with([$this->subscriberFactory()], null, null, '42');
+        $insuranceEndpoint->expects($this->once())
+            ->method('subscription')
+            ->with([$this->subscriberFactory()], null, null, '42')
+            ->willReturn('{"subscriptions":[{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_298QYLM3q94luQSD34LDlr","cms_reference":"24-MB02"},{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_2333333333333333333333","cms_reference":"24-MB02"}]}');
 
         $client = $this->createMock(Client::class);
         $client->insurance = $insuranceEndpoint;
 
         $this->almaClient->expects($this->once())->method('getDefaultClient')->willReturn($client);
+        $dbSubscription1 = $this->createMock(Subscription::class);
+        $dbSubscription2 = $this->createMock(Subscription::class);
+        $this->insuranceHelper->expects($this->once())->method('createDbSubscriptionArrayFromItemsAndApiResult')->willReturn([$dbSubscription1, $dbSubscription2]);
+        $this->subscriptionResourceModel->expects($this->exactly(2))->method('save');
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
     }
 
@@ -107,7 +121,8 @@ class SalesOrderInvoicePayObserverTest extends TestCase
             $this->logger,
             $this->insuranceHelper,
             $this->almaClient,
-            $this->session
+            $this->subscriptionResourceModel,
+            $this->apiConfigHelper,
         ];
     }
 
