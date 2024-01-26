@@ -73,6 +73,7 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
 
         // Exit if no subscription in invoice
         if (!count($subscriptionArray) > 0) {
+            $this->logger->info('No subscription in invoice', [$invoice->getIncrementId()]);
             return;
         }
 
@@ -80,13 +81,12 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         try {
             $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
             $this->logger->info('$return', [$return]);
-            $subscriptionReturnData = json_decode($return, true);
-            if (!$subscriptionReturnData['subscriptions']) {
-                $this->logger->error('Warning No subscription data in Alma return', [$subscriptionReturnData]);
+            if (!$return['subscriptions']) {
+                $this->logger->error('Warning No subscription data in Alma return', [$return]);
                 return;
             }
-            $subscriptionReturnData = $subscriptionReturnData['subscriptions'];
-            $dbSubscriptionToSave = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult($invoicedItems, $subscriptionReturnData, $this->apiConfigHelper->getActiveMode());
+            $return = $return['subscriptions'];
+            $dbSubscriptionToSave = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult($invoicedItems, $return, $this->apiConfigHelper->getActiveMode());
             foreach ($dbSubscriptionToSave as $dbSubscription) {
                 $this->subscriptionResourceModel->save($dbSubscription);
             }

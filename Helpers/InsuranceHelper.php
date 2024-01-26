@@ -30,9 +30,7 @@ class InsuranceHelper extends AbstractHelper
     const ALMA_PRODUCT_WITH_INSURANCE_TYPE = 'product_with_alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
     const CONFIG_IFRAME_URL = 'https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
-    //TODO fix with ne final host
-    const SANDBOX_IFRAME_HOST_URL = 'https://protect.staging.almapay.com';
-    //TODO fix with ne final host
+    const SANDBOX_IFRAME_HOST_URL = 'https://protect.sandbox.almapay.com';
     const PRODUCTION_IFRAME_HOST_URL = 'https://protect.almapay.com';
     const SCRIPT_IFRAME_PATH = '/displayModal.js';
     const CONFIG_IFRAME_PATH = '/almaBackOfficeConfiguration.html';
@@ -373,7 +371,6 @@ class InsuranceHelper extends AbstractHelper
         /** @var \Magento\Sales\Model\Order\Invoice\Item $item */
         foreach ($itemsCollection as $item) {
             if (self::ALMA_INSURANCE_SKU !== $item->getSku()) {
-                var_dump('Not insurance item continue');
                 continue;
             }
             $dbSubscriptionData = [];
