@@ -11,17 +11,18 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
     protected function doGetItemData(): array
     {
         $objectManager = ObjectManager::getInstance();
-        $logger= $objectManager->get(Logger::class);
-        $insuranceHelper= $objectManager->get(InsuranceHelper::class);
+        $logger = $objectManager->get(Logger::class);
+        $insuranceHelper = $objectManager->get(InsuranceHelper::class);
 
         $result = parent::doGetItemData();
 
-		$result['hasInsurance'] = $this->hasInsurance();
-		$result['isInsuranceProduct'] = $this->isInsuranceProduct();
-		$result['isProductWithInsurance'] = $this->isProductWithInsurance();
-        if ($this->hasInsurance()){
+        $result['hasInsurance'] = $this->hasInsurance();
+        $result['isInsuranceProduct'] = $this->isInsuranceProduct();
+        $result['isProductWithInsurance'] = $this->isProductWithInsurance();
+        if ($this->hasInsurance()) {
 
-            $insuranceData = json_decode($this->item->getAlmaInsurance(),true);
+            $insuranceData = json_decode($this->item->getAlmaInsurance(), true);
+            $result['insuranceName'] = $insuranceData['name'];
             $result['insuranceFiles'] = $insuranceData['files'];
         }
         if ($this->isInsuranceProduct()) {

@@ -45,6 +45,7 @@ define([
             var noticeFileUrl = ''
             var ipidFileUrl = ''
             var ficFileUrl = ''
+            var insuranceName = ''
             var cart = customerData.get('cart');
             for (var [key, item] of Object.entries(cart().items)) {
                 if (item.hasInsurance) {
@@ -63,9 +64,10 @@ define([
                                 console.log(`Sorry, type not exist ${file.type}.`);
                         }
                     })
+                    insuranceName = item.insuranceName
                 }
             }
-            return $t("By accepting to subscribe to Alma insurance, I confirm my thorough review, acceptance, and retention of the general terms outlined in the <a href='{0}' target='_blank' >information booklet</a> and the <a href='{1}' target='_blank' >insurance product details</a>. Additionally, I consent to receiving contractual information by e-mail for the purpose of securely storing it in a durable format.").replace('{0}', noticeFileUrl).replace('{1}', ficFileUrl);
+            return $t("I agree to subscribe to {0} coverage, and I confirm that I have read, accepted, and saved the <a href='{1}' target='_blank' > information notice, which constitutes the general conditions</a>, the <a href='{2}' target='_blank' >insurance product information document</a>, and <a href='{3}' target='_blank' >the pre-contractual information and advice sheet</a> before finalising my purchase and subscribing to the insurance.").replace('{0}', insuranceName).replace('{1}', noticeFileUrl).replace('{2}', ipidFileUrl).replace('{3}', ficFileUrl);
         },
 
         /**
