@@ -245,13 +245,22 @@ class InsuranceHelperTest extends TestCase
      * @dataProvider iframeHasDbGetParamsDataProvider
      * @return void
      */
-    public function testIframeHasDbGetParams($dbValue, $expectedURL): void
+    public function testIframeHasDbGetParams($dbValue, $expectedURL, string $mode): void
     {
         $this->configHelper->expects($this->exactly(2))
             ->method('getConfigByCode')
             ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH], [InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
             ->willReturn($dbValue);
-        $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams());
+        $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams($mode));
+    }
+
+    public function testScriptUrlSandbox():void
+    {
+        $this->assertEquals('https://protect.almapay.com/displayModal.js', $this->insuranceHelper->getScriptUrl('live'));
+    }
+    public function testScriptUrlLive():void
+    {
+        $this->assertEquals('https://protect.sandbox.almapay.com/displayModal.js', $this->insuranceHelper->getScriptUrl('test'));
     }
 
     private function iframeHasDbGetParamsDataProvider(): array
@@ -259,7 +268,8 @@ class InsuranceHelperTest extends TestCase
         return [
             'No params if config is empty' => [
                 'db_value' => '',
-                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL
+                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html',
+                'mode' => 'test'
             ],
             'all params are true if all is true in DB' => [
                 'db_value' => '{
@@ -268,9 +278,10 @@ class InsuranceHelperTest extends TestCase
                     "is_insurance_on_cart_page_activated":true,
                     "is_add_to_cart_popup_insurance_activated":true
                     }',
-                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL . '?is_insurance_on_product_page_activated=true' .
+                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=true' .
                     '&is_insurance_on_cart_page_activated=true' .
-                    '&is_add_to_cart_popup_insurance_activated=true'
+                    '&is_add_to_cart_popup_insurance_activated=true',
+                'mode' => 'test'
             ],
             'all params are false if all is false in DB' => [
                 'db_value' => '{
@@ -279,9 +290,10 @@ class InsuranceHelperTest extends TestCase
                     "is_insurance_on_cart_page_activated":false,
                     "is_add_to_cart_popup_insurance_activated":false
                     }',
-                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL . '?is_insurance_on_product_page_activated=false' .
+                'expectedUrl' => 'https://protect.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=false' .
                     '&is_insurance_on_cart_page_activated=false' .
-                    '&is_add_to_cart_popup_insurance_activated=false'
+                    '&is_add_to_cart_popup_insurance_activated=false',
+                'mode' => 'live'
             ],
             'params are good values' => [
                 'db_value' => '{
@@ -290,9 +302,10 @@ class InsuranceHelperTest extends TestCase
                     "is_insurance_on_cart_page_activated":true,
                     "is_add_to_cart_popup_insurance_activated":false
                     }',
-                'expectedUrl' => InsuranceHelper::CONFIG_IFRAME_URL . '?is_insurance_on_product_page_activated=false' .
+                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=false' .
                     '&is_insurance_on_cart_page_activated=true' .
-                    '&is_add_to_cart_popup_insurance_activated=false'
+                    '&is_add_to_cart_popup_insurance_activated=false',
+                'mode' => 'test'
             ],
         ];
     }

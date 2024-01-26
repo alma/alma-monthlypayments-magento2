@@ -29,7 +29,7 @@ class InsuranceHelper extends AbstractHelper
     const ALMA_INSURANCE_DB_KEY = 'alma_insurance';
     const ALMA_PRODUCT_WITH_INSURANCE_TYPE = 'product_with_alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
-    const CONFIG_IFRAME_URL = 'https://protect.staging.almapay.com/almaBackOfficeConfiguration.html';
+    const CONFIG_IFRAME_URL = '/almaBackOfficeConfiguration.html';
     const SANDBOX_IFRAME_HOST_URL = 'https://protect.sandbox.almapay.com';
     const PRODUCTION_IFRAME_HOST_URL = 'https://protect.almapay.com';
     const SCRIPT_IFRAME_PATH = '/displayModal.js';
@@ -101,7 +101,8 @@ class InsuranceHelper extends AbstractHelper
         AlmaClient              $almaClient,
         SubscriptionFactory     $subscriptionFactory,
         Session                 $session
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -219,7 +220,7 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getIframeUrlWithParams(): string
+    public function getIframeUrlWithParams($mode): string
     {
         $configArray = $this->getConfig()->getArrayConfig();
         unset($configArray['is_insurance_activated']);
@@ -229,7 +230,18 @@ class InsuranceHelper extends AbstractHelper
             $uri .= ($paramNumber === 0 ? '?' : '&') . $key . '=' . ($value ? 'true' : 'false');
             $paramNumber++;
         }
-        return self::CONFIG_IFRAME_URL . $uri;
+        $baseUrl = $this->getBaseUrl($mode);
+        return $baseUrl . self::CONFIG_IFRAME_URL . $uri;
+    }
+
+    /**
+     * @param string $mode
+     * @return string
+     */
+    public function getScriptUrl(string $mode): string
+    {
+        $baseUrl = $this->getBaseUrl($mode);
+        return $baseUrl . self::SCRIPT_IFRAME_PATH;
     }
 
     /**
@@ -400,4 +412,26 @@ class InsuranceHelper extends AbstractHelper
         }
         return $dbSubscriptionArray;
     }
+
+    /**
+     * @param $mode
+     * @return string
+     */
+    private function getBaseUrl($mode): string
+    {
+        switch ($mode) {
+            case 'test':
+                $baseUrl = self::SANDBOX_IFRAME_HOST_URL;
+                break;
+            case 'live':
+                $baseUrl = self::PRODUCTION_IFRAME_HOST_URL;
+                break;
+            default:
+                $baseUrl = self::SANDBOX_IFRAME_HOST_URL;
+                $this->logger->info('Unknown mode use sandbox', [$mode]);
+                break;
+        }
+        return $baseUrl;
+    }
+
 }
