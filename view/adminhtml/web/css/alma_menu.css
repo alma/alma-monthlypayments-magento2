@@ -29,7 +29,7 @@
     font-weight: normal;
     font-style: normal;
 }
-.admin__menu .level-0.item-almaconfigmenu > a:before {
+.admin__menu .level-0.item-alma > a:before {
     font-family: 'alma';
     content: '\e800';
     font-size : 3.2rem;

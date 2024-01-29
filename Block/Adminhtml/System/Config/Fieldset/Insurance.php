@@ -25,11 +25,31 @@
 
 namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset;
 
+use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Insurance extends Fieldset
 {
+    /**
+     * @var InsuranceHelper
+     */
+    private $insuranceHelper;
+
+    public function __construct(
+        \Magento\Backend\Block\Context      $context,
+        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Framework\View\Helper\Js   $jsHelper,
+        InsuranceHelper                     $insuranceHelper,
+        array                               $data = [],
+        ?SecureHtmlRenderer                 $secureRenderer = null
+    )
+    {
+        parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
+        $this->insuranceHelper = $insuranceHelper;
+    }
+
     /**
      * Add custom css class
      *
@@ -39,7 +59,7 @@ class Insurance extends Fieldset
      */
     protected function _getFrontendClass($element)
     {
-        return parent::_getFrontendClass($element) . ' with-button';
+        return parent::_getFrontendClass($element);
     }
 
     /**
@@ -50,68 +70,14 @@ class Insurance extends Fieldset
      */
     protected function _getHeaderTitleHtml($element)
     {
-        $html = '<div class="config-heading" >';
-        $htmlId = $element->getHtmlId();
-        $html .= '<div class="button-container"><button type="button"' .
-                 ' class="button action-configure' .
-                 '" id="' .
-                 $htmlId .
-                 '-head" onclick="almaToggleSolution.call(this, \'' .
-                 $htmlId .
-                 "', '" .
-                 $this->getUrl(
-                     'adminhtml/*/state'
-                 ) . '\'); return false;"><span class="state-closed">' . __(
-                     'Configure'
-                 ) . '</span><span class="state-opened">' . __(
-                     'Close'
-                 ) . '</span></button>';
-
-        $html .= '</div>';
-        $html .= '<div class="heading"><strong>' . $element->getLegend() . '</strong>';
-
-        if ($element->getComment()) {
-            $html .= '<span class="heading-intro">' . $element->getComment() . '</span>';
+        if ($this->insuranceHelper->getConfig()->isAllowed()) {
+            return parent::_getHeaderTitleHtml($element);
+        } else {
+            $notAllowedComment = __('Insurance is not activated - if you are interested by Alma insurance please contact');
+            return '<div>
+                        <h1>Alma insurance Beta</h1>
+                        <p>' . $notAllowedComment . '</p>
+                    </div>';
         }
-        $html .= '<div class="config-alt"></div>';
-        $html .= '</div></div>';
-
-        return $html;
-    }
-
-    /**
-     * Return header comment part of html for payment solution
-     *
-     * @param AbstractElement $element
-     * @return string
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    protected function _getHeaderCommentHtml($element)
-    {
-        return "";
-    }
-
-    /**
-     * Get collapsed state on-load
-     *
-     * @param AbstractElement $element
-     * @return false
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    protected function _isCollapseState($element)
-    {
-        return false;
-    }
-
-    /**
-     * Return extra Js.
-     *
-     * @param AbstractElement $element
-     * @return string
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    protected function _getExtraJs($element)
-    {
-        return '';
     }
 }

@@ -1,11 +1,41 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Alma_MonthlyPayments::almaconfigmenu"
+        <add id="Alma_MonthlyPayments::alma"
              title="Alma" module="Alma_MonthlyPayments"
              sortOrder="10"
              resource="Magento_Backend::content"
+        />
+        <add id="Alma_MonthlyPayments::alma_payment"
+             title="Alma Payment" module="Alma_MonthlyPayments"
+             translate="title"
+             sortOrder="5"
+             parent="Alma_MonthlyPayments::alma"
+             resource="Magento_Backend::content"
+        />
+        <add id="Alma_MonthlyPayments::almaconfigmenu"
+             title="Payment configuration" module="Alma_MonthlyPayments"
+             translate="title"
+             sortOrder="10"
+             parent="Alma_MonthlyPayments::alma_payment"
+             resource="Magento_Backend::content"
              action="admin/system_config/edit/section/payment/"
+        />
+        <add id="Alma_MonthlyPayments::alma_insurance"
+             dependsOnConfig="payment/alma_monthly_payments/insurance_allowed"
+             title="Alma Insurance" module="Alma_MonthlyPayments"
+             translate="title"
+             sortOrder="15"
+             parent="Alma_MonthlyPayments::alma"
+             resource="Magento_Backend::content"
+        />
+        <add id="Alma_MonthlyPayments::almainsurance"
+             title="Insurance configuration" module="Alma_MonthlyPayments"
+             translate="title"
+             sortOrder="20"
+             parent="Alma_MonthlyPayments::alma_insurance"
+             resource="Magento_Backend::content"
+             action="admin/system_config/edit/section/alma_insurance_section"
         />
     </menu>
 </config>
