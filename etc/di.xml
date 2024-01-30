@@ -28,6 +28,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- Web API -->
+    <preference for="Alma\MonthlyPayments\Api\Insurance\InsuranceUpdateInterface"
+                type="Alma\MonthlyPayments\Model\Api\Insurance\InsuranceUpdate"/>
+
     <preference for="Alma\MonthlyPayments\Api\PaymentInterface" type="Alma\MonthlyPayments\Model\Api\Payment"/>
     <preference for="Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface"
                 type="Alma\MonthlyPayments\Model\Api\Data\PaymentValidationResult"/>
@@ -95,7 +98,8 @@
     </type>
 
     <!-- Initialize command -->
-    <virtualType name="AlmaMonthlyPaymentsGatewayInitializeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+    <virtualType name="AlmaMonthlyPaymentsGatewayInitializeCommand"
+                 type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">AlmaMonthlyPaymentsGatewayRequestInitializeRequest
             </argument>
@@ -109,13 +113,16 @@
     </virtualType>
 
     <!-- Initialize Request -->
-    <virtualType name="AlmaMonthlyPaymentsGatewayRequestInitializeRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <virtualType name="AlmaMonthlyPaymentsGatewayRequestInitializeRequest"
+                 type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="payment" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\PaymentDataBuilder</item>
                 <item name="customer" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\CustomerDataBuilder</item>
                 <item name="order" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\OrderDataBuilder</item>
-                <item name="websiteCustomerDetails" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\WebsiteCustomerDetailsDataBuilder</item>
+                <item name="websiteCustomerDetails" xsi:type="string">
+                    Alma\MonthlyPayments\Gateway\Request\WebsiteCustomerDetailsDataBuilder
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -125,31 +132,43 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">AlmaMonthlyPaymentsGatewayRequestRefundRequest</argument>
             <argument name="handler" xsi:type="object">Alma\MonthlyPayments\Gateway\Response\RefundHandler</argument>
-            <argument name="transferFactory" xsi:type="object">Alma\MonthlyPayments\Gateway\Http\TransferFactory</argument>
-            <argument name="validator" xsi:type="object">Alma\MonthlyPayments\Gateway\Validator\RefundResponseValidator</argument>
+            <argument name="transferFactory" xsi:type="object">Alma\MonthlyPayments\Gateway\Http\TransferFactory
+            </argument>
+            <argument name="validator" xsi:type="object">
+                Alma\MonthlyPayments\Gateway\Validator\RefundResponseValidator
+            </argument>
             <argument name="client" xsi:type="object">Alma\MonthlyPayments\Gateway\Http\Client\RefundClient</argument>
-            <argument name="errorMessageMapper" xsi:type="object">Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+            <argument name="errorMessageMapper" xsi:type="object">
+                Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualErrorMessageMapper
+            </argument>
         </arguments>
     </virtualType>
     <!-- Refund error mapper -->
     <!-- Amazon error code mapper -->
-    <virtualType name="Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualConfigReader" type="Magento\Payment\Gateway\ErrorMapper\VirtualConfigReader">
+    <virtualType name="Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualConfigReader"
+                 type="Magento\Payment\Gateway\ErrorMapper\VirtualConfigReader">
         <arguments>
             <argument name="fileName" xsi:type="string">alma_error_mapping.xml</argument>
         </arguments>
     </virtualType>
-    <virtualType name="Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualMappingData" type="Magento\Payment\Gateway\ErrorMapper\MappingData">
+    <virtualType name="Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualMappingData"
+                 type="Magento\Payment\Gateway\ErrorMapper\MappingData">
         <arguments>
-            <argument name="reader" xsi:type="object">Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualConfigReader</argument>
+            <argument name="reader" xsi:type="object">Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualConfigReader
+            </argument>
         </arguments>
     </virtualType>
-    <virtualType name="Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualErrorMessageMapper" type="Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapper">
+    <virtualType name="Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualErrorMessageMapper"
+                 type="Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapper">
         <arguments>
-            <argument name="messageMapping" xsi:type="object">Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualMappingData</argument>
+            <argument name="messageMapping" xsi:type="object">
+                Alma\MonthlyPayments\Gateway\ErrorMapper\VirtualMappingData
+            </argument>
         </arguments>
     </virtualType>
     <!-- Refund Request -->
-    <virtualType name="AlmaMonthlyPaymentsGatewayRequestRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <virtualType name="AlmaMonthlyPaymentsGatewayRequestRefundRequest"
+                 type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="refund" xsi:type="string">Alma\MonthlyPayments\Gateway\Request\RefundDataBuilder</item>
