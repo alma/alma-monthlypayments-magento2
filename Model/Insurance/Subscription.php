@@ -11,6 +11,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     const ORDER_ID_KEY = 'order_id';
     const ORDER_ITEM_ID_KEY = 'order_item_id';
     const SUBSCRIPTION_ID_KEY = 'subscription_id';
+    const PROVIDER_SUBSCRIPTION_ID_KEY = 'provider_subscription_id';
     const SUBSCRIPTION_NAME_KEY = 'name';
     const SUBSCRIPTION_PRICE_KEY = 'subscription_price';
     const CONTRACT_ID_KEY = 'contract_id';
@@ -20,6 +21,8 @@ class Subscription extends AbstractModel implements IdentityInterface
     const CANCELLATION_DATE_KEY = 'cancellation_date';
     const CANCELLATION_REASON_KEY = 'cancellation_reason';
     const IS_REFUND_KEY = 'is_refunded';
+    const CALLBACK_URL = 'callback_url';
+    const AUTH_TOKEN = 'callback_auth_token';
     /**
      * @var string
      */
@@ -70,6 +73,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     {
         $this->setData(self::ORDER_ID_KEY, $orderId);
     }
+
     /**
      * @return int
      */
@@ -130,6 +134,23 @@ class Subscription extends AbstractModel implements IdentityInterface
     public function setSubscriptionPrice(int $price): void
     {
         $this->setData(self::SUBSCRIPTION_PRICE_KEY, $price);
+    }
+
+    /**
+     * @return string
+     */
+    public function getProviderSubscriptionId(): string
+    {
+        return $this->getDataByKey(self::PROVIDER_SUBSCRIPTION_ID_KEY);
+    }
+
+    /**
+     * @param string $providerSubscriptionId
+     * @return void
+     */
+    public function setProviderSubscriptionId(string $providerSubscriptionId): void
+    {
+        $this->setData(self::PROVIDER_SUBSCRIPTION_ID_KEY, $providerSubscriptionId);
     }
 
     /**
@@ -246,8 +267,42 @@ class Subscription extends AbstractModel implements IdentityInterface
      * @param bool $isRefunded
      * @return void
      */
-    public function setIsRefunded(bool $isRefunded):void
+    public function setIsRefunded(bool $isRefunded): void
     {
         $this->setData(self::IS_REFUND_KEY, $isRefunded);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCallbackUrl() : string
+    {
+        return $this->getDataByKey(self::CALLBACK_URL);
+    }
+
+    /**
+     * @param string $callbackUrl
+     * @return void
+     */
+    public function setCallbackUrl(string $callbackUrl): void
+    {
+        $this->setData(self::CALLBACK_URL, $callbackUrl);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthToken(): string
+    {
+        return $this->getDataByKey(self::AUTH_TOKEN);
+    }
+
+    /**
+     * @param string $authToken
+     * @return void
+     */
+    public function setAuthToken(string $authToken): void
+    {
+        $this->setData(self::AUTH_TOKEN, $authToken);
     }
 }

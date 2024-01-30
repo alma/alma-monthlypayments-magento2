@@ -28,6 +28,9 @@ use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 use Magento\Sales\Model\Order\Item as OrderItem;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManager;
+use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class InsuranceHelperTest extends TestCase
@@ -81,6 +84,10 @@ class InsuranceHelperTest extends TestCase
      */
     private $dbSubscriptionFactory;
     private $session;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManagerInterface;
 
     protected function setUp(): void
     {
@@ -96,6 +103,11 @@ class InsuranceHelperTest extends TestCase
         $this->dbSubscriptionFactory = $this->createMock(SubscriptionFactory::class);
         $subscriptionMock = $this->createPartialMock(\Alma\MonthlyPayments\Model\Insurance\Subscription::class, []);
         $this->dbSubscriptionFactory->method('create')->willReturn($subscriptionMock);
+        $this->storeManagerInterface = $this->createMock(StoreManager::class);
+        $store = $this->createMock(Store::class);
+        $store->method('getBaseUrl')->willReturn('http://my-website.com');
+        $this->storeManagerInterface->method('getStore')->willReturn($store);
+
         $this->insuranceHelper = $this->createNewInsuranceHelper();
     }
 
@@ -111,7 +123,8 @@ class InsuranceHelperTest extends TestCase
             $this->cartRepository,
             $this->almaClient,
             $this->dbSubscriptionFactory,
-            $this->session
+            $this->session,
+            $this->storeManagerInterface
         ];
     }
 
@@ -254,11 +267,12 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams($mode));
     }
 
-    public function testScriptUrlSandbox():void
+    public function testScriptUrlSandbox(): void
     {
         $this->assertEquals('https://protect.almapay.com/displayModal.js', $this->insuranceHelper->getScriptUrl('live'));
     }
-    public function testScriptUrlLive():void
+
+    public function testScriptUrlLive(): void
     {
         $this->assertEquals('https://protect.sandbox.almapay.com/displayModal.js', $this->insuranceHelper->getScriptUrl('test'));
     }
@@ -572,7 +586,14 @@ class InsuranceHelperTest extends TestCase
         $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
-        $this->assertEquals([$subscription], $subscriptionArray);
+        foreach ([$subscription] as $key => $subscription) {
+            $this->assertEquals($subscription->getContractId(), $subscriptionArray[$key]->getContractId());
+            $this->assertEquals($subscription->getCmsReference(), $subscriptionArray[$key]->getCmsReference());
+            $this->assertEquals($subscription->getProductPrice(), $subscriptionArray[$key]->getProductPrice());
+            $this->assertEquals($subscription->getSubscriber(), $subscriptionArray[$key]->getSubscriber());
+            $this->assertTrue(boolval($subscription->getCallbackToken()));
+            $this->assertTrue(boolval($subscriptionArray[$key]->getSubscriber()));
+        }
     }
 
     public function testGetSubscriberWithInvoice(): void
@@ -599,7 +620,7 @@ class InsuranceHelperTest extends TestCase
         $itemInsurance2 = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 25, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300');
         $collectionWithInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2, $itemWithInsurance2, $itemInsurance2]);
 
-            $subscriptionResult = '{"subscriptions":[{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_298QYLM3q94luQSD34LDlr","cms_reference":"24-MB02"},{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_2333333333333333333333","cms_reference":"24-MB02"}]}';
+        $subscriptionResult = '{"subscriptions":[{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_298QYLM3q94luQSD34LDlr","provider_subscription_id":"provider_subscription_298QYLM3q94luQSD34LDlr","cms_reference":"24-MB02","callback_token":"mycallbackToken123"},{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_2333333333333333333333","provider_subscription_id":"provider_subscription_2333333333333333333333","cms_reference":"24-MB02","callback_token":"mycallbackToken321"}]}';
         $mode = 'test';
         $expected = [
             [
@@ -607,22 +628,28 @@ class InsuranceHelperTest extends TestCase
                 'order_item_id' => 23,
                 'name' => 'Alma outillage thermique 3 ans (Vol + casse)',
                 'subscription_id' => 'subscription_298QYLM3q94luQSD34LDlr',
+                'provider_subscription_id' => 'provider_subscription_298QYLM3q94luQSD34LDlr',
                 'subscription_price' => 12300,
                 'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
                 'cms_reference' => '24-MB02',
                 'state' => 'Active',
-                'mode' => 'test'
+                'mode' => 'test',
+                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update',
+                'callback_auth_token' => 'mycallbackToken123'
             ],
             [
                 'order_id' => 2,
                 'order_item_id' => 25,
                 'name' => 'Alma outillage thermique 3 ans (Vol + casse)',
                 'subscription_id' => 'subscription_2333333333333333333333',
+                'provider_subscription_id' => 'provider_subscription_2333333333333333333333',
                 'subscription_price' => 12300,
                 'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
                 'cms_reference' => '24-MB02',
                 'state' => 'Active',
-                'mode' => 'test'
+                'mode' => 'test',
+                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update',
+                'callback_auth_token' => 'mycallbackToken321'
             ],
         ];
         $arraySubscriptionResult = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult(
@@ -641,8 +668,9 @@ class InsuranceHelperTest extends TestCase
         return new Subscription(
             $contractId,
             $sku,
-            '12012',
-            $subscriber
+            12012,
+            $subscriber,
+            'http://my-website.com/rest/V1/alma/insurance/update'
         );
     }
 

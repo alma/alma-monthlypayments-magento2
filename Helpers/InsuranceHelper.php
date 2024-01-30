@@ -22,6 +22,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
+use Magento\Store\Model\StoreManagerInterface;
 
 class InsuranceHelper extends AbstractHelper
 {
@@ -41,6 +42,7 @@ class InsuranceHelper extends AbstractHelper
     const CUSTOMER_SESSION_ID_PARAM_KEY = 'customer_session_id';
     const CUSTOMER_CART_ID_PARAM_KEY = 'cart_id';
     const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
+    const CALLBACK_URI = '/rest/V1/alma/insurance/update';
 
     /**
      * @var ProductRepository
@@ -78,6 +80,10 @@ class InsuranceHelper extends AbstractHelper
      * @var SubscriptionFactory
      */
     private $subscriptionFactory;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * @param Context $context
@@ -100,7 +106,8 @@ class InsuranceHelper extends AbstractHelper
         CartRepositoryInterface $cartRepository,
         AlmaClient              $almaClient,
         SubscriptionFactory     $subscriptionFactory,
-        Session                 $session
+        Session                 $session,
+        StoreManagerInterface   $storeManager
     )
     {
         parent::__construct($context);
@@ -113,6 +120,7 @@ class InsuranceHelper extends AbstractHelper
         $this->almaClient = $almaClient;
         $this->session = $session;
         $this->subscriptionFactory = $subscriptionFactory;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -346,7 +354,7 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @param Collection $itemsCollection
      * @param Subscriber $subscriber
-     * @return array
+     * @return Subscription[]
      */
     public function getSubscriptionData(Collection $itemsCollection, Subscriber $subscriber): array
     {
@@ -360,12 +368,19 @@ class InsuranceHelper extends AbstractHelper
                 continue;
             }
             $insuranceData = json_decode($insuranceData, true);
-            $subscriptionArray[] = new Subscription(
-                $insuranceData['id'],
-                $item->getSku(),
-                Functions::priceToCents($orderItem->getOriginalPrice()),
-                $subscriber
-            );
+            try {
+                $subscriptionArray[] = new Subscription(
+                    $insuranceData['id'],
+                    $item->getSku(),
+                    Functions::priceToCents($orderItem->getOriginalPrice()),
+                    $subscriber,
+                    $this->getCallbackUrl()
+                );
+            } catch (\Exception $e) {
+                $this->logger->info('et mince ', [$e->getMessage()]);
+                die;
+            }
+
         }
         return $subscriptionArray;
     }
@@ -403,11 +418,14 @@ class InsuranceHelper extends AbstractHelper
             $dbSubscription->setOrderItemId($orderItem->getItemId());
             $dbSubscription->setName($orderItemInsuranceData['name']);
             $dbSubscription->setSubscriptionId($subscriptionResultContractData['subscription_id']);
+            $dbSubscription->setProviderSubscriptionId($subscriptionResultContractData['provider_subscription_id']);
             $dbSubscription->setSubscriptionPrice(intval($orderItemInsuranceData['price']));
             $dbSubscription->setContractId($orderItemInsuranceData['id']);
             $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
             $dbSubscription->setSubscriptionState('Active');
             $dbSubscription->setSubscriptionMode($mode);
+            $dbSubscription->setCallbackUrl($this->getCallbackUrl());
+            $dbSubscription->setAuthToken($subscriptionResultContractData['callback_token']);
             $dbSubscriptionArray[] = clone $dbSubscription;
         }
         return $dbSubscriptionArray;
@@ -432,6 +450,15 @@ class InsuranceHelper extends AbstractHelper
                 break;
         }
         return $baseUrl;
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getCallbackUrl(): string
+    {
+        return $this->storeManager->getStore()->getBaseUrl() . self::CALLBACK_URI;
     }
 
 }

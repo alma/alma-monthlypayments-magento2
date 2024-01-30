@@ -90,13 +90,16 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $observer = $this->createMock(Observer::class);
         $observer->method('getEvent')->willReturn($event);
 
-        $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress');
-        $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([$this->subscriberFactory()]);
+        $subscription1 = $this->createMock(\Alma\API\Entities\Insurance\Subscription::class);
+        $subscription2 = $this->createMock(\Alma\API\Entities\Insurance\Subscription::class);
+
+        $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress')->willReturn($this->subscriberFactory());
+        $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([$subscription1, $subscription2]);
 
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $insuranceEndpoint->expects($this->once())
             ->method('subscription')
-            ->with([$this->subscriberFactory()], null, null, '42')
+            ->with([$subscription1, $subscription2], null, null, '42')
             ->willReturn(json_decode('{"subscriptions":[{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_298QYLM3q94luQSD34LDlr","cms_reference":"24-MB02"},{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_2333333333333333333333","cms_reference":"24-MB02"}]}', true));
 
         $client = $this->createMock(Client::class);
