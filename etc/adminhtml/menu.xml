@@ -37,5 +37,13 @@
              resource="Magento_Backend::content"
              action="admin/system_config/edit/section/alma_insurance_section"
         />
+        <add id="Alma_MonthlyPayments::almasubscriptiongrid"
+             title="Subscription list" module="Alma_MonthlyPayments"
+             translate="title"
+             sortOrder="25"
+             parent="Alma_MonthlyPayments::alma_insurance"
+             resource="Magento_Backend::content"
+             action="alma_monthly/insurance/subscriptions"
+        />
     </menu>
 </config>

@@ -14,7 +14,7 @@
         <column xsi:type="int" name="order_item_id" nullable="false" unsigned="true" comment="Order item id"/>
         <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Insurance Name"/>
         <column xsi:type="varchar" name="subscription_id" nullable="false" length="255" comment="Alma subscription ID"/>
-        <column xsi:type="varchar" name="provider_subscription_id" nullable="true" length="255" comment="Provider subscription ID"/>
+        <column xsi:type="varchar" name="broker_subscription_id" nullable="true" length="255" comment="Provider subscription ID"/>
         <column xsi:type="int" name="subscription_price" nullable="false" unsigned="true" comment="Alma subscription Price"/>
         <column xsi:type="varchar" name="contract_id" nullable="false" length="255"  comment="Alma contract ID"/>
         <column xsi:type="varchar" name="cms_reference" nullable="false" length="255" comment="cms reference - SKU"/>
@@ -24,7 +24,6 @@
         <column xsi:type="varchar" name="cancellation_reason" nullable="true" length="255" comment="Cancellation reason"/>
         <column xsi:type="boolean" name="is_refunded" default="false" comment="Confirm subscription refund"/>
         <column xsi:type="varchar" name="callback_url" nullable="false" length="255" comment="Callback url for update"/>
-        <column xsi:type="varchar" name="callback_auth_token" nullable="false" length="255" comment="Alma api auth token"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>

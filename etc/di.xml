@@ -222,5 +222,19 @@
             <argument name="config" xsi:type="object">Alma\MonthlyPayments\Gateway\Config\Config</argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="subscription_grid_listing_data_source" xsi:type="string">SubscriptionGridCollection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SubscriptionGridCollection" type="Alma\MonthlyPayments\Ui\DataProvider\Insurance\Subscription\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">alma_insurance_subscription</argument>
+            <argument name="resourceModel" xsi:type="string">Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription</argument>
+        </arguments>
+    </virtualType>
 
 </config>

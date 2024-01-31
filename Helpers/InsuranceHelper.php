@@ -34,7 +34,6 @@ class InsuranceHelper extends AbstractHelper
     const SANDBOX_IFRAME_HOST_URL = 'https://protect.sandbox.almapay.com';
     const PRODUCTION_IFRAME_HOST_URL = 'https://protect.almapay.com';
     const SCRIPT_IFRAME_PATH = '/displayModal.js';
-    const CONFIG_IFRAME_PATH = '/almaBackOfficeConfiguration.html';
     const FRONT_IFRAME_PATH = '/almaProductInPageWidget.html';
     const MERCHANT_ID_PARAM_KEY = 'merchant_id';
     const CMS_REF_PARAM_KEY = 'cms_reference';
@@ -418,14 +417,13 @@ class InsuranceHelper extends AbstractHelper
             $dbSubscription->setOrderItemId($orderItem->getItemId());
             $dbSubscription->setName($orderItemInsuranceData['name']);
             $dbSubscription->setSubscriptionId($subscriptionResultContractData['subscription_id']);
-            $dbSubscription->setProviderSubscriptionId($subscriptionResultContractData['provider_subscription_id']);
+            $dbSubscription->setProviderSubscriptionId($subscriptionResultContractData['broker_subscription_id']);
             $dbSubscription->setSubscriptionPrice(intval($orderItemInsuranceData['price']));
             $dbSubscription->setContractId($orderItemInsuranceData['id']);
             $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
-            $dbSubscription->setSubscriptionState('Active');
+            $dbSubscription->setSubscriptionState(Subscription::STATE_STARTED);
             $dbSubscription->setSubscriptionMode($mode);
             $dbSubscription->setCallbackUrl($this->getCallbackUrl());
-            $dbSubscription->setAuthToken($subscriptionResultContractData['callback_token']);
             $dbSubscriptionArray[] = clone $dbSubscription;
         }
         return $dbSubscriptionArray;
