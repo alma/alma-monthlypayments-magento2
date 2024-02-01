@@ -9,7 +9,7 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Ui\Component\Listing\Columns\Column;
 
-class SubscriptionAmount extends Column
+class SubscriptionColumnFormatter extends Column
 {
 
     /**
