@@ -77,7 +77,7 @@
                 <label translate="true">Subscription Id</label>
             </settings>
         </column>
-        <column name="subscription_amount">
+        <column name="subscription_amount" class="Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column\SubscriptionAmount">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Price</label>
