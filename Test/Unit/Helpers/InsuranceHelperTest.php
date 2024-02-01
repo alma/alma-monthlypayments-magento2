@@ -619,7 +619,24 @@ class InsuranceHelperTest extends TestCase
         $itemInsurance2 = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 25, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300');
         $collectionWithInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2, $itemWithInsurance2, $itemInsurance2]);
 
-        $subscriptionResult = '{"subscriptions":[{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_298QYLM3q94luQSD34LDlr","broker_subscription_id":"provider_subscription_298QYLM3q94luQSD34LDlr","cms_reference":"24-MB02"},{"contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx","subscription_id":"subscription_2333333333333333333333","broker_subscription_id":"provider_subscription_2333333333333333333333","cms_reference":"24-MB02"}]}';
+        $subscriptionResult = '{
+        "subscriptions":
+        [
+        {
+        "contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx",
+        "subscription_id":"subscription_298QYLM3q94luQSD34LDlr",
+        "subscription_price":"12312",
+        "broker_subscription_id":"provider_subscription_298QYLM3q94luQSD34LDlr",
+        "cms_reference":"24-MB02"},
+        {
+        "contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx",
+        "subscription_id":"subscription_2333333333333333333333",
+        "subscription_price":"12456",
+        "broker_subscription_id":"provider_subscription_2333333333333333333333",
+        "cms_reference":"24-MB02"
+        }
+        ]
+        }';
         $mode = 'test';
         $expected = [
             [
@@ -628,7 +645,7 @@ class InsuranceHelperTest extends TestCase
                 'name' => 'Alma outillage thermique 3 ans (Vol + casse)',
                 'subscription_id' => 'subscription_298QYLM3q94luQSD34LDlr',
                 'broker_subscription_id' => 'provider_subscription_298QYLM3q94luQSD34LDlr',
-                'subscription_price' => 12300,
+                'subscription_price' => 12312,
                 'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
                 'cms_reference' => '24-MB02',
                 'state' => 'started',
@@ -641,7 +658,7 @@ class InsuranceHelperTest extends TestCase
                 'name' => 'Alma outillage thermique 3 ans (Vol + casse)',
                 'subscription_id' => 'subscription_2333333333333333333333',
                 'broker_subscription_id' => 'provider_subscription_2333333333333333333333',
-                'subscription_price' => 12300,
+                'subscription_price' => 12456,
                 'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
                 'cms_reference' => '24-MB02',
                 'state' => 'started',

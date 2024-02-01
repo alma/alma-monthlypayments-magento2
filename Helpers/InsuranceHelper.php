@@ -418,7 +418,7 @@ class InsuranceHelper extends AbstractHelper
             $dbSubscription->setName($orderItemInsuranceData['name']);
             $dbSubscription->setSubscriptionId($subscriptionResultContractData['subscription_id']);
             $dbSubscription->setProviderSubscriptionId($subscriptionResultContractData['broker_subscription_id']);
-            $dbSubscription->setSubscriptionPrice(intval($orderItemInsuranceData['price']));
+            $dbSubscription->setSubscriptionPrice(intval($subscriptionResultContractData['subscription_price']));
             $dbSubscription->setContractId($orderItemInsuranceData['id']);
             $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
             $dbSubscription->setSubscriptionState(Subscription::STATE_STARTED);
@@ -454,7 +454,7 @@ class InsuranceHelper extends AbstractHelper
      * @return string
      * @throws NoSuchEntityException
      */
-    public function getCallbackUrl(): string
+    private function getCallbackUrl(): string
     {
         return $this->storeManager->getStore()->getBaseUrl() . self::CALLBACK_URI;
     }
