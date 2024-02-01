@@ -651,7 +651,7 @@ class InsuranceHelperTest extends TestCase
                 'linked_product_name' => 'Fusion Backpack',
                 'subscription_state' => 'started',
                 'mode' => 'test',
-                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update',
+                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update?sid=<subscription_id>&trace=<trace>',
             ],
             [
                 'order_id' => 2,
@@ -665,7 +665,7 @@ class InsuranceHelperTest extends TestCase
                 'linked_product_name' => 'Fusion Backpack',
                 'subscription_state' => 'started',
                 'mode' => 'test',
-                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update',
+                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update?sid=<subscription_id>&trace=<trace>',
             ],
         ];
         $arraySubscriptionResult = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult(
