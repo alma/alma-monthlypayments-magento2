@@ -11,18 +11,19 @@ class Subscription extends AbstractModel implements IdentityInterface
     const ORDER_ID_KEY = 'order_id';
     const ORDER_ITEM_ID_KEY = 'order_item_id';
     const SUBSCRIPTION_ID_KEY = 'subscription_id';
-    const BROKER_SUBSCRIPTION_ID_KEY = 'broker_subscription_id';
+    const BROKER_SUBSCRIPTION_ID_KEY = 'subscription_broker_id';
     const SUBSCRIPTION_NAME_KEY = 'name';
-    const SUBSCRIPTION_PRICE_KEY = 'subscription_price';
+    const SUBSCRIPTION_AMOUNT_KEY = 'subscription_amount';
     const CONTRACT_ID_KEY = 'contract_id';
     const CMS_REFERENCE_KEY = 'cms_reference';
-    const SUBSCRIPTION_STATE_KEY = 'state';
+    const LINKED_PRODUCT_NAME_KEY = 'linked_product_name';
+    const SUBSCRIPTION_STATE_KEY = 'subscription_state';
     const SUBSCRIPTION_MODE_KEY = 'mode';
-    const CANCELLATION_DATE_KEY = 'cancellation_date';
-    const CANCELLATION_REASON_KEY = 'cancellation_reason';
+    const CANCELATION_DATE_KEY = 'date_of_cancelation';
+    const CANCELATION_REASON_KEY = 'reason_of_cancelation';
+    const CANCELATION_REQUEST_DATE_KEY = 'date_of_cancelation_request';
     const IS_REFUND_KEY = 'is_refunded';
-    const CALLBACK_URL = 'callback_url';
-    const AUTH_TOKEN = 'callback_auth_token';
+    const CALLBACK_URL_KEY = 'callback_url';
     /**
      * @var string
      */
@@ -120,37 +121,37 @@ class Subscription extends AbstractModel implements IdentityInterface
     }
 
     /**
-     * @return int
-     */
-    public function getSubscriptionPrice(): int
-    {
-        return $this->getDataByKey(self::SUBSCRIPTION_PRICE_KEY);
-    }
-
-    /**
-     * @param int $price
-     * @return void
-     */
-    public function setSubscriptionPrice(int $price): void
-    {
-        $this->setData(self::SUBSCRIPTION_PRICE_KEY, $price);
-    }
-
-    /**
      * @return string
      */
-    public function getProviderSubscriptionId(): string
+    public function getSubscriptionBrokerId(): string
     {
         return $this->getDataByKey(self::BROKER_SUBSCRIPTION_ID_KEY);
     }
 
     /**
-     * @param string $providerSubscriptionId
+     * @param string $subscriptionBrokerId
      * @return void
      */
-    public function setProviderSubscriptionId(string $providerSubscriptionId): void
+    public function setSubscriptionBrokerId(string $subscriptionBrokerId): void
     {
-        $this->setData(self::BROKER_SUBSCRIPTION_ID_KEY, $providerSubscriptionId);
+        $this->setData(self::BROKER_SUBSCRIPTION_ID_KEY, $subscriptionBrokerId);
+    }
+
+    /**
+     * @return int
+     */
+    public function getSubscriptionAmount(): int
+    {
+        return $this->getDataByKey(self::SUBSCRIPTION_AMOUNT_KEY);
+    }
+
+    /**
+     * @param int $amount
+     * @return void
+     */
+    public function setSubscriptionAmount(int $amount): void
+    {
+        $this->setData(self::SUBSCRIPTION_AMOUNT_KEY, $amount);
     }
 
     /**
@@ -185,6 +186,23 @@ class Subscription extends AbstractModel implements IdentityInterface
     public function setCmsReference(string $cmsReference): void
     {
         $this->setData(self::CMS_REFERENCE_KEY, $cmsReference);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkedProductName(): string
+    {
+        return $this->getDataByKey(self::LINKED_PRODUCT_NAME_KEY);
+    }
+
+    /**
+     * @param string $linkedProductName
+     * @return void
+     */
+    public function setLinkedProductName(string $linkedProductName): void
+    {
+        $this->setData(self::LINKED_PRODUCT_NAME_KEY, $linkedProductName);
     }
 
     /**
@@ -226,7 +244,7 @@ class Subscription extends AbstractModel implements IdentityInterface
      */
     public function getCancellationDate(): ?string
     {
-        return $this->getDataByKey(self::CANCELLATION_DATE_KEY);
+        return $this->getDataByKey(self::CANCELATION_DATE_KEY);
     }
 
     /**
@@ -235,7 +253,7 @@ class Subscription extends AbstractModel implements IdentityInterface
      */
     public function setCancellationDate(string $date = null): void
     {
-        $this->setData(self::CANCELLATION_DATE_KEY, $date);
+        $this->setData(self::CANCELATION_DATE_KEY, $date);
     }
 
     /**
@@ -243,7 +261,7 @@ class Subscription extends AbstractModel implements IdentityInterface
      */
     public function getCancellationReason(): ?string
     {
-        return $this->getDataByKey(self::CANCELLATION_REASON_KEY);
+        return $this->getDataByKey(self::CANCELATION_REASON_KEY);
     }
 
     /**
@@ -252,7 +270,24 @@ class Subscription extends AbstractModel implements IdentityInterface
      */
     public function setCancellationReason(string $reason = null): void
     {
-        $this->setData(self::CANCELLATION_REASON_KEY, $reason);
+        $this->setData(self::CANCELATION_REASON_KEY, $reason);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCancellationRequestDate(): ?string
+    {
+        return $this->getDataByKey(self::CANCELATION_REQUEST_DATE_KEY);
+    }
+
+    /**
+     * @param string|null $date
+     * @return void
+     */
+    public function setCancellationRequestDate(string $date = null): void
+    {
+        $this->setData(self::CANCELATION_REQUEST_DATE_KEY, $date);
     }
 
     /**
@@ -275,9 +310,9 @@ class Subscription extends AbstractModel implements IdentityInterface
     /**
      * @return string
      */
-    public function getCallbackUrl() : string
+    public function getCallbackUrl(): string
     {
-        return $this->getDataByKey(self::CALLBACK_URL);
+        return $this->getDataByKey(self::CALLBACK_URL_KEY);
     }
 
     /**
@@ -286,23 +321,6 @@ class Subscription extends AbstractModel implements IdentityInterface
      */
     public function setCallbackUrl(string $callbackUrl): void
     {
-        $this->setData(self::CALLBACK_URL, $callbackUrl);
-    }
-
-    /**
-     * @return string
-     */
-    public function getAuthToken(): string
-    {
-        return $this->getDataByKey(self::AUTH_TOKEN);
-    }
-
-    /**
-     * @param string $authToken
-     * @return void
-     */
-    public function setAuthToken(string $authToken): void
-    {
-        $this->setData(self::AUTH_TOKEN, $authToken);
+        $this->setData(self::CALLBACK_URL_KEY, $callbackUrl);
     }
 }

@@ -71,25 +71,25 @@
                 <label translate="true">Name</label>
             </settings>
         </column>
-        <column name="subscription_id">
+        <column name="subscription_broker_id">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Subscription Id</label>
             </settings>
         </column>
-        <column name="subscription_price">
+        <column name="subscription_amount">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Price</label>
             </settings>
         </column>
-        <column name="cms_reference">
+        <column name="linked_product_name">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Product SKU</label>
+                <label translate="true">Insured product</label>
             </settings>
         </column>
-        <column name="state">
+        <column name="subscription_state">
             <settings>
                 <options class="Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column\SubscriptionStateOptions"/>
                 <filter>select</filter>

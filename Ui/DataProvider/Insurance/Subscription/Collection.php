@@ -30,12 +30,12 @@ class Collection extends SearchResult
      * @throws LocalizedException
      */
     public function __construct(
-        EntityFactory $entityFactory,
-        Logger        $logger,
-        FetchStrategy $fetchStrategy,
-        EventManager  $eventManager,
+        EntityFactory   $entityFactory,
+        Logger          $logger,
+        FetchStrategy   $fetchStrategy,
+        EventManager    $eventManager,
         ApiConfigHelper $apiConfigHelper,
-        $mainTable    = 'alma_insurance_subscription',
+        $mainTable = 'alma_insurance_subscription',
         $resourceModel = null,
         $identifierName = null,
         $connectionName = null
@@ -64,7 +64,6 @@ class Collection extends SearchResult
             'entity_id',
             'main_table.entity_id'
         );
-        $this->addFilterToMap('state', 'main_table.state');
 
         parent::_initSelect();
         $this->addFieldToFilter("mode", ["eq" => $this->apiConfigHelper->getActiveMode()]);
