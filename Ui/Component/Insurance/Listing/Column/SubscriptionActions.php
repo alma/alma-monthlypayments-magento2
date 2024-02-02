@@ -2,12 +2,10 @@
 
 namespace Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column;
 
-
-use Magento\Framework\View\Element\UiComponentFactory;
-use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-
 
 class SubscriptionActions extends Column
 {
@@ -32,15 +30,15 @@ class SubscriptionActions extends Column
      * @param array $data
      */
     public function __construct(
-        ContextInterface $context,
+        ContextInterface   $context,
         UiComponentFactory $uiComponentFactory,
-        UrlInterface $urlBuilder,
+        UrlInterface       $urlBuilder,
         $viewUrl = '',
-        array $components = [],
-        array $data = []
+        array              $components = [],
+        array              $data = []
     ) {
         $this->_urlBuilder = $urlBuilder;
-        $this->_viewUrl    = $viewUrl;
+        $this->_viewUrl = $viewUrl;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -56,10 +54,10 @@ class SubscriptionActions extends Column
             foreach ($dataSource['data']['items'] as &$item) {
                 $name = $this->getData('name');
                 if (isset($item['entity_id'])) {
-                    $item[$name]['view']   = [
-                        'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['id' => $item['entity_id']]),
-                        'target' => '_blank',
-                        'label' => __('View on Frontend')
+                    $item[$name]['view'] = [
+                        'href' => $this->_urlBuilder->getUrl('alma_monthly/insurance/subscriptiondetails', ['id' => $item['entity_id']]),
+                        'ariaLabel' => __('View details ') . $item['name'],
+                        'label' => __('View details')
                     ];
                 }
             }

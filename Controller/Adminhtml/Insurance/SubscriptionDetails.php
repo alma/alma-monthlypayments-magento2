@@ -8,7 +8,7 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 
-class Subscriptions extends Action implements HttpGetActionInterface
+class SubscriptionDetails extends Action implements HttpGetActionInterface
 {
     /**
      * @var PageFactory
@@ -31,14 +31,14 @@ class Subscriptions extends Action implements HttpGetActionInterface
     }
 
     /**
-     * Add the main Admin Grid page
+     * Add the main Admin page
      *
      * @return Page
      */
     public function execute(): Page
     {
         $resultPage = $this->pageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('Alma Subscription list'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Alma Subscription details'));
 
         return $resultPage;
     }
