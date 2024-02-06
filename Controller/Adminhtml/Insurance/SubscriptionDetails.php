@@ -19,13 +19,13 @@ class SubscriptionDetails extends Action implements HttpGetActionInterface
      * Constructor
      *
      * @param Context $context
-     * @param PageFactory $rawFactory
+     * @param PageFactory $pageFactory
      */
     public function __construct(
         Context     $context,
-        PageFactory $rawFactory
+        PageFactory $pageFactory
     ) {
-        $this->pageFactory = $rawFactory;
+        $this->pageFactory = $pageFactory;
 
         parent::__construct($context);
     }
@@ -38,7 +38,9 @@ class SubscriptionDetails extends Action implements HttpGetActionInterface
     public function execute(): Page
     {
         $resultPage = $this->pageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('Alma Subscription details'));
+        $subscriptionId = $this->getRequest()->getParam('id');
+
+        $resultPage->getConfig()->getTitle()->prepend(__('Alma Subscription details for order'));
 
         return $resultPage;
     }

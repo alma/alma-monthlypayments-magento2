@@ -1,0 +1,18 @@
+<?php
+/**
+ * @var $block \Alma\MonthlyPayments\Block\Adminhtml\Insurance\SubscriptionDetails
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+?>
+<div>
+    <iframe
+        id="subscription-alma-iframe"
+        class="subscription-alma-iframe"
+        width="100%"
+        height="100%"
+        src="https://protect.staging.almapay.com/almaBackOfficeSubscriptions.html">
+    </iframe>
+    <div id="alma-insurance-modal"></div>
+</div>
+
+<script type="module" src="<?= $block->getScriptUrl() ?>"></script>
