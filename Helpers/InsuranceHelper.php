@@ -416,13 +416,13 @@ class InsuranceHelper extends AbstractHelper
             $dbSubscription->setOrderId($orderItem->getOrderId());
             $dbSubscription->setOrderItemId($orderItem->getItemId());
             $dbSubscription->setName($orderItemInsuranceData['name']);
-            $dbSubscription->setSubscriptionId($subscriptionResultContractData['subscription_id']);
-            $dbSubscription->setSubscriptionBrokerId($subscriptionResultContractData['subscription_broker_id']);
-            $dbSubscription->setSubscriptionAmount(intval($subscriptionResultContractData['subscription_amount']));
+            $dbSubscription->setSubscriptionId($subscriptionResultContractData['id']);
+            $dbSubscription->setSubscriptionBrokerId($subscriptionResultContractData['broker_subscription_id']);
+            $dbSubscription->setSubscriptionAmount(intval($subscriptionResultContractData['amount']));
             $dbSubscription->setContractId($orderItemInsuranceData['id']);
             $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
             $dbSubscription->setLinkedProductName($orderItemInsuranceData['parent_name']);
-            $dbSubscription->setSubscriptionState(Subscription::STATE_STARTED);
+            $dbSubscription->setSubscriptionState($subscriptionResultContractData['state']);
             $dbSubscription->setSubscriptionMode($mode);
             $dbSubscription->setCallbackUrl($this->getCallbackUrl());
             $dbSubscriptionArray[] = clone $dbSubscription;

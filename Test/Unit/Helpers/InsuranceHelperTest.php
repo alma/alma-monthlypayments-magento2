@@ -621,21 +621,24 @@ class InsuranceHelperTest extends TestCase
 
         $subscriptionResult = '{
         "subscriptions":
-        [
-        {
-        "contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx",
-        "subscription_id":"subscription_298QYLM3q94luQSD34LDlr",
-        "subscription_amount":"12312",
-        "subscription_broker_id":"provider_subscription_298QYLM3q94luQSD34LDlr",
-        "cms_reference":"24-MB02"},
-        {
-        "contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx",
-        "subscription_id":"subscription_2333333333333333333333",
-        "subscription_amount":"12456",
-        "subscription_broker_id":"provider_subscription_2333333333333333333333",
-        "cms_reference":"24-MB02"
-        }
-        ]
+            [
+                {
+                "contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx",
+                "id":"subscription_298QYLM3q94luQSD34LDlr",
+                "amount":"12312",
+                "broker_subscription_id":"provider_subscription_298QYLM3q94luQSD34LDlr",
+                "cms_reference":"24-MB02",
+                "state":"started"
+                },
+                {
+                "contract_id":"insurance_contract_5LH0o7qj87xGp6sF1AGWqx",
+                "id":"subscription_2333333333333333333333",
+                "amount":"12456",
+                "broker_subscription_id":"provider_subscription_2333333333333333333333",
+                "cms_reference":"24-MB02",
+                "state":"started"
+                }
+            ]
         }';
         $mode = 'test';
         $expected = [
