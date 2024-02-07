@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Model\Data;
 
 use Alma\API\Entities\Insurance\Contract;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
+use Magento\Catalog\Api\Data\ProductInterface;
 use PHPUnit\Framework\TestCase;
 
 class InsuranceProductTest extends TestCase
@@ -14,17 +15,20 @@ class InsuranceProductTest extends TestCase
         $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
         $name = 'insurance test';
         $insuranceContract = $this->contractFactory($id, $name);
-
-        $parentName = 'my parent name';
+        $quoteItemMock = $this->createMock(ProductInterface::class);
+        $quoteItemMock->method('getPrice')->willReturn(59.00);
+        $quoteItemMock->method('getName')->willReturn('my parent name');
         $expectedReturn = [
             'id' => $id,
             'name' => $name,
             'price' => 10023,
             'duration_year' => 1,
             'link' => null,
-            'parent_name' => 'my parent name'
+            'parent_name' => 'my parent name',
+            'parent_price' => 5900,
+            'files' => []
         ];
-        $insuranceProduct = new InsuranceProduct($insuranceContract, $parentName);
+        $insuranceProduct = new InsuranceProduct($insuranceContract, $quoteItemMock);
         $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
     }
 
@@ -33,9 +37,11 @@ class InsuranceProductTest extends TestCase
         $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
         $name = 'insurance test';
         $insuranceContract = $this->contractFactory($id, $name);
-        $parentName = 'my parent name';
+        $quoteItemMock = $this->createMock(ProductInterface::class);
+        $quoteItemMock->method('getPrice')->willReturn(5900);
+        $quoteItemMock->method('getName')->willReturn('my parent name');
 
-        $insuranceProduct = new InsuranceProduct($insuranceContract, $parentName);
+        $insuranceProduct = new InsuranceProduct($insuranceContract, $quoteItemMock);
 
         $this->assertEquals(100.23, $insuranceProduct->getFloatPrice());
     }

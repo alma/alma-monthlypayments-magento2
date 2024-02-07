@@ -19,6 +19,7 @@
         <column xsi:type="varchar" name="contract_id" nullable="false" length="255"  comment="Alma contract ID"/>
         <column xsi:type="varchar" name="cms_reference" nullable="false" length="255" comment="cms reference - SKU"/>
         <column xsi:type="varchar" name="linked_product_name" nullable="false" length="255" comment="Name of insured product"/>
+        <column xsi:type="int" name="linked_product_price" nullable="false" comment="Price of insured product"/>
         <column xsi:type="varchar" name="subscription_state" nullable="false" length="255" comment="Subscription state"/>
         <column xsi:type="varchar" name="mode" nullable="false" length="10" comment="Subscription mode live/test"/>
         <column xsi:type="datetime" name="date_of_cancelation" nullable="true" comment="Cancellation date"/>

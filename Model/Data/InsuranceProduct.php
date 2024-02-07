@@ -4,6 +4,8 @@ namespace Alma\MonthlyPayments\Model\Data;
 
 use Alma\API\Entities\Insurance\Contract;
 use Alma\API\Entities\Insurance\File;
+use Alma\MonthlyPayments\Helpers\Functions;
+use Magento\Catalog\Api\Data\ProductInterface;
 
 class InsuranceProduct
 {
@@ -14,7 +16,7 @@ class InsuranceProduct
     /**
      * @var string
      */
-    private $parentName;
+    private $parent;
     /**
      * @var Contract
      */
@@ -22,16 +24,17 @@ class InsuranceProduct
 
     /**
      * @param Contract $contract
-     * @param string $parentName
+     * @param string $parent
      * @param int|null $linkToken
      */
     public function __construct(
         Contract $contract,
-        string $parentName,
-        int    $linkToken = null
-    ) {
+        ProductInterface     $parent,
+        int      $linkToken = null
+    )
+    {
         $this->linkToken = $linkToken;
-        $this->parentName = $parentName;
+        $this->parent = $parent;
         $this->contract = $contract;
     }
 
@@ -54,13 +57,17 @@ class InsuranceProduct
     /**
      * @return int
      */
-    public function getPrice():int
+    public function getPrice(): int
     {
         return $this->contract->getPrice();
     }
+
+    /**
+     * @return float
+     */
     public function getFloatPrice(): float
     {
-        return (float)($this->getPrice()/100);
+        return (float)($this->getPrice() / 100);
     }
 
     /**
@@ -73,8 +80,9 @@ class InsuranceProduct
             'name' => $this->getName(),
             'price' => $this->getPrice(),
             'duration_year' => $this->getDurationYear(),
-            'link' => $this->linkToken,
-            'parent_name' => $this->parentName,
+            'link' => $this->getLinkToken(),
+            'parent_name' => $this->getParentName(),
+            'parent_price' => $this->getParentPrice(),
             'files' => $this->getFiles()
         ];
     }
@@ -101,7 +109,15 @@ class InsuranceProduct
      */
     public function getParentName(): string
     {
-        return $this->parentName;
+        return $this->parent->getName();
+    }
+
+    /**
+     * @return int
+     */
+    public function getParentPrice(): int
+    {
+        return Functions::priceToCents($this->parent->getPrice());
     }
 
     public function getDurationYear(): int
@@ -116,7 +132,7 @@ class InsuranceProduct
 
     public function getFiles(): array
     {
-        $filesArray= [];
+        $filesArray = [];
         /** @var File $file */
         foreach ($this->contract->getFiles() as $file) {
             $fileArray['name'] = $file->getName();

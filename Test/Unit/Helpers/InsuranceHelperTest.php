@@ -15,6 +15,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Insurance\SubscriptionFactory;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Customer\Model\Session;
@@ -536,8 +537,9 @@ class InsuranceHelperTest extends TestCase
     {
         $insuranceId = 'alm_insurance_id123456789';
         $parentName = 'fusion back pack';
-        $item = $this->createMock(Product::class);
+        $item = $this->createMock(ProductInterface::class);
         $item->method('getName')->willReturn($parentName);
+        $item->method('getPrice')->willReturn(53.00);
         $contract = new Contract(
             "alm_insurance_id123456789",
             "Alma outillage thermique 3 ans (Vol + casse)",
@@ -550,7 +552,7 @@ class InsuranceHelperTest extends TestCase
             500,
             []
         );
-        $insuranceProductExpected = new InsuranceProduct($contract, $parentName);
+        $insuranceProductExpected = new InsuranceProduct($contract, $item);
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $insuranceEndpoint->method('getInsuranceContract')->willReturn($contract);
         $almaClient = $this->createMock(Client::class);
@@ -615,8 +617,8 @@ class InsuranceHelperTest extends TestCase
         $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
         $itemWithInsurance1 = $this->invoiceItemFactory('mySku', true, 2, 22);
         $itemWithInsurance2 = $this->invoiceItemFactory('mySku', true, 2, 24);
-        $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 23, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300');
-        $itemInsurance2 = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 25, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300');
+        $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 23, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300', 5900);
+        $itemInsurance2 = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true, 2, 25, 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx', '12300', 5600);
         $collectionWithInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2, $itemWithInsurance2, $itemInsurance2]);
 
         $subscriptionResult = '{
@@ -652,6 +654,7 @@ class InsuranceHelperTest extends TestCase
                 'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
                 'cms_reference' => '24-MB02',
                 'linked_product_name' => 'Fusion Backpack',
+                'linked_product_price' => 5900,
                 'subscription_state' => 'started',
                 'mode' => 'test',
                 'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update?sid=<subscription_id>&trace=<trace>',
@@ -666,6 +669,7 @@ class InsuranceHelperTest extends TestCase
                 'contract_id' => 'insurance_contract_5LH0o7qj87xGp6sF1AGWqx',
                 'cms_reference' => '24-MB02',
                 'linked_product_name' => 'Fusion Backpack',
+                'linked_product_price' => 5600,
                 'subscription_state' => 'started',
                 'mode' => 'test',
                 'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update?sid=<subscription_id>&trace=<trace>',
@@ -704,12 +708,12 @@ class InsuranceHelperTest extends TestCase
     /**
      * @return InvoiceItem
      */
-    private function invoiceItemFactory(string $sku, bool $hasInsuranceData = false, int $orderId = 1, int $orderItemId = 1, string $contractId = 'contract_id_123', string $price = '11'): InvoiceItem
+    private function invoiceItemFactory(string $sku, bool $hasInsuranceData = false, int $orderId = 1, int $orderItemId = 1, string $contractId = 'contract_id_123', string $price = '11', int $parentPrice = 5300): InvoiceItem
     {
         $invoiceItem = $this->createMock(InvoiceItem::class);
         $orderItem = $this->createMock(OrderItem::class);
         if ($hasInsuranceData) {
-            $orderItem->method('getData')->willReturn($this->getInsuranceData('1234', $contractId, $price));
+            $orderItem->method('getData')->willReturn($this->getInsuranceData('1234', $contractId, $price, $parentPrice));
             $orderItem->method('getOriginalPrice')->willReturn(120.12);
             $orderItem->method('getOrderId')->willReturn($orderId);
             $orderItem->method('getItemId')->willReturn($orderItemId);
@@ -754,12 +758,12 @@ class InsuranceHelperTest extends TestCase
         ];
     }
 
-    private function getInsuranceData(string $linkToken = null, string $contractId = 'contract_id_123', string $price = '11'): ?string
+    private function getInsuranceData(string $linkToken = null, string $contractId = 'contract_id_123', string $price = '11', int $parent_price = 5300): ?string
     {
         if (!$linkToken) {
             return null;
         }
-        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack"}';
+        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack", "parent_price":"'.$parent_price .'"}';
     }
 
     private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string
@@ -767,7 +771,7 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '"}';
+        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '", "parent_price": "5300"}';
     }
 
 

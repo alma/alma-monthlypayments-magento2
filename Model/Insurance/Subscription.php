@@ -17,6 +17,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     const CONTRACT_ID_KEY = 'contract_id';
     const CMS_REFERENCE_KEY = 'cms_reference';
     const LINKED_PRODUCT_NAME_KEY = 'linked_product_name';
+    const LINKED_PRODUCT_PRICE_KEY = 'linked_product_price';
     const SUBSCRIPTION_STATE_KEY = 'subscription_state';
     const SUBSCRIPTION_MODE_KEY = 'mode';
     const CANCELATION_DATE_KEY = 'date_of_cancelation';
@@ -203,6 +204,22 @@ class Subscription extends AbstractModel implements IdentityInterface
     public function setLinkedProductName(string $linkedProductName): void
     {
         $this->setData(self::LINKED_PRODUCT_NAME_KEY, $linkedProductName);
+    }
+        /**
+     * @return string
+     */
+    public function getLinkedProductPrice(): int
+    {
+        return $this->getDataByKey(self::LINKED_PRODUCT_PRICE_KEY);
+    }
+
+    /**
+     * @param string $linkedProductPrice
+     * @return void
+     */
+    public function setLinkedProductPrice(int $linkedProductPrice): void
+    {
+        $this->setData(self::LINKED_PRODUCT_PRICE_KEY, $linkedProductPrice);
     }
 
     /**

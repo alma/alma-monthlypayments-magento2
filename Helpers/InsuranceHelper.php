@@ -171,7 +171,6 @@ class InsuranceHelper extends AbstractHelper
      */
     public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId, ?string $quoteId = null): ?InsuranceProduct
     {
-        $parentName = $addedItemToQuote->getName();
         $parentSku = $addedItemToQuote->getSku();
         $parentRegularPrice = $addedItemToQuote->getPrice();
         try {
@@ -188,7 +187,7 @@ class InsuranceHelper extends AbstractHelper
         }
 
         $this->logger->info('New insurance Product', []);
-        return new InsuranceProduct($insuranceContract, $parentName);
+        return new InsuranceProduct($insuranceContract, $addedItemToQuote);
     }
 
     /**
@@ -422,6 +421,7 @@ class InsuranceHelper extends AbstractHelper
             $dbSubscription->setContractId($orderItemInsuranceData['id']);
             $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
             $dbSubscription->setLinkedProductName($orderItemInsuranceData['parent_name']);
+            $dbSubscription->setLinkedProductPrice($orderItemInsuranceData['parent_price']);
             $dbSubscription->setSubscriptionState($subscriptionResultContractData['state']);
             $dbSubscription->setSubscriptionMode($mode);
             $dbSubscription->setCallbackUrl($this->getCallbackUrl());
