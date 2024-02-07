@@ -38,7 +38,6 @@ class SubscriptionDetails extends Action implements HttpGetActionInterface
     public function execute(): Page
     {
         $resultPage = $this->pageFactory->create();
-        $subscriptionId = $this->getRequest()->getParam('id');
 
         $resultPage->getConfig()->getTitle()->prepend(__('Alma Subscription details for order'));
 

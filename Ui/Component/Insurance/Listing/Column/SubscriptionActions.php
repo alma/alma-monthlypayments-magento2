@@ -55,7 +55,7 @@ class SubscriptionActions extends Column
                 $name = $this->getData('name');
                 if (isset($item['entity_id'])) {
                     $item[$name]['view'] = [
-                        'href' => $this->_urlBuilder->getUrl('alma_monthly/insurance/subscriptiondetails', ['id' => $item['entity_id']]),
+                        'href' => $this->_urlBuilder->getUrl('alma_monthly/insurance/subscriptiondetails', ['order_id' => $item['order_id']]),
                         'ariaLabel' => __('View details ') . $item['name'],
                         'label' => __('View details')
                     ];
