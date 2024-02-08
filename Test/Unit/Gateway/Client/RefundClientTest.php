@@ -17,6 +17,18 @@ use PHPUnit\Framework\TestCase;
 
 class RefundClientTest extends TestCase
 {
+    private string $mockPaymentId;
+    private string $mockMerchantId;
+    private string $mockAmount;
+    /**
+     * @var AlmaClient|(AlmaClient&object&\PHPUnit\Framework\MockObject\MockObject)|(AlmaClient&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $almaClient;
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+
     public function setUp(): void
     {
         $this->mockPaymentId = 'payment_11uNKOn3uuKhgUdY2eU6AZF1oKifmetCKZ';

@@ -32,6 +32,38 @@ class PaymentValidationTest extends TestCase
     const PAYMENT_ID = 'payment_11upE7m4owxuD78NBymjsYGD6xzxL3KKpZ';
     const INCREMENT_ID = '0000000001';
     const ORDER_ID = '23';
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+    /**
+     * @var Session|(Session&object&\PHPUnit\Framework\MockObject\MockObject)|(Session&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $checkoutSession;
+    /**
+     * @var AlmaClient|(AlmaClient&object&\PHPUnit\Framework\MockObject\MockObject)|(AlmaClient&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $almaClient;
+    /**
+     * @var Processor|(Processor&object&\PHPUnit\Framework\MockObject\MockObject)|(Processor&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $paymentProcessor;
+    /**
+     * @var QuoteRepository|(QuoteRepository&object&\PHPUnit\Framework\MockObject\MockObject)|(QuoteRepository&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $quoteRepository;
+    /**
+     * @var BuilderInterface|(BuilderInterface&Mockery\LegacyMockInterface)|(BuilderInterface&Mockery\MockInterface)|Mockery\LegacyMockInterface|Mockery\MockInterface
+     */
+    private $builderInterface;
+    /**
+     * @var OrderHelper|(OrderHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(OrderHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $orderHelper;
+    /**
+     * @var ConfigHelper|(ConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(ConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $configHelper;
 
 
     public function setUp(): void

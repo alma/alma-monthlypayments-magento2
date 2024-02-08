@@ -13,6 +13,23 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentPlansHelperTest extends TestCase
 {
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+    /**
+     * @var PaymentPlansConfigInterface|(PaymentPlansConfigInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(PaymentPlansConfigInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $paymentPlansConfig;
+    /**
+     * @var MessageManager|(MessageManager&object&\PHPUnit\Framework\MockObject\MockObject)|(MessageManager&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $messageManager;
+    /**
+     * @var ConfigHelper|(ConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(ConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $configHelper;
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
