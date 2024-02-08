@@ -14,7 +14,7 @@
         <column xsi:type="int" name="order_item_id" nullable="false" unsigned="true" comment="Order item id"/>
         <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Insurance Name"/>
         <column xsi:type="varchar" name="subscription_id" nullable="false" length="255" comment="Alma subscription ID"/>
-        <column xsi:type="varchar" name="subscription_broker_id" nullable="true" length="255" comment="Subscription broker ID"/>
+        <column xsi:type="varchar" name="subscription_broker_id" length="255" comment="Subscription broker ID"/>
         <column xsi:type="int" name="subscription_amount" nullable="false" unsigned="true" comment="Alma subscription Price"/>
         <column xsi:type="varchar" name="contract_id" nullable="false" length="255"  comment="Alma contract ID"/>
         <column xsi:type="varchar" name="cms_reference" nullable="false" length="255" comment="cms reference - SKU"/>
