@@ -122,18 +122,18 @@ class Subscription extends AbstractModel implements IdentityInterface
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getSubscriptionBrokerId(): string
+    public function getSubscriptionBrokerId(): ?string
     {
         return $this->getDataByKey(self::BROKER_SUBSCRIPTION_ID_KEY);
     }
 
     /**
-     * @param string $subscriptionBrokerId
+     * @param string | null $subscriptionBrokerId
      * @return void
      */
-    public function setSubscriptionBrokerId(string $subscriptionBrokerId): void
+    public function setSubscriptionBrokerId(?string $subscriptionBrokerId): void
     {
         $this->setData(self::BROKER_SUBSCRIPTION_ID_KEY, $subscriptionBrokerId);
     }
