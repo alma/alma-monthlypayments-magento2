@@ -369,6 +369,7 @@ class InsuranceHelper extends AbstractHelper
             try {
                 $subscriptionArray[] = new Subscription(
                     $insuranceData['id'],
+                    $insuranceData['price'],
                     $item->getSku(),
                     Functions::priceToCents($orderItem->getOriginalPrice()),
                     $subscriber,

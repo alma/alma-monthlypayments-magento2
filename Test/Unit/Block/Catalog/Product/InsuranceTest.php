@@ -90,6 +90,14 @@ class InsuranceTest extends TestCase
      *
      */
     private $config;
+    /**
+     * @var Data|(Data&object&\PHPUnit\Framework\MockObject\MockObject)|(Data&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $configurableHelper;
+    /**
+     * @var \Magento\Checkout\Model\Session|(\Magento\Checkout\Model\Session&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Checkout\Model\Session&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $checkoutSession;
 
     protected function setUp() : void
     {
@@ -115,6 +123,7 @@ class InsuranceTest extends TestCase
         $this->config = $this->createMock(Config::class);
         $this->config->method('getMerchantId')->willReturn('merchant_123456');
         $this->configurableHelper = $this->createMock(Data::class);
+        $this->checkoutSession = $this->createMock(\Magento\Checkout\Model\Session::class);
         $this->insuranceBlock = $this->createNewInsuranceBlock();
     }
     protected function getConstructorDependency():array
@@ -134,7 +143,8 @@ class InsuranceTest extends TestCase
             $this->insuranceHelper,
             $this->apiConfigHelper,
             $this->config,
-            $this->configurableHelper
+            $this->configurableHelper,
+            $this->checkoutSession
         ];
     }
     protected function createNewInsuranceBlock() : Insurance
@@ -202,7 +212,7 @@ class InsuranceTest extends TestCase
         return [
             'Return sandbox front widget Url for sandbox Mode' => [
                 'activeMode' => ApiConfigHelper::TEST_MODE_KEY,
-                'expectedUrl' => 'https://protect.staging.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456',
+                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456',
             ],
             'Return Prod front widget Url for Prod Mode' => [
                 'activeMode' => ApiConfigHelper::LIVE_MODE_KEY,
@@ -214,7 +224,7 @@ class InsuranceTest extends TestCase
      * @param $activeMode
      * @param $expectedUrl
      * @dataProvider scriptUrlDependingMode
-     * @return void
+     * @return voidgi
      */
     public function testGetScriptUrlDependingMode($activeMode, $expectedUrl):void
     {
@@ -227,7 +237,7 @@ class InsuranceTest extends TestCase
         return [
             'Return sandbox script Url for sandbox Mode' => [
                 'activeMode' => ApiConfigHelper::TEST_MODE_KEY,
-                'expectedUrl' => 'https://protect.staging.almapay.com/displayModal.js',
+                'expectedUrl' => 'https://protect.sandbox.almapay.com/displayModal.js',
             ],
             'Return Prod script Url for Prod Mode' => [
                 'activeMode' => ApiConfigHelper::LIVE_MODE_KEY,

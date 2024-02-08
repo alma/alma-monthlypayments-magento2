@@ -686,10 +686,11 @@ class InsuranceHelperTest extends TestCase
         }
     }
 
-    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku'): Subscription
+    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku', int $amount =11): Subscription
     {
         return new Subscription(
             $contractId,
+            $amount,
             $sku,
             12012,
             $subscriber,
