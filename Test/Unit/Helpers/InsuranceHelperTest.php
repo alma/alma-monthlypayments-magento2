@@ -106,7 +106,7 @@ class InsuranceHelperTest extends TestCase
         $this->dbSubscriptionFactory->method('create')->willReturn($subscriptionMock);
         $this->storeManagerInterface = $this->createMock(StoreManager::class);
         $store = $this->createMock(Store::class);
-        $store->method('getBaseUrl')->willReturn('http://my-website.com');
+        $store->method('getBaseUrl')->willReturn('https://my-website.com');
         $this->storeManagerInterface->method('getStore')->willReturn($store);
 
         $this->insuranceHelper = $this->createNewInsuranceHelper();
@@ -657,7 +657,7 @@ class InsuranceHelperTest extends TestCase
                 'linked_product_price' => 5900,
                 'subscription_state' => 'started',
                 'mode' => 'test',
-                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update?sid=<subscription_id>&trace=<trace>',
+                'callback_url' => 'https://my-website.com/rest/V1/alma/insurance/update?subscription_id=<subscription_id>&trace=<trace>',
             ],
             [
                 'order_id' => 2,
@@ -672,7 +672,7 @@ class InsuranceHelperTest extends TestCase
                 'linked_product_price' => 5600,
                 'subscription_state' => 'started',
                 'mode' => 'test',
-                'callback_url' => 'http://my-website.com/rest/V1/alma/insurance/update?sid=<subscription_id>&trace=<trace>',
+                'callback_url' => 'https://my-website.com/rest/V1/alma/insurance/update?subscription_id=<subscription_id>&trace=<trace>',
             ],
         ];
         $arraySubscriptionResult = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult(
@@ -694,7 +694,7 @@ class InsuranceHelperTest extends TestCase
             $sku,
             12012,
             $subscriber,
-            'http://my-website.com/rest/V1/alma/insurance/update'
+            'https://my-website.com/rest/V1/alma/insurance/update'
         );
     }
 

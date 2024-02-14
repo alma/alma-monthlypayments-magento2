@@ -45,7 +45,7 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
-    <route url="/V1/alma/insurance/update" method="POST">
+    <route url="/V1/alma/insurance/update" method="GET">
         <service class="Alma\MonthlyPayments\Api\Insurance\InsuranceUpdateInterface" method="update"/>
         <resources>
             <resource ref="anonymous"/>
