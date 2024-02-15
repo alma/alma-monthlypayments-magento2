@@ -67,12 +67,17 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $invoice = $this->createMock(Invoice::class);
         $invoice->method('getBillingAddress')->willReturn($billingAddress);
         $invoice->method('getItems')->willReturn($itemsInvoiceCollection);
+
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getQuoteId')->willReturn(42);
+        $invoice->method('getOrder')->willReturn($orderMock);
+
         $event = $this->createMock(Event::class);
         $event->method('getData')->willReturn($invoice);
         $observer = $this->createMock(Observer::class);
         $observer->method('getEvent')->willReturn($event);
         $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress');
-        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection);
+        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection, 42);
         $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([]);
         $this->almaClient->expects($this->never())->method('getDefaultClient');
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
@@ -88,7 +93,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $invoice->method('getItems')->willReturn($itemsInvoiceCollection);
 
         $orderMock = $this->createMock(Order::class);
-        $orderMock->method('getQuoteId')->willReturn('42');
+        $orderMock->method('getQuoteId')->willReturn(42);
         $invoice->method('getOrder')->willReturn($orderMock);
 
         $event = $this->createMock(Event::class);
@@ -101,7 +106,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $subscription2 = $this->createMock(\Alma\API\Entities\Insurance\Subscription::class);
 
         $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress')->willReturn($this->subscriberFactory());
-        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection);
+        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection, 42);
         $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([$subscription1, $subscription2]);
 
         $insuranceEndpoint = $this->createMock(Insurance::class);

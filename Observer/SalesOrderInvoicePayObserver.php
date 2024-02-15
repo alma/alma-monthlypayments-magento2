@@ -67,7 +67,8 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
 
         /** @var Collection $invoicedItems */
         $invoicedItems = $invoice->getItems();
-        $this->insuranceSendCustomerCartHelper->sendCustomerCart($invoicedItems);
+        $orderId = $invoice->getOrder()->getQuoteId();
+        $this->insuranceSendCustomerCartHelper->sendCustomerCart($invoicedItems, $orderId);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
 
         // Exit if no subscription in invoice
@@ -77,7 +78,7 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         }
 
         try {
-            $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
+            $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $orderId);
             if (!$return['subscriptions']) {
                 $this->logger->error('Warning No subscription data in Alma return', [$return]);
                 return;
