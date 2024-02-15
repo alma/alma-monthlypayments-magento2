@@ -3,7 +3,7 @@
     "description": "Integrates Alma Monthly Payments into Magento 2",
     "require": {
         "php": ">=7.1",
-        "alma/alma-php-client": ">=2.0.2"
+        "alma/alma-php-client": ">=2.0.3"
     },
     "type": "magento2-module",
     "version": "4.1.1",
