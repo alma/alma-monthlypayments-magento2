@@ -67,7 +67,7 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
     {
         $itemsCollection = $this->collectionFactory();
         $insuranceEndpoint = $this->createMock(Insurance::class);
-        $insuranceEndpoint->expects($this->once())->method('sendCustomerCart')->with(['mb-024', 'mb-025']);
+        $insuranceEndpoint->expects($this->once())->method('sendCustomerCart')->with(['mb-024', 'mb-025', 'mb-025']);
         $client = $this->createMock(Client::class);
         $client->insurance = $insuranceEndpoint;
         $this->almaClient->expects($this->once())->method('getDefaultClient')->willReturn($client);
@@ -79,7 +79,7 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
     {
         $itemsCollection = $this->collectionFactory(true);
         $insuranceEndpoint = $this->createMock(Insurance::class);
-        $insuranceEndpoint->expects($this->once())->method('sendCustomerCart')->with(['mb-024', 'mb-025']);
+        $insuranceEndpoint->expects($this->once())->method('sendCustomerCart')->with(['mb-024', 'mb-025', 'mb-025']);
         $client = $this->createMock(Client::class);
         $client->insurance = $insuranceEndpoint;
         $this->almaClient->expects($this->once())->method('getDefaultClient')->willReturn($client);
@@ -92,10 +92,10 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         $items=[
             $this->invoiceItemFactory('mb-024'),
             $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU),
-            $this->invoiceItemFactory('mb-025')
+            $this->invoiceItemFactory('mb-025', 2.0000)
         ];
         if ($withConfigurable) {
-            $items[] = $this->invoiceItemFactory('mb-024', 30);
+            $items[] = $this->invoiceItemFactory('mb-024', 1.0000,30);
         }
         $iterator = new \ArrayIterator($items);
 
@@ -104,10 +104,11 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         return $itemsCollection;
     }
 
-    private function invoiceItemFactory(string $sku, ?int $parentItemId = null):Item
+    private function invoiceItemFactory(string $sku, float $qty = 1.000, ?int $parentItemId = null):Item
     {
         $item = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
         $item->method('getSku')->willReturn($sku);
+        $item->method('getQty')->willReturn($qty);
         $orderItem = $this->createMock(\Magento\Sales\Model\Order\Item::class);
         $orderItem->expects($this->once())->method('getParentItemId')->willReturn($parentItemId);
         $item->expects($this->once())->method('getOrderItem')->willReturn($orderItem);

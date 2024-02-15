@@ -40,7 +40,9 @@ class InsuranceSendCustomerCartHelper extends AbstractHelper
             }
             $sku = $item->getSku();
             if ($sku !== InsuranceHelper::ALMA_INSURANCE_SKU) {
-                $items[] = $sku;
+                for ($i = 0; $i < (int)$item->getQty(); $i++) {
+                    $items[] = $sku;
+                }
             }
         }
         try {
