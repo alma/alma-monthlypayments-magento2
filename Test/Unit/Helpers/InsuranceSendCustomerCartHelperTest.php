@@ -10,6 +10,7 @@ use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceSendCustomerCartHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\App\Helper\Context;
+use Magento\Sales\Model\Order\Invoice\Item;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 use PHPUnit\Framework\TestCase;
 
@@ -88,42 +89,28 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
 
     private function collectionFactory($withConfigurable = false): Collection
     {
-        $items = [];
-        $item1 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
-        $item1->expects($this->once())->method('getSku')->willReturn('mb-024');
-        $orderItem1 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
-        $orderItem1->expects($this->once())->method('getParentItemId')->willReturn(null);
-        $item1->expects($this->once())->method('getOrderItem')->willReturn($orderItem1);
-        $items[] = $item1;
-
-        $item2 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
-        $item2->expects($this->once())->method('getSku')->willReturn(InsuranceHelper::ALMA_INSURANCE_SKU);
-        $orderItem2 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
-        $orderItem2->expects($this->once())->method('getParentItemId')->willReturn(null);
-        $item2->expects($this->once())->method('getOrderItem')->willReturn($orderItem2);
-
-        $items[] = $item2;
-
+        $items=[
+            $this->invoiceItemFactory('mb-024'),
+            $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU),
+            $this->invoiceItemFactory('mb-025')
+        ];
         if ($withConfigurable) {
-            $item3 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
-            $item3->method('getSku')->willReturn('mb-024');
-            $orderItem3 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
-            $orderItem3->expects($this->once())->method('getParentItemId')->willReturn(30);
-            $item3->expects($this->once())->method('getOrderItem')->willReturn($orderItem3);
-            $items[] = $item3;
+            $items[] = $this->invoiceItemFactory('mb-024', 30);
         }
-
-        $item4 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
-        $item4->expects($this->once())->method('getSku')->willReturn('mb-025');
-        $orderItem4 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
-        $orderItem4->expects($this->once())->method('getParentItemId')->willReturn(null);
-        $item4->expects($this->once())->method('getOrderItem')->willReturn($orderItem4);
-        $items[] = $item4;
-
         $iterator = new \ArrayIterator($items);
 
         $itemsCollection = $this->createMock(Collection::class);
         $itemsCollection->expects($this->once())->method('getIterator')->willReturn($iterator);
         return $itemsCollection;
+    }
+
+    private function invoiceItemFactory(string $sku, ?int $parentItemId = null):Item
+    {
+        $item = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
+        $item->method('getSku')->willReturn($sku);
+        $orderItem = $this->createMock(\Magento\Sales\Model\Order\Item::class);
+        $orderItem->expects($this->once())->method('getParentItemId')->willReturn($parentItemId);
+        $item->expects($this->once())->method('getOrderItem')->willReturn($orderItem);
+        return $item;
     }
 }
