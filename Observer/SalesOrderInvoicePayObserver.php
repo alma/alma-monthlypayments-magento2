@@ -56,18 +56,13 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $this->logger->info('In Sales order invoice pay observer', []);
         /** @var Invoice $invoice */
         $invoice = $observer->getEvent()->getData('invoice');
-        $this->logger->info('$invoice', [$invoice]);
         $billingAddress = $invoice->getBillingAddress();
-        $this->logger->info('$billingAddress', [$billingAddress]);
         $subscriber = $this->insuranceHelper->getSubscriberByAddress($billingAddress);
-        $this->logger->info('$subscriber', [$subscriber]);
 
         /** @var Collection $invoicedItems */
         $invoicedItems = $invoice->getItems();
-        $this->logger->info('$invoicedItems', [$invoicedItems]);
 
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
 
@@ -77,10 +72,8 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
             return;
         }
 
-        $this->logger->info('$subscriptionArray', [$subscriptionArray]);
         try {
             $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
-            $this->logger->info('$return', [$return]);
             if (!$return['subscriptions']) {
                 $this->logger->error('Warning No subscription data in Alma return', [$return]);
                 return;
