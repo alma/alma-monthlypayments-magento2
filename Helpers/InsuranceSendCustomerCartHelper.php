@@ -6,6 +6,7 @@ use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Sales\Model\Order\Invoice\Item;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 
 class InsuranceSendCustomerCartHelper extends AbstractHelper
@@ -14,10 +15,11 @@ class InsuranceSendCustomerCartHelper extends AbstractHelper
     private Logger $logger;
 
     public function __construct(
-        Context $context,
+        Context    $context,
         AlmaClient $almaClient,
-        Logger $logger
-    ) {
+        Logger     $logger
+    )
+    {
         parent::__construct($context);
         $this->almaClient = $almaClient;
         $this->logger = $logger;
@@ -31,7 +33,11 @@ class InsuranceSendCustomerCartHelper extends AbstractHelper
     public function sendCustomerCart(Collection $invoicesItemsCollection, int $orderId)
     {
         $items = [];
+        /** @var Item $item */
         foreach ($invoicesItemsCollection as $item) {
+            if ($item->getParentId()) {
+                continue;
+            }
             $sku = $item->getSku();
             if ($sku !== InsuranceHelper::ALMA_INSURANCE_SKU) {
                 $items[] = $sku;
@@ -39,7 +45,7 @@ class InsuranceSendCustomerCartHelper extends AbstractHelper
         }
         try {
             $this->almaClient->getDefaultClient()->insurance->sendCustomerCart($items, $orderId);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Error sending customer cart to Alma', ['exception' => $e]);
         }
     }

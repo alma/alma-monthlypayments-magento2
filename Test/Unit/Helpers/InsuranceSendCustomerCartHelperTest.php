@@ -62,7 +62,7 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         $this->assertNull($newInsuranceSendCustomerCartHelper->sendCustomerCart($itemsCollection, $this->orderId));
     }
 
-    public function testGivenItemsCollectionWhenSendCustomerCartThenCallAlmaClient()
+    public function testGivenSimpleItemsCollectionSendCustomerCartThenCallAlmaClient()
     {
         $itemsCollection = $this->collectionFactory();
         $insuranceEndpoint = $this->createMock(Insurance::class);
@@ -74,15 +74,45 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         $newInsuranceSendCustomerCartHelper->sendCustomerCart($itemsCollection, $this->orderId);
     }
 
-    private function collectionFactory(): Collection
+    public function testGivenConfigurableItemCOllectionSendCustomerCartThenCallAlmaClient()
     {
+        $itemsCollection = $this->collectionFactory(true);
+        $insuranceEndpoint = $this->createMock(Insurance::class);
+        $insuranceEndpoint->expects($this->once())->method('sendCustomerCart')->with(['mb-024', 'mb-025']);
+        $client = $this->createMock(Client::class);
+        $client->insurance = $insuranceEndpoint;
+        $this->almaClient->expects($this->once())->method('getDefaultClient')->willReturn($client);
+        $newInsuranceSendCustomerCartHelper = $this->newInsuranceSendCustomerCartHelper();
+        $newInsuranceSendCustomerCartHelper->sendCustomerCart($itemsCollection, $this->orderId);
+    }
+
+    private function collectionFactory($withConfigurable = false): Collection
+    {
+        $items = [];
         $item1 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
         $item1->expects($this->once())->method('getSku')->willReturn('mb-024');
+        $item1->expects($this->once())->method('getParentId')->willReturn(null);
+        $items[] = $item1;
+
         $item2 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
-        $item2->expects($this->once())->method('getSku')->willReturn('mb-025');
-        $item3 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
-        $item3->expects($this->once())->method('getSku')->willReturn(InsuranceHelper::ALMA_INSURANCE_SKU);
-        $iterator = new \ArrayIterator([$item1, $item2, $item3]);
+        $item2->expects($this->once())->method('getSku')->willReturn(InsuranceHelper::ALMA_INSURANCE_SKU);
+        $item2->expects($this->once())->method('getParentId')->willReturn(null);
+        $items[] = $item2;
+
+        if ($withConfigurable) {
+            $item3 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
+            $item3->method('getSku')->willReturn('mb-024');
+            $item3->expects($this->once())->method('getParentId')->willReturn(23);
+            $items[] = $item3;
+        }
+
+        $item4 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
+        $item4->expects($this->once())->method('getSku')->willReturn('mb-025');
+        $item4->expects($this->once())->method('getParentId')->willReturn(null);
+        $items[] = $item4;
+
+        $iterator = new \ArrayIterator($items);
+
         $itemsCollection = $this->createMock(Collection::class);
         $itemsCollection->expects($this->once())->method('getIterator')->willReturn($iterator);
         return $itemsCollection;
