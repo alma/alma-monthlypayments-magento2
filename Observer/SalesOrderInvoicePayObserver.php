@@ -6,6 +6,7 @@ use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
+use Alma\MonthlyPayments\Helpers\InsuranceSendCustomerCartHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Magento\Framework\Event\Observer;
@@ -36,19 +37,22 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+    private InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper;
 
     public function __construct(
         Logger          $logger,
         InsuranceHelper $insuranceHelper,
         AlmaClient      $almaClient,
         Subscription    $subscriptionResourceModel,
-        ApiConfigHelper $apiConfigHelper
+        ApiConfigHelper $apiConfigHelper,
+        InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper
     ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
         $this->almaClient = $almaClient;
         $this->subscriptionResourceModel = $subscriptionResourceModel;
         $this->apiConfigHelper = $apiConfigHelper;
+        $this->insuranceSendCustomerCartHelper = $insuranceSendCustomerCartHelper;
     }
 
     /**
@@ -56,19 +60,14 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $this->logger->info('In Sales order invoice pay observer', []);
         /** @var Invoice $invoice */
         $invoice = $observer->getEvent()->getData('invoice');
-        $this->logger->info('$invoice', [$invoice]);
         $billingAddress = $invoice->getBillingAddress();
-        $this->logger->info('$billingAddress', [$billingAddress]);
         $subscriber = $this->insuranceHelper->getSubscriberByAddress($billingAddress);
-        $this->logger->info('$subscriber', [$subscriber]);
 
         /** @var Collection $invoicedItems */
         $invoicedItems = $invoice->getItems();
-        $this->logger->info('$invoicedItems', [$invoicedItems]);
-
+        $this->insuranceSendCustomerCartHelper->sendCustomerCart($invoicedItems, $invoice->getOrder()->getQuoteId());
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
 
         // Exit if no subscription in invoice
@@ -77,10 +76,8 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
             return;
         }
 
-        $this->logger->info('$subscriptionArray', [$subscriptionArray]);
         try {
             $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
-            $this->logger->info('$return', [$return]);
             if (!$return['subscriptions']) {
                 $this->logger->error('Warning No subscription data in Alma return', [$return]);
                 return;
