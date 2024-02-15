@@ -8,6 +8,7 @@ use Alma\API\Entities\Insurance\Subscriber;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
+use Alma\MonthlyPayments\Helpers\InsuranceSendCustomerCartHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Insurance\Subscription;
 use Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver;
@@ -42,6 +43,10 @@ class SalesOrderInvoicePayObserverTest extends TestCase
      * @var \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription
      */
     private $subscriptionResourceModel;
+    /**
+     * @var InsuranceSendCustomerCartHelper
+     */
+    private $insuranceSendCustomerCartHelper;
 
 
     protected function setUp(): void
@@ -51,6 +56,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->almaClient = $this->createMock(AlmaClient::class);
         $this->subscriptionResourceModel = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription::class);
         $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
+        $this->insuranceSendCustomerCartHelper = $this->createMock(InsuranceSendCustomerCartHelper::class);
 
     }
 
@@ -66,6 +72,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $observer = $this->createMock(Observer::class);
         $observer->method('getEvent')->willReturn($event);
         $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress');
+        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection);
         $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([]);
         $this->almaClient->expects($this->never())->method('getDefaultClient');
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
@@ -94,6 +101,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $subscription2 = $this->createMock(\Alma\API\Entities\Insurance\Subscription::class);
 
         $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress')->willReturn($this->subscriberFactory());
+        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection);
         $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([$subscription1, $subscription2]);
 
         $insuranceEndpoint = $this->createMock(Insurance::class);
@@ -126,6 +134,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
             $this->almaClient,
             $this->subscriptionResourceModel,
             $this->apiConfigHelper,
+            $this->insuranceSendCustomerCartHelper
         ];
     }
 

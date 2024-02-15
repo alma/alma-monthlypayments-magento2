@@ -6,6 +6,7 @@ use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
+use Alma\MonthlyPayments\Helpers\InsuranceSendCustomerCartHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Magento\Framework\Event\Observer;
@@ -36,19 +37,22 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+    private InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper;
 
     public function __construct(
         Logger          $logger,
         InsuranceHelper $insuranceHelper,
         AlmaClient      $almaClient,
         Subscription    $subscriptionResourceModel,
-        ApiConfigHelper $apiConfigHelper
+        ApiConfigHelper $apiConfigHelper,
+        InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper
     ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
         $this->almaClient = $almaClient;
         $this->subscriptionResourceModel = $subscriptionResourceModel;
         $this->apiConfigHelper = $apiConfigHelper;
+        $this->insuranceSendCustomerCartHelper = $insuranceSendCustomerCartHelper;
     }
 
     /**
@@ -63,7 +67,7 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
 
         /** @var Collection $invoicedItems */
         $invoicedItems = $invoice->getItems();
-
+        $this->insuranceSendCustomerCartHelper->sendCustomerCart($invoicedItems);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
 
         // Exit if no subscription in invoice
