@@ -91,24 +91,33 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         $items = [];
         $item1 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
         $item1->expects($this->once())->method('getSku')->willReturn('mb-024');
-        $item1->expects($this->once())->method('getParentId')->willReturn(null);
+        $orderItem1 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
+        $orderItem1->expects($this->once())->method('getParentItemId')->willReturn(null);
+        $item1->expects($this->once())->method('getOrderItem')->willReturn($orderItem1);
         $items[] = $item1;
 
         $item2 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
         $item2->expects($this->once())->method('getSku')->willReturn(InsuranceHelper::ALMA_INSURANCE_SKU);
-        $item2->expects($this->once())->method('getParentId')->willReturn(null);
+        $orderItem2 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
+        $orderItem2->expects($this->once())->method('getParentItemId')->willReturn(null);
+        $item2->expects($this->once())->method('getOrderItem')->willReturn($orderItem2);
+
         $items[] = $item2;
 
         if ($withConfigurable) {
             $item3 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
             $item3->method('getSku')->willReturn('mb-024');
-            $item3->expects($this->once())->method('getParentId')->willReturn(23);
+            $orderItem3 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
+            $orderItem3->expects($this->once())->method('getParentItemId')->willReturn(30);
+            $item3->expects($this->once())->method('getOrderItem')->willReturn($orderItem3);
             $items[] = $item3;
         }
 
         $item4 = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
         $item4->expects($this->once())->method('getSku')->willReturn('mb-025');
-        $item4->expects($this->once())->method('getParentId')->willReturn(null);
+        $orderItem4 = $this->createMock(\Magento\Sales\Model\Order\Item::class);
+        $orderItem4->expects($this->once())->method('getParentItemId')->willReturn(null);
+        $item4->expects($this->once())->method('getOrderItem')->willReturn($orderItem4);
         $items[] = $item4;
 
         $iterator = new \ArrayIterator($items);

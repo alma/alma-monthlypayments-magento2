@@ -35,7 +35,7 @@ class InsuranceSendCustomerCartHelper extends AbstractHelper
         $items = [];
         /** @var Item $item */
         foreach ($invoicesItemsCollection as $item) {
-            if ($item->getParentId()) {
+            if ($item->getOrderItem()->getParentItemId()) {
                 continue;
             }
             $sku = $item->getSku();
