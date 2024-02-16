@@ -417,7 +417,6 @@ class InsuranceHelper extends AbstractHelper
             $dbSubscription->setOrderItemId($orderItem->getItemId());
             $dbSubscription->setName($orderItemInsuranceData['name']);
             $dbSubscription->setSubscriptionId($subscriptionResultContractData['id']);
-            $dbSubscription->setSubscriptionBrokerId($subscriptionResultContractData['broker_subscription_id']);
             $dbSubscription->setSubscriptionAmount(intval($subscriptionResultContractData['amount']));
             $dbSubscription->setContractId($orderItemInsuranceData['id']);
             $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
