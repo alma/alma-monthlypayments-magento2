@@ -77,7 +77,7 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         }
 
         try {
-            $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, null, null, $invoice->getOrder()->getQuoteId());
+            $return = $this->almaClient->getDefaultClient()->insurance->subscription($subscriptionArray, $invoice->getOrder()->getId(), null, $invoice->getOrder()->getQuoteId());
             if (!$return['subscriptions']) {
                 $this->logger->error('Warning No subscription data in Alma return', [$return]);
                 return;
