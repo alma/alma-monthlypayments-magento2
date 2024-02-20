@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Model\Api\Insurance;
 use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Api\Insurance\InsuranceUpdateInterface;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory;
@@ -80,11 +81,11 @@ class InsuranceUpdate implements InsuranceUpdateInterface
         } catch (AlreadyExistsException|\Exception $e) {
             throw new Exception(__('Impossible to save subscription data'), 0, 500);
         }
-        if (\Alma\API\Entities\Insurance\Subscription::STATE_CANCELLED === $subscription['state']) {
+        if (\Alma\API\Entities\Insurance\Subscription::STATE_STARTED === $subscription['state']) {
             $order = $this->orderRepository->get($dbSubscription->getOrderId());
             $this->notifierPool->addMajor(
-                __(sprintf('Alma Insurance: Order %s - Cancelled insurance subscriptions need to be refunded', $order->getIncrementId())),
-                sprintf(__('<p>Please be informed that one or multiple subscriptions in Order %s have been canceled.</p><br/><b><p>**Action Required: Refund the customer for the affected subscriptions.**</p></b><br/><p>Thank you.</p>'), $order->getIncrementId()),
+                sprintf(__('Alma Insurance: Order %s - Cancelled insurance subscriptions need to be refunded'), $order->getIncrementId()),
+                sprintf(__('<p>The Insurance %s at %s€ for the product %s has been cancelled. Please refund the customer.</p><p><b>**Action Required: Refund the customer for the affected subscriptions.**</b></p></p><p>Thank you.</p>'), $dbSubscription['name'], (string)Functions::priceFromCents($dbSubscription['subscription_amount']), $dbSubscription['linked_product_name']),
                 $this->url->getUrl('sales/order/view', ['order_id' => $order->getId()])
             );
         }
