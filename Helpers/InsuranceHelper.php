@@ -376,8 +376,7 @@ class InsuranceHelper extends AbstractHelper
                     $this->getCallbackUrl()
                 );
             } catch (\Exception $e) {
-                $this->logger->info('et mince ', [$e->getMessage()]);
-                die;
+                $this->logger->info('Impossible to create subscription Data : ', ['exception message :' => $e->getMessage(), 'Data' => $insuranceData]);
             }
 
         }
