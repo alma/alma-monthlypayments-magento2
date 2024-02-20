@@ -28,6 +28,9 @@ class InsuranceUpdateTest extends TestCase
 
     private $subscriptionRessourceModel;
     private $subscriptionCollection;
+    private $notifierPool;
+    private $orderRepository;
+    private $url;
 
     /**
      * @return void
@@ -39,6 +42,10 @@ class InsuranceUpdateTest extends TestCase
         $this->almaClient = $this->createMock(AlmaClient::class);
         $this->subscriptionCollection = $this->createMock(CollectionFactory::class);
         $this->subscriptionRessourceModel = $this->createMock(Subscription::class);
+        $this->notifierPool = $this->createMock(\Magento\Framework\Notification\NotifierPool::class);
+        $this->orderRepository = $this->createMock(\Magento\Sales\Model\OrderRepository::class);
+        $this->url = $this->createMock(\Magento\Backend\Model\Url::class);
+
     }
 
     /**
@@ -51,7 +58,10 @@ class InsuranceUpdateTest extends TestCase
             $this->logger,
             $this->almaClient,
             $this->subscriptionCollection,
-            $this->subscriptionRessourceModel
+            $this->subscriptionRessourceModel,
+            $this->notifierPool,
+            $this->orderRepository,
+            $this->url
         ];
     }
 
@@ -91,6 +101,7 @@ class InsuranceUpdateTest extends TestCase
         $instance = $this->createInstance();
         $instance->update();
     }
+
     public function testGivenSubscriptionIdReturnEmptySubscriptionListMustReturnError(): void
     {
         $this->request->expects($this->once())
@@ -109,7 +120,7 @@ class InsuranceUpdateTest extends TestCase
         $instance->update();
     }
 
-    public function testGivenEmptyDbSubscriptionMustThrow():void
+    public function testGivenEmptyDbSubscriptionMustThrow(): void
     {
         $this->request->expects($this->once())
             ->method('getParams')
@@ -132,7 +143,7 @@ class InsuranceUpdateTest extends TestCase
         $instance->update();
     }
 
-    public function testGivenAValidApiReturnMustLoadAndSaveModelFromRepository(): void
+    public function testGivenAValidApiReturnStartedMustLoadAndSaveModelFromRepositoryAndNotSendNotification(): void
     {
         $this->request->expects($this->once())
             ->method('getParams')
@@ -140,19 +151,66 @@ class InsuranceUpdateTest extends TestCase
 
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $apiResult = $this->getSubscriptionResultData();
-        $insuranceEndpoint->expects($this->once())->method('getSubscription')->with(['id' => 'valid_subscription_key'])->willReturn($this->getSubscriptionResultData($apiResult));
+        $insuranceEndpoint
+            ->expects($this->once())
+            ->method('getSubscription')
+            ->with(['id' => 'valid_subscription_key'])
+            ->willReturn($apiResult);
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
+
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
+
         $dbSubscriptionMock = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\Subscription::class);
         $dbSubscriptionMock->method('getId')->willReturn(1);
         $dbSubscriptionMock->method('setSubscriptionState')->with($apiResult['subscriptions'][0]['state']);
         $dbSubscriptionMock->method('setSubscriptionBrokerId')->with($apiResult['subscriptions'][0]['broker_subscription_id']);
+
         $this->subscriptionRessourceModel->expects($this->once())->method('save')->with($dbSubscriptionMock);
         $collectionMock = $this->createMock(Subscription\Collection::class);
         $collectionMock->method('getFirstItem')->willReturn($dbSubscriptionMock);
         $collectionMock->method('addFieldToFilter')->willReturn($collectionMock);
 
+        $this->orderRepository->expects($this->never())->method('get');
+        $this->notifierPool->expects($this->never())->method('addMajor');
+        $this->subscriptionCollection->method('create')->willReturn($collectionMock);
+
+        $instance = $this->createInstance();
+        $this->assertNull($instance->update());
+    }
+
+    public function testGivenAValidApiReturnCancelledMustLoadAndSaveModelFromRepositoryAndSendNotification(): void
+    {
+        $this->request->expects($this->once())
+            ->method('getParams')
+            ->willReturn(['subscription_id' => 'valid_subscription_key']);
+
+        $insuranceEndpoint = $this->createMock(Insurance::class);
+        $apiResult = $this->getSubscriptionResultData(\Alma\API\Entities\Insurance\Subscription::STATE_CANCELLED);
+        $insuranceEndpoint
+            ->expects($this->once())
+            ->method('getSubscription')
+            ->with(['id' => 'valid_subscription_key'])
+            ->willReturn($apiResult);
+        $almaClient = $this->createMock(Client::class);
+        $almaClient->insurance = $insuranceEndpoint;
+
+        $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
+        $dbSubscriptionMock = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\Subscription::class);
+        $dbSubscriptionMock->method('getId')->willReturn(1);
+        $dbSubscriptionMock->method('setSubscriptionState')->with($apiResult['subscriptions'][0]['state']);
+        $dbSubscriptionMock->method('setSubscriptionBrokerId')->with($apiResult['subscriptions'][0]['broker_subscription_id']);
+
+        $this->subscriptionRessourceModel->expects($this->once())->method('save')->with($dbSubscriptionMock);
+        $collectionMock = $this->createMock(Subscription\Collection::class);
+        $collectionMock->method('getFirstItem')->willReturn($dbSubscriptionMock);
+        $collectionMock->method('addFieldToFilter')->willReturn($collectionMock);
+
+        $orderMock = $this->createMock(\Magento\Sales\Model\Order::class);
+        $orderMock->method('getIncrementId')->willReturn('123');
+
+        $this->orderRepository->expects($this->once())->method('get')->willReturn($orderMock);
+        $this->notifierPool->expects($this->once())->method('addMajor');
         $this->subscriptionCollection->method('create')->willReturn($collectionMock);
 
         $instance = $this->createInstance();
@@ -160,7 +218,7 @@ class InsuranceUpdateTest extends TestCase
     }
 
 
-    private function getSubscriptionResultData(): array
+    private function getSubscriptionResultData(string $state = 'started '): array
     {
         return [
             "subscriptions" => [
@@ -170,7 +228,7 @@ class InsuranceUpdateTest extends TestCase
                     "contract_id" => "insurance_contract_755vkKQUnezKPvzMWc4Qeq",
                     "id" => "subscription_5FM3wla3WvVjFaOUb06nXt",
                     "broker_subscription_id" => "xxxx",
-                    "state" => "cancel",
+                    "state" => $state,
                     "subscriber" => [
                         "address_line_1" => "adr1",
                         "address_line_2" => "adr1",

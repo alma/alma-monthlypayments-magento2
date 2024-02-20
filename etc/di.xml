@@ -48,8 +48,10 @@
                 type="Alma\MonthlyPayments\CustomerData\DefaultItem"/>
     <preference for="Magento\Checkout\CustomerData\Cart"
                 type="Alma\MonthlyPayments\CustomerData\Cart"/>
-
-
+    <preference for="Magento\AdminNotification\Block\Grid\Renderer\Notice"
+                type="Alma\MonthlyPayments\Block\Grid\Renderer\Notice"/>
+    <preference for="Magento\AdminNotification\Block\Grid\Renderer\Actions"
+                type="Alma\MonthlyPayments\Block\Grid\Renderer\Actions"/>
     <!-- Eligibility injection in cart customer data -->
     <type name="Magento\Checkout\CustomerData\Cart">
         <plugin name="cart_eligibility" type="Alma\MonthlyPayments\Plugin\Checkout\CustomerData\CartEligibility"/>
