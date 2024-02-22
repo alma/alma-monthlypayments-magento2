@@ -56,18 +56,18 @@ define([
                 return subscriptions.map(subscription => {
                     console.log(subscription);
                     return {
-                        subscriptionId: subscription.subscription_id,
                         id: subscription.entity_id,
                         productName: subscription.linked_product_name,
+                        productPrice: subscription.linked_product_price,
                         insuranceName: subscription.name,
                         status: subscription.subscription_state,
-                        productPrice: subscription.linked_product_price,
+                        subscriptionId: subscription.subscription_id,
+                        subscriptionBrokerId: subscription.subscription_broker_id,
                         subscriptionAmount: subscription.subscription_amount,
                         isRefunded: subscription.is_refunded === '1',
                         reasonForCancelation: subscription.reason_of_cancelation,
                         dateOfCancelation: subscription.date_of_cancelation,
                         dateOfCancelationRequest: subscription.date_of_cancelation_request,
-                        subscriptionBrokerId: subscription.subscription_broker_id,
                     }
                 })
             }
