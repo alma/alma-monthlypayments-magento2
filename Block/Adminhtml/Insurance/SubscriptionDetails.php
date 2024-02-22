@@ -85,8 +85,6 @@ class SubscriptionDetails extends Template
      */
     public function getScriptUrl(): string
     {
-        //TODO : Remove staging URL
-        return 'https://protect.staging.almapay.com/displayModal.js';
         return $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
     }
 
