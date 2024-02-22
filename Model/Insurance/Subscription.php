@@ -259,7 +259,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     /**
      * @return string|null
      */
-    public function getCancellationDate(): ?string
+    public function getCancellationDate(): ?\DateTime
     {
         return $this->getDataByKey(self::CANCELATION_DATE_KEY);
     }
@@ -293,7 +293,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     /**
      * @return string|null
      */
-    public function getCancellationRequestDate(): ?string
+    public function getCancellationRequestDate(): ?\DateTime
     {
         return $this->getDataByKey(self::CANCELATION_REQUEST_DATE_KEY);
     }

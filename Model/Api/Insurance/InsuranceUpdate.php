@@ -46,7 +46,8 @@ class InsuranceUpdate implements InsuranceUpdateInterface
         NotifierPool                $notifierPool,
         OrderRepository             $orderRepository,
         Url                         $url
-    ) {
+    )
+    {
         $this->request = $request;
         $this->logger = $logger;
         $this->almaClient = $almaClient;
@@ -77,14 +78,10 @@ class InsuranceUpdate implements InsuranceUpdateInterface
             throw new Exception(__('Invalid subscription_id'), 0, 404);
         }
 
-        $dbSubscription->setSubscriptionState($subscription['state']);
-        $dbSubscription->setSubscriptionBrokerId($subscription['broker_subscription_id']);
-        try {
-            $this->subscription->save($dbSubscription);
-        } catch (AlreadyExistsException|\Exception $e) {
-            throw new Exception(__('Impossible to save subscription data'), 0, 500);
-        }
         if (\Alma\API\Entities\Insurance\Subscription::STATE_CANCELLED === $subscription['state']) {
+            if (!$dbSubscription->getCancellationDate()) {
+                $dbSubscription->setCancellationDate(new \DateTime());
+            }
             $order = $this->orderRepository->get($dbSubscription->getOrderId());
             $this->notifierPool->addMajor(
                 sprintf(__('Alma Insurance: Order %s - Cancelled insurance subscriptions need to be refunded'), $order->getIncrementId()),
@@ -92,6 +89,15 @@ class InsuranceUpdate implements InsuranceUpdateInterface
                 $this->url->getUrl('sales/order/view', ['order_id' => $order->getId()])
             );
         }
+
+        $dbSubscription->setSubscriptionState($subscription['state']);
+        $dbSubscription->setSubscriptionBrokerId($subscription['broker_subscription_id']);
+        try {
+            $this->subscription->save($dbSubscription);
+        } catch (AlreadyExistsException|\Exception $e) {
+            throw new Exception(__('Impossible to save subscription data'), 0, 500);
+        }
+
     }
 
     /**
@@ -117,17 +123,6 @@ class InsuranceUpdate implements InsuranceUpdateInterface
         }
     }
 
-    /**
-     * @param $collection
-     * @return void
-     * @throws Exception
-     */
-    private function checkSubscriptionExistInDb($collection): void
-    {
-        if (!$collection->getFirstItem()->getId()) {
-            throw new Exception(__('Subscription not found'), 0, 404);
-        }
-    }
 
     /**
      * @param string $subscriptionId
@@ -140,7 +135,7 @@ class InsuranceUpdate implements InsuranceUpdateInterface
             $subscriptions = $this->almaClient->getDefaultClient()->insurance->getSubscription(['id' => $subscriptionId]);
         } catch (AlmaException $e) {
             $this->logger->error("Error getting subscription:", [$e->getMessage()]);
-            throw new Exception(__('Impossible to get subscription_id'), 0, 404, );
+            throw new Exception(__('Impossible to get subscription_id'), 0, 404,);
         }
         return $subscriptions;
     }
