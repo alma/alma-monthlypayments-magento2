@@ -9,15 +9,36 @@ define([
                 const payload = generateIframePayload(data);
                 loadDataInIframe(payload);
             })
+
             window.addEventListener('message', (e) => {
                 if (e.data.type === 'sendCancelSubscriptionToCms') {
-                    console.log('Cancel subscription', e.data)
-                    console.log(data)
-                    window.location.href = 'http://adobe-commerce-a-2-4-6.local.test/backadm/'
+
+                    cancelSubscription(e.data.cmsSubscription.subscriptionId, e.data.cmsSubscription.subscriptionBrokerId, e.data.reasonContent)
                 }
             })
+
+            function cancelSubscription(subscriptionId, brokerId, reasonContent = '') {
+                $.ajax({
+                    url: data.controllerCancelUrl,
+                    type: 'POST',
+                    data: {
+                        subscriptionId: subscriptionId,
+                        cancelReason: reasonContent
+                    },
+                    success: function (result) {
+                        console.log(result.message)
+                        sendNotificationToIFrame([
+                            {subscriptionBrokerId: brokerId, newStatus: result.state},
+                        ])
+                    },
+                    error: function (result) {
+                        console.log('Error', result)
+                    }
+                });
+            }
+
             function generateIframePayload(data) {
-               return {
+                return {
                     token: '',
                     orderId: data.orderId,
                     orderReference: data.incrementId, // Order increment ID -> join with order_id
@@ -30,16 +51,19 @@ define([
                     cmsSubscriptions: getCmsSubscriptions(data.subscriptions),
                 }
             }
+
             function getCmsSubscriptions(subscriptions) {
                 return subscriptions.map(subscription => {
+                    console.log(subscription);
                     return {
+                        subscriptionId: subscription.subscription_id,
                         id: subscription.entity_id,
                         productName: subscription.linked_product_name,
                         insuranceName: subscription.name,
                         status: subscription.subscription_state,
                         productPrice: subscription.linked_product_price,
                         subscriptionAmount: subscription.subscription_amount,
-                        isRefunded: subscription.is_refunded,
+                        isRefunded: subscription.is_refunded === '1',
                         reasonForCancelation: subscription.reason_of_cancelation,
                         dateOfCancelation: subscription.date_of_cancelation,
                         dateOfCancelationRequest: subscription.date_of_cancelation_request,
@@ -47,15 +71,15 @@ define([
                     }
                 })
             }
-            function loadDataInIframe (payload) {
-                setTimeout(() =>
-                {
-                    if( typeof(getSubscriptionDatafromCms) !== 'undefined') {
+
+            function loadDataInIframe(payload) {
+                setTimeout(() => {
+                    if (typeof (getSubscriptionDatafromCms) !== 'undefined') {
                         getSubscriptionDatafromCms(payload)
                     } else {
                         loadDataInIframe(payload)
                     }
-                } , 150);
+                }, 250);
             }
         });
     }
