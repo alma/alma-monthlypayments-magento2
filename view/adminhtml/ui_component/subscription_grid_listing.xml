@@ -100,13 +100,14 @@
                 <label translate="true">State</label>
             </settings>
         </column>
-        <column name="cancellation_date">
+        <column name="date_of_cancelation">
             <settings>
                 <label translate="true">Cancellation Date</label>
             </settings>
         </column>
-        <column name="cancellation_reason" >
+        <column name="reason_of_cancelation">
             <settings>
+                <filter>text</filter>
                 <label translate="true">Cancellation Reason</label>
             </settings>
         </column>
