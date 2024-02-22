@@ -12,6 +12,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Validator\Exception;
 
 
 class CancelSubscription extends Action
@@ -63,10 +64,18 @@ class CancelSubscription extends Action
             return $result->setData($response);
         }
 
-
+        try {
+            $dbSubscription = $this->insuranceSubscriptionHelper->getDbSubscription($post['subscriptionId']);
+        } catch (Exception $e) {
+            $this->logger->error('Impossible to load subscription data', [$e->getMessage()]);
+            $response = ['state' => Subscription::STATE_FAILED, 'message' => 'Impossible to load subscription data'];
+            return $result->setData($response);
+        }
 
         try {
+            $dbSubscription->setCancellationRequestDate(new \DateTime());
             $this->almaClient->getDefaultClient()->insurance->cancelSubscription($post['subscriptionId']);
+            $dbSubscription->setCancellationDate(new \DateTime());
         } catch (InsuranceCancelPendingException $e) {
             $response = ['state' => Subscription::STATE_PENDING_CANCELLATION, 'message' => self::CANCEL_PENDING_MESSAGE];
         } catch (AlmaException $e) {
@@ -75,8 +84,8 @@ class CancelSubscription extends Action
         }
 
         try {
-            $dbSubscription = $this->insuranceSubscriptionHelper->getDbSubscription($post['subscriptionId']);
             $dbSubscription->setSubscriptionState($response['state']);
+            $dbSubscription->setCancellationReason($post['cancelReason'] ?? '');
             $this->subscriptionResourceModel->save($dbSubscription);
         } catch (\Exception $e) {
             $this->logger->error('Impossible to load/save Subscription', [$post['subscriptionId']]);
