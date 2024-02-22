@@ -26,7 +26,8 @@
                 "orderDate": "<?= $block->getOrderDate() ?>",
                 "firstName": "<?= $block->getCustomerFirstName() ?>",
                 "lastName": "<?= $block->getCustomerLastName() ?>",
-                "subscriptions": <?=  json_encode($block->getSubscriptionCollection(), true) ?>
+                "subscriptions": <?=  json_encode($block->getSubscriptionCollection(), true) ?>,
+                "controllerCancelUrl": "<?= $block->getControllerCancelUrl() ?>"
             }
         }
     }

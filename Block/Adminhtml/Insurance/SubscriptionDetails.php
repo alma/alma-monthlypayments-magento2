@@ -8,6 +8,8 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\Collection;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory;
 use Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template\Context;
+use Magento\Backend\Model\Url;
 use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -37,7 +39,20 @@ class SubscriptionDetails extends Template
      * @var OrderRepository
      */
     private $orderRepository;
+    private $urlBuilder;
 
+    /**
+     * @param Logger $logger
+     * @param Context $context
+     * @param InsuranceHelper $insuranceHelper
+     * @param ApiConfigHelper $apiConfigHelper
+     * @param CollectionFactory $collectionFactory
+     * @param OrderRepository $orderRepository
+     * @param Url $urlBuilder
+     * @param array $data
+     * @param JsonHelper|null $jsonHelper
+     * @param DirectoryHelper|null $directoryHelper
+     */
     public function __construct(
         Logger            $logger,
         Template\Context  $context,
@@ -45,6 +60,7 @@ class SubscriptionDetails extends Template
         ApiConfigHelper   $apiConfigHelper,
         CollectionFactory $collectionFactory,
         OrderRepository   $orderRepository,
+        Url               $urlBuilder,
         array             $data = [],
         ?JsonHelper       $jsonHelper = null,
         ?DirectoryHelper  $directoryHelper = null
@@ -61,6 +77,7 @@ class SubscriptionDetails extends Template
         $this->logger = $logger;
         $this->collectionFactory = $collectionFactory;
         $this->orderRepository = $orderRepository;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -68,10 +85,15 @@ class SubscriptionDetails extends Template
      */
     public function getScriptUrl(): string
     {
+        //TODO : Remove staging URL
         return 'https://protect.staging.almapay.com/displayModal.js';
-        //return $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
+        return $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
     }
 
+    public function getControllerCancelUrl(): string
+    {
+        return $this->urlBuilder->getUrl('alma_monthly/insurance/cancelsubscription');
+    }
     /**
      * @return array
      */
