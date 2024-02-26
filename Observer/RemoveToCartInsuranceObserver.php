@@ -20,9 +20,10 @@ class RemoveToCartInsuranceObserver implements ObserverInterface
     private $insuranceHelper;
 
     public function __construct(
-        Logger $logger,
+        Logger          $logger,
         InsuranceHelper $insuranceHelper
-    ) {
+    )
+    {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
     }
@@ -47,14 +48,14 @@ class RemoveToCartInsuranceObserver implements ObserverInterface
 
         if (InsuranceHelper::ALMA_INSURANCE_SKU === $removedItem->getSku()) {
             $productWithInsurance = $this->insuranceHelper->getProductLinkedToInsurance($linkToken, $quoteItems);
-			if($productWithInsurance){
-				$this->insuranceHelper->setAlmaInsuranceToQuoteItem($productWithInsurance);
-			}
+            if ($productWithInsurance) {
+                $this->insuranceHelper->setAlmaInsuranceToQuoteItem($productWithInsurance);
+            }
         } else {
             $insuranceToRemove = $this->insuranceHelper->getInsuranceProductToRemove($linkToken, $quoteItems);
-			if($insuranceToRemove){
-				$this->insuranceHelper->removeQuoteItemFromCart($insuranceToRemove);
-			}
+            if ($insuranceToRemove) {
+                $this->insuranceHelper->removeQuoteItemFromCart($insuranceToRemove);
+            }
         }
     }
 }

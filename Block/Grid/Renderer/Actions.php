@@ -12,12 +12,11 @@ class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
         Context $context,
         Data    $urlHelper,
         array   $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $urlHelper, $data);
     }
 
-    public function render(\Magento\Framework\DataObject $row)
+    public function render(\Magento\Framework\DataObject $row): string
     {
         if (preg_match('/^Alma/', $row->getTitle())) {
             $readDetailsHtml = $row->getUrl() ? '<a class="action-details" target="_blank" href="' .
@@ -26,9 +25,9 @@ class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
                 __('View Order') . '</a>' : '';
 
             $markAsReadHtml = !$row->getIsRead() ? '<a class="action-mark" href="' . $this->getUrl(
-                    '*/*/markAsRead/',
-                    ['_current' => true, 'id' => $row->getNotificationId()]
-                ) . '">' . __(
+                '*/*/markAsRead/',
+                ['_current' => true, 'id' => $row->getNotificationId()]
+            ) . '">' . __(
                     'Mark as Read'
                 ) . '</a>' : '';
 
@@ -52,5 +51,4 @@ class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
 
         return parent::render($row);
     }
-
 }

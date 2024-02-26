@@ -44,8 +44,7 @@ class Insurance extends Fieldset
         InsuranceHelper                     $insuranceHelper,
         array                               $data = [],
         ?SecureHtmlRenderer                 $secureRenderer = null
-    )
-    {
+    ) {
         parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
         $this->insuranceHelper = $insuranceHelper;
     }
@@ -57,7 +56,7 @@ class Insurance extends Fieldset
      *
      * @return string
      */
-    protected function _getFrontendClass($element)
+    protected function _getFrontendClass($element): string
     {
         return parent::_getFrontendClass($element);
     }
@@ -68,7 +67,7 @@ class Insurance extends Fieldset
      * @param AbstractElement $element
      * @return string
      */
-    protected function _getHeaderTitleHtml($element)
+    protected function _getHeaderTitleHtml($element): string
     {
         if ($this->insuranceHelper->getConfig()->isAllowed()) {
             return parent::_getHeaderTitleHtml($element);

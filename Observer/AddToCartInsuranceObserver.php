@@ -103,11 +103,14 @@ class AddToCartInsuranceObserver implements ObserverInterface
             if (!$insuranceId) {
                 return;
             }
-            $insuranceObject = $this->insuranceHelper->getInsuranceProduct($this->configurableItemProductResolver->getFinalProduct($addedItemToQuote), $insuranceId, $addedItemToQuote->getQuoteId());
+            $insuranceObject = $this->insuranceHelper->getInsuranceProduct(
+                $this->configurableItemProductResolver->getFinalProduct($addedItemToQuote),
+                $insuranceId,
+                $addedItemToQuote->getQuoteId()
+            );
             if (!$insuranceObject) {
                 return;
             }
-
 
             $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE);

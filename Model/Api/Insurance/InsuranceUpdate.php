@@ -135,7 +135,7 @@ class InsuranceUpdate implements InsuranceUpdateInterface
             $subscriptions = $this->almaClient->getDefaultClient()->insurance->getSubscription(['id' => $subscriptionId]);
         } catch (AlmaException $e) {
             $this->logger->error("Error getting subscription:", [$e->getMessage()]);
-            throw new Exception(__('Impossible to get subscription_id'), 0, 404,);
+            throw new Exception(__('Impossible to get subscription_id'), 0, 404);
         }
         return $subscriptions;
     }

@@ -16,10 +16,11 @@ class InsuranceAllowed extends Field
      */
     public function __construct(
         Context $context,
-        array $data = []
+        array   $data = []
     ) {
         parent::__construct($context, $data);
     }
+
     /**
      * Retrieve element HTML markup
      *
@@ -28,7 +29,7 @@ class InsuranceAllowed extends Field
      */
     protected function _getElementHtml(AbstractElement $element)
     {
-        $element->setReadonly(true,true);
+        $element->setReadonly(true, true);
         return $element->getElementHtml();
     }
 }
