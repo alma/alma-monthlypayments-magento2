@@ -201,7 +201,7 @@ class InsuranceUpdateTest extends TestCase
 
         $this->orderRepository->method('get')->willReturn($orderMock);
 
-        $this->dbSubscriptionMock->method('getCancellationDate')->willReturn(new \DateTime());
+        $this->dbSubscriptionMock->method('getCancellationDate')->willReturn('2024:09:01-00:00:00');
         $this->almaClient->method('getDefaultClient')->willReturn($this->client);
         $this->dbSubscriptionMock->expects($this->never())->method('setCancellationDate');
         $instance = $this->createInstance();
