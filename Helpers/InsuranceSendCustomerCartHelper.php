@@ -11,8 +11,8 @@ use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
 
 class InsuranceSendCustomerCartHelper extends AbstractHelper
 {
-    private AlmaClient $almaClient;
-    private Logger $logger;
+    private $almaClient;
+    private $logger;
 
     public function __construct(
         Context    $context,

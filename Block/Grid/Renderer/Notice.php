@@ -7,7 +7,7 @@ use Magento\Backend\Block\Context;
 
 class Notice extends \Magento\AdminNotification\Block\Grid\Renderer\Notice
 {
-    private Logger $logger;
+    private $logger;
 
     public function __construct(
         Context $context,
