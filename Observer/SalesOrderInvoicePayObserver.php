@@ -40,11 +40,11 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
     private InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper;
 
     public function __construct(
-        Logger          $logger,
-        InsuranceHelper $insuranceHelper,
-        AlmaClient      $almaClient,
-        Subscription    $subscriptionResourceModel,
-        ApiConfigHelper $apiConfigHelper,
+        Logger                          $logger,
+        InsuranceHelper                 $insuranceHelper,
+        AlmaClient                      $almaClient,
+        Subscription                    $subscriptionResourceModel,
+        ApiConfigHelper                 $apiConfigHelper,
         InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper
     ) {
         $this->logger = $logger;
