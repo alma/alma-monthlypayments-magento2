@@ -31,7 +31,7 @@ class InsuranceUpdate implements InsuranceUpdateInterface
     private $subscription;
     private $notifierPool;
     private $orderRepository;
-    private Url $url;
+    private $url;
 
     /**
      * @param Request $request

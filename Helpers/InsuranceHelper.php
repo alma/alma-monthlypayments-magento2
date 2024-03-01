@@ -361,23 +361,27 @@ class InsuranceHelper extends AbstractHelper
         foreach ($itemsCollection as $item) {
             /** @var \Magento\Sales\Model\Order\Item $orderItem */
             $orderItem = $item->getOrderItem();
+            $orderItemQty = (int)$item->getQty();
             $insuranceData = $orderItem->getData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
             if (!$insuranceData || $item->getSku() === InsuranceHelper::ALMA_INSURANCE_SKU) {
                 continue;
             }
             $insuranceData = json_decode($insuranceData, true);
-            try {
-                $subscriptionArray[] = new Subscription(
-                    $insuranceData['id'],
-                    $insuranceData['price'],
-                    $item->getSku(),
-                    Functions::priceToCents($orderItem->getOriginalPrice()),
-                    $subscriber,
-                    $this->getCallbackUrl()
-                );
-            } catch (\Exception $e) {
-                $this->logger->info('Impossible to create subscription Data : ', ['exception message :' => $e->getMessage(), 'Data' => $insuranceData]);
+            for ($i = 0; $i < $orderItemQty; $i++) {
+                try {
+                    $subscriptionArray[] = new Subscription(
+                        $insuranceData['id'],
+                        $insuranceData['price'],
+                        $item->getSku(),
+                        Functions::priceToCents($orderItem->getOriginalPrice()),
+                        $subscriber,
+                        $this->getCallbackUrl()
+                    );
+                } catch (\Exception $e) {
+                    $this->logger->info('Impossible to create subscription Data : ', ['exception message :' => $e->getMessage(), 'Data' => $insuranceData]);
+                }
             }
+
 
         }
         return $subscriptionArray;
@@ -401,30 +405,33 @@ class InsuranceHelper extends AbstractHelper
             }
 
             /** @var \Alma\MonthlyPayments\Model\Insurance\Subscription $dbSubscription */
-            $dbSubscription = $this->subscriptionFactory->create();
             $orderItem = $item->getOrderItem();
+            $orderItemQty = (int)$item->getQty();
             $orderItemInsuranceData = json_decode($orderItem->getData(self::ALMA_INSURANCE_DB_KEY), true);
             $subscriptionResultContractData = [];
-            foreach ($subscriptionResult as $key => $result) {
-                if (array_search($orderItemInsuranceData['id'], $result)) {
-                    $subscriptionResultContractData = $result;
-                    unset($subscriptionResult[$key]);
-                    break;
+            for ($i = 0; $i < $orderItemQty; $i++) {
+                foreach ($subscriptionResult as $key => $result) {
+                    if (array_search($orderItemInsuranceData['id'], $result)) {
+                        $subscriptionResultContractData = $result;
+                        unset($subscriptionResult[$key]);
+                        break;
+                    }
                 }
+                $dbSubscription = $this->subscriptionFactory->create();
+                $dbSubscription->setOrderId($orderItem->getOrderId());
+                $dbSubscription->setOrderItemId($orderItem->getItemId());
+                $dbSubscription->setName($orderItemInsuranceData['name']);
+                $dbSubscription->setSubscriptionId($subscriptionResultContractData['id']);
+                $dbSubscription->setSubscriptionAmount(intval($subscriptionResultContractData['amount']));
+                $dbSubscription->setContractId($orderItemInsuranceData['id']);
+                $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
+                $dbSubscription->setLinkedProductName($orderItemInsuranceData['parent_name']);
+                $dbSubscription->setLinkedProductPrice($orderItemInsuranceData['parent_price']);
+                $dbSubscription->setSubscriptionState($subscriptionResultContractData['state']);
+                $dbSubscription->setSubscriptionMode($mode);
+                $dbSubscription->setCallbackUrl($this->getCallbackUrl());
+                $dbSubscriptionArray[] = clone $dbSubscription;
             }
-            $dbSubscription->setOrderId($orderItem->getOrderId());
-            $dbSubscription->setOrderItemId($orderItem->getItemId());
-            $dbSubscription->setName($orderItemInsuranceData['name']);
-            $dbSubscription->setSubscriptionId($subscriptionResultContractData['id']);
-            $dbSubscription->setSubscriptionAmount(intval($subscriptionResultContractData['amount']));
-            $dbSubscription->setContractId($orderItemInsuranceData['id']);
-            $dbSubscription->setCmsReference($subscriptionResultContractData['cms_reference']);
-            $dbSubscription->setLinkedProductName($orderItemInsuranceData['parent_name']);
-            $dbSubscription->setLinkedProductPrice($orderItemInsuranceData['parent_price']);
-            $dbSubscription->setSubscriptionState($subscriptionResultContractData['state']);
-            $dbSubscription->setSubscriptionMode($mode);
-            $dbSubscription->setCallbackUrl($this->getCallbackUrl());
-            $dbSubscriptionArray[] = clone $dbSubscription;
         }
         return $dbSubscriptionArray;
     }

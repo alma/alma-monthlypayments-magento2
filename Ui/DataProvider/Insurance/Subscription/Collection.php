@@ -66,7 +66,6 @@ class Collection extends SearchResult
         );
 
         parent::_initSelect();
-        $this->addFieldToFilter("mode", ["eq" => $this->apiConfigHelper->getActiveMode()]);
         $this->getSelect()
             ->joinLeft(
                 ['sales_order' => $this->getConnection()->getTableName('sales_order')],
