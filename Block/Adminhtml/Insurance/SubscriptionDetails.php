@@ -98,15 +98,12 @@ class SubscriptionDetails extends Template
     public function getSubscriptionCollection(): array
     {
         $collection = $this->collectionFactory->create();
-        $this->logger->info('$collection', [$collection]);
-
         $collection->addFieldToFilter('order_id', $this->_request->getParam('order_id'));
         $collection->getSelect()->joinLeft(
             ['order' => 'sales_order'],
             'main_table.order_id = order.entity_id',
             ['order.increment_id']
         );
-        $this->logger->info('$collection->getData()', [$collection->getData()]);
         return $collection->getData();
     }
 
