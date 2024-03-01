@@ -43,7 +43,7 @@ class InsuranceWidget extends Field
     {
         $iframeUrl = $this->insuranceHelper->getIframeUrlWithParams($this->apiConfigHelper->getActiveMode());
         $scriptUrl = $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
-        $iframe = "<div id='alma-insurance-modal'></div>
+        return "<div id='alma-insurance-modal'></div>
                    <iframe id='config-alma-iframe'
                     class='alma-insurance-iframe'
                     width='100%'
@@ -66,6 +66,5 @@ class InsuranceWidget extends Field
                    </script>
                    <input id='alma_insurance_config' name='groups[alma_insurance][fields][alma_insurance_config][value]' type='hidden' value='false' />
                    ";
-        return $iframe;
     }
 }

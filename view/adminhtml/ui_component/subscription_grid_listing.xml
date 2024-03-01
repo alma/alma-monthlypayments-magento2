@@ -57,7 +57,7 @@
         </column>
         <column name="name">
             <settings>
-                <label translate="true">Name</label>
+                <label translate="true">Insurance contract</label>
             </settings>
         </column>
         <column name="subscription_broker_id">

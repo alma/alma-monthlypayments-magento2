@@ -10,8 +10,6 @@ class Item extends \Magento\Quote\Model\Quote\Item
 {
     public function getProductType()
     {
-        $objectManager = ObjectManager::getInstance();
-        $logger= $objectManager->get(Logger::class);
         $parentType = parent::getProductType();
         $insuranceData = $this->getData(InsuranceHelper::ALMA_INSURANCE_SKU);
         if (!$insuranceData) {

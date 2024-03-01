@@ -4,6 +4,7 @@ namespace Alma\MonthlyPayments\CustomerData;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Quote\Item;
 use Magento\Framework\App\ObjectManager;
 
 /**
@@ -13,14 +14,12 @@ use Magento\Framework\App\ObjectManager;
  */
 class Cart extends \Magento\Checkout\CustomerData\Cart
 {
-	protected function getRecentItems()
-	{
-		$objectManager = ObjectManager::getInstance();
-		$logger= $objectManager->get(Logger::class);
-		$insuranceHelper= $objectManager->get(InsuranceHelper::class);
+    protected function getRecentItems(): array
+    {
+        $objectManager = ObjectManager::getInstance();
+        $insuranceHelper = $objectManager->get(InsuranceHelper::class);
 
-		$items =  parent::getRecentItems();
-		$items = $insuranceHelper->reorderMiniCart($items);
-		return $items;
-	}
+        $items = parent::getRecentItems();
+        return $insuranceHelper->reorderMiniCart($items);
+    }
 }

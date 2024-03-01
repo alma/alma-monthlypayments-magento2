@@ -220,7 +220,7 @@ class InsuranceHelper extends AbstractHelper
      */
     public function createLinkToken(int $productId, string $insuranceId): string
     {
-        return (hash('sha256', $productId . time() . $insuranceId));
+        return hash('sha256', $productId . time() . $insuranceId);
     }
 
     /**
@@ -393,6 +393,7 @@ class InsuranceHelper extends AbstractHelper
      * @param int $orderId // same for all subscription
      * @param string $mode // same for all subscription
      * @return \Alma\MonthlyPayments\Model\Insurance\Subscription[]
+     * @throws NoSuchEntityException
      */
     public function createDbSubscriptionArrayFromItemsAndApiResult(Collection $itemsCollection, array $subscriptionResult, string $mode): array
     {
@@ -402,7 +403,6 @@ class InsuranceHelper extends AbstractHelper
             if (self::ALMA_INSURANCE_SKU !== $item->getSku()) {
                 continue;
             }
-            $dbSubscriptionData = [];
 
             /** @var \Alma\MonthlyPayments\Model\Insurance\Subscription $dbSubscription */
             $orderItem = $item->getOrderItem();

@@ -359,13 +359,13 @@
             <label>Alma Insurance</label>
         </tab>
         <section id="alma_insurance_section" translate="label" type="'text" sortOrder="420" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Insurance configuration</label>
+            <label>Configuration</label>
             <tab>alma_insurance_tab</tab>
             <resource>Magento_Backend::content</resource>
 
             <group id="alma_insurance" translate="label comment" type="text" sortOrder="2" showInDefault="1"
                    showInWebsite="1" showInStore="1">
-                <comment><![CDATA[<div class="alma-payment-logo"></div><div class="alma-payment-text">Offer insurance with Alma</div>]]></comment>
+                <comment><![CDATA[<div class="alma-payment-logo"></div>]]></comment>
                 <fieldset_css>complex alma-section</fieldset_css>
                 <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset\Insurance</frontend_model>
                 <field id="alma_insurance_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"

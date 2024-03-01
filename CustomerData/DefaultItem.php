@@ -11,7 +11,6 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
     protected function doGetItemData(): array
     {
         $objectManager = ObjectManager::getInstance();
-        $logger = $objectManager->get(Logger::class);
         $insuranceHelper = $objectManager->get(InsuranceHelper::class);
 
         $result = parent::doGetItemData();

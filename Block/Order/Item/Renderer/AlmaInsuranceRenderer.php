@@ -28,13 +28,13 @@ class AlmaInsuranceRenderer extends DefaultRenderer
 
 
     public function __construct(
-        Context            $context,
-        StringUtils        $string,
-        OptionFactory      $productOptionFactory,
-        Logger             $logger,
-        CollectionFactory  $quoteCollectionFactory,
-        InsuranceHelper    $insuranceHelper,
-        array              $data = []
+        Context           $context,
+        StringUtils       $string,
+        OptionFactory     $productOptionFactory,
+        Logger            $logger,
+        CollectionFactory $quoteCollectionFactory,
+        InsuranceHelper   $insuranceHelper,
+        array             $data = []
     ) {
         parent::__construct(
             $context,
@@ -48,7 +48,12 @@ class AlmaInsuranceRenderer extends DefaultRenderer
         $this->insuranceHelper = $insuranceHelper;
     }
 
-    public function getItem()
+    /**
+     * Get item.
+     *
+     * @return array|null
+     */
+    public function getItem(): ?array
     {
 
         /** @var Item $item */
@@ -56,9 +61,9 @@ class AlmaInsuranceRenderer extends DefaultRenderer
 
         /** @var \Magento\Quote\Model\Quote\Item $quotItem */
 
-        if (InsuranceHelper::ALMA_INSURANCE_SKU === $item->getSku()){
+        if (InsuranceHelper::ALMA_INSURANCE_SKU === $item->getSku()) {
             $quoteItemCollection = $this->quoteItemCollectionFactory->create();
-            $quoteItem           = $quoteItemCollection
+            $quoteItem = $quoteItemCollection
                 ->addFieldToSelect('*')
                 ->addFieldToFilter('item_id', [$item->getQuoteItemId()])
                 ->getFirstItem();
@@ -69,9 +74,5 @@ class AlmaInsuranceRenderer extends DefaultRenderer
         return parent::getItem();
     }
 
-    protected function getInsuranceName(\Magento\Quote\Model\Quote\Item $quoteItem){
-        $almaInsurance = json_decode($quoteItem->getAlmaInsurance(), true);
-        return $almaInsurance['name'];
-    }
 
 }
