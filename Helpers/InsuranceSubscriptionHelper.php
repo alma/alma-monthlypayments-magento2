@@ -37,4 +37,11 @@ class InsuranceSubscriptionHelper extends AbstractHelper
             throw new Exception(__('Subscription not found'));
         }
     }
+
+    public function getCollectionSubscriptionsByOrderId(int $orderId): array
+    {
+        $collection = $this->subscriptionCollection->create();
+        $collection->addFieldToFilter('order_id', $orderId);
+        return $collection->getData();
+    }
 }

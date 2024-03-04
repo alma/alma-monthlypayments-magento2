@@ -1,0 +1,13 @@
+<?php
+/**
+ * @var $block \Alma\MonthlyPayments\Block\Adminhtml\Insurance\OrderViewMessage
+ */
+
+?>
+<?php if ($block->hasActiveInsurance()): ?>
+    <div class="message message-warning warning">
+        <b><?= __('Remember to cancel insurance subscriptions before initiating a refund') ?></b> <br/>
+        <?= sprintf(__('This order includes one or more insurance subscriptions. Make sure that the subscription(s) is canceled before proceeding with the refund. <a href =%s > Manage the cancellation directly here. </a>'), $block->getOrderDetailsLink()) ?>
+    </div>
+<?php endif; ?>
+
