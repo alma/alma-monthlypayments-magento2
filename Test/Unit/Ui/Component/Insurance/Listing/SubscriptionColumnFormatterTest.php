@@ -74,7 +74,7 @@ class SubscriptionColumnFormatterTest extends TestCase
         ];
         $currency = 'EUR';
         $orderInterface = $this->createMock(OrderInterface::class);
-        $orderInterface->method('getOrderCurrencyCode')->willReturn($currency);
+        $orderInterface->expects($this->exactly(2))->method('getOrderCurrencyCode')->willReturn($currency);
         $this->orderRepository->method('get')->willReturn($orderInterface);
         $this->priceCurrency->expects($this->exactly(2))
             ->method('convertAndFormat')
