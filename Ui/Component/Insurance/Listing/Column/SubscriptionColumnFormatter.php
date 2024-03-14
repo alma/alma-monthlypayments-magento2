@@ -56,11 +56,16 @@ class SubscriptionColumnFormatter extends Column
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
-            foreach ($dataSource['data']['items'] as & $item) {
+            foreach ($dataSource['data']['items'] as &$item) {
                 if ($item) {
                     $order = $this->orderRepository->get($item['order_id']);
-                    $currency = $order->getOrderCurrencyCode();
-                    $item['subscription_amount'] = $this->priceCurrency->convertAndFormat(Functions::priceFromCents($item['subscription_amount']), false, 2, null, $currency);
+                    $item['subscription_amount'] = $this->priceCurrency->convertAndFormat(
+                        Functions::priceFromCents($item['subscription_amount']),
+                        false,
+                        2,
+                        null,
+                        $order->getOrderCurrencyCode()
+                    );
                     $item['subscription_state'] = $this->subscriptionHelper->getNameStatus($item['subscription_state'] ?? '');
                 }
             }
