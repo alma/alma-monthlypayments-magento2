@@ -3,8 +3,6 @@
 namespace Alma\MonthlyPayments\CustomerData;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
-use Alma\MonthlyPayments\Model\Quote\Item;
 use Magento\Framework\App\ObjectManager;
 
 /**

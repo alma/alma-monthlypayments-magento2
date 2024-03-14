@@ -171,3 +171,8 @@
 "Unknown","Inconnu"
 "Remember to cancel insurance subscriptions before initiating a refund", "Pensez a bien résilier les souscriptions d’assurance avant de procéder un remboursement"
 "This order includes one or more insurance subscriptions. Make sure that the subscription(s) is canceled before proceeding with the refund. <a href =%s > Manage the cancellation directly here. </a>", "Cette commande comprend une ou plusieurs souscriptions à l'assurance. Assurez-vous que la ou les souscriptions sont résiliées avant de procéder au remboursement. <a href =%s > Gérez la résiliation directement ici. </a>"
+"Pending Cancellation", "Attente d'annulation"
+"Canceled", "Annulé"
+"Active", "Active"
+"Failed", "Echec"
+"Pending", "En attente"

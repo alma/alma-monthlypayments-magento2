@@ -80,7 +80,6 @@
         </column>
         <column name="subscription_state">
             <settings>
-                <options class="Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column\SubscriptionStateOptions"/>
                 <filter>select</filter>
                 <editor>
                     <editorType>select</editorType>

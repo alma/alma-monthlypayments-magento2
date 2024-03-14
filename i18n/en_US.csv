@@ -171,3 +171,8 @@
 "Unknown","Unknown"
 "Remember to cancel insurance subscriptions before initiating a refund", "Remember to cancel insurance subscriptions before initiating a refund"
 "This order includes one or more insurance subscriptions. Make sure that the subscription(s) is canceled before proceeding with the refund. <a href =%s > Manage the cancellation directly here. </a>", "This order includes one or more insurance subscriptions. Make sure that the subscription(s) is canceled before proceeding with the refund. <a href =%s > Manage the cancellation directly here. </a>"
+"Pending Cancellation", "Pending Cancellation"
+"Canceled", "Canceled"
+"Active", "Active"
+"Failed", "Failed"
+"Pending", "Pending"

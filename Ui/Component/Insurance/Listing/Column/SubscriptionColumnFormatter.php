@@ -3,6 +3,8 @@
 namespace Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column;
 
 use Alma\MonthlyPayments\Helpers\Functions;
+use Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -20,8 +22,18 @@ class SubscriptionColumnFormatter extends Column
      * @var PriceCurrencyInterface
      */
     private $priceCurrency;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var InsuranceSubscriptionHelper
+     */
+    private $subscriptionHelper;
 
     public function __construct(
+        Logger                 $logger,
+        InsuranceSubscriptionHelper $subscriptionHelper,
         ContextInterface       $context,
         UiComponentFactory     $uiComponentFactory,
         OrderRepository        $orderRepository,
@@ -37,6 +49,8 @@ class SubscriptionColumnFormatter extends Column
         );
         $this->orderRepository = $orderRepository;
         $this->priceCurrency = $priceCurrency;
+        $this->logger = $logger;
+        $this->subscriptionHelper = $subscriptionHelper;
     }
 
     public function prepareDataSource(array $dataSource)
@@ -47,6 +61,7 @@ class SubscriptionColumnFormatter extends Column
                     $order = $this->orderRepository->get($item['order_id']);
                     $currency = $order->getOrderCurrencyCode();
                     $item['subscription_amount'] = $this->priceCurrency->convertAndFormat(Functions::priceFromCents($item['subscription_amount']), false, 2, null, $currency);
+                    $item['subscription_state'] = $this->subscriptionHelper->getNameStatus($item['subscription_state'] ?? '');
                 }
             }
         }
