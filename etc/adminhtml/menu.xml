@@ -3,7 +3,7 @@
     <menu>
         <add id="Alma_MonthlyPayments::alma"
              title="Alma" module="Alma_MonthlyPayments"
-             sortOrder="10"
+             sortOrder="61"
              resource="Magento_Backend::content"
         />
         <add id="Alma_MonthlyPayments::alma_payment"
@@ -30,7 +30,7 @@
              resource="Magento_Backend::content"
         />
         <add id="Alma_MonthlyPayments::almainsurance"
-             title="Insurance configuration" module="Alma_MonthlyPayments"
+             title="Configuration" module="Alma_MonthlyPayments"
              translate="title"
              sortOrder="20"
              parent="Alma_MonthlyPayments::alma_insurance"
