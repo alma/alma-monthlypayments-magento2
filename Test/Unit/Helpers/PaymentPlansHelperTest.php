@@ -112,6 +112,50 @@ class PaymentPlansHelperTest extends TestCase
         $this->assertEquals($result, $this->createPaymentPlansHelper()->formatLocalFeePlanConfig($apiFeePlan, $configFeePlan));
     }
 
+    /**
+     * @return void
+     */
+    public function testIsInPageAllowedWithInPageActivated()
+    {
+        $planKeys = $this->getInPagePlanKeys();
+
+        foreach ($planKeys as $plan) {
+            $this->configHelper->method('isInPageEnabled')->willReturn(true);
+            $this->assertEquals($plan['result'], $this->createPaymentPlansHelper()->isInPageAllowed($plan['key']));
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsInPageAllowedWithoutInPageActivated()
+    {
+        $planKeys = $this->getInPagePlanKeys();
+
+        foreach ($planKeys as $plan) {
+            $this->configHelper->method('isInPageEnabled')->willReturn(false);
+            $this->assertEquals(false, $this->createPaymentPlansHelper()->isInPageAllowed($plan['key']));
+        }
+    }
+
+    /**
+     * @return array[]
+     */
+    private function getInPagePlanKeys(): array
+    {
+        return [
+            ['key' => 'general:1:0:0', 'result' => true],
+            ['key' => 'general:2:0:0', 'result' => true ],
+            ['key' => 'general:3:0:0', 'result' => true],
+            ['key' => 'general:4:0:0', 'result' => true],
+            ['key' => 'general:6:0:0', 'result' => false],
+            ['key' => 'general:12:0:0', 'result' => false],
+            ['key' => 'general:1:15:0', 'result' => true],
+            ['key' => 'general:1:30:0', 'result' => true]
+        ];
+    }
+
+
     public function formatFeePlanDataProviderForDisplay(): array
     {
         $dataToDisplayDefaultValue = FeePlanConfigFactoryMock::getDefaultDataPlan();

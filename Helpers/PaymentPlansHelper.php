@@ -101,7 +101,8 @@ class PaymentPlansHelper
      */
     public function isInPageAllowed(string $planKey): bool
     {
-        $planIsAllowed = preg_match('!general:[1-4]:0:0!', $planKey);
+        $planIsAllowed = preg_match('!general:[1-4]:([\d]+):([\d]+)!', $planKey);
+
         return $this->configHelper->isInPageEnabled() && $planIsAllowed;
     }
 

@@ -57,6 +57,7 @@
         <ul class="alma-installments">
             <!-- ko if: deferredSelectedPlan().eligibility -->
             <!-- ko foreach: deferredSelectedPlan().eligibility.paymentPlan -->
+            <!-- ko ifnot: $parent.deferredSelectedPlan().inPageAllowed -->
             <li>
                 <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
                 <span class="alma-installment--amount-column">
@@ -70,7 +71,12 @@
                     </span>
             </li>
             <!-- /ko -->
-        <!-- /ko -->
+            <!-- /ko -->
+
+            <!-- ko if: deferredSelectedPlan().inPageAllowed -->
+            <div id="alma-in-page-alma_monthly_payments_deferred"></div>
+            <!-- /ko -->
+            <!-- /ko -->
         </ul>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
