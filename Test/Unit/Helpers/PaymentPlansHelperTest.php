@@ -167,7 +167,7 @@ class PaymentPlansHelperTest extends TestCase
         $this->configHelper->expects($this->once())
             ->method('isInPageEnabled')
             ->willReturn(false);
-        $this->assertEquals(false, $this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
+        $this->assertFalse($this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
     }
 
     /**
