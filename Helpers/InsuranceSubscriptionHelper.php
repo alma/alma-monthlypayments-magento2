@@ -44,4 +44,16 @@ class InsuranceSubscriptionHelper extends AbstractHelper
         $collection->addFieldToFilter('order_id', $orderId);
         return $collection->getData();
     }
+
+    public function getNameStatus(string $key): string
+    {
+        $status = [
+            'started' => __('Active'),
+            'pending_cancellation' => __('Pending Cancellation'),
+            'canceled' => __('Canceled'),
+            'failed' => __('Failed'),
+            'pending' => __('Pending'),
+        ];
+        return $status[$key] ?? $key;
+    }
 }

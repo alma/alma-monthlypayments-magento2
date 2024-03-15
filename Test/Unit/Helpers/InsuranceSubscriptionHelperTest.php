@@ -46,4 +46,27 @@ class InsuranceSubscriptionHelperTest extends TestCase
         $this->assertEquals($this->subscriptionMock, $this->subscriptionHelper->getDbSubscription(1));
     }
 
+
+    /**
+     * @dataProvider keyAndExpectedStatusName
+     * @return void
+     */
+    public function testShouldReturnActiveIfKeyIsStarted($key, $expected)
+    {
+        $this->assertEquals($expected, $this->subscriptionHelper->getNameStatus($key));
+    }
+    
+    protected function keyAndExpectedStatusName(): array
+    {
+        return [
+            'Empty' => ['', ''],
+            'Invalid status' => ['invalid_status', 'invalid_status'],
+            'Active' => ['started', 'Active'],
+            'Pending Cancellation' => ['pending_cancellation', 'Pending Cancellation'],
+            'Canceled' => ['canceled', 'Canceled'],
+            'Pending' => ['pending', 'Pending'],
+            'failed' => ['failed', 'Failed'],
+        ];
+    }
+
 }
