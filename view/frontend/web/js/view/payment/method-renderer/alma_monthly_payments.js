@@ -228,7 +228,7 @@ define(
                 if(!plan.inPageAllowed) {
                     return true;
                 }
-console.log('alma-in-page'+'-'+self.checkedPaymentMethod())
+
                 self.unMountInPage();
                 const merchantId = self.config.merchantId
                 const totalInCent = self.totals().base_grand_total * 100
