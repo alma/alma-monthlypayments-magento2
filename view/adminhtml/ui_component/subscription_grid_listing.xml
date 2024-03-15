@@ -69,7 +69,7 @@
         <column name="subscription_amount">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Price</label>
+                <label translate="true">Insurance Price</label>
             </settings>
         </column>
         <column name="linked_product_name">
