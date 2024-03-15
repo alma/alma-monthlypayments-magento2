@@ -231,8 +231,18 @@ class ConfigHelper extends AbstractHelper
                 $isAllowedInsurance = $merchant->cms_insurance ? 1 : 0;
             }
         }
-        $this->saveConfig(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH, $isAllowedInsurance, $scope, $storeId);
+        $this->saveIsAllowedInsuranceValue($isAllowedInsurance, $scope, $storeId);
     }
+
+    public function saveIsAllowedInsuranceValue($value, $scope, $storeId):void
+    {
+        $this->saveConfig(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH, $value, $scope, $storeId);
+    }
+    public function clearInsuranceConfig($scope, $storeId):void
+    {
+        $this->saveConfig(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE, null, $scope, $storeId);
+    }
+
 
     /**
      * @return FeePlan[]
