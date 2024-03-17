@@ -45,7 +45,7 @@ jobs:
         repository: alma/integration-infrastructure
 
     - name: Invoke e2e workflow with inputs
-      uses: benc-uk/workflow-dispatch@v1.2.2
+      uses: benc-uk/workflow-dispatch@v1.2.3
       with:
         workflow: Deploy CMS
         token: ${{ steps.generate_github_token.outputs.token }}
