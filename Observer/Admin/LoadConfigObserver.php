@@ -10,9 +10,11 @@ use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceFlagException;
 use Magento\Backend\Model\UrlInterface;
+use Magento\Config\Controller\Adminhtml\System\Config\Edit;
+use Magento\Framework\App\ActionFlag;
+use Magento\Framework\App\ResponseFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Store\Model\StoreManager;
 
 class LoadConfigObserver implements ObserverInterface
 {
@@ -35,9 +37,8 @@ class LoadConfigObserver implements ObserverInterface
         PaymentPlansHelper $paymentPlansHelper,
         Availability       $availability,
         ConfigHelper       $configHelper,
-        StoreHelper        $storeHelper
-    )
-    {
+        StoreHelper        $storeHelper,
+    ) {
         $this->url = $url;
         $this->paymentPlansHelper = $paymentPlansHelper;
         $this->logger = $logger;
@@ -48,29 +49,56 @@ class LoadConfigObserver implements ObserverInterface
 
     /**
      * @param Observer $observer
-     * @return void
+     * @return $this
      * @throws AlmaInsuranceFlagException
      */
-    public function execute(Observer $observer): void
+    public function execute(Observer $observer) : self
     {
-        if (preg_match('!section\/(alma_insurance_section|payment)!', $this->url->getCurrentUrl(), $matches)) {
+        $controller = $observer->getEvent()->getControllerAction();
+        $currentUrl = $this->url->getCurrentUrl();
+        if (preg_match('!section\/(alma_insurance_section|payment)!', $currentUrl, $matches)) {
             $cmsInsuranceFlagValue = $this->availability->getMerchantInsuranceAvailability();
-            if(!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1'){
-                // Hide immediately the insurance section if the merchant is not allowed to use it
-                $this->configHelper->saveIsAllowedInsuranceValue(
-                    0,
-                    $this->storeHelper->getScope(),
-                    $this->storeHelper->getStoreId()
-                );
-                $this->configHelper->clearInsuranceConfig(
-                    $this->storeHelper->getScope(),
-                    $this->storeHelper->getStoreId()
-                );
-                //TODO REDIRECT TO CURRENT PAGE FOR RELOAD PAGE WITHOUT CONFIG ENABLED
+            if (!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1') {
+
+                $this->saveIsAllowedInsurance(0);
+                $this->getClearInsuranceConfig();
+                $controller->getResponse()->setRedirect($currentUrl);
+            }
+            if ($cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '0') {
+
+                $this->saveIsAllowedInsurance(1);
+                $controller->getResponse()->setRedirect($currentUrl);
             }
             if ($matches[1] === 'payment') {
+
                 $this->paymentPlansHelper->saveBaseApiPlansConfig();
             }
         }
+        return $this;
     }
+
+    /**
+     * @param $value
+     * @return void
+     */
+    private function saveIsAllowedInsurance($value):void
+    {
+        $this->configHelper->saveIsAllowedInsuranceValue(
+            $value,
+            $this->storeHelper->getScope(),
+            $this->storeHelper->getStoreId()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    private function getClearInsuranceConfig(): void
+    {
+        $this->configHelper->clearInsuranceConfig(
+            $this->storeHelper->getScope(),
+            $this->storeHelper->getStoreId()
+        );
+    }
+
 }

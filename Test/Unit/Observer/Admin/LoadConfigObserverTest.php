@@ -9,6 +9,12 @@ use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Observer\Admin\LoadConfigObserver;
 use Magento\Backend\Model\UrlInterface;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\Response\HttpInterface;
+use Magento\Framework\App\ResponseFactory;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use PHPUnit\Framework\TestCase;
 
@@ -24,19 +30,32 @@ class LoadConfigObserverTest extends TestCase
     private $availability;
     private $configHelper;
     private $storeHelper;
+    private $httpInterface;
 
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
         $this->urlInterface = $this->createMock(UrlInterface::class);
         $this->paymentPlansHelper = $this->createMock(PaymentPlansHelper::class);
+        $eventMock = $this->getMockBuilder(Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getControllerAction'])
+            ->getMock();
+        $actionInterface = $this->getMockBuilder(ActionInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['execute','getResponse'])
+            ->getMock();
+        $this->httpInterface = $this->createMock(HttpInterface::class);
+        $actionInterface->method('getResponse')->willReturn($this->httpInterface);
+        $eventMock->method('getControllerAction')->willReturn($actionInterface);
         $this->observer = $this->createMock(Observer::class);
+        $this->observer->method('getEvent')->willReturn($eventMock);
         $this->availability = $this->createMock(Availability::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->storeHelper = $this->createMock(StoreHelper::class);
         $this->storeHelper->method('getScope')->willReturn('default');
         $this->storeHelper->method('getStoreId')->willReturn('1');
-    }
+   }
 
     public function tearDown(): void
     {
@@ -56,7 +75,7 @@ class LoadConfigObserverTest extends TestCase
             $this->paymentPlansHelper,
             $this->availability,
             $this->configHelper,
-            $this->storeHelper
+            $this->storeHelper,
         );
     }
 
@@ -115,6 +134,9 @@ class LoadConfigObserverTest extends TestCase
             ->with(0);
         $this->configHelper->expects($this->once())
             ->method('clearInsuranceConfig');
+        $this->httpInterface->expects($this->once())
+            ->method('setRedirect')
+            ->with(self::PAYMENT_URL);
         $this->createLoadConfigObserver()->execute($this->observer);
     }
 
@@ -146,10 +168,30 @@ class LoadConfigObserverTest extends TestCase
         $this->availability->expects($this->once())
             ->method('getMerchantInsuranceAvailability')
             ->willReturn(true);
-        $this->configHelper->expects($this->never())
+        $this->configHelper->expects($this->once())
             ->method('getConfigByCode');
         $this->configHelper->expects($this->never())
             ->method('saveIsAllowedInsuranceValue');
+        $this->createLoadConfigObserver()->execute($this->observer);
+    }
+
+    public function testGivenInsuranceFlagTrueAndConfigFalseMustSaveIsAllowedInsuranceAndRedirect():void
+    {
+        $this->urlInterface->expects($this->once())
+            ->method('getCurrentUrl')
+            ->willReturn(self::INSURANCE_URL);
+        $this->availability->expects($this->once())
+            ->method('getMerchantInsuranceAvailability')
+            ->willReturn(true);
+        $this->configHelper->expects($this->once())
+            ->method('getConfigByCode')
+            ->willReturn('0');
+        $this->configHelper->expects($this->once())
+            ->method('saveIsAllowedInsuranceValue')
+            ->with(1);
+        $this->httpInterface->expects($this->once())
+            ->method('setRedirect')
+            ->with(self::INSURANCE_URL);
         $this->createLoadConfigObserver()->execute($this->observer);
     }
 
