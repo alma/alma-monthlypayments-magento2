@@ -50,14 +50,21 @@ class LoadConfigObserver implements ObserverInterface
     /**
      * @param Observer $observer
      * @return $this
-     * @throws AlmaInsuranceFlagException
      */
     public function execute(Observer $observer) : self
     {
         $controller = $observer->getEvent()->getControllerAction();
         $currentUrl = $this->url->getCurrentUrl();
         if (preg_match('!section\/(alma_insurance_section|payment)!', $currentUrl, $matches)) {
-            $cmsInsuranceFlagValue = $this->availability->getMerchantInsuranceAvailability();
+            if ($matches[1] === 'payment') {
+
+                $this->paymentPlansHelper->saveBaseApiPlansConfig();
+            }
+            try {
+                $cmsInsuranceFlagValue = $this->availability->getMerchantInsuranceAvailability();
+            } catch (AlmaInsuranceFlagException $e) {
+                return $this;
+            }
             if (!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1') {
 
                 $this->saveIsAllowedInsurance(0);
@@ -69,10 +76,7 @@ class LoadConfigObserver implements ObserverInterface
                 $this->saveIsAllowedInsurance(1);
                 $controller->getResponse()->setRedirect($currentUrl);
             }
-            if ($matches[1] === 'payment') {
 
-                $this->paymentPlansHelper->saveBaseApiPlansConfig();
-            }
         }
         return $this;
     }

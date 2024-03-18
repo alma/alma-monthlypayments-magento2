@@ -7,6 +7,7 @@ use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceFlagException;
 use Alma\MonthlyPayments\Observer\Admin\LoadConfigObserver;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -43,7 +44,7 @@ class LoadConfigObserverTest extends TestCase
             ->getMock();
         $actionInterface = $this->getMockBuilder(ActionInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['execute','getResponse'])
+            ->setMethods(['execute', 'getResponse'])
             ->getMock();
         $this->httpInterface = $this->createMock(HttpInterface::class);
         $actionInterface->method('getResponse')->willReturn($this->httpInterface);
@@ -55,7 +56,7 @@ class LoadConfigObserverTest extends TestCase
         $this->storeHelper = $this->createMock(StoreHelper::class);
         $this->storeHelper->method('getScope')->willReturn('default');
         $this->storeHelper->method('getStoreId')->willReturn('1');
-   }
+    }
 
     public function tearDown(): void
     {
@@ -78,6 +79,7 @@ class LoadConfigObserverTest extends TestCase
             $this->storeHelper,
         );
     }
+
 
     public function testNeverCallSaveBaseApiPlansConfigForNonPaymentUrl(): void
     {
@@ -115,6 +117,25 @@ class LoadConfigObserverTest extends TestCase
         $this->availability->expects($this->never())
             ->method('getMerchantInsuranceAvailability');
         $this->createLoadConfigObserver()->execute($this->observer);
+    }
+
+
+    public function testGivenApiMeThrowExceptionMustReturnThisWithoutCallSaveButCallingFeePlans(): void
+    {
+        $this->urlInterface->expects($this->once())
+            ->method('getCurrentUrl')
+            ->willReturn(self::PAYMENT_URL);
+        $this->paymentPlansHelper->expects($this->once())
+            ->method('saveBaseApiPlansConfig');
+        $this->availability->expects($this->once())
+            ->method('getMerchantInsuranceAvailability')
+            ->willThrowException(new AlmaInsuranceFlagException('No Api Key', $this->logger));
+        $this->configHelper->expects($this->never())
+            ->method('saveIsAllowedInsuranceValue');
+        $this->configHelper->expects($this->never())
+            ->method('clearInsuranceConfig');
+        $instance = $this->createLoadConfigObserver();
+        $this->assertEquals($instance, $instance->execute($this->observer));
     }
 
     public function testCallGetMerchantInsuranceAvailabilityHasFalseAndGetConfigCodeTrueForPaymentUrl(): void
@@ -175,7 +196,7 @@ class LoadConfigObserverTest extends TestCase
         $this->createLoadConfigObserver()->execute($this->observer);
     }
 
-    public function testGivenInsuranceFlagTrueAndConfigFalseMustSaveIsAllowedInsuranceAndRedirect():void
+    public function testGivenInsuranceFlagTrueAndConfigFalseMustSaveIsAllowedInsuranceAndRedirect(): void
     {
         $this->urlInterface->expects($this->once())
             ->method('getCurrentUrl')
