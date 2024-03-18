@@ -122,6 +122,7 @@ class InsuranceHelper extends AbstractHelper
         $this->storeManager = $storeManager;
     }
 
+
     /**
      * @return InsuranceConfig
      */
