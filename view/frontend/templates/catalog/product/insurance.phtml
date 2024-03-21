@@ -25,12 +25,11 @@
         ) {
             utils.setSkuForWifget('<?= $block->getBaseProductSku() ?>')
             var cart = customerData.get('cart');
-            var baseCount = null;
+            var baseCount = 0;
             cart.subscribe(function () {
-                if (baseCount !== null && cart().summary_count !== baseCount) {
+                if (cart().summary_count > baseCount) {
                     resetInsurance();
                     baseCount = cart().summary_count;
-                    console.log('reset insurance')
                 }
                 baseCount = cart().summary_count;
             });
