@@ -28,7 +28,9 @@
             var baseCount = 0;
             cart.subscribe(function () {
                 if (cart().summary_count > baseCount) {
-                    resetInsurance();
+                    if(typeof (resetInsurance) !== 'undefined'){
+                        resetInsurance();
+                    }
                     baseCount = cart().summary_count;
                 }
                 baseCount = cart().summary_count;
