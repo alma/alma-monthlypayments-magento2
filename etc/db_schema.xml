@@ -2,10 +2,10 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
 
     <table name="quote_item" resource="checkout" comment="Alma insurance Data in Quote Item">
-        <column xsi:type="blob" name="alma_insurance" nullable="true" comment="Alma insurance"/>
+        <column xsi:type="text" name="alma_insurance" nullable="true" comment="Alma insurance"/>
     </table>
     <table name="sales_order_item" resource="sales" comment="Alma insurance Data in Order Item">
-        <column xsi:type="blob" name="alma_insurance" nullable="true" comment="Alma insurance"/>
+        <column xsi:type="text" name="alma_insurance" nullable="true" comment="Alma insurance"/>
     </table>
 
     <table name="alma_insurance_subscription" resource="checkout" comment="Alma insurance subscriptions">
