@@ -92,6 +92,7 @@ class InsuranceUpdate implements InsuranceUpdateInterface
 
         $dbSubscription->setSubscriptionState($subscription['state']);
         $dbSubscription->setSubscriptionBrokerId($subscription['broker_subscription_id']);
+        $dbSubscription->setSubscriptionBrokerReference($subscription['broker_subscription_reference']);
         try {
             $this->subscription->save($dbSubscription);
         } catch (AlreadyExistsException|\Exception $e) {

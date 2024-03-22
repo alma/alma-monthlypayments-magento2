@@ -278,6 +278,16 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals('https://protect.sandbox.almapay.com/displayModal.js', $this->insuranceHelper->getScriptUrl('test'));
     }
 
+    public function testOrderDetailUrlSandbox(): void
+    {
+        $this->assertEquals('https://protect.almapay.com/almaBackOfficeSubscriptions.html', $this->insuranceHelper->getOrderDetailsUrl('live'));
+    }
+
+    public function testOrderDetailUrlLive(): void
+    {
+        $this->assertEquals('https://protect.sandbox.almapay.com/almaBackOfficeSubscriptions.html', $this->insuranceHelper->getOrderDetailsUrl('test'));
+    }
+
     private function iframeHasDbGetParamsDataProvider(): array
     {
         return [
