@@ -18,7 +18,14 @@ class FeePlanFactoryMock
         int $minAmount = 5000,
         int $maxAmount = 200000
     ): FeePlan {
-        $planData = self::dataFeePlanFactory($key, $allowed, $triggerDays, $minAmount, $maxAmount);
+        $planData = self::dataFeePlanFactory(
+            $key,
+            $allowed,
+            $triggerDays,
+            $minAmount,
+            $maxAmount
+        );
+
         return new FeePlan($planData);
     }
 

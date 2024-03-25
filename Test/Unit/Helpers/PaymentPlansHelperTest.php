@@ -13,6 +13,23 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentPlansHelperTest extends TestCase
 {
+    /**
+     * @var Logger
+     */
+    protected $logger;
+    /**
+     * @var PaymentPlansConfigInterface
+     */
+    protected $paymentPlansConfig;
+    /**
+     * @var MessageManager
+     */
+    protected $messageManager;
+    /**
+     * @var ConfigHelper
+     */
+    protected $configHelper;
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
@@ -32,9 +49,9 @@ class PaymentPlansHelperTest extends TestCase
     private function getArrayPlansKey(): array
     {
         return [
-            ['key' => 'general:1:0:0', 'allowed' => true, 'trigger' => null ],
-            ['key' => 'general:2:0:0', 'allowed' => false, 'trigger' => null ],
-            ['key' => 'general:3:0:0', 'allowed' => true, 'trigger' => '30' ]
+            ['key' => 'general:1:0:0', 'allowed' => true, 'trigger' => null, 'minAmount' => 100 ],
+            ['key' => 'general:2:0:0', 'allowed' => false, 'trigger' => null, 'minAmount' => 5000 ],
+            ['key' => 'general:3:0:0', 'allowed' => true, 'trigger' => '30', 'minAmount' => 5000 ]
         ];
     }
 
@@ -45,7 +62,9 @@ class PaymentPlansHelperTest extends TestCase
         $mockFeePlans = $this->getApiPlansConfigMock($arrayPlansKey);
         $this->paymentPlansConfig->method('getFeePlansFromApi')->willReturn($mockFeePlans);
 
-        $this->configHelper->expects($this->once())->method('saveBasePlansConfig')->with($this->getApiPlansConfigResult($arrayPlansKey));
+        $this->configHelper->expects($this->once())
+            ->method('saveBasePlansConfig')
+            ->with($this->getApiPlansConfigResult($arrayPlansKey));
         $this->createPaymentPlansHelper()->saveBaseApiPlansConfig();
     }
 
@@ -71,16 +90,28 @@ class PaymentPlansHelperTest extends TestCase
     {
         $apiPlansMock = [];
         foreach ($plansConfig as $plan) {
-            $apiPlansMock[] = FeePlanFactoryMock::feePlanFactory($plan['key'], $plan['allowed'], $plan['trigger']);
+            $apiPlansMock[] = FeePlanFactoryMock::feePlanFactory(
+                $plan['key'],
+                $plan['allowed'],
+                $plan['trigger'],
+                $plan['minAmount']
+            );
         }
+
         return $apiPlansMock;
     }
     private function getApiPlansConfigResult($plansConfig): array
     {
         $apiPlansResultMock = [];
         foreach ($plansConfig as $plan) {
-            $apiPlansResultMock[$plan['key']] = FeePlanFactoryMock::feePlanFactory($plan['key'], $plan['allowed'], $plan['trigger']);
+            $apiPlansResultMock[$plan['key']] = FeePlanFactoryMock::feePlanFactory(
+                $plan['key'],
+                $plan['allowed'],
+                $plan['trigger'],
+                $plan['minAmount']
+            );
         }
+
         return $apiPlansResultMock;
     }
 
@@ -111,6 +142,75 @@ class PaymentPlansHelperTest extends TestCase
     {
         $this->assertEquals($result, $this->createPaymentPlansHelper()->formatLocalFeePlanConfig($apiFeePlan, $configFeePlan));
     }
+
+    /**
+     * @dataProvider getInPagePlanKeys
+     * @param $keyPlan
+     * @param $result
+     * @return void
+     */
+    public function testIsInPageAllowedWithInPageActivated($keyPlan, $result): void
+    {
+            $this->configHelper->expects($this->once())
+                ->method('isInPageEnabled')
+                ->willReturn(true);
+            $this->assertEquals($result, $this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
+    }
+
+    /**
+     * @dataProvider getInPagePlanKeys
+     * @param $keyPlan
+     * @return void
+     */
+    public function testIsInPageAllowedWithoutInPageActivated($keyPlan): void
+    {
+        $this->configHelper->expects($this->once())
+            ->method('isInPageEnabled')
+            ->willReturn(false);
+        $this->assertFalse($this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getInPagePlanKeys(): array
+    {
+        return [
+            'test paynow' => [
+                'keyPlan' => 'general:1:0:0',
+                'result' => true,
+            ],
+            'test p2x' => [
+                'keyPlan' => 'general:2:0:0',
+                'result' => true,
+            ],
+            'test p3x' => [
+                'keyPlan' => 'general:3:0:0',
+                'result' => true,
+            ],
+            'test p4x' => [
+                'keyPlan' => 'general:4:0:0',
+                'result' => true,
+            ],
+            'test p6x' => [
+                'keyPlan' => 'general:6:0:0',
+                'result' => false,
+            ],
+            'test p12x' => [
+                'keyPlan' => 'general:6:0:0',
+                'result' => false,
+            ],
+            'test deferred 15d' => [
+                'keyPlan' => 'general:1:15:0',
+                'result' => true,
+            ],
+            'test deferred 30d' => [
+                'keyPlan' => 'general:1:30:0',
+                'result' => true,
+            ],
+        ];
+    }
+
 
     public function formatFeePlanDataProviderForDisplay(): array
     {
