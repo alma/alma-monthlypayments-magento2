@@ -37,6 +37,28 @@ class OrderHelperTest extends TestCase
      */
     private $orderFactory;
     private $logger;
+    /**
+     * @var Context|(Context&object&MockObject)|(Context&MockObject)|(object&MockObject)|MockObject
+     */
+    private $contextMock;
+    /**
+     * @var CollectionFactory|(CollectionFactory&object&MockObject)|(CollectionFactory&MockObject)|(object&MockObject)|MockObject
+     */
+    private $orderCollectionFactory;
+    /**
+     * @var OrderManagementInterface|(OrderManagementInterface&object&MockObject)|(OrderManagementInterface&MockObject)|(object&MockObject)|MockObject
+     */
+    private $orderManagement;
+    /**
+     * @var StoreManager|(StoreManager&object&MockObject)|(StoreManager&MockObject)|(object&MockObject)|MockObject
+     */
+    private $storeManager;
+    private $productHelper;
+    /**
+     * @var StoreManagerInterface|(StoreManagerInterface&object&MockObject)|(StoreManagerInterface&MockObject)|(object&MockObject)|MockObject
+     */
+    private $storeManagerInterface;
+
 
     protected function setUp(): void
     {

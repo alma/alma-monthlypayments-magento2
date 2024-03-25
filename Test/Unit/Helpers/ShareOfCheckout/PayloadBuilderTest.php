@@ -12,6 +12,14 @@ use PHPUnit\Framework\TestCase;
 class PayloadBuilderTest extends TestCase
 {
     private $payloadBuilder;
+    /**
+     * @var DateHelper|(DateHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(DateHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $dateHelper;
+    /**
+     * @var OrderHelper|(OrderHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(OrderHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $orderHelper;
 
     public function setUp(): void
     {

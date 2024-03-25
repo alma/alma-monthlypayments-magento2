@@ -29,7 +29,7 @@
     font-weight: normal;
     font-style: normal;
 }
-.admin__menu .level-0.item-almaconfigmenu > a:before {
+.admin__menu .level-0.item-alma > a:before {
     font-family: 'alma';
     content: '\e800';
     font-size : 3.2rem;
@@ -65,4 +65,28 @@ display: none;
 #alma_soc_detail_content_message, #alma_soc_detail_content_comment {
     display: none;
     padding: 0 0 0 15px;
+}
+.message-alma {
+    background: #fffbbb;
+    border: none;
+    border-radius: 0;
+    color: #333333;
+    font-size: 1.4rem;
+    margin: 0 0 1px;
+    padding: 1.8rem 4rem 1.8rem 5.5rem;
+    position: relative;
+    text-shadow: none;
+}
+.message-alma::before {
+    border: 0;
+    content: ' ';
+    height: 80px;
+    left: 0.3em;
+    line-height: inherit;
+    position: absolute;
+    speak: none;
+    text-shadow: none;
+    width: 80px;
+    background:url('../images/alma-insurance-small.png') no-repeat;
+    background-size: 60%;
 }

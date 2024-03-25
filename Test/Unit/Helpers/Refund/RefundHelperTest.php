@@ -14,6 +14,15 @@ use Magento\Framework\App\Helper\Context;
 
 class RefundHelperTest extends TestCase
 {
+    /**
+     * @var Context|(Context&object&\PHPUnit\Framework\MockObject\MockObject)|(Context&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $context;
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+
     public function setUp(): void
     {
         $this->context = $this->createMock(Context::class);

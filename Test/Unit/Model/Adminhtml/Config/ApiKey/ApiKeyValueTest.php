@@ -195,7 +195,6 @@ class ApiKeyValueTest extends TestCase
             $this->availability,
             $this->messageManager,
             $this->configHelper,
-            $this->logger,
             $this->apiConfigHelper
         ];
     }

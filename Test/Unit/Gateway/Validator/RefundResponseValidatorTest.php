@@ -14,6 +14,15 @@ use PHPUnit\Framework\TestCase;
 
 class RefundResponseValidatorTest extends TestCase
 {
+    /**
+     * @var ResultInterfaceFactory|(ResultInterfaceFactory&object&\PHPUnit\Framework\MockObject\MockObject)|(ResultInterfaceFactory&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $resultInterface;
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);

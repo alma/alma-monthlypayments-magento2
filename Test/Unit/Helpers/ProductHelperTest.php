@@ -7,14 +7,28 @@ use Alma\MonthlyPayments\Helpers\ProductHelper;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use PHPUnit\Framework\TestCase;
 
 class ProductHelperTest extends TestCase
 {
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+    /**
+     * @var CollectionFactory|(Collection&object&\PHPUnit\Framework\MockObject\MockObject)|(Collection&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $productCollectionFactory;
+    /**
+     * @var CategoryCollection|(CategoryCollection&object&\PHPUnit\Framework\MockObject\MockObject)|(CategoryCollection&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $categoryCollection;
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
-        $this->productCollection = $this->createMock(Collection::class);
+        $this->productCollectionFactory = $this->createMock(CollectionFactory::class);
         $this->categoryCollection = $this->createMock(CategoryCollection::class);
     }
     private function createProductHelper(): ProductHelper
@@ -25,7 +39,7 @@ class ProductHelperTest extends TestCase
     {
         return [
             $this->logger,
-            $this->productCollection,
+            $this->productCollectionFactory,
             $this->categoryCollection
         ];
     }

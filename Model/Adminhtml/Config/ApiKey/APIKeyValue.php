@@ -44,7 +44,6 @@ class APIKeyValue extends Encrypted
 {
     protected $apiKeyType = '';
     protected $merchantIdPath = '';
-    protected $merchantIsAllowedInPagePath = '';
 
     /**
      * @var Availability
@@ -182,6 +181,11 @@ class APIKeyValue extends Encrypted
     {
         $this->configHelper->saveMerchantId(
             $this->getMerchantIdPath(),
+            $merchant,
+            $this->getScope(),
+            $this->getScopeId()
+        );
+        $this->configHelper->saveIsAllowedInsurance(
             $merchant,
             $this->getScope(),
             $this->getScopeId()

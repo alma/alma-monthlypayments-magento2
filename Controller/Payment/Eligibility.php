@@ -41,7 +41,7 @@ class Eligibility extends Action
     /**
      * @var Logger
      */
-    private Logger $logger;
+    private $logger;
 
     /**
      * Eligibility constructor.

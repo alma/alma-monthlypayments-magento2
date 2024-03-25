@@ -14,21 +14,22 @@ use PHPUnit\Framework\TestCase;
 class PaymentPlansHelperTest extends TestCase
 {
     /**
-     * @var Logger
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected $logger;
+    private $logger;
     /**
-     * @var PaymentPlansConfigInterface
+     * @var PaymentPlansConfigInterface|(PaymentPlansConfigInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(PaymentPlansConfigInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected $paymentPlansConfig;
+    private $paymentPlansConfig;
     /**
-     * @var MessageManager
+     * @var MessageManager|(MessageManager&object&\PHPUnit\Framework\MockObject\MockObject)|(MessageManager&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected $messageManager;
+    private $messageManager;
     /**
-     * @var ConfigHelper
+     * @var ConfigHelper|(ConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(ConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected $configHelper;
+    private $configHelper;
+
 
     public function setUp(): void
     {

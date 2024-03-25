@@ -23,6 +23,39 @@ use PHPUnit\Framework\TestCase;
 class SOCConsentFieldTest extends TestCase
 {
     /**
+     * @var SOCHelper|(SOCHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(SOCHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $socHelper;
+    /**
+     * @var Context|(Context&object&\PHPUnit\Framework\MockObject\MockObject)|(Context&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $context;
+    /**
+     * @var Registry|(Registry&object&\PHPUnit\Framework\MockObject\MockObject)|(Registry&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $registry;
+    /**
+     * @var ScopeConfigInterface|(ScopeConfigInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(ScopeConfigInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $scopeConfigInterface;
+    /**
+     * @var TypeListInterface|(TypeListInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(TypeListInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $typeListInterface;
+    /**
+     * @var AlmaClient|(AlmaClient&object&\PHPUnit\Framework\MockObject\MockObject)|(AlmaClient&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $almaClient;
+    /**
+     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $logger;
+    /**
+     * @var ManagerInterface|(ManagerInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(ManagerInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $messageManager;
+
+    /**
      * @return void
      */
     public function setUp(): void
