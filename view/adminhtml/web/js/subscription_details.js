@@ -54,7 +54,6 @@ define([
 
             function getCmsSubscriptions(subscriptions) {
                 return subscriptions.map(subscription => {
-                    console.log(subscription);
                     return {
                         id: subscription.entity_id,
                         productName: subscription.linked_product_name,
@@ -63,6 +62,7 @@ define([
                         status: subscription.subscription_state,
                         subscriptionId: subscription.subscription_id,
                         subscriptionBrokerId: subscription.subscription_broker_id,
+                        subscriptionBrokerReference: subscription.subscription_broker_reference,
                         subscriptionAmount: subscription.subscription_amount,
                         isRefunded: subscription.is_refunded === '1',
                         reasonForCancelation: subscription.reason_of_cancelation,

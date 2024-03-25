@@ -87,6 +87,13 @@ class SubscriptionDetails extends Template
     {
         return $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
     }
+    /**
+     * @return string
+     */
+    public function getOrderDetailsUrl(): string
+    {
+        return $this->insuranceHelper->getOrderDetailsUrl($this->apiConfigHelper->getActiveMode());
+    }
 
     public function getControllerCancelUrl(): string
     {

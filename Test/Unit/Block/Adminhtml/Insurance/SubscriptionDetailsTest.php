@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Test\Unit\Block\Adminhtml\Insurance;
 
 use Alma\MonthlyPayments\Block\Adminhtml\Insurance\SubscriptionDetails;
+use Magento\Backend\Model\Url;
 use Magento\Sales\Api\Data\OrderInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -45,6 +46,7 @@ class SubscriptionDetailsTest extends TestCase
      * @var \Magento\Sales\Model\OrderRepository|(\Magento\Sales\Model\OrderRepository&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Sales\Model\OrderRepository&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
     private $orderRepository;
+    private $urlBuilder;
 
     public function setUp():void
     {
@@ -56,10 +58,10 @@ class SubscriptionDetailsTest extends TestCase
         $this->insuranceHelper = $this->createMock(\Alma\MonthlyPayments\Helpers\InsuranceHelper::class);
         $this->apiConfigHelper = $this->createMock(\Alma\MonthlyPayments\Helpers\ApiConfigHelper::class);
         $this->collectionFactory = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory::class);
+        $this->urlBuilder = $this->createMock(Url::class);
         $this->orderRepository = $this->createMock(\Magento\Sales\Model\OrderRepository::class);
         $this->jsonHelper = $this->createMock(\Magento\Framework\Json\Helper\Data::class);
         $this->directoryHelper = $this->createMock(\Magento\Directory\Helper\Data::class);
-        $this->request = $this->createMock(\Magento\Framework\App\Request\Http::class);
     }
 
     private function getConstructorDependencies():array
@@ -71,6 +73,7 @@ class SubscriptionDetailsTest extends TestCase
             $this->apiConfigHelper,
             $this->collectionFactory,
             $this->orderRepository,
+            $this->urlBuilder,
             [],
             $this->jsonHelper,
             $this->directoryHelper
@@ -83,10 +86,31 @@ class SubscriptionDetailsTest extends TestCase
     }
     public function testGetScriptUrl():void
     {
+        $this->apiConfigHelper->expects($this->once())
+            ->method('getActiveMode')
+            ->willReturn('activeMode');
+        $this->insuranceHelper->expects($this->once())
+            ->method('getScriptUrl')
+            ->with('activeMode')
+            ->willReturn('https://my-iframe-url/displayModal.js')
+        ;
         $subscriptionDetails = $this->createSubscriptionDetails();
-        $this->assertEquals('https://protect.staging.almapay.com/displayModal.js', $subscriptionDetails->getScriptUrl());
+        $this->assertEquals('https://my-iframe-url/displayModal.js', $subscriptionDetails->getScriptUrl());
     }
 
+    public function testGetOrderDatailUrl():void
+    {
+        $this->apiConfigHelper->expects($this->once())
+            ->method('getActiveMode')
+            ->willReturn('activeMode');
+        $this->insuranceHelper->expects($this->once())
+            ->method('getOrderDetailsUrl')
+            ->with('activeMode')
+            ->willReturn('https://my-order_details-url/back.js')
+        ;
+        $subscriptionDetails = $this->createSubscriptionDetails();
+        $this->assertEquals('https://my-order_details-url/back.js', $subscriptionDetails->getOrderDetailsUrl());
+    }
     public function testGetSubscriptionCollectionReturnArrayData():void
     {
         $collection = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\Collection::class);

@@ -174,6 +174,7 @@ class InsuranceUpdateTest extends TestCase
         $this->almaClient->method('getDefaultClient')->willReturn($this->client);
         $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionState')->with($apiResult['subscriptions'][0]['state']);
         $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionBrokerId')->with($apiResult['subscriptions'][0]['broker_subscription_id']);
+        $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionBrokerReference')->with($apiResult['subscriptions'][0]['broker_subscription_reference']);
         $this->dbSubscriptionMock->expects($this->once())->method('setCancellationDate');
         $this->subscriptionResourceModel->expects($this->once())->method('save')->with($this->dbSubscriptionMock);
 
@@ -201,7 +202,7 @@ class InsuranceUpdateTest extends TestCase
 
         $this->orderRepository->method('get')->willReturn($orderMock);
 
-        $this->dbSubscriptionMock->method('getCancellationDate')->willReturn('2024:09:01-00:00:00');
+        $this->dbSubscriptionMock->method('getCancellationDate')->willReturn('2024:09:01 00:00:00');
         $this->almaClient->method('getDefaultClient')->willReturn($this->client);
         $this->dbSubscriptionMock->expects($this->never())->method('setCancellationDate');
         $instance = $this->createInstance();
@@ -220,6 +221,7 @@ class InsuranceUpdateTest extends TestCase
                     "contract_id" => "insurance_contract_755vkKQUnezKPvzMWc4Qeq",
                     "id" => "subscription_5FM3wla3WvVjFaOUb06nXt",
                     "broker_subscription_id" => "xxxx",
+                    "broker_subscription_reference" => "12345",
                     "state" => $state,
                     "subscriber" => [
                         "address_line_1" => "adr1",

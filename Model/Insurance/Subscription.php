@@ -12,6 +12,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     const ORDER_ITEM_ID_KEY = 'order_item_id';
     const SUBSCRIPTION_ID_KEY = 'subscription_id';
     const BROKER_SUBSCRIPTION_ID_KEY = 'subscription_broker_id';
+    const BROKER_SUBSCRIPTION_REFERENCE_KEY = 'subscription_broker_reference';
     const SUBSCRIPTION_NAME_KEY = 'name';
     const SUBSCRIPTION_AMOUNT_KEY = 'subscription_amount';
     const CONTRACT_ID_KEY = 'contract_id';
@@ -136,6 +137,23 @@ class Subscription extends AbstractModel implements IdentityInterface
     public function setSubscriptionBrokerId(?string $subscriptionBrokerId): void
     {
         $this->setData(self::BROKER_SUBSCRIPTION_ID_KEY, $subscriptionBrokerId);
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getSubscriptionBrokerReference(): ?string
+    {
+        return $this->getDataByKey(self::BROKER_SUBSCRIPTION_REFERENCE_KEY);
+    }
+
+    /**
+     * @param string | null $subscriptionBrokerReference
+     * @return void
+     */
+    public function setSubscriptionBrokerReference(?string $subscriptionBrokerReference): void
+    {
+        $this->setData(self::BROKER_SUBSCRIPTION_REFERENCE_KEY, $subscriptionBrokerReference);
     }
 
     /**
@@ -293,7 +311,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     /**
      * @return string|null
      */
-    public function getCancellationRequestDate(): ?\DateTime
+    public function getCancellationRequestDate(): ?string
     {
         return $this->getDataByKey(self::CANCELATION_REQUEST_DATE_KEY);
     }
