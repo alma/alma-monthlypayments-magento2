@@ -139,7 +139,7 @@
                            showInStore="1">
                         <label>Activate in-page checkout</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>Activate this setting if you want an in-page checkout for Pay Now, P2X, P3X and P4X</comment>
+                        <comment>Activate this setting if you want an in-page checkout for Pay Now, P2X, P3X, P4X and Deferred payments</comment>
                         <config_path>payment/alma_monthly_payments/in_page_enabled</config_path>
                     </field>
                     <field id="payment_expiration" translate="label comment" sortOrder="20" showInDefault="1">
