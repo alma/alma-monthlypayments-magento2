@@ -1,7 +1,10 @@
 Changelog
 =========
 
+v4.2.0
+------
 * feat : Deferred Payments with In page checkout
+
 v4.1.1
 ------
 * fix : Remove duplicate font src in csp whitelist
