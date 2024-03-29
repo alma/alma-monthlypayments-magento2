@@ -60,10 +60,10 @@
                 <label translate="true">Insurance contract</label>
             </settings>
         </column>
-        <column name="subscription_broker_id">
+        <column name="subscription_broker_reference">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Subscription Id</label>
+                <label translate="true">Subscription reference</label>
             </settings>
         </column>
         <column name="subscription_amount">

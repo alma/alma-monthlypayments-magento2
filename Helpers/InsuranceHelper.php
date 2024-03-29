@@ -31,6 +31,7 @@ class InsuranceHelper extends AbstractHelper
     const ALMA_PRODUCT_WITH_INSURANCE_TYPE = 'product_with_alma_insurance';
     const ALMA_INSURANCE_CONFIG_CODE = 'insurance_config';
     const CONFIG_IFRAME_URL = '/almaBackOfficeConfiguration.html';
+    const ORDER_DETAIL_IFRAME_URL = '/almaBackOfficeSubscriptions.html';
     const SANDBOX_IFRAME_HOST_URL = 'https://protect.sandbox.almapay.com';
     const PRODUCTION_IFRAME_HOST_URL = 'https://protect.almapay.com';
     const SCRIPT_IFRAME_PATH = '/displayModal.js';
@@ -41,6 +42,7 @@ class InsuranceHelper extends AbstractHelper
     const CUSTOMER_SESSION_ID_PARAM_KEY = 'customer_session_id';
     const CUSTOMER_CART_ID_PARAM_KEY = 'cart_id';
     const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
+
     const CALLBACK_URI = '/rest/V1/alma/insurance/update?subscription_id=<subscription_id>&trace=<trace>';
 
     /**
@@ -250,7 +252,15 @@ class InsuranceHelper extends AbstractHelper
         $baseUrl = $this->getBaseUrl($mode);
         return $baseUrl . self::SCRIPT_IFRAME_PATH;
     }
-
+    /**
+     * @param string $mode
+     * @return string
+     */
+    public function getOrderDetailsUrl(string $mode): string
+    {
+        $baseUrl = $this->getBaseUrl($mode);
+        return $baseUrl . self::ORDER_DETAIL_IFRAME_URL;
+    }
     /**
      * @param array $items
      * @return array
