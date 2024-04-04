@@ -20,11 +20,11 @@ class InsuranceSubscriptionHelper extends AbstractHelper
     }
 
     /**
-     * @param mixed $subscriptionId
+     * @param string $subscriptionId
      * @return mixed
      * @throws Exception
      */
-    public function getDbSubscription(mixed $subscriptionId): Subscription
+    public function getDbSubscription(string $subscriptionId): Subscription
     {
         $collection = $this->subscriptionCollection->create();
         $collection->addFieldToFilter('subscription_id', $subscriptionId);

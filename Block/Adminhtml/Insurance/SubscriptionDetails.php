@@ -68,9 +68,7 @@ class SubscriptionDetails extends Template
     {
         parent::__construct(
             $context,
-            $data,
-            $jsonHelper,
-            $directoryHelper
+            $data
         );
         $this->insuranceHelper = $insuranceHelper;
         $this->apiConfigHelper = $apiConfigHelper;

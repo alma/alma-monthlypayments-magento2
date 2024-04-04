@@ -10,8 +10,8 @@
 
     <table name="alma_insurance_subscription" resource="checkout" comment="Alma insurance subscriptions">
         <column xsi:type="int" name="entity_id" identity="true" comment="Auto increment ID"/>
-        <column xsi:type="int" name="order_id" nullable="false" unsigned="true" comment="Subscription Order id"/>
-        <column xsi:type="int" name="order_item_id" nullable="false" unsigned="true" comment="Order item id"/>
+        <column xsi:type="int" name="order_id" padding="10" nullable="false" unsigned="true" comment="Subscription Order id"/>
+        <column xsi:type="int" name="order_item_id" padding="10" nullable="false" unsigned="true" comment="Order item id"/>
         <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Insurance Name"/>
         <column xsi:type="varchar" name="subscription_id" nullable="false" length="255" comment="Alma subscription ID"/>
         <column xsi:type="varchar" name="subscription_broker_id" length="255" comment="Subscription broker ID"/>
