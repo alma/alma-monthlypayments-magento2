@@ -37,7 +37,7 @@ class LoadConfigObserver implements ObserverInterface
         PaymentPlansHelper $paymentPlansHelper,
         Availability       $availability,
         ConfigHelper       $configHelper,
-        StoreHelper        $storeHelper,
+        StoreHelper        $storeHelper
     ) {
         $this->url = $url;
         $this->paymentPlansHelper = $paymentPlansHelper;

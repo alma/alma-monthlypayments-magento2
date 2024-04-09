@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Ui\DataProvider\Insurance\Subscription;
 
-use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
 use Magento\Framework\Event\ManagerInterface as EventManager;
@@ -13,20 +12,14 @@ use Psr\Log\LoggerInterface as Logger;
 class Collection extends SearchResult
 {
     /**
-     * @var ApiConfigHelper
-     */
-    private $apiConfigHelper;
-
-    /**
      * @param EntityFactory $entityFactory
      * @param Logger $logger
      * @param FetchStrategy $fetchStrategy
      * @param EventManager $eventManager
-     * @param $mainTable
-     * @param ApiConfigHelper $apiConfigHelper
-     * @param $resourceModel
-     * @param $identifierName
-     * @param $connectionName
+     * @param string $mainTable
+     * @param null|string $resourceModel
+     * @param null|string $identifierName
+     * @param null|string $connectionName
      * @throws LocalizedException
      */
     public function __construct(
@@ -34,13 +27,11 @@ class Collection extends SearchResult
         Logger          $logger,
         FetchStrategy   $fetchStrategy,
         EventManager    $eventManager,
-        ApiConfigHelper $apiConfigHelper,
         $mainTable = 'alma_insurance_subscription',
         $resourceModel = null,
         $identifierName = null,
         $connectionName = null
     ) {
-        $this->apiConfigHelper = $apiConfigHelper;
         parent::__construct(
             $entityFactory,
             $logger,

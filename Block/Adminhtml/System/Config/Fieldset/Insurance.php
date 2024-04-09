@@ -26,9 +26,11 @@
 namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
+use Magento\Backend\Block\Context;
+use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Magento\Framework\View\Helper\Js;
 
 class Insurance extends Fieldset
 {
@@ -37,15 +39,21 @@ class Insurance extends Fieldset
      */
     private $insuranceHelper;
 
+    /**
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param InsuranceHelper $insuranceHelper
+     * @param array $data
+     */
     public function __construct(
         \Magento\Backend\Block\Context      $context,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\View\Helper\Js   $jsHelper,
         InsuranceHelper                     $insuranceHelper,
-        array                               $data = [],
-        ?SecureHtmlRenderer                 $secureRenderer = null
+        array                               $data = []
     ) {
-        parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
+        parent::__construct($context, $authSession, $jsHelper, $data);
         $this->insuranceHelper = $insuranceHelper;
     }
 

@@ -27,9 +27,7 @@ class OrderViewMessage extends Template
     ) {
         parent::__construct(
             $context,
-            $data,
-            $jsonHelper,
-            $directoryHelper
+            $data
         );
         $this->logger = $logger;
         $this->insuranceSubscriptionHelper = $insuranceSubscriptionHelper;
