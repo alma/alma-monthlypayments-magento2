@@ -8,6 +8,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\State;
+use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\StoreResolver;
@@ -16,23 +17,23 @@ use PHPUnit\Framework\TestCase;
 class StoreHelperTest extends TestCase
 {
     /**
-     * @var Context|(Context&object&\PHPUnit\Framework\MockObject\MockObject)|(Context&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Context
      */
     private $context;
     /**
-     * @var State|(State&object&\PHPUnit\Framework\MockObject\MockObject)|(State&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var State
      */
     private $state;
     /**
-     * @var StoreResolver|(StoreResolver&object&\PHPUnit\Framework\MockObject\MockObject)|(StoreResolver&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var StoreResolver
      */
     private $storeManager;
     /**
-     * @var RequestInterface|(RequestInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(RequestInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var RequestInterface
      */
     private $request;
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
 
@@ -55,9 +56,11 @@ class StoreHelperTest extends TestCase
     public function testStoreId($data): void
     {
         $this->state->method('getAreaCode')->willReturn($data['area']);
-        $this->storeManager->method('getCurrentStoreId')->willReturn($data['currentStoreId']);
+        $mockStoreInterface = $this->createMock(StoreInterface::class);
+        $mockStoreInterface->method('getId')->willReturn($data['currentStoreId']);
+        $this->storeManager->method('getStore')->willReturn($mockStoreInterface);
         $this->request->method('getParam')->willReturnOnConsecutiveCalls($data['store'], $data['website']);
-        $this->assertEquals($data['expectedStoreId'], $this->createNewStoreHelper()->getStoreId($data['storeId']));
+        $this->assertEquals($data['expectedStoreId'], $this->createNewStoreHelper()->getStoreId());
     }
 
     /**
@@ -71,7 +74,7 @@ class StoreHelperTest extends TestCase
     {
         $this->state->method('getAreaCode')->willReturn($data['area']);
         $this->request->method('getParam')->willReturnOnConsecutiveCalls($data['store'], $data['website']);
-        $this->assertEquals($data['expectedScope'], $this->createNewStoreHelper()->getScope($data['scope']));
+        $this->assertEquals($data['expectedScope'], $this->createNewStoreHelper()->getScope());
     }
 
     public function dataProviderForTestStoreIdAndScope(): array

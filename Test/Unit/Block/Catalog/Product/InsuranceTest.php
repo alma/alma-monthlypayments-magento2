@@ -212,11 +212,11 @@ class InsuranceTest extends TestCase
         return [
             'Return sandbox front widget Url for sandbox Mode' => [
                 'activeMode' => ApiConfigHelper::TEST_MODE_KEY,
-                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456',
+                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456&customer_session_id=&cart_id=',
             ],
             'Return Prod front widget Url for Prod Mode' => [
                 'activeMode' => ApiConfigHelper::LIVE_MODE_KEY,
-                'expectedUrl' => 'https://protect.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456',
+                'expectedUrl' => 'https://protect.almapay.com/almaProductInPageWidget.html?cms_reference=mysku&product_price=10010&merchant_id=merchant_123456&customer_session_id=&cart_id=',
             ],
         ];
     }
