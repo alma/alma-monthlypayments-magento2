@@ -112,7 +112,8 @@ class OrderHelperTest extends TestCase
         $mockOrderId = 10;
         $this->orderManagement->expects($this->once())
             ->method('cancel')
-            ->with($mockOrderId);
+            ->with($mockOrderId)
+            ->willReturn(true);
         $orderHelper = $this->createNewOrderHelper();
         $orderHelper->cancel($mockOrderId);
     }
@@ -140,13 +141,15 @@ class OrderHelperTest extends TestCase
      *
      * @return void
      */
-    public function testBuild(array $dataItems, $expectedPayload):void
+    public function testBuild(array $dataProducts, array $dataItems, $expectedPayload):void
     {
         $products = [];
         $items = [];
-        foreach ($dataItems as $data) {
-            $products[] = $this->productFactory(...$data);
-            $items[] = $this->itemFactory(...$data);
+        foreach ($dataProducts as $dataProduct) {
+            $products[] = $this->productFactory(...$dataProduct);
+        }
+        foreach ($dataItems as $dataItem) {
+            $items[] = $this->itemFactory(...$dataItem);
         }
 
         $productIterator = new \ArrayIterator($products);
@@ -227,7 +230,6 @@ class OrderHelperTest extends TestCase
             24.30,
             0,
             1.10,
-            []
         ];
         $formattedSimpleWithoutCategory = $this->formattedItemFactory(
             'base-02',
@@ -243,7 +245,7 @@ class OrderHelperTest extends TestCase
         $virtualProduct1 = [
             '4',
             'base-02',
-            'Simple product 2',
+            'virtual product 4',
             1.0,
             24.30,
             24.30,
@@ -252,7 +254,7 @@ class OrderHelperTest extends TestCase
         ];
         $formattedVirtualProduct1 = $this->formattedItemFactory(
             'base-02',
-            'Simple product 2',
+            'virtual product 4',
             '',
             1,
             2430,
@@ -263,7 +265,7 @@ class OrderHelperTest extends TestCase
         $simpleWithoutTax = [
             '5',
             'base-01',
-            'Simple product 1',
+            'Simple product 5',
             2.0,
             22.30,
             44.60,
@@ -272,7 +274,7 @@ class OrderHelperTest extends TestCase
         ];
         $formattedSimpleWithoutTax = $this->formattedItemFactory(
             'base-01',
-            'Simple product 1',
+            'Simple product 5',
             '',
             2,
             2230,
@@ -290,7 +292,6 @@ class OrderHelperTest extends TestCase
             0.0,
             0,
             0,
-            ['3','4'],
             true
         ];
         $configurableProduct = [
@@ -302,7 +303,6 @@ class OrderHelperTest extends TestCase
             24.30,
             0,
             1.2,
-            ['3','4'],
             false,
             ['simple_name' => 'Configurable product 1 - with variation']
         ];
@@ -318,43 +318,50 @@ class OrderHelperTest extends TestCase
         );
         return [
             '1 simple product' => [
-                'products' =>  [$simple1],
+                'products' =>  [['1','Simple product 1', ['3','4']]],
+                'items' =>  [$simple1],
                 'expected_payload' => [
                     $formattedSimple1
                 ]
             ],
             '2 simple products' => [
-                'products' =>  [$simple1, $simple2],
+                'products' =>  [['1','Simple product 1', ['3','4']],['2','Simple product 2', ['3','4']]],
+                'items' =>  [$simple1, $simple2],
                 'expected_payload' => [
                     $formattedSimple1 ,$formattedSimple2
                 ]
             ],
             '1 simple product without category' => [
-                'products' =>  [$simpleWithoutCategory],
+                'products' =>  [['3','Simple product 3', []]],
+                'items' =>  [$simpleWithoutCategory],
                 'expected_payload' => [
                     $formattedSimpleWithoutCategory
                 ]
             ],
             '1 virtual product' => [
-                'products' =>  [$virtualProduct1],
+                'products' =>  [['4','virtual product 4', ['3','4']]],
+                'items' =>  [$virtualProduct1],
                 'expected_payload' => [
                     $formattedVirtualProduct1
                 ]
             ],
             '1 simple without tax' => [
-                'products' =>  [$simpleWithoutTax],
+                'products' =>  [['5','Simple product 5', ['3','4']]],
+                'items' =>  [$simpleWithoutTax],
                 'expected_payload' => [
                     $formattedSimpleWithoutTax
                 ]
             ],
             '1 configurable product with dummy item' => [
-                'products' =>  [$configurableProduct, $dummyConfigurableProduct],
+                'products' =>  [['7','Configurable product 1', ['3','4']],['6','Configurable dummy product 1', ['3','4']]],
+                'items' =>  [$configurableProduct, $dummyConfigurableProduct],
                 'expected_payload' => [
                     $formattedConfigurableProduct
                 ]
             ],
             '1 configurable product with dummy item and 1 simple' => [
-                'products' =>  [
+                'products' =>  [['7','Configurable product 1', ['3','4']],['6','Configurable dummy product 1', ['3','4']],['1','Simple product 1', ['3','4']]],
+                'items' =>  [
                     $configurableProduct,
                     $dummyConfigurableProduct,
                     $simple1
