@@ -91,11 +91,11 @@ class InsuranceTest extends TestCase
      */
     private $config;
     /**
-     * @var Data|(Data&object&\PHPUnit\Framework\MockObject\MockObject)|(Data&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Data
      */
     private $configurableHelper;
     /**
-     * @var \Magento\Checkout\Model\Session|(\Magento\Checkout\Model\Session&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Checkout\Model\Session&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Magento\Checkout\Model\Session
      */
     private $checkoutSession;
 
@@ -186,7 +186,7 @@ class InsuranceTest extends TestCase
     }
     public function testIsStringIframeUrl():void
     {
-        $this->assertTrue(gettype($this->insuranceBlock->getIframeUrl()) === 'string');
+        $this->assertSame('string', gettype($this->insuranceBlock->getIframeUrl()));
     }
     public function testCallConfigToKnowMode():void
     {
@@ -207,7 +207,7 @@ class InsuranceTest extends TestCase
         $this->assertEquals($expectedUrl, $this->insuranceBlock->getIframeUrl());
     }
 
-    private function iframeUrlDependingMode(): array
+    public function iframeUrlDependingMode(): array
     {
         return [
             'Return sandbox front widget Url for sandbox Mode' => [
@@ -224,7 +224,7 @@ class InsuranceTest extends TestCase
      * @param $activeMode
      * @param $expectedUrl
      * @dataProvider scriptUrlDependingMode
-     * @return voidgi
+     * @return void
      */
     public function testGetScriptUrlDependingMode($activeMode, $expectedUrl):void
     {
@@ -232,7 +232,7 @@ class InsuranceTest extends TestCase
         $this->assertEquals($expectedUrl, $this->insuranceBlock->getScriptUrl());
     }
 
-    private function scriptUrlDependingMode(): array
+    public function scriptUrlDependingMode(): array
     {
         return [
             'Return sandbox script Url for sandbox Mode' => [

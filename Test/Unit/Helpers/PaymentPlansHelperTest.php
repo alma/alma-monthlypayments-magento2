@@ -14,19 +14,19 @@ use PHPUnit\Framework\TestCase;
 class PaymentPlansHelperTest extends TestCase
 {
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
     /**
-     * @var PaymentPlansConfigInterface|(PaymentPlansConfigInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(PaymentPlansConfigInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var PaymentPlansConfigInterface
      */
     private $paymentPlansConfig;
     /**
-     * @var MessageManager|(MessageManager&object&\PHPUnit\Framework\MockObject\MockObject)|(MessageManager&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var MessageManager
      */
     private $messageManager;
     /**
-     * @var ConfigHelper|(ConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(ConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var ConfigHelper
      */
     private $configHelper;
 
@@ -38,6 +38,7 @@ class PaymentPlansHelperTest extends TestCase
         $this->messageManager = $this->createMock(MessageManager::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
     }
+
     private function getDependency(): array
     {
         return [
@@ -47,12 +48,13 @@ class PaymentPlansHelperTest extends TestCase
             $this->configHelper
         ];
     }
+
     private function getArrayPlansKey(): array
     {
         return [
-            ['key' => 'general:1:0:0', 'allowed' => true, 'trigger' => null, 'minAmount' => 100 ],
-            ['key' => 'general:2:0:0', 'allowed' => false, 'trigger' => null, 'minAmount' => 5000 ],
-            ['key' => 'general:3:0:0', 'allowed' => true, 'trigger' => '30', 'minAmount' => 5000 ]
+            ['key' => 'general:1:0:0', 'allowed' => true, 'trigger' => null, 'minAmount' => 100],
+            ['key' => 'general:2:0:0', 'allowed' => false, 'trigger' => null, 'minAmount' => 5000],
+            ['key' => 'general:3:0:0', 'allowed' => true, 'trigger' => '30', 'minAmount' => 5000]
         ];
     }
 
@@ -74,6 +76,7 @@ class PaymentPlansHelperTest extends TestCase
         $this->configHelper->method('getBaseApiPlansConfig')->willReturn($this->getApiPlansConfigResult($this->getArrayPlansKey()));
         $this->assertTrue($this->createPaymentPlansHelper()->paymentTriggerIsAllowed());
     }
+
     public function testPaymentTriggerIsNotAllowedWithAllNull(): void
     {
         $basePlans = $this->getArrayPlansKey();
@@ -101,6 +104,7 @@ class PaymentPlansHelperTest extends TestCase
 
         return $apiPlansMock;
     }
+
     private function getApiPlansConfigResult($plansConfig): array
     {
         $apiPlansResultMock = [];
@@ -152,10 +156,10 @@ class PaymentPlansHelperTest extends TestCase
      */
     public function testIsInPageAllowedWithInPageActivated($keyPlan, $result): void
     {
-            $this->configHelper->expects($this->once())
-                ->method('isInPageEnabled')
-                ->willReturn(true);
-            $this->assertEquals($result, $this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
+        $this->configHelper->expects($this->once())
+            ->method('isInPageEnabled')
+            ->willReturn(true);
+        $this->assertEquals($result, $this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
     }
 
     /**

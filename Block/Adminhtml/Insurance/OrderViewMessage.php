@@ -21,9 +21,7 @@ class OrderViewMessage extends Template
         InsuranceSubscriptionHelper $insuranceSubscriptionHelper,
         Template\Context $context,
         Url $url,
-        array $data = [],
-        ?JsonHelper $jsonHelper = null,
-        ?DirectoryHelper $directoryHelper = null
+        array $data = []
     ) {
         parent::__construct(
             $context,

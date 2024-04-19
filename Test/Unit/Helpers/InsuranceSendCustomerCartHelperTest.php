@@ -29,6 +29,7 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
      * @var Logger
      */
     private $logger;
+
     protected function setUp(): void
     {
         $this->almaClient = $this->createMock(AlmaClient::class);
@@ -36,6 +37,7 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         $this->logger = $this->createMock(Logger::class);
         $this->orderId = 42;
     }
+
     private function getConstructorDependencies(): array
     {
         return [
@@ -89,13 +91,13 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
 
     private function collectionFactory($withConfigurable = false): Collection
     {
-        $items=[
+        $items = [
             $this->invoiceItemFactory('mb-024'),
             $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU),
             $this->invoiceItemFactory('mb-025', 2.0000)
         ];
         if ($withConfigurable) {
-            $items[] = $this->invoiceItemFactory('mb-024', 1.0000,30);
+            $items[] = $this->invoiceItemFactory('mb-024', 1.0000, 30);
         }
         $iterator = new \ArrayIterator($items);
 
@@ -104,7 +106,7 @@ class InsuranceSendCustomerCartHelperTest extends TestCase
         return $itemsCollection;
     }
 
-    private function invoiceItemFactory(string $sku, float $qty = 1.000, ?int $parentItemId = null):Item
+    private function invoiceItemFactory(string $sku, float $qty = 1.000, ?int $parentItemId = null): Item
     {
         $item = $this->createMock(\Magento\Sales\Model\Order\Invoice\Item::class);
         $item->method('getSku')->willReturn($sku);

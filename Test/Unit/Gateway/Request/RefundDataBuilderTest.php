@@ -16,11 +16,11 @@ use PHPUnit\Framework\TestCase;
 class RefundDataBuilderTest extends TestCase
 {
     /**
-     * @var Config|(Config&object&\PHPUnit\Framework\MockObject\MockObject)|(Config&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Config
      */
     private $config;
     /**
-     * @var OrderRepository|(OrderRepository&object&\PHPUnit\Framework\MockObject\MockObject)|(OrderRepository&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderRepository
      */
     private $orderRepository;
 

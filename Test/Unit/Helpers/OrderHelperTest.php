@@ -29,33 +29,33 @@ class OrderHelperTest extends TestCase
 {
     const MEDIA_BASE_URL = 'https://adobe-commerce-a-2-4-5.local.test/media/';
     /**
-     * @var OrderRepositoryInterface|MockObject
+     * @var OrderRepositoryInterface
      */
     private $orderRepository;
     /**
-     * @var OrderFactory|MockObject
+     * @var OrderFactory
      */
     private $orderFactory;
     private $logger;
     /**
-     * @var Context|(Context&object&MockObject)|(Context&MockObject)|(object&MockObject)|MockObject
+     * @var Context
      */
     private $contextMock;
     /**
-     * @var CollectionFactory|(CollectionFactory&object&MockObject)|(CollectionFactory&MockObject)|(object&MockObject)|MockObject
+     * @var CollectionFactory
      */
     private $orderCollectionFactory;
     /**
-     * @var OrderManagementInterface|(OrderManagementInterface&object&MockObject)|(OrderManagementInterface&MockObject)|(object&MockObject)|MockObject
+     * @var OrderManagementInterface
      */
     private $orderManagement;
     /**
-     * @var StoreManager|(StoreManager&object&MockObject)|(StoreManager&MockObject)|(object&MockObject)|MockObject
+     * @var StoreManager
      */
     private $storeManager;
     private $productHelper;
     /**
-     * @var StoreManagerInterface|(StoreManagerInterface&object&MockObject)|(StoreManagerInterface&MockObject)|(object&MockObject)|MockObject
+     * @var StoreManagerInterface
      */
     private $storeManagerInterface;
 

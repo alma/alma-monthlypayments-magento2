@@ -118,7 +118,8 @@ class UpdateCreateInsuranceProduct implements DataPatchInterface
         ]);
         // Not visible individualy ID 1
         $insuranceProduct->setVisibility(1);
-        $insuranceProduct->setTaxClassId(0); // ID de la classe de taxe (0 pour non applicable)
+        // ID de la classe de taxe (0 pour non applicable)
+        $insuranceProduct->setTaxClassId(0);
         $insuranceProduct->setDescription('Alma Insurance product');
         $insuranceProduct->setUrlKey('alma-insurance');
 

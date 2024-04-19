@@ -1,6 +1,6 @@
 <?php
 
-namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
+namespace Alma\MonthlyPayments\Test\Unit\Gateway\Client;
 
 use Alma\API\Client;
 use Alma\API\Endpoints\Payments;
@@ -21,11 +21,11 @@ class RefundClientTest extends TestCase
     private string $mockMerchantId;
     private string $mockAmount;
     /**
-     * @var AlmaClient|(AlmaClient&object&\PHPUnit\Framework\MockObject\MockObject)|(AlmaClient&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var AlmaClient
      */
     private $almaClient;
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
 

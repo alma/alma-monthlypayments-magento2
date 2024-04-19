@@ -11,39 +11,39 @@ class SubscriptionDetailsTest extends TestCase
 {
 
     /**
-     * @var \Alma\MonthlyPayments\Helpers\Logger|(\Alma\MonthlyPayments\Helpers\Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(\Alma\MonthlyPayments\Helpers\Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Alma\MonthlyPayments\Helpers\Logger
      */
     private $logger;
     /**
-     * @var \Magento\Backend\Block\Template\Context|(\Magento\Backend\Block\Template\Context&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Backend\Block\Template\Context&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Magento\Backend\Block\Template\Context
      */
     private $context;
     /**
-     * @var \Alma\MonthlyPayments\Helpers\InsuranceHelper|(\Alma\MonthlyPayments\Helpers\InsuranceHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(\Alma\MonthlyPayments\Helpers\InsuranceHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Alma\MonthlyPayments\Helpers\InsuranceHelper
      */
     private $insuranceHelper;
     /**
-     * @var \Alma\MonthlyPayments\Helpers\ApiConfigHelper|(\Alma\MonthlyPayments\Helpers\ApiConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(\Alma\MonthlyPayments\Helpers\ApiConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Alma\MonthlyPayments\Helpers\ApiConfigHelper
      */
     private $apiConfigHelper;
     /**
-     * @var \Magento\Framework\Json\Helper\Data|(\Magento\Framework\Json\Helper\Data&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Framework\Json\Helper\Data&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Magento\Framework\Json\Helper\Data
      */
     private $jsonHelper;
     /**
-     * @var \Magento\Directory\Helper\Data|(\Magento\Directory\Helper\Data&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Directory\Helper\Data&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Magento\Directory\Helper\Data
      */
     private $directoryHelper;
     /**
-     * @var \Magento\Framework\App\Request\Http|(\Magento\Framework\App\Request\Http&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Framework\App\Request\Http&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Magento\Framework\App\Request\Http
      */
     private $request;
     /**
-     * @var \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory|(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory&object&\PHPUnit\Framework\MockObject\MockObject)|(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory
      */
     private $collectionFactory;
     /**
-     * @var \Magento\Sales\Model\OrderRepository|(\Magento\Sales\Model\OrderRepository&object&\PHPUnit\Framework\MockObject\MockObject)|(\Magento\Sales\Model\OrderRepository&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \Magento\Sales\Model\OrderRepository
      */
     private $orderRepository;
     private $urlBuilder;

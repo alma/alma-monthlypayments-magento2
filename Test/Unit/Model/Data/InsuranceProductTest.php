@@ -32,7 +32,7 @@ class InsuranceProductTest extends TestCase
         $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
     }
 
-    public function testGetFloatPrice():void
+    public function testGetFloatPrice(): void
     {
         $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
         $name = 'insurance test';
@@ -46,7 +46,7 @@ class InsuranceProductTest extends TestCase
         $this->assertEquals(100.23, $insuranceProduct->getFloatPrice());
     }
 
-    private function contractFactory(string $id, string $name):Contract
+    private function contractFactory(string $id, string $name): Contract
     {
         $protectionDays = 365;
         $description = null;
@@ -56,7 +56,7 @@ class InsuranceProductTest extends TestCase
         $uncoveredArea = null;
         $price = 10023;
         $files = [];
-        $insuranceContract = new Contract(
+        return new Contract(
             $id,
             $name,
             $protectionDays,
@@ -68,7 +68,6 @@ class InsuranceProductTest extends TestCase
             $price,
             $files
         );
-        return $insuranceContract;
     }
 
 }

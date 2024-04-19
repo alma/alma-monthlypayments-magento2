@@ -20,7 +20,7 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
      */
     private $logger;
     /**
-     * @var OrderHelper|(OrderHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(OrderHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderHelper
      */
     private $orderHelper;
 

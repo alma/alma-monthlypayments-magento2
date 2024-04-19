@@ -61,11 +61,8 @@ class SubscriptionDetails extends Template
         CollectionFactory $collectionFactory,
         OrderRepository   $orderRepository,
         Url               $urlBuilder,
-        array             $data = [],
-        ?JsonHelper       $jsonHelper = null,
-        ?DirectoryHelper  $directoryHelper = null
-    )
-    {
+        array             $data = []
+    ) {
         parent::__construct(
             $context,
             $data
@@ -85,6 +82,7 @@ class SubscriptionDetails extends Template
     {
         return $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
     }
+
     /**
      * @return string
      */
@@ -97,6 +95,7 @@ class SubscriptionDetails extends Template
     {
         return $this->urlBuilder->getUrl('alma_monthly/insurance/cancelsubscription');
     }
+
     /**
      * @return array
      */
@@ -135,7 +134,7 @@ class SubscriptionDetails extends Template
     {
         try {
             return $this->orderRepository->get(intval($this->_request->getParam('order_id')));
-        } catch (InputException | NoSuchEntityException $e) {
+        } catch (InputException|NoSuchEntityException $e) {
             $this->logger->error('Impossible to get Order in DB', [$this->_request->getParam('order_id')]);
             return null;
         }

@@ -15,11 +15,11 @@ use PHPUnit\Framework\TestCase;
 class RefundResponseValidatorTest extends TestCase
 {
     /**
-     * @var ResultInterfaceFactory|(ResultInterfaceFactory&object&\PHPUnit\Framework\MockObject\MockObject)|(ResultInterfaceFactory&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var ResultInterfaceFactory
      */
     private $resultInterface;
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
 

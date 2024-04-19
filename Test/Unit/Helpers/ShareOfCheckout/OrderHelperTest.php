@@ -18,15 +18,15 @@ class OrderHelperTest extends TestCase
 {
     const EURO_CURRENCY = 'EUR';
     /**
-     * @var Context|(Context&object&\PHPUnit\Framework\MockObject\MockObject)|(Context&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Context
      */
     private $context;
     /**
-     * @var CollectionFactory|(CollectionFactory&object&\PHPUnit\Framework\MockObject\MockObject)|(CollectionFactory&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var CollectionFactory
      */
     private $collectionFactory;
     /**
-     * @var DateHelper|(DateHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(DateHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var DateHelper
      */
     private $dateHelper;
     /**

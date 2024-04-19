@@ -23,35 +23,35 @@ use PHPUnit\Framework\TestCase;
 class SOCConsentFieldTest extends TestCase
 {
     /**
-     * @var SOCHelper|(SOCHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(SOCHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var SOCHelper
      */
     private $socHelper;
     /**
-     * @var Context|(Context&object&\PHPUnit\Framework\MockObject\MockObject)|(Context&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Context
      */
     private $context;
     /**
-     * @var Registry|(Registry&object&\PHPUnit\Framework\MockObject\MockObject)|(Registry&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Registry
      */
     private $registry;
     /**
-     * @var ScopeConfigInterface|(ScopeConfigInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(ScopeConfigInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var ScopeConfigInterface
      */
     private $scopeConfigInterface;
     /**
-     * @var TypeListInterface|(TypeListInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(TypeListInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var TypeListInterface
      */
     private $typeListInterface;
     /**
-     * @var AlmaClient|(AlmaClient&object&\PHPUnit\Framework\MockObject\MockObject)|(AlmaClient&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var AlmaClient
      */
     private $almaClient;
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
     /**
-     * @var ManagerInterface|(ManagerInterface&object&\PHPUnit\Framework\MockObject\MockObject)|(ManagerInterface&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var ManagerInterface
      */
     private $messageManager;
 

@@ -133,7 +133,7 @@ class InsuranceHelperTest extends TestCase
     public function testInsuranceConfigIsAnInsuranceConfigObject(): void
     {
         $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturn('');
-        $this->assertTrue(get_class($this->insuranceHelper->getConfig()) == InsuranceConfig::class);
+        $this->assertSame(InsuranceConfig::class, get_class($this->insuranceHelper->getConfig()));
     }
 
     public function testInsuranceConfigGetDataInDb(): void
@@ -162,7 +162,7 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals((bool)$isAllowed, $insuranceObject->isAllowed());
     }
 
-    private function configObjectIsCreatedWithDbDataDataProvider(): array
+    public function configObjectIsCreatedWithDbDataDataProvider(): array
     {
         return [
             'Return false if no data in DB' => [
@@ -288,7 +288,7 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals('https://protect.sandbox.almapay.com/almaBackOfficeSubscriptions.html', $this->insuranceHelper->getOrderDetailsUrl('test'));
     }
 
-    private function iframeHasDbGetParamsDataProvider(): array
+    public function iframeHasDbGetParamsDataProvider(): array
     {
         return [
             'No params if config is empty' => [
@@ -622,7 +622,7 @@ class InsuranceHelperTest extends TestCase
         $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
-        foreach ([$subscription , $subscription] as $key => $subscription) {
+        foreach ([$subscription, $subscription] as $key => $subscription) {
             $this->assertEquals($subscription->getContractId(), $subscriptionArray[$key]->getContractId());
             $this->assertEquals($subscription->getCmsReference(), $subscriptionArray[$key]->getCmsReference());
             $this->assertEquals($subscription->getProductPrice(), $subscriptionArray[$key]->getProductPrice());
@@ -630,6 +630,7 @@ class InsuranceHelperTest extends TestCase
             $this->assertTrue(boolval($subscriptionArray[$key]->getSubscriber()));
         }
     }
+
     public function testGetSubscriberWithInvoice(): void
     {
         $subscriber = $this->subscriberFactory();
@@ -720,7 +721,7 @@ class InsuranceHelperTest extends TestCase
         }
     }
 
-    public function testCreateDbSubscriptionWithItemCollectionAndSubscriptionApiResultWithAProductWith2qty():void
+    public function testCreateDbSubscriptionWithItemCollectionAndSubscriptionApiResultWithAProductWith2qty(): void
     {
         $itemWithInsurance1 = $this->invoiceItemFactory('mySku', true, 2, 22);
         $itemWithInsurance1->method('getQty')->willReturn('2.00000');
@@ -788,7 +789,7 @@ class InsuranceHelperTest extends TestCase
         }
     }
 
-    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku', int $amount =11): Subscription
+    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku', int $amount = 11): Subscription
     {
         return new Subscription(
             $contractId,
@@ -811,7 +812,15 @@ class InsuranceHelperTest extends TestCase
     /**
      * @return InvoiceItem
      */
-    private function invoiceItemFactory(string $sku, bool $hasInsuranceData = false, int $orderId = 1, int $orderItemId = 1, string $contractId = 'contract_id_123', string $price = '11', int $parentPrice = 5300): InvoiceItem
+    private function invoiceItemFactory(
+        string $sku,
+        bool   $hasInsuranceData = false,
+        int    $orderId = 1,
+        int    $orderItemId = 1,
+        string $contractId = 'contract_id_123',
+        string $price = '11',
+        int    $parentPrice = 5300
+    ): InvoiceItem
     {
         $invoiceItem = $this->createMock(InvoiceItem::class);
         $orderItem = $this->createMock(OrderItem::class);
@@ -861,12 +870,12 @@ class InsuranceHelperTest extends TestCase
         ];
     }
 
-    private function getInsuranceData(string $linkToken = null, string $contractId = 'contract_id_123', string $price = '11', int $parent_price = 5300): ?string
+    private function getInsuranceData(string $linkToken = null, string $contractId = 'contract_id_123', string $price = '11', int $parentPrice = 5300): ?string
     {
         if (!$linkToken) {
             return null;
         }
-        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack", "parent_price":"'.$parent_price .'"}';
+        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack", "parent_price":"' . $parentPrice . '"}';
     }
 
     private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string

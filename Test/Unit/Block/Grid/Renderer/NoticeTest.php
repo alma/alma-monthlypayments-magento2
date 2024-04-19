@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Test\Unit\Block\Grid\Renderer;
 
 use Magento\AdminNotification\Model\Inbox;
-use Magento\Catalog\Block\Product\View\Description;
 use PHPUnit\Framework\TestCase;
 
 class NoticeTest extends TestCase
@@ -59,8 +58,8 @@ class NoticeTest extends TestCase
 
         $this->escaper
             ->method('escapeHtml')
-            ->withConsecutive([$row->getTitle()],[$row->getDescription()])
-            ->willReturnOnConsecutiveCalls('Magento insurance : New Order #1234567890','Description',);
+            ->withConsecutive([$row->getTitle()], [$row->getDescription()])
+            ->willReturnOnConsecutiveCalls('Magento insurance : New Order #1234567890', 'Description', );
         $this->assertEquals(
             '<span class="grid-row-title">Magento insurance : New Order #1234567890</span><br />Description',
             $this->notice->render($row)

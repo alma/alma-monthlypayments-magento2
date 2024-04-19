@@ -37,10 +37,14 @@ class CheckoutSubmitAllAfter implements ObserverInterface
         $this->orderModel = $orderModel;
     }
 
-    public function execute(Observer $observer)
+    /**
+     * Transfer insurance data from quoteItems to orderItems
+     *
+     * @param Observer $observer
+     * @return void
+     */
+    public function execute(Observer $observer): void
     {
-        $this->logger->info('In Checkout Submit all after', []);
-
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
 
@@ -60,11 +64,7 @@ class CheckoutSubmitAllAfter implements ObserverInterface
                 case 'configurable_product_with_alma_insurance':
                 case 'alma_insurance':
                     $saveInsuranceData = true;
-                    $quoteItemId = $orderItem->getQuoteItemId();
-                    $quoteItem = $quote->getItemById($quoteItemId);
-                    $quoteItemInsuranceData = $quoteItem->getData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
-                    $orderItem->setData(InsuranceHelper::ALMA_INSURANCE_DB_KEY, $quoteItemInsuranceData);
-                    $quoteItemInsuranceData = null;
+                    $this->setInsuranceData($orderItem, $quote);
                     break;
                 default:
                     break;
@@ -78,5 +78,14 @@ class CheckoutSubmitAllAfter implements ObserverInterface
                 $this->logger->error('Impossible to save order', [$e->getMessage()]);
             }
         }
+    }
+
+    private function setInsuranceData(Order\Item $orderItem, Quote $quote): void
+    {
+        $quoteItemId = $orderItem->getQuoteItemId();
+        $quoteItem = $quote->getItemById($quoteItemId);
+        $quoteItemInsuranceData = $quoteItem->getData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
+        $orderItem->setData(InsuranceHelper::ALMA_INSURANCE_DB_KEY, $quoteItemInsuranceData);
+        $quoteItemInsuranceData = null;
     }
 }

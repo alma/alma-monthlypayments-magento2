@@ -33,38 +33,37 @@ class PaymentValidationTest extends TestCase
     const INCREMENT_ID = '0000000001';
     const ORDER_ID = '23';
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
     /**
-     * @var Session|(Session&object&\PHPUnit\Framework\MockObject\MockObject)|(Session&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Session
      */
     private $checkoutSession;
     /**
-     * @var AlmaClient|(AlmaClient&object&\PHPUnit\Framework\MockObject\MockObject)|(AlmaClient&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var AlmaClient
      */
     private $almaClient;
     /**
-     * @var Processor|(Processor&object&\PHPUnit\Framework\MockObject\MockObject)|(Processor&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Processor
      */
     private $paymentProcessor;
     /**
-     * @var QuoteRepository|(QuoteRepository&object&\PHPUnit\Framework\MockObject\MockObject)|(QuoteRepository&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var QuoteRepository
      */
     private $quoteRepository;
     /**
-     * @var BuilderInterface|(BuilderInterface&Mockery\LegacyMockInterface)|(BuilderInterface&Mockery\MockInterface)|Mockery\LegacyMockInterface|Mockery\MockInterface
+     * @var BuilderInterface
      */
     private $builderInterface;
     /**
-     * @var OrderHelper|(OrderHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(OrderHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderHelper
      */
     private $orderHelper;
     /**
-     * @var ConfigHelper|(ConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(ConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var ConfigHelper
      */
     private $configHelper;
-
 
     public function setUp(): void
     {
@@ -141,8 +140,8 @@ class PaymentValidationTest extends TestCase
         $paymentValidation = $this->getPaymentValidationMockPartial();
         $paymentValidation->shouldReceive('createPaymentData')->once();
         $paymentValidation->shouldReceive('addTransactionComment')
-             ->once()
-             ->andReturn($paymentMock);
+            ->once()
+            ->andReturn($paymentMock);
         $paymentValidation->addTransactionToPayment($paymentMock, $orderMock, $almaPaymentMock);
     }
 
@@ -272,6 +271,7 @@ class PaymentValidationTest extends TestCase
     {
         return new PaymentValidation(...$this->getConstructorDependency());
     }
+
     private function getConstructorDependency(): array
     {
         return [
@@ -289,8 +289,7 @@ class PaymentValidationTest extends TestCase
     public function paymentDataProvider(): array
     {
         return [
-            'Check with deferred Trigger True' =>
-                [
+            'Check with deferred Trigger True' => [
                     [
                         'created' => self::FIXED_TIMESTAMP,
                         'deferred_days' => self::DEFFERED_DAYS_30,

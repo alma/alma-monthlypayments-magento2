@@ -11,11 +11,11 @@ use PHPUnit\Framework\TestCase;
 class APIModesTest extends TestCase
 {
     /**
-     * @var Logger|(Logger&object&\PHPUnit\Framework\MockObject\MockObject)|(Logger&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger
      */
     private $logger;
     /**
-     * @var ApiConfigHelper|(ApiConfigHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(ApiConfigHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var ApiConfigHelper
      */
     private $apiConfig;
 
