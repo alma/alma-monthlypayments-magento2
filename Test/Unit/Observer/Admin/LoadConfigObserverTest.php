@@ -12,6 +12,7 @@ use Alma\MonthlyPayments\Observer\Admin\LoadConfigObserver;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Response\HttpInterface;
 use Magento\Framework\App\ResponseFactory;
 use Magento\Framework\App\ResponseInterface;
@@ -32,6 +33,7 @@ class LoadConfigObserverTest extends TestCase
     private $configHelper;
     private $storeHelper;
     private $httpInterface;
+    private $cacheManager;
 
     public function setUp(): void
     {
@@ -54,6 +56,7 @@ class LoadConfigObserverTest extends TestCase
         $this->availability = $this->createMock(Availability::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->storeHelper = $this->createMock(StoreHelper::class);
+        $this->cacheManager = $this->createMock(Manager::class);
         $this->storeHelper->method('getScope')->willReturn('default');
         $this->storeHelper->method('getStoreId')->willReturn('1');
     }
@@ -66,6 +69,7 @@ class LoadConfigObserverTest extends TestCase
         $this->availability = null;
         $this->configHelper = null;
         $this->storeHelper = null;
+        $this->cacheManager = null;
     }
 
     private function createLoadConfigObserver(): LoadConfigObserver
@@ -77,6 +81,7 @@ class LoadConfigObserverTest extends TestCase
             $this->availability,
             $this->configHelper,
             $this->storeHelper,
+            $this->cacheManager
         );
     }
 

@@ -10,9 +10,7 @@ use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceFlagException;
 use Magento\Backend\Model\UrlInterface;
-use Magento\Config\Controller\Adminhtml\System\Config\Edit;
-use Magento\Framework\App\ActionFlag;
-use Magento\Framework\App\ResponseFactory;
+use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
@@ -30,6 +28,7 @@ class LoadConfigObserver implements ObserverInterface
     private $availability;
     private $configHelper;
     private $storeHelper;
+    private $cacheManager;
 
     public function __construct(
         Logger             $logger,
@@ -37,7 +36,8 @@ class LoadConfigObserver implements ObserverInterface
         PaymentPlansHelper $paymentPlansHelper,
         Availability       $availability,
         ConfigHelper       $configHelper,
-        StoreHelper        $storeHelper
+        StoreHelper        $storeHelper,
+        Manager            $cacheManager
     ) {
         $this->url = $url;
         $this->paymentPlansHelper = $paymentPlansHelper;
@@ -45,6 +45,7 @@ class LoadConfigObserver implements ObserverInterface
         $this->availability = $availability;
         $this->configHelper = $configHelper;
         $this->storeHelper = $storeHelper;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -63,17 +64,20 @@ class LoadConfigObserver implements ObserverInterface
             try {
                 $cmsInsuranceFlagValue = $this->availability->getMerchantInsuranceAvailability();
             } catch (AlmaInsuranceFlagException $e) {
+                $this->logger->error('Alma Insurance Flag Exception', ['exception' => $e->getMessage()]);
                 return $this;
             }
+            $cacheTypeList = ["config","layout","block_html","compiled_config","config_integration","config_integration_api","full_page"];
             if (!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1') {
 
                 $this->saveIsAllowedInsurance(0);
                 $this->getClearInsuranceConfig();
+                $this->cacheManager->clean($cacheTypeList);
                 $controller->getResponse()->setRedirect($currentUrl);
             }
             if ($cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '0') {
-
                 $this->saveIsAllowedInsurance(1);
+                $this->cacheManager->clean($cacheTypeList);
                 $controller->getResponse()->setRedirect($currentUrl);
             }
 
