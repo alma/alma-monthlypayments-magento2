@@ -25,4 +25,13 @@
     <head>
         <css src="Alma_MonthlyPayments::css/alma_menu.css"/>
     </head>
+    <body>
+        <referenceContainer name="header">
+            <referenceBlock name="notification.messages">
+                <action method="setTemplate">
+                    <argument name="template" xsi:type="string">Alma_MonthlyPayments::toolbar_entry.phtml</argument>
+                </action>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
 </page>

@@ -2,9 +2,10 @@
 
 namespace Alma\MonthlyPayments\Helpers\Exceptions;
 
+use Alma\API\Exceptions\AlmaException;
 use Exception;
 
-class AlmaClientException extends Exception
+class AlmaClientException extends AlmaException
 {
     /**
      * Get exception message same as Request error

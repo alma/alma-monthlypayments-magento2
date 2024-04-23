@@ -17,6 +17,22 @@ use PHPUnit\Framework\TestCase;
 class OrderHelperTest extends TestCase
 {
     const EURO_CURRENCY = 'EUR';
+    /**
+     * @var Context
+     */
+    private $context;
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+    /**
+     * @var DateHelper
+     */
+    private $dateHelper;
+    /**
+     * @var null
+     */
+    private $orderHelper;
 
     public function setUp(): void
     {

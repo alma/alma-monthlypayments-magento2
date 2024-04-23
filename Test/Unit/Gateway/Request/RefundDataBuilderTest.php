@@ -15,6 +15,15 @@ use PHPUnit\Framework\TestCase;
 
 class RefundDataBuilderTest extends TestCase
 {
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var OrderRepository
+     */
+    private $orderRepository;
+
     public function setUp(): void
     {
         $this->config = $this->createMock(Config::class);

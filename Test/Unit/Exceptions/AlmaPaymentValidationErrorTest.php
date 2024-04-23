@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class AlmaPaymentValidationErrorTest extends TestCase
 {
+    private $paymentValidationError;
     public function setUp(): void
     {
         $this->paymentValidationError = new AlmaPaymentValidationException();
