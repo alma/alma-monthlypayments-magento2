@@ -27,4 +27,7 @@
         <observer name="alma_monthly_payments_gateway_data_assign"
                   instance="Alma\MonthlyPayments\Observer\PaymentDataAssignObserver"/>
     </event>
+    <event name="sales_order_save_after">
+        <observer name="sales_order_save_after_order_status" instance="Alma\MonthlyPayments\Observer\OrderStatusObserver" />
+    </event>
 </config>
