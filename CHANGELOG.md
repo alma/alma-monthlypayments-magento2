@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v4.3.0
+------
+* feat : data analysis for improved customer experience
+
 v4.2.0
 ------
 * feat : Deferred Payments with In page checkout
