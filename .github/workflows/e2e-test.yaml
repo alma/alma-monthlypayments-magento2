@@ -55,7 +55,7 @@ jobs:
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-infrastructure.outputs.token }}
-          ref: devx/dex-866-improve-e2e-status-update-on-pr
+          ref: main
           repo: integration-infrastructure
           owner: alma
           workflow: deploy-cms.yaml
