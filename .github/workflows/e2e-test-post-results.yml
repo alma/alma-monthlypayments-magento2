@@ -1,0 +1,81 @@
+name: Post E2E results in pull request
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        type: string
+        description: The PR number in which to post the results
+        required: true
+      e2e-status:
+        type: string
+        description: The status of the E2E tests (failure or success)
+        required: true
+      e2e-run-url:
+        type: string
+        description: The URL of the E2E tests run
+        required: true
+      check-id:
+        type: string
+        description: Github check ID of the E2E tests in the pull request
+        required: true
+
+jobs:
+
+  e2e-post-results:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+      - name: Add a comment with E2E tests results in the Pull Request
+        uses: actions/github-script@v7
+        with:
+            script: |
+              let commentBody = '❌ E2E tests have failed. \n';
+              if ('${{ github.event.inputs.e2e-status }}' === 'success') {
+                  commentBody = '✅ E2E tests have been successfully completed. \n';
+              }
+              commentBody += '➡️ You can find the results [here](${{ github.event.inputs.e2e-run-url }}).';
+              commentBody += '\n\n<!-- id:e2e-test-run-info -->';
+              github.rest.issues.createComment({
+                  issue_number: ${{ github.event.inputs.pr-number }},
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: commentBody
+              })
+
+
+      - name: Generate Github token for PR checks
+        id: github-token-checks
+        uses: actions/create-github-app-token@v1
+        continue-on-error: true
+        with:
+          app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
+          private-key: ${{ secrets.ALMA_UPDATE_CHECKS_APP_PEM }}
+          repositories: alma-monthlypayments-magento2
+
+      - name: Update check in PR with E2E tests results
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.github-token-checks.outputs.token }}
+          script: |
+            let checkStatus = 'completed';
+            let checkConclusion = 'success';
+            let checkOutput = {
+              title: 'E2E tests',
+              summary: '✅ E2E tests have been successfully completed',
+              text: `➡️ You can find the results [here](${{ github.event.inputs.e2e-run-url }}).`
+            };
+            if ('${{ github.event.inputs.e2e-status }}' === 'failure') {
+              checkConclusion = 'failure';
+              checkOutput.summary = '❌ E2E tests have failed.';
+            }
+            github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: '${{ github.event.inputs.check-id }}',
+              status: checkStatus,
+              conclusion: checkConclusion,
+              output: checkOutput
+            })
+
