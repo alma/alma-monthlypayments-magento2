@@ -1,0 +1,10 @@
+services:
+  magento:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # args:
+      #   PHP_VERSION:
+      #   MAGENTO_VERSION:
+    volumes:
+      - ./:/home/magento2/app/code/Alma/MonthlyPayments/
