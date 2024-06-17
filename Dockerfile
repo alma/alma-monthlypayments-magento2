@@ -32,9 +32,7 @@ USER phpuser
 WORKDIR /home/phpuser
 
 ARG MAGENTO_VERSION=2.4.6-p6
-RUN git clone https://github.com/magento/magento2.git magento2 && \
-    cd magento2 && \
-    git checkout $MAGENTO_VERSION
+RUN git clone --depth 1 --branch $MAGENTO_VERSION https://github.com/magento/magento2.git magento2
 
 WORKDIR /home/phpuser/magento2
 
