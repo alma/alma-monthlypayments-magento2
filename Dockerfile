@@ -27,10 +27,8 @@ RUN apt update && \
     xsl \
     zip
 
-RUN pecl install xdebug-3.1.5 \
+RUN pecl install xdebug-3.3.2 \
     && docker-php-ext-enable xdebug
-
-COPY ./docker/custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
 
 RUN useradd -ms /bin/bash phpuser
 USER phpuser

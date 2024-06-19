@@ -21,8 +21,6 @@ tasks:
       - docker:build
     cmds:
       - docker compose run --rm magento ./vendor/phpunit/phpunit/phpunit -c app/code/Alma/MonthlyPayments/Test/Unit/phpunit.ci.xml --coverage-text
-    env:
-      XDEBUG_MODE: coverage
 
   dist:
     desc: Build the zip file of the module
