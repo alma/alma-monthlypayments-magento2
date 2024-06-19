@@ -2,3 +2,4 @@ vendor
 .DS_Store
 auth.json
 .idea
+.phpunit.result.cache
