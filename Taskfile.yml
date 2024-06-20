@@ -37,14 +37,12 @@ tasks:
   lint:
     desc: Run linter
     cmds:
-      - docker compose run --rm magento composer exec phpcs -- ./app/code/Alma/MonthlyPayments/
+      - docker compose run -T --rm magento composer exec phpcs -- ./app/code/Alma/MonthlyPayments/
 
   lint:fix:
-    desc: Run linter and apply fix
-    deps:
-      - install-tools
+    desc: Run linter and apply fixes
     cmds:
-      - docker compose run --rm magento composer exec php-cs-fixer -- fix ./app/code/Alma/MonthlyPayments/
+      - docker compose run -T --rm magento composer exec php-cs-fixer -- fix ./app/code/Alma/MonthlyPayments/
 
   crowdin:
     internal: true

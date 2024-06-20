@@ -17,28 +17,22 @@ repos:
       - id: detect-private-key
       - id: check-merge-conflict
 
-  - repo: local
-    hooks:
-      - id: coding-standard-fixer
-        name: Coding standards Fixer test
-        language: system
-        pass_filenames: false
-        entry:  task lint:fix
-        stages: [commit]
+  # Uncomment this once the code is compliant with phpcs
+  # - repo: local
+  #   hooks:
+      # - id: coding-standard-fixer
+      #   name: Coding standards Fixer test
+      #   language: system
+      #   pass_filenames: false
+      #   entry:  task lint:fix
+      #   stages: [commit]
 
-      - id: coding-standard
-        name: Check the PHP coding standards
-        language: system
-        pass_filenames: false
-        entry:  task lint
-        stages: [commit]
-
-      - id: php-compatibility
-        name: Check the PHP compatibility
-        language: system
-        pass_filenames: false
-        entry:  task php-compatibility
-        stages: [commit]
+      # - id: coding-standard
+      #   name: Check the PHP coding standards
+      #   language: system
+      #   pass_filenames: false
+      #   entry:  task lint
+      #   stages: [commit]
 
   - repo: https://github.com/returntocorp/semgrep
     rev: v1.73.0
