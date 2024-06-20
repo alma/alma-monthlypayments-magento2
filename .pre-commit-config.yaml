@@ -1,0 +1,56 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.27.0
+    hooks:
+      - id: commitizen
+        name: Check commit message format
+        stages: [commit-msg]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  # Uncomment this once the code is compliant with phpcs
+  # - repo: local
+  #   hooks:
+      # - id: coding-standard-fixer
+      #   name: Coding standards Fixer test
+      #   language: system
+      #   pass_filenames: false
+      #   entry:  task lint:fix
+      #   stages: [commit]
+
+      # - id: coding-standard
+      #   name: Check the PHP coding standards
+      #   language: system
+      #   pass_filenames: false
+      #   entry:  task lint
+      #   stages: [commit]
+
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.73.0
+    hooks:
+      - id: semgrep
+        args:
+          - --error
+          - --config
+          - semgrep/rules/
+          - --metrics
+          - "off"
+          - --disable-version-check
+          - --skip-unknown-extensions
+        pass_filenames: false # Passing files explicitely override semgrepignore
+
+  - repo: https://github.com/alma/pre-commit-hooks
+    rev: 1.1.2
+    hooks:
+      - id: check-branch-name
+        args:
+          - "-r^((chore|ci|dependabot|devx|docs|feature|fix|release|hotfix|hotfix-backport|infra|other|perf|refactor|security|test)\/.+|(snyk)-.+|main|develop|HEAD)$$"

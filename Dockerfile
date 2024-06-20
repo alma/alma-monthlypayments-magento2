@@ -27,6 +27,9 @@ RUN apt update && \
     xsl \
     zip
 
+RUN pecl install xdebug-3.3.2 \
+    && docker-php-ext-enable xdebug
+
 RUN useradd -ms /bin/bash phpuser
 USER phpuser
 WORKDIR /home/phpuser
