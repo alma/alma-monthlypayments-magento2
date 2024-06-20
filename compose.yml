@@ -1,0 +1,13 @@
+services:
+  magento:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.1}
+        MAGENTO_VERSION: ${MAGENTO_VERSION:-2.4.6-p6}
+    user: ${UID:-1000}:${GID:-1000}
+    volumes:
+      - ./:/home/phpuser/magento2/app/code/Alma/MonthlyPayments/
+    environment:
+      XDEBUG_MODE: coverage
