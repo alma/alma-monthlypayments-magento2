@@ -19,7 +19,6 @@ zip -9 -r "dist/almapay-monthlypayments-magento2.zip" \
     view/ \
     CHANGELOG.md \
     composer.json \
-    crowdin.yml \
     LICENSE.txt \
     README.md \
     registration.php
