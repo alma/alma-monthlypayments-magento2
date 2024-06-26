@@ -39,15 +39,6 @@
             var isAddToCartFlow = false;
             var selectedAlmaInsurance = null
             window.addEventListener('message', (e) => {
-                if(e.data.type === 'almaEligibilityAnswer'){
-                    let insuranceData = e.data.eligibilityCallResult
-                    if (insuranceData) {
-                        let height = e.data.widgetSize.height + 55
-                        let iframe = document.getElementById('product-alma-iframe')
-                        iframe.style.height = height + 'px'
-                    }
-                }
-
                 if(e.data.type === 'getResetInsuranceData'){
                     $('input[name=alma_insurance_id]').val('');
                     $('input[name=alma_insurance_name]').val('');
