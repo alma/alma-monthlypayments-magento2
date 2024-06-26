@@ -61,8 +61,8 @@ class InsuranceWidget extends Field
                                   const configurationOptions = {
                                     isInsuranceActivated: Boolean('" . $config->isActivated() . "'),
                                     isInsuranceOnProductPageActivated: Boolean('" . $config->isPageActivated() . "'),
-                                    isAddToCartPopupActivated: Boolean('" . $config->isPopupActivated()  . "'),
-                                    //isInCartWidgetActivated: Boolean('" . $config->isCartActivated() . "'),
+                                    isAddToCartPopupActivated: Boolean('" . $config->isPopupActivated() . "'),
+                                    isInCartWidgetActivated: Boolean('" . $config->isCartActivated() . "'),
                                   }
                                 setTimeout(sendConfigurationInsuranceParams(configurationOptions), 650)
                             } else {
@@ -78,15 +78,11 @@ class InsuranceWidget extends Field
                            var inputValue = document.getElementById('alma_insurance_config').value;
                            if (inputValue == 'false'){
                                e.stopImmediatePropagation();
-                               console.log('click')
                                getAlmaWidgetData().then((data) => {
-                                   console.log('data')
-                                   console.log(data)
-                                   console.log(JSON.stringify(data))
                                     document.getElementById('alma_insurance_config').value = JSON.stringify(data)
                                     document.getElementById('save').click();
                                }).catch((error) => {
-                                   console.log('error')
+                                   console.log('error in alma widget data')
                                    console.log(error)
                                })
                            }
