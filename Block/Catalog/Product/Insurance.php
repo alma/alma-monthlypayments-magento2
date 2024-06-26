@@ -167,7 +167,7 @@ class Insurance extends ProductView
 
     public function getProductPriceInCent(): int
     {
-        return (int)($this->getProduct()->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount()->getValue() * 100);
+        return (int)($this->getProduct()->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getValue() * 100);
     }
 
     public function getBaseProductSku(): string
