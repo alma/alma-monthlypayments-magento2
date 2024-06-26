@@ -167,6 +167,7 @@ class InsuranceHelper extends AbstractHelper
     }
 
     /**
+     * @param float $addItemPrice
      * @param ProductInterface $addedItemToQuote
      * @param string $insuranceId
      * @param string|null $quoteId
@@ -188,8 +189,7 @@ class InsuranceHelper extends AbstractHelper
             return null;
         }
 
-        $this->logger->info('New insurance Product', []);
-        return new InsuranceProduct($insuranceContract, $addedItemToQuote->getName(),$addItemPrice );
+        return new InsuranceProduct($insuranceContract, $addedItemToQuote->getName(), $addItemPrice);
     }
 
     /**
@@ -243,6 +243,7 @@ class InsuranceHelper extends AbstractHelper
         $baseUrl = $this->getBaseUrl($mode);
         return $baseUrl . self::SCRIPT_IFRAME_PATH;
     }
+
     /**
      * @param string $mode
      * @return string
@@ -252,6 +253,7 @@ class InsuranceHelper extends AbstractHelper
         $baseUrl = $this->getBaseUrl($mode);
         return $baseUrl . self::ORDER_DETAIL_IFRAME_URL;
     }
+
     /**
      * @param array $items
      * @return array

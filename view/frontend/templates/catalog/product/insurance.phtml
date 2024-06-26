@@ -8,8 +8,7 @@
 <script type="module" src="<?= $block->getScriptUrl()?>"></script>
     <iframe title="Product alma Iframe" id="product-alma-iframe" class="alma-insurance-iframe" scrolling="no" src="<?= $block->getIframeUrl()?>"></iframe>
     <input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="">
-    <input type="hidden" name="alma_insurance_name" form="product_addtocart_form" value="">
-    <input type="hidden" name="alma_insurance_duration" form="product_addtocart_form" value="">
+    <input type="hidden" name="alma_insurance_qty" form="product_addtocart_form" value="">
     <div id="alma-insurance-modal"></div>
 <?php } ?>
 <?php if ($widgetIsActivated) { ?>
@@ -41,8 +40,7 @@
             window.addEventListener('message', (e) => {
                 if(e.data.type === 'getResetInsuranceData'){
                     $('input[name=alma_insurance_id]').val('');
-                    $('input[name=alma_insurance_name]').val('');
-                    $('input[name=alma_insurance_duration]').val('')
+                    $('input[name=alma_insurance_qty]').val('')
                     isAddToCartFlow = false;
                     madeChoiceForInsurance = false;
                 }
@@ -52,12 +50,10 @@
                     selectedAlmaInsurance = e.data.selectedInsuranceData
                     if (selectedAlmaInsurance) {
                         $('input[name=alma_insurance_id]').val(selectedAlmaInsurance.insuranceContractId);
-                        $('input[name=alma_insurance_name]').val(selectedAlmaInsurance.name);
-                        $('input[name=alma_insurance_duration]').val(selectedAlmaInsurance.duration);
+                        $('input[name=alma_insurance_qty]').val(selectedAlmaInsurance.selectedQuantity);
                     } else {
                         $('input[name=alma_insurance_id]').val('');
-                        $('input[name=alma_insurance_name]').val('');
-                        $('input[name=alma_insurance_duration]').val('');
+                        $('input[name=alma_insurance_qty]').val('');
                     }
                     if(isAddToCartFlow){
                         document.getElementById('product-addtocart-button').click()
