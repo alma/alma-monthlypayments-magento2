@@ -11,8 +11,8 @@ use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View as ProductView;
 use Magento\Catalog\Helper\Product;
 use Magento\Catalog\Model\ProductTypes\ConfigInterface;
+use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\ConfigurableProduct\Helper\Data;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Json\EncoderInterface as jsonEncoderInterface;
@@ -167,10 +167,7 @@ class Insurance extends ProductView
 
     public function getProductPriceInCent(): int
     {
-        if ($this->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
-            return (int)($this->getProduct()->getPriceInfo()->getPrice('regular_price')->getMinRegularAmount()->getValue() * 100);
-        }
-        return (int)($this->getProduct()->getPrice() * 100);
+        return (int)($this->getProduct()->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount()->getValue() * 100);
     }
 
     public function getBaseProductSku(): string
@@ -181,6 +178,11 @@ class Insurance extends ProductView
     public function getBaseProductId(): string
     {
         return $this->getProduct()->getId();
+    }
+
+    public function getProductName(): string
+    {
+        return $this->getProduct()->getName();
     }
 
     public function getProductChild(): string
