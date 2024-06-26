@@ -24,42 +24,70 @@ class InsuranceWidget extends Field
      * @param array $data
      */
     public function __construct(
-        Context $context,
+        Context         $context,
         InsuranceHelper $insuranceHelper,
         ApiConfigHelper $apiConfigHelper,
-        array $data = []
-    ) {
+        array           $data = []
+    )
+    {
         parent::__construct($context, $data);
         $this->insuranceHelper = $insuranceHelper;
         $this->apiConfigHelper = $apiConfigHelper;
     }
+
     /**
      * Retrieve element HTML markup
      *
      * @param AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml(AbstractElement $element):string
+    protected function _getElementHtml(AbstractElement $element): string
     {
-        $iframeUrl = $this->insuranceHelper->getIframeUrlWithParams($this->apiConfigHelper->getActiveMode());
+        $iframeUrl = $this->insuranceHelper->getConfigIframeUrl($this->apiConfigHelper->getActiveMode());
         $scriptUrl = $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
+        $config = $this->insuranceHelper->getConfig();
         return "<div id='alma-insurance-modal'></div>
+                   <script type='module' src='" . $scriptUrl . "'></script>
                    <iframe id='config-alma-iframe'
                     class='alma-insurance-iframe'
                     width='100%'
                     height='100%'
                     src='" . $iframeUrl . "'>
                    </iframe>
-                   <script type='module' src='" . $scriptUrl . "'></script>
+                   <script >
+                        function waitForScript ()
+                        {
+                            if (typeof sendConfigurationInsuranceParams !== 'undefined') {
+                                  const configurationOptions = {
+                                    isInsuranceActivated: Boolean('" . $config->isActivated() . "'),
+                                    isInsuranceOnProductPageActivated: Boolean('" . $config->isPageActivated() . "'),
+                                    isAddToCartPopupActivated: Boolean('" . $config->isPopupActivated()  . "'),
+                                    //isInCartWidgetActivated: Boolean('" . $config->isCartActivated() . "'),
+                                  }
+                                setTimeout(sendConfigurationInsuranceParams(configurationOptions), 650)
+                            } else {
+                                console.log('re set timeout')
+                                setTimeout(waitForScript, 450)
+                            }
+                        }
+                        waitForScript()
+                   </script>
                    <script>
                        var btnSave = document.getElementById('save')
                        btnSave.addEventListener('click', function (e) {
                            var inputValue = document.getElementById('alma_insurance_config').value;
                            if (inputValue == 'false'){
                                e.stopImmediatePropagation();
+                               console.log('click')
                                getAlmaWidgetData().then((data) => {
+                                   console.log('data')
+                                   console.log(data)
+                                   console.log(JSON.stringify(data))
                                     document.getElementById('alma_insurance_config').value = JSON.stringify(data)
                                     document.getElementById('save').click();
+                               }).catch((error) => {
+                                   console.log('error')
+                                   console.log(error)
                                })
                            }
                        })

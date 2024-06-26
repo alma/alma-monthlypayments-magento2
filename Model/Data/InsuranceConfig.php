@@ -41,10 +41,10 @@ class InsuranceConfig
     private $isAllowed;
 
     public function __construct(
-        bool $isAllowed,
+        bool   $isAllowed,
         string $jsonData
     ) {
-        $this->isAllowed =$isAllowed;
+        $this->isAllowed = $isAllowed;
         $this->activated = false;
         $this->pageActivated = false;
         $this->cartActivated = false;
@@ -52,18 +52,22 @@ class InsuranceConfig
         $this->arrayData = json_decode($jsonData, true);
         if ($this->arrayData) {
             foreach ($this->arrayData as $key => $value) {
+                if (!is_bool($this->arrayData[$key])) {
+                    continue;
+                }
                 switch ($key) {
-                    case 'is_insurance_activated':
-                        $this->activated = $this->arrayData['is_insurance_activated'];
+                    case 'isInsuranceActivated':
+                        $this->activated = $this->arrayData[$key];
                         break;
-                    case 'is_insurance_on_product_page_activated':
-                        $this->pageActivated = $this->arrayData['is_insurance_on_product_page_activated'];
+                    case 'isInsuranceOnProductPageActivated':
+                        $this->pageActivated = $this->arrayData[$key];
                         break;
-                    case 'is_insurance_on_cart_page_activated':
-                        $this->cartActivated = $this->arrayData['is_insurance_on_cart_page_activated'];
+                    case 'isAddToCartPopupActivated':
+                        $this->popupActivated = $this->arrayData[$key];
                         break;
-                    case 'is_add_to_cart_popup_insurance_activated':
-                        $this->popupActivated = $this->arrayData['is_add_to_cart_popup_insurance_activated'];
+                    case 'isInCartWidgetActivated':
+                        $this->cartActivated = $this->arrayData[$key];
+
                         break;
                     default:
                         break;
@@ -72,25 +76,27 @@ class InsuranceConfig
         }
     }
 
-    public function isActivated():bool
+    public function isActivated(): bool
     {
         return $this->activated;
     }
-    public function isPageActivated():bool
+
+    public function isPageActivated(): bool
     {
         return $this->pageActivated;
     }
-    public function isCartActivated():bool
+
+    public function isCartActivated(): bool
     {
         return $this->cartActivated;
     }
 
-    public function isPopupActivated():bool
+    public function isPopupActivated(): bool
     {
         return $this->popupActivated;
     }
 
-    public function getArrayConfig():array
+    public function getArrayConfig(): array
     {
         return (array)$this->arrayData;
     }

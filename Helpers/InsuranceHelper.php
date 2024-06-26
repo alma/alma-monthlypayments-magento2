@@ -229,18 +229,10 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getIframeUrlWithParams($mode): string
+    public function getConfigIframeUrl($mode): string
     {
-        $configArray = $this->getConfig()->getArrayConfig();
-        unset($configArray['is_insurance_activated']);
-        $paramNumber = 0;
-        $uri = '';
-        foreach ($configArray as $key => $value) {
-            $uri .= ($paramNumber === 0 ? '?' : '&') . $key . '=' . ($value ? 'true' : 'false');
-            $paramNumber++;
-        }
         $baseUrl = $this->getBaseUrl($mode);
-        return $baseUrl . self::CONFIG_IFRAME_URL . $uri;
+        return $baseUrl . self::CONFIG_IFRAME_URL;
     }
 
     /**

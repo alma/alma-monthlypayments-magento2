@@ -256,16 +256,12 @@ class InsuranceHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider iframeHasDbGetParamsDataProvider
+     * @dataProvider iframeUrlDataProvider
      * @return void
      */
-    public function testIframeHasDbGetParams($dbValue, $expectedURL, string $mode): void
+    public function testIframeHasDbGetParams($expectedURL, string $mode): void
     {
-        $this->configHelper->expects($this->exactly(2))
-            ->method('getConfigByCode')
-            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH], [InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
-            ->willReturn($dbValue);
-        $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams($mode));
+        $this->assertEquals($expectedURL, $this->insuranceHelper->getConfigIframeUrl($mode));
     }
 
     public function testScriptUrlSandbox(): void
@@ -288,49 +284,16 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals('https://protect.sandbox.almapay.com/almaBackOfficeSubscriptions.html', $this->insuranceHelper->getOrderDetailsUrl('test'));
     }
 
-    public function iframeHasDbGetParamsDataProvider(): array
+    public function iframeUrlDataProvider(): array
     {
         return [
-            'No params if config is empty' => [
-                'db_value' => '',
+            'Test URL' => [
                 'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html',
                 'mode' => 'test'
             ],
-            'all params are true if all is true in DB' => [
-                'db_value' => '{
-                    "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":true,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":true
-                    }',
-                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=true' .
-                    '&is_insurance_on_cart_page_activated=true' .
-                    '&is_add_to_cart_popup_insurance_activated=true',
-                'mode' => 'test'
-            ],
-            'all params are false if all is false in DB' => [
-                'db_value' => '{
-                    "is_insurance_activated":false,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":false,
-                    "is_add_to_cart_popup_insurance_activated":false
-                    }',
-                'expectedUrl' => 'https://protect.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=false' .
-                    '&is_insurance_on_cart_page_activated=false' .
-                    '&is_add_to_cart_popup_insurance_activated=false',
+            'Live URL' => [
+                'expectedUrl' => 'https://protect.almapay.com/almaBackOfficeConfiguration.html',
                 'mode' => 'live'
-            ],
-            'params are good values' => [
-                'db_value' => '{
-                    "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":false
-                    }',
-                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=false' .
-                    '&is_insurance_on_cart_page_activated=true' .
-                    '&is_add_to_cart_popup_insurance_activated=false',
-                'mode' => 'test'
             ],
         ];
     }
