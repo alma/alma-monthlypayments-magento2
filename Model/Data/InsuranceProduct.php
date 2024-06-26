@@ -5,7 +5,6 @@ namespace Alma\MonthlyPayments\Model\Data;
 use Alma\API\Entities\Insurance\Contract;
 use Alma\API\Entities\Insurance\File;
 use Alma\MonthlyPayments\Helpers\Functions;
-use Magento\Catalog\Api\Data\ProductInterface;
 
 class InsuranceProduct
 {
@@ -14,27 +13,34 @@ class InsuranceProduct
      */
     private $linkToken;
     /**
-     * @var string
-     */
-    private $parent;
-    /**
      * @var Contract
      */
     private $contract;
+    /**
+     * @var float
+     */
+    private $parentPrice;
+    /**
+     * @var string
+     */
+    private $parentName;
 
     /**
      * @param Contract $contract
-     * @param string $parent
+     * @param string $parentName
+     * @param float $parentPrice
      * @param int|null $linkToken
      */
     public function __construct(
-        Contract $contract,
-        ProductInterface     $parent,
-        int      $linkToken = null
+        Contract         $contract,
+        string           $parentName,
+        float            $parentPrice,
+        int              $linkToken = null
     )
     {
         $this->linkToken = $linkToken;
-        $this->parent = $parent;
+        $this->parentName = $parentName;
+        $this->parentPrice = $parentPrice;
         $this->contract = $contract;
     }
 
@@ -109,7 +115,7 @@ class InsuranceProduct
      */
     public function getParentName(): string
     {
-        return $this->parent->getName();
+        return $this->parentName;
     }
 
     /**
@@ -117,7 +123,7 @@ class InsuranceProduct
      */
     public function getParentPrice(): int
     {
-        return Functions::priceToCents($this->parent->getPrice());
+        return Functions::priceToCents($this->parentPrice);
     }
 
     public function getDurationYear(): int

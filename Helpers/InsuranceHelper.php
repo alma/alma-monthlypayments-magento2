@@ -172,15 +172,14 @@ class InsuranceHelper extends AbstractHelper
      * @param string|null $quoteId
      * @return InsuranceProduct|null
      */
-    public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId, ?string $quoteId = null): ?InsuranceProduct
+    public function getInsuranceProduct(float $addItemPrice, ProductInterface $addedItemToQuote, string $insuranceId, ?string $quoteId = null): ?InsuranceProduct
     {
         $parentSku = $addedItemToQuote->getSku();
-        $parentRegularPrice = $addedItemToQuote->getPrice();
         try {
             $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract(
                 $insuranceId,
                 $parentSku,
-                Functions::priceToCents($parentRegularPrice),
+                Functions::priceToCents($addItemPrice),
                 $this->session->getSessionId(),
                 $quoteId
             );
@@ -190,7 +189,7 @@ class InsuranceHelper extends AbstractHelper
         }
 
         $this->logger->info('New insurance Product', []);
-        return new InsuranceProduct($insuranceContract, $addedItemToQuote);
+        return new InsuranceProduct($insuranceContract, $addedItemToQuote->getName(),$addItemPrice );
     }
 
     /**
