@@ -65,6 +65,9 @@ class AddToCartInsuranceObserver implements ObserverInterface
     /**
      * @param InsuranceHelper $insuranceHelper
      * @param Logger $logger
+     * @param RequestInterface $request
+     * @param ItemProductResolver $configurableItemProductResolver
+     * @param Session $checkoutSession
      */
     public function __construct(
         InsuranceHelper $insuranceHelper,
@@ -80,7 +83,11 @@ class AddToCartInsuranceObserver implements ObserverInterface
         $this->checkoutSession = $checkoutSession;
     }
 
-    public function execute(Observer $observer)
+	/**
+	 * @param Observer $observer
+	 * @return void
+	 */
+    public function execute(Observer $observer): void
     {
         try {
             $insuranceProduct = $this->insuranceHelper->getAlmaInsuranceProduct();
@@ -88,32 +95,41 @@ class AddToCartInsuranceObserver implements ObserverInterface
             return;
         }
 
+        /** @var Item $addedItemToQuote */
+        $addedItemToQuote = $observer->getData('quote_item');
+
+        if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
+            $this->logger->info('Warning insurance product added to quote', []);
+            return;
+        }
+
+        $insuranceId = $this->request->getParam('alma_insurance_id');
+        $insuranceQty = $this->request->getParam('alma_insurance_qty')??1;
+
+        if (!$insuranceId) {
+            $this->logger->info('Warning no insurance contract id in request params', [$this->request->getParams()]);
+            return;
+        }
+
+        $insuranceObject = $this->insuranceHelper->getInsuranceProduct(
+            $addedItemToQuote->getPrice(),
+            $this->configurableItemProductResolver->getFinalProduct($addedItemToQuote),
+            $insuranceId,
+            $addedItemToQuote->getQuoteId()
+        );
+        if (!$insuranceObject) {
+            $this->logger->info('Warning no insurance found for this contract id', [
+                'itemSku' => $addedItemToQuote->getSku(),
+                'insuranceId' => $insuranceId,
+                'itemPrice' => $addedItemToQuote->getPrice(),
+                'quoteId' => $addedItemToQuote->getQuoteId()
+            ]);
+            return;
+        }
+        $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
         try {
-            /** @var Item $addedItemToQuote */
-            $addedItemToQuote = $observer->getData('quote_item');
-
-            if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
-                $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()->getSku()]);
-                return;
-            }
-
-            $insuranceId = $this->request->getParam('alma_insurance_id');
-            if (!$insuranceId) {
-                return;
-            }
-            $insuranceObject = $this->insuranceHelper->getInsuranceProduct(
-                $addedItemToQuote->getPrice(),
-                $this->configurableItemProductResolver->getFinalProduct($addedItemToQuote),
-                $insuranceId,
-                $addedItemToQuote->getQuoteId()
-            );
-            if (!$insuranceObject) {
-                return;
-            }
-
-            $insuranceObject->setLinkToken($this->insuranceHelper->createLinkToken($addedItemToQuote->getProduct()->getId(), $insuranceObject->getId()));
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE);
-            $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $addedItemToQuote, $insuranceObject);
+            $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $insuranceQty, $insuranceObject);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_INSURANCE_SKU);
         } catch (\Exception $e) {
             $this->logger->info('Error', [$e->getMessage()]);
@@ -123,14 +139,15 @@ class AddToCartInsuranceObserver implements ObserverInterface
     /**
      * @param Quote $quote
      * @param Product $magentoInsuranceProduct
-     * @param Item $addedItemToQuote
+     * @param int $qtyToAdd
+     * @param InsuranceProduct $insuranceProduct
      * @return Item
      * @throws AlmaInsuranceProductException
      */
-    private function addInsuranceProductToQuote(Quote $quote, Product $magentoInsuranceProduct, Item $addedItemToQuote, InsuranceProduct $insuranceProduct): Item
+    private function addInsuranceProductToQuote(Quote $quote, Product $magentoInsuranceProduct, int $qtyToAdd, InsuranceProduct $insuranceProduct): Item
     {
         try {
-            $insuranceInQuote = $quote->addProduct($magentoInsuranceProduct, $this->makeAddRequest($magentoInsuranceProduct, $addedItemToQuote->getQty()));
+            $insuranceInQuote = $quote->addProduct($magentoInsuranceProduct, $this->makeAddRequest($magentoInsuranceProduct, $qtyToAdd));
             $insuranceInQuote->setName($insuranceProduct->getName());
             $insuranceInQuote->setCustomPrice($insuranceProduct->getFloatPrice());
             $insuranceInQuote->setOriginalCustomPrice($insuranceProduct->getFloatPrice());
