@@ -47,7 +47,7 @@ class InsuranceWidget extends Field
         $scriptUrl = $this->insuranceHelper->getScriptUrl($this->apiConfigHelper->getActiveMode());
         $config = $this->insuranceHelper->getConfig();
         return "<div id='alma-insurance-modal'></div>
-                   <script type='module' src='" . $scriptUrl . "'></script>
+                   <script data-cfasync='false' type='module' src='" . $scriptUrl . "'></script>
                    <iframe id='config-alma-iframe'
                     class='alma-insurance-iframe'
                     width='100%'
