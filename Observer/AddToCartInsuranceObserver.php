@@ -83,6 +83,10 @@ class AddToCartInsuranceObserver implements ObserverInterface
         $this->checkoutSession = $checkoutSession;
     }
 
+	/**
+	 * @param Observer $observer
+	 * @return void
+	 */
     public function execute(Observer $observer): void
     {
         try {
@@ -128,7 +132,6 @@ class AddToCartInsuranceObserver implements ObserverInterface
             $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $insuranceQty, $insuranceObject);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_INSURANCE_SKU);
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
             $this->logger->info('Error', [$e->getMessage()]);
         }
     }
