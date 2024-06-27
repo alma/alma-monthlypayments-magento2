@@ -62,7 +62,7 @@ class InsuranceWidget extends Field
                                     isInsuranceActivated: Boolean('" . $config->isActivated() . "'),
                                     isInsuranceOnProductPageActivated: Boolean('" . $config->isPageActivated() . "'),
                                     isAddToCartPopupActivated: Boolean('" . $config->isPopupActivated() . "'),
-                                    isInCartWidgetActivated: Boolean('" . $config->isCartActivated() . "'),
+                                    // isInCartWidgetActivated: Boolean('" . $config->isCartActivated() . "'), to be activated later
                                   }
                                 setTimeout(sendConfigurationInsuranceParams(configurationOptions), 650)
                             } else {
