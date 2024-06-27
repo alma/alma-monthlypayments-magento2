@@ -35,26 +35,32 @@ define([
 
     var widgetSku = '';
 
-    function getProductRegularPrice(regularPrice, productId) {
+    function getProductRegularPrice(basePrice, productId) {
+        let finalPrice = basePrice;
         const productPriceBlock = $('#product-price-' +productId +' .price');
         if (productPriceBlock.length){
-            regularPrice = convertHtmlPriceToCent(productPriceBlock.html())
+            finalPrice = convertHtmlPriceToCent(productPriceBlock.html())
         }
-
-        const regularPriceBlock = $('#old-price-' +productId +' .price');
-        if (regularPriceBlock.length){
-            regularPrice = convertHtmlPriceToCent(regularPriceBlock.html())
-        }
-        return regularPrice.toString();
+        return finalPrice.toString();
     }
 
     return {
         setSkuForWifget : function (sku){
             widgetSku = sku;
         },
-        refreshWidget: function (basePrice, productID, merchantId){
-            var regularPrice = getProductRegularPrice(basePrice, productID);
-            getproductDataForApiCall(widgetSku,regularPrice, merchantId, qty)
+        refreshWidget: function (basePrice, productID, productName, merchantId, quoteId, sessionId){
+            const insuranceSelected = false;
+            var finalPrice = getProductRegularPrice(basePrice, productID);
+            getProductDataForApiCall(
+                widgetSku,
+                finalPrice,
+                productName,
+                merchantId,
+                qty,
+                quoteId,
+                sessionId,
+                insuranceSelected
+            )
         }
     };
 });

@@ -172,15 +172,14 @@ class InsuranceHelper extends AbstractHelper
      * @param string|null $quoteId
      * @return InsuranceProduct|null
      */
-    public function getInsuranceProduct(ProductInterface $addedItemToQuote, string $insuranceId, ?string $quoteId = null): ?InsuranceProduct
+    public function getInsuranceProduct(float $addItemPrice, ProductInterface $addedItemToQuote, string $insuranceId, ?string $quoteId = null): ?InsuranceProduct
     {
         $parentSku = $addedItemToQuote->getSku();
-        $parentRegularPrice = $addedItemToQuote->getPrice();
         try {
             $insuranceContract = $this->almaClient->getDefaultClient()->insurance->getInsuranceContract(
                 $insuranceId,
                 $parentSku,
-                Functions::priceToCents($parentRegularPrice),
+                Functions::priceToCents($addItemPrice),
                 $this->session->getSessionId(),
                 $quoteId
             );
@@ -190,7 +189,7 @@ class InsuranceHelper extends AbstractHelper
         }
 
         $this->logger->info('New insurance Product', []);
-        return new InsuranceProduct($insuranceContract, $addedItemToQuote);
+        return new InsuranceProduct($insuranceContract, $addedItemToQuote->getName(),$addItemPrice );
     }
 
     /**
@@ -229,18 +228,10 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getIframeUrlWithParams($mode): string
+    public function getConfigIframeUrl($mode): string
     {
-        $configArray = $this->getConfig()->getArrayConfig();
-        unset($configArray['is_insurance_activated']);
-        $paramNumber = 0;
-        $uri = '';
-        foreach ($configArray as $key => $value) {
-            $uri .= ($paramNumber === 0 ? '?' : '&') . $key . '=' . ($value ? 'true' : 'false');
-            $paramNumber++;
-        }
         $baseUrl = $this->getBaseUrl($mode);
-        return $baseUrl . self::CONFIG_IFRAME_URL . $uri;
+        return $baseUrl . self::CONFIG_IFRAME_URL;
     }
 
     /**

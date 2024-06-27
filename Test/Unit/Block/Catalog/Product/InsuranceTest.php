@@ -16,7 +16,9 @@ use Magento\ConfigurableProduct\Helper\Data;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Json\EncoderInterface as jsonEncoderInterface;
 use Magento\Framework\Locale\FormatInterface;
+use Magento\Framework\Pricing\Price\PriceInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Pricing\PriceInfo\Base;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\StringUtils;
 use Magento\Framework\Url\EncoderInterface;
@@ -104,7 +106,16 @@ class InsuranceTest extends TestCase
         $this->contextMock = $this->createMock(Context::class);
         $productMock = $this->createMock(\Magento\Catalog\Model\Product::class);
         $productMock->method('getSku')->willReturn('mysku');
-        $productMock->method('getPrice')->willReturn(100.10);
+
+
+
+        $priceInterface = $this->createMock(PriceInterface::class);
+        $priceInterface->method('getValue')->willReturn(100.10);
+
+        $basePriceInfo = $this->createMock(Base::class);
+        $basePriceInfo->method('getPrice')->willReturn($priceInterface);
+
+        $productMock->method('getPriceInfo')->willReturn($basePriceInfo);
         $registry = $this->createMock(Registry::class);
         $registry->method('registry')->willReturn($productMock);
         $this->contextMock->method('getRegistry')->willReturn($registry);

@@ -91,8 +91,6 @@ class AddToCartInsuranceObserver implements ObserverInterface
         try {
             /** @var Item $addedItemToQuote */
             $addedItemToQuote = $observer->getData('quote_item');
-            $this->logger->info(' $this->checkoutSession->getQuoteId()->getEntityId();', [ $this->checkoutSession->getQuote()->getEntityId()]);
-            $this->logger->info('$addedItemToQuote->getQuoteId()', [$addedItemToQuote->getQuoteId()]);
 
             if ($addedItemToQuote->getProduct()->getId() === $insuranceProduct->getId()) {
                 $this->logger->info(' WARNING I AM ADDING INSURANCE PRODUCT', [$addedItemToQuote->getProduct()->getSku()]);
@@ -104,6 +102,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
                 return;
             }
             $insuranceObject = $this->insuranceHelper->getInsuranceProduct(
+                $addedItemToQuote->getPrice(),
                 $this->configurableItemProductResolver->getFinalProduct($addedItemToQuote),
                 $insuranceId,
                 $addedItemToQuote->getQuoteId()

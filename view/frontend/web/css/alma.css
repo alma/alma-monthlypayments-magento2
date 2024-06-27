@@ -67,6 +67,7 @@
 .alma-insurance-iframe {
     height: 0;
     width: 100%;
+    height: 100%;
     border: none;
 }
 .cart.table-wrapper .cart > .alma-cart-with-insurance {

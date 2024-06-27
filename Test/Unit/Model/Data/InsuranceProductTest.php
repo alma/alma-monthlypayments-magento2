@@ -15,9 +15,6 @@ class InsuranceProductTest extends TestCase
         $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
         $name = 'insurance test';
         $insuranceContract = $this->contractFactory($id, $name);
-        $quoteItemMock = $this->createMock(ProductInterface::class);
-        $quoteItemMock->method('getPrice')->willReturn(59.00);
-        $quoteItemMock->method('getName')->willReturn('my parent name');
         $expectedReturn = [
             'id' => $id,
             'name' => $name,
@@ -25,25 +22,23 @@ class InsuranceProductTest extends TestCase
             'duration_year' => 1,
             'link' => null,
             'parent_name' => 'my parent name',
-            'parent_price' => 5900,
+            'parent_price' => 1410,
             'files' => []
         ];
-        $insuranceProduct = new InsuranceProduct($insuranceContract, $quoteItemMock);
+        $insuranceProduct = new InsuranceProduct($insuranceContract, 'my parent name', 14.10);
         $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
     }
 
-    public function testGetFloatPrice(): void
+    public function testGetPrices(): void
     {
         $id = 'insurance_contract_6hjsKIAhBMGCW69BAQepUN';
         $name = 'insurance test';
         $insuranceContract = $this->contractFactory($id, $name);
-        $quoteItemMock = $this->createMock(ProductInterface::class);
-        $quoteItemMock->method('getPrice')->willReturn(5900);
-        $quoteItemMock->method('getName')->willReturn('my parent name');
 
-        $insuranceProduct = new InsuranceProduct($insuranceContract, $quoteItemMock);
+        $insuranceProduct = new InsuranceProduct($insuranceContract, 'my parent name', 14.20);
 
         $this->assertEquals(100.23, $insuranceProduct->getFloatPrice());
+        $this->assertEquals(1420, $insuranceProduct->getParentPrice());
     }
 
     private function contractFactory(string $id, string $name): Contract

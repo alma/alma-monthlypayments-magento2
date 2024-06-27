@@ -185,7 +185,7 @@ class InsuranceHelperTest extends TestCase
                 'activated' => false,
                 'page_activated' => false,
                 'cart_activated' => false,
-                'popup_activated' => true,
+                'popup_activated' => false,
                 'is_allowed' => '0',
                 'db_value' => '{
                     "is_activated":true,
@@ -201,10 +201,10 @@ class InsuranceHelperTest extends TestCase
                 'popup_activated' => true,
                 'is_allowed' => '0',
                 'db_value' => '{
-                    "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":true,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":true
+                    "isInsuranceActivated":true,
+                    "isInsuranceOnProductPageActivated":true,
+                    "isInCartWidgetActivated":true,
+                    "isAddToCartPopupActivated":true
                     }'
             ],
             'Return false if all is false in DB' => [
@@ -214,10 +214,10 @@ class InsuranceHelperTest extends TestCase
                 'popup_activated' => false,
                 'is_allowed' => '0',
                 'db_value' => '{
-                    "is_insurance_activated":false,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":false,
-                    "is_add_to_cart_popup_insurance_activated":false
+                    "isInsuranceActivated":false,
+                    "isInsuranceOnProductPageActivated":false,
+                    "isInCartWidgetActivated":false,
+                    "isAddToCartPopupActivated":false
                     }'
             ],
             'Return good values' => [
@@ -227,10 +227,10 @@ class InsuranceHelperTest extends TestCase
                 'popup_activated' => false,
                 'is_allowed' => '0',
                 'db_value' => '{
-                    "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":false
+                    "isInsuranceActivated":true,
+                    "isInsuranceOnProductPageActivated":false,
+                    "isInCartWidgetActivated":true,
+                    "isAddToCartPopupActivated":false
                     }'
             ]
         ];
@@ -240,15 +240,15 @@ class InsuranceHelperTest extends TestCase
     {
         $dbValue = '{
                     "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":false
+                    "isInsuranceOnProductPageActivated":false,
+                    "isInCartWidgetActivated":true,
+                    "isAddToCartPopupActivated":false
                     }';
         $result = [
             'is_insurance_activated' => true,
-            'is_insurance_on_product_page_activated' => false,
-            'is_insurance_on_cart_page_activated' => true,
-            'is_add_to_cart_popup_insurance_activated' => false,
+            'isInsuranceOnProductPageActivated' => false,
+            'isInCartWidgetActivated' => true,
+            'isAddToCartPopupActivated' => false,
         ];
         $this->configHelper->expects($this->exactly(2))->method('getConfigByCode')->willReturn($dbValue);
         $insuranceObject = $this->insuranceHelper->getConfig();
@@ -256,16 +256,12 @@ class InsuranceHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider iframeHasDbGetParamsDataProvider
+     * @dataProvider iframeUrlDataProvider
      * @return void
      */
-    public function testIframeHasDbGetParams($dbValue, $expectedURL, string $mode): void
+    public function testIframeHasDbGetParams($expectedURL, string $mode): void
     {
-        $this->configHelper->expects($this->exactly(2))
-            ->method('getConfigByCode')
-            ->withConsecutive([InsuranceHelper::IS_ALLOWED_INSURANCE_PATH], [InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE])
-            ->willReturn($dbValue);
-        $this->assertEquals($expectedURL, $this->insuranceHelper->getIframeUrlWithParams($mode));
+        $this->assertEquals($expectedURL, $this->insuranceHelper->getConfigIframeUrl($mode));
     }
 
     public function testScriptUrlSandbox(): void
@@ -288,49 +284,16 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals('https://protect.sandbox.almapay.com/almaBackOfficeSubscriptions.html', $this->insuranceHelper->getOrderDetailsUrl('test'));
     }
 
-    public function iframeHasDbGetParamsDataProvider(): array
+    public function iframeUrlDataProvider(): array
     {
         return [
-            'No params if config is empty' => [
-                'db_value' => '',
+            'Test URL' => [
                 'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html',
                 'mode' => 'test'
             ],
-            'all params are true if all is true in DB' => [
-                'db_value' => '{
-                    "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":true,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":true
-                    }',
-                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=true' .
-                    '&is_insurance_on_cart_page_activated=true' .
-                    '&is_add_to_cart_popup_insurance_activated=true',
-                'mode' => 'test'
-            ],
-            'all params are false if all is false in DB' => [
-                'db_value' => '{
-                    "is_insurance_activated":false,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":false,
-                    "is_add_to_cart_popup_insurance_activated":false
-                    }',
-                'expectedUrl' => 'https://protect.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=false' .
-                    '&is_insurance_on_cart_page_activated=false' .
-                    '&is_add_to_cart_popup_insurance_activated=false',
+            'Live URL' => [
+                'expectedUrl' => 'https://protect.almapay.com/almaBackOfficeConfiguration.html',
                 'mode' => 'live'
-            ],
-            'params are good values' => [
-                'db_value' => '{
-                    "is_insurance_activated":true,
-                    "is_insurance_on_product_page_activated":false,
-                    "is_insurance_on_cart_page_activated":true,
-                    "is_add_to_cart_popup_insurance_activated":false
-                    }',
-                'expectedUrl' => 'https://protect.sandbox.almapay.com/almaBackOfficeConfiguration.html?is_insurance_on_product_page_activated=false' .
-                    '&is_insurance_on_cart_page_activated=true' .
-                    '&is_add_to_cart_popup_insurance_activated=false',
-                'mode' => 'test'
             ],
         ];
     }
@@ -540,7 +503,7 @@ class InsuranceHelperTest extends TestCase
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
-        $this->assertNull($this->insuranceHelper->getInsuranceProduct($item, $insuranceId));
+        $this->assertNull($this->insuranceHelper->getInsuranceProduct(14.50, $item, $insuranceId));
     }
 
     public function testGetInsuranceProductReturnInsuranceProduct(): void
@@ -548,8 +511,8 @@ class InsuranceHelperTest extends TestCase
         $insuranceId = 'alm_insurance_id123456789';
         $parentName = 'fusion back pack';
         $item = $this->createMock(ProductInterface::class);
+        $item->method('getSku')->willReturn('superSku');
         $item->method('getName')->willReturn($parentName);
-        $item->method('getPrice')->willReturn(53.00);
         $contract = new Contract(
             "alm_insurance_id123456789",
             "Alma outillage thermique 3 ans (Vol + casse)",
@@ -562,14 +525,14 @@ class InsuranceHelperTest extends TestCase
             500,
             []
         );
-        $insuranceProductExpected = new InsuranceProduct($contract, $item);
+        $insuranceProductExpected = new InsuranceProduct($contract, $parentName, 12.50);
         $insuranceEndpoint = $this->createMock(Insurance::class);
-        $insuranceEndpoint->method('getInsuranceContract')->willReturn($contract);
+        $insuranceEndpoint->method('getInsuranceContract')->with('alm_insurance_id123456789', 'superSku', 1250 )->willReturn($contract);
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
         $quoteId = '42';
-        $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct($item, $insuranceId, $quoteId));
+        $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct(12.50, $item, $insuranceId, $quoteId));
     }
 
     public function testGetSubscriptionDataReturnMustBeAnArray(): void
