@@ -82,7 +82,7 @@
             document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
                 if (!madeChoiceForInsurance){
                     e.preventDefault();
-                    openModal('popupModal', document.getElementById('qty').value);
+                    openModal('popupModal', parseInt(document.getElementById('qty').value));
                     madeChoiceForInsurance = true;
                     isAddToCartFlow = true;
                 }
