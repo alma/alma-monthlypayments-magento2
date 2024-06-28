@@ -62,7 +62,7 @@ class LoadConfigObserver implements ObserverInterface
                 $this->paymentPlansHelper->saveBaseApiPlansConfig();
             }
             try {
-                $cmsInsuranceFlagValue = $this->availability->getMerchantInsuranceAvailability();
+                $cmsInsuranceFlagValue = $this->availability->isMerchantInsuranceAvailable();
             } catch (AlmaInsuranceFlagException $e) {
                 $this->logger->error('Alma Insurance Flag Exception', ['exception' => $e->getMessage()]);
                 return $this;

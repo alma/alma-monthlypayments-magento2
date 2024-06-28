@@ -59,7 +59,7 @@ class NoticeTest extends TestCase
         $this->escaper
             ->method('escapeHtml')
             ->withConsecutive([$row->getTitle()], [$row->getDescription()])
-            ->willReturnOnConsecutiveCalls('Magento insurance : New Order #1234567890', 'Description', );
+            ->willReturnOnConsecutiveCalls('Magento insurance : New Order #1234567890', 'Description');
         $this->assertEquals(
             '<span class="grid-row-title">Magento insurance : New Order #1234567890</span><br />Description',
             $this->notice->render($row)

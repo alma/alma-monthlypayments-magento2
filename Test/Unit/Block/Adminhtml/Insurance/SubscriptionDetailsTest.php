@@ -35,10 +35,6 @@ class SubscriptionDetailsTest extends TestCase
      */
     private $directoryHelper;
     /**
-     * @var \Magento\Framework\App\Request\Http
-     */
-    private $request;
-    /**
      * @var \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory
      */
     private $collectionFactory;
@@ -48,7 +44,7 @@ class SubscriptionDetailsTest extends TestCase
     private $orderRepository;
     private $urlBuilder;
 
-    public function setUp():void
+    public function setUp(): void
     {
         $this->logger = $this->createMock(\Alma\MonthlyPayments\Helpers\Logger::class);
         $this->context = $this->createMock(\Magento\Backend\Block\Template\Context::class);
@@ -64,7 +60,7 @@ class SubscriptionDetailsTest extends TestCase
         $this->directoryHelper = $this->createMock(\Magento\Directory\Helper\Data::class);
     }
 
-    private function getConstructorDependencies():array
+    private function getConstructorDependencies(): array
     {
         return [
             $this->logger,
@@ -80,11 +76,12 @@ class SubscriptionDetailsTest extends TestCase
         ];
     }
 
-    private function createSubscriptionDetails():SubscriptionDetails
+    private function createSubscriptionDetails(): SubscriptionDetails
     {
         return new SubscriptionDetails(...$this->getConstructorDependencies());
     }
-    public function testGetScriptUrl():void
+
+    public function testGetScriptUrl(): void
     {
         $this->apiConfigHelper->expects($this->once())
             ->method('getActiveMode')
@@ -92,13 +89,12 @@ class SubscriptionDetailsTest extends TestCase
         $this->insuranceHelper->expects($this->once())
             ->method('getScriptUrl')
             ->with('activeMode')
-            ->willReturn('https://my-iframe-url/displayModal.js')
-        ;
+            ->willReturn('https://my-iframe-url/displayModal.js');
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('https://my-iframe-url/displayModal.js', $subscriptionDetails->getScriptUrl());
     }
 
-    public function testGetOrderDatailUrl():void
+    public function testGetOrderDatailUrl(): void
     {
         $this->apiConfigHelper->expects($this->once())
             ->method('getActiveMode')
@@ -106,12 +102,12 @@ class SubscriptionDetailsTest extends TestCase
         $this->insuranceHelper->expects($this->once())
             ->method('getOrderDetailsUrl')
             ->with('activeMode')
-            ->willReturn('https://my-order_details-url/back.js')
-        ;
+            ->willReturn('https://my-order_details-url/back.js');
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('https://my-order_details-url/back.js', $subscriptionDetails->getOrderDetailsUrl());
     }
-    public function testGetSubscriptionCollectionReturnArrayData():void
+
+    public function testGetSubscriptionCollectionReturnArrayData(): void
     {
         $collection = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\Collection::class);
         $collection->method('addFieldToFilter')->willReturn($this->collectionFactory);
@@ -125,33 +121,34 @@ class SubscriptionDetailsTest extends TestCase
         $this->assertSame(['subscription_id' => 1], $data);
     }
 
-    public function testGetActiveModeReturnApiConfigActiveMode():void
+    public function testGetActiveModeReturnApiConfigActiveMode(): void
     {
         $this->apiConfigHelper->method('getActiveMode')->willReturn('sandbox');
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('sandbox', $subscriptionDetails->getActiveMode());
     }
 
-    public function testGetOrderIdReturnRequestParamOrderId():void
+    public function testGetOrderIdReturnRequestParamOrderId(): void
     {
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('1', $subscriptionDetails->getOrderId());
     }
 
-    public function testGetOrderReturnOrderInterfaceIfOrderExist():void
+    public function testGetOrderReturnOrderInterfaceIfOrderExist(): void
     {
         $this->orderRepository->method('get')->willReturn($this->createMock(OrderInterface::class));
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertInstanceOf(OrderInterface::class, $subscriptionDetails->getOrder());
     }
-    public function testGetOrderReturnNullIfNoOrderInDb():void
+
+    public function testGetOrderReturnNullIfNoOrderInDb(): void
     {
         $this->orderRepository->method('get')->willThrowException(new \Magento\Framework\Exception\NoSuchEntityException());
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertNull($subscriptionDetails->getOrder());
     }
 
-    public function testGetIncrementIdReturnOrderIncrementId():void
+    public function testGetIncrementIdReturnOrderIncrementId(): void
     {
         $order = $this->createMock(OrderInterface::class);
         $order->method('getIncrementId')->willReturn('000000001');
@@ -159,7 +156,8 @@ class SubscriptionDetailsTest extends TestCase
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('000000001', $subscriptionDetails->getIncrementId());
     }
-    public function testGetOrderDatedReturnOrderCreatedAt():void
+
+    public function testGetOrderDatedReturnOrderCreatedAt(): void
     {
         $order = $this->createMock(OrderInterface::class);
         $order->method('getCreatedAt')->willReturn('06/12/14 12:00:00');
@@ -167,7 +165,8 @@ class SubscriptionDetailsTest extends TestCase
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('06/12/14 12:00:00', $subscriptionDetails->getOrderDate());
     }
-    public function testGetCustomerFirstNameReturnOrderFirstname():void
+
+    public function testGetCustomerFirstNameReturnOrderFirstname(): void
     {
         $order = $this->createMock(OrderInterface::class);
         $order->method('getCustomerFirstname')->willReturn('John');
@@ -175,7 +174,8 @@ class SubscriptionDetailsTest extends TestCase
         $subscriptionDetails = $this->createSubscriptionDetails();
         $this->assertEquals('John', $subscriptionDetails->getCustomerFirstName());
     }
-    public function testGetCustomerLastNameReturnOrderLastName():void
+
+    public function testGetCustomerLastNameReturnOrderLastName(): void
     {
         $order = $this->createMock(OrderInterface::class);
         $order->method('getCustomerLastname')->willReturn('Doe');

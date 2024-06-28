@@ -111,7 +111,7 @@ class Availability
      * @return bool
      * @throws AlmaInsuranceFlagException
      */
-    public function getMerchantInsuranceAvailability(): bool
+    public function isMerchantInsuranceAvailable(): bool
     {
         try {
             $merchant = $this->almaClient->getDefaultClient()->merchants->me();

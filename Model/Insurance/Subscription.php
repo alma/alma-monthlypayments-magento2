@@ -328,7 +328,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     /**
      * @return bool
      */
-    public function getIsRefunded(): bool
+    public function isRefunded(): bool
     {
         return $this->getDataByKey(self::IS_REFUND_KEY);
     }

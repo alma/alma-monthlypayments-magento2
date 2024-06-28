@@ -120,7 +120,7 @@ class LoadConfigObserverTest extends TestCase
         $this->configHelper->expects($this->never())
             ->method('clearInsuranceConfig');
         $this->availability->expects($this->never())
-            ->method('getMerchantInsuranceAvailability');
+            ->method('isMerchantInsuranceAvailable');
         $this->createLoadConfigObserver()->execute($this->observer);
     }
 
@@ -133,7 +133,7 @@ class LoadConfigObserverTest extends TestCase
         $this->paymentPlansHelper->expects($this->once())
             ->method('saveBaseApiPlansConfig');
         $this->availability->expects($this->once())
-            ->method('getMerchantInsuranceAvailability')
+            ->method('isMerchantInsuranceAvailable')
             ->willThrowException(new AlmaInsuranceFlagException('No Api Key', $this->logger));
         $this->configHelper->expects($this->never())
             ->method('saveIsAllowedInsuranceValue');
@@ -150,7 +150,7 @@ class LoadConfigObserverTest extends TestCase
             ->willReturn(self::PAYMENT_URL);
 
         $this->availability->expects($this->once())
-            ->method('getMerchantInsuranceAvailability')
+            ->method('isMerchantInsuranceAvailable')
             ->willReturn(false);
         $this->configHelper->expects($this->once())
             ->method('getConfigByCode')
@@ -173,7 +173,7 @@ class LoadConfigObserverTest extends TestCase
             ->willReturn(self::PAYMENT_URL);
 
         $this->availability->expects($this->once())
-            ->method('getMerchantInsuranceAvailability')
+            ->method('isMerchantInsuranceAvailable')
             ->willReturn(false);
         $this->configHelper->expects($this->once())
             ->method('getConfigByCode')
@@ -192,7 +192,7 @@ class LoadConfigObserverTest extends TestCase
             ->willReturn(self::PAYMENT_URL);
 
         $this->availability->expects($this->once())
-            ->method('getMerchantInsuranceAvailability')
+            ->method('isMerchantInsuranceAvailable')
             ->willReturn(true);
         $this->configHelper->expects($this->once())
             ->method('getConfigByCode');
@@ -207,7 +207,7 @@ class LoadConfigObserverTest extends TestCase
             ->method('getCurrentUrl')
             ->willReturn(self::INSURANCE_URL);
         $this->availability->expects($this->once())
-            ->method('getMerchantInsuranceAvailability')
+            ->method('isMerchantInsuranceAvailable')
             ->willReturn(true);
         $this->configHelper->expects($this->once())
             ->method('getConfigByCode')
@@ -228,7 +228,7 @@ class LoadConfigObserverTest extends TestCase
             ->willReturn(self::INSURANCE_URL);
 
         $this->availability->expects($this->once())
-            ->method('getMerchantInsuranceAvailability');
+            ->method('isMerchantInsuranceAvailable');
 
         $this->paymentPlansHelper->expects($this->never())
             ->method('saveBaseApiPlansConfig');

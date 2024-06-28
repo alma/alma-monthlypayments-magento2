@@ -72,6 +72,6 @@ class SubscriptionTest extends TestCase
         $this->assertEquals(self::SUBSCRIPTION_MODE, $this->subscription->getSubscriptionMode());
         $this->assertEquals(self::CANCELATION_REASON, $this->subscription->getCancellationReason());
         $this->assertEquals(self::CALLBACK_URL, $this->subscription->getCallbackUrl());
-        $this->assertEquals(self::IS_REFUNDED, $this->subscription->getIsRefunded());
+        $this->assertEquals(self::IS_REFUNDED, $this->subscription->isRefunded());
     }
 }

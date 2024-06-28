@@ -57,17 +57,6 @@ class Insurance extends Fieldset
         $this->insuranceHelper = $insuranceHelper;
     }
 
-    /**
-     * Add custom css class
-     *
-     * @param AbstractElement $element
-     *
-     * @return string
-     */
-    protected function _getFrontendClass($element): string
-    {
-        return parent::_getFrontendClass($element);
-    }
 
     /**
      * Return header title part of html for payment solution

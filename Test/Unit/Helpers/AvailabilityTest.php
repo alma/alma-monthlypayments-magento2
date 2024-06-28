@@ -57,7 +57,7 @@ class AvailabilityTest extends TestCase
     {
         $this->merchantsEndpoint->method('me')->willThrowException(new RequestError('error'));
         $this->expectException(AlmaInsuranceFlagException::class);
-        $this->createAvailability()->getMerchantInsuranceAvailability();
+        $this->createAvailability()->isMerchantInsuranceAvailable();
     }
 
     public function testGivenNoCmsInsuranceFlagInMeReturnTrue(): void
@@ -65,7 +65,7 @@ class AvailabilityTest extends TestCase
         $meData = $this->extendedDataMe();
         $meData->cms_insurance = null;
         $this->merchantsEndpoint->method('me')->willReturn($meData);
-        $this->assertTrue($this->createAvailability()->getMerchantInsuranceAvailability());
+        $this->assertTrue($this->createAvailability()->isMerchantInsuranceAvailable());
     }
 
     /**
@@ -78,17 +78,17 @@ class AvailabilityTest extends TestCase
     {
 
         $this->merchantsEndpoint->method('me')->willReturn($meData);
-        $this->assertEquals($result, $this->createAvailability()->getMerchantInsuranceAvailability());
+        $this->assertEquals($result, $this->createAvailability()->isMerchantInsuranceAvailable());
     }
 
 
-    public function extendedDataMe($cms_insurance = true)
+    public function extendedDataMe($cmsInsurance = true)
     {
         return new Merchant([
             'id' => 'merchant_11mLCKp39by3Yb1VAAIAWWqSwYg8Q2Fy17',
             'name' => 'Alma',
             'country' => 'FR',
-            'cms_insurance' => $cms_insurance,
+            'cms_insurance' => $cmsInsurance,
         ]);
     }
 
