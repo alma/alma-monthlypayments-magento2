@@ -380,7 +380,7 @@ class InsuranceHelper extends AbstractHelper
                         $insuranceData['id'],
                         $insuranceData['price'],
                         $insuranceData['parent_sku'],
-                        Functions::priceToCents($orderItem->getOriginalPrice()),
+                        $insuranceData['parent_price'],
                         $subscriber,
                         $this->getCallbackUrl()
                     );

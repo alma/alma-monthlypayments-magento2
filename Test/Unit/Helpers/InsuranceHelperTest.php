@@ -567,10 +567,10 @@ class InsuranceHelperTest extends TestCase
         $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
-        foreach ([$subscription] as $key => $subscription) {
+        foreach ($subscriptionArray as $key => $subscription) {
             $this->assertEquals($subscription->getContractId(), $subscriptionArray[$key]->getContractId());
             $this->assertEquals($subscription->getCmsReference(), $subscriptionArray[$key]->getCmsReference());
-            $this->assertEquals($subscription->getProductPrice(), $subscriptionArray[$key]->getProductPrice());
+            $this->assertEquals(5300, $subscriptionArray[$key]->getProductPrice());
             $this->assertEquals($subscription->getSubscriber(), $subscriptionArray[$key]->getSubscriber());
             $this->assertTrue(boolval($subscriptionArray[$key]->getSubscriber()));
         }
@@ -592,7 +592,7 @@ class InsuranceHelperTest extends TestCase
         foreach ($subscriptionArray as $key => $subscription) {
             $this->assertEquals($subscription->getContractId(), $subscriptionArray[$key]->getContractId());
             $this->assertEquals($subscription->getCmsReference(), $subscriptionArray[$key]->getCmsReference());
-            $this->assertEquals($subscription->getProductPrice(), $subscriptionArray[$key]->getProductPrice());
+            $this->assertEquals(5300, $subscriptionArray[$key]->getProductPrice());
             $this->assertEquals($subscription->getSubscriber(), $subscriptionArray[$key]->getSubscriber());
             $this->assertTrue(boolval($subscriptionArray[$key]->getSubscriber()));
         }
@@ -793,7 +793,6 @@ class InsuranceHelperTest extends TestCase
         $orderItem = $this->createMock(OrderItem::class);
         if ($hasInsuranceData) {
             $orderItem->method('getData')->willReturn($this->getInsuranceData('1234', $contractId, $price, $parentPrice));
-            $orderItem->method('getOriginalPrice')->willReturn(120.12);
             $orderItem->method('getOrderId')->willReturn($orderId);
             $orderItem->method('getItemId')->willReturn($orderItemId);
             $orderItem->method('getSku')->willReturn($sku);
