@@ -564,7 +564,6 @@ class InsuranceHelperTest extends TestCase
         $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true);
         $itemInsurance->method('getQty')->willReturn('1.00000');
         $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2]);
-        $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
         foreach ($subscriptionArray as $key => $subscription) {
@@ -754,18 +753,6 @@ class InsuranceHelperTest extends TestCase
         foreach ($expected as $key => $result) {
             $this->assertEquals($result, $arraySubscriptionResult[$key]->getData());
         }
-    }
-
-    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku', int $amount = 11): Subscription
-    {
-        return new Subscription(
-            $contractId,
-            $amount,
-            $sku,
-            12012,
-            $subscriber,
-            'https://my-website.com/rest/V1/alma/insurance/update'
-        );
     }
 
     private function newCollectionFactory(array $items): Collection
