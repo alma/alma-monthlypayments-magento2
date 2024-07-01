@@ -24,21 +24,27 @@ class InsuranceProduct
      * @var string
      */
     private $parentName;
+    /**
+     * @var string
+     */
+    private $parentSku;
 
     /**
      * @param Contract $contract
+     * @param string $parentSku
      * @param string $parentName
      * @param float $parentPrice
      * @param int|null $linkToken
      */
     public function __construct(
         Contract         $contract,
+        string           $parentSku,
         string           $parentName,
         float            $parentPrice,
         int              $linkToken = null
-    )
-    {
+    ) {
         $this->linkToken = $linkToken;
+        $this->parentSku = $parentSku;
         $this->parentName = $parentName;
         $this->parentPrice = $parentPrice;
         $this->contract = $contract;
@@ -87,6 +93,7 @@ class InsuranceProduct
             'price' => $this->getPrice(),
             'duration_year' => $this->getDurationYear(),
             'link' => $this->getLinkToken(),
+            'parent_sku' => $this->getParentSku(),
             'parent_name' => $this->getParentName(),
             'parent_price' => $this->getParentPrice(),
             'files' => $this->getFiles()
@@ -116,6 +123,14 @@ class InsuranceProduct
     public function getParentName(): string
     {
         return $this->parentName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParentSku(): string
+    {
+        return $this->parentSku;
     }
 
     /**
