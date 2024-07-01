@@ -17,7 +17,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Json\EncoderInterface as jsonEncoderInterface;
 use Magento\Framework\Locale\FormatInterface;
-use Magento\Framework\Pricing\PriceCurrencyInterface as PriceCurrencyInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\StringUtils;
 use Magento\Framework\Url\EncoderInterface;
 

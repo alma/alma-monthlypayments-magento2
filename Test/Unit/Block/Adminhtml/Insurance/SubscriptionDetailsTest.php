@@ -110,7 +110,7 @@ class SubscriptionDetailsTest extends TestCase
     public function testGetSubscriptionCollectionReturnArrayData(): void
     {
         $collection = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\Collection::class);
-        $collection->method('addFieldToFilter')->willReturn($this->collectionFactory);
+        $collection->method('addFieldToFilter');
         $selectMock = $this->createMock(\Magento\Framework\DB\Select::class);
         $collection->method('getSelect')->willReturn($selectMock);
         $collection->method('getData')->willReturn(['subscription_id' => 1]);

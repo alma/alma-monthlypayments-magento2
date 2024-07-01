@@ -71,7 +71,7 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($invoicedItems, $subscriber);
 
         // Exit if no subscription in invoice
-        if (!count($subscriptionArray) > 0) {
+        if (count($subscriptionArray) < 1) {
             $this->logger->info('No subscription in invoice', [$invoice->getIncrementId()]);
             return;
         }

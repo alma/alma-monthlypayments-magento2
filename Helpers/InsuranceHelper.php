@@ -9,6 +9,7 @@ use Alma\MonthlyPayments\Model\Data\InsuranceConfig;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Alma\MonthlyPayments\Model\Insurance\SubscriptionFactory;
+use InvalidArgumentException;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
@@ -255,6 +256,8 @@ class InsuranceHelper extends AbstractHelper
     }
 
     /**
+     * By default, insurance product is added before product in cart - reorder to have insurance product after product
+     *
      * @param array $items
      * @return array
      */
@@ -464,6 +467,7 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @return string
      * @throws NoSuchEntityException
+     * @throws InvalidArgumentException
      */
     private function getCallbackUrl(): string
     {

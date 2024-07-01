@@ -131,7 +131,7 @@ class AddToCartInsuranceObserver implements ObserverInterface
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($addedItemToQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_PRODUCT_WITH_INSURANCE_TYPE);
             $insuranceProductInQuote = $this->addInsuranceProductToQuote($addedItemToQuote->getQuote(), $insuranceProduct, $insuranceQty, $insuranceObject);
             $this->insuranceHelper->setAlmaInsuranceToQuoteItem($insuranceProductInQuote, $insuranceObject->toArray(), InsuranceHelper::ALMA_INSURANCE_SKU);
-        } catch (\Exception $e) {
+        } catch (AlmaInsuranceProductException $e) {
             $this->logger->info('Error', [$e->getMessage()]);
         }
     }
@@ -168,7 +168,6 @@ class AddToCartInsuranceObserver implements ObserverInterface
     private function makeAddRequest(Product $product, int $qty = 1): DataObject
     {
         $data = [
-            'product' => $product->getEntityId(),
             'qty' => $qty
         ];
 

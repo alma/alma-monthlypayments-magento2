@@ -70,7 +70,8 @@ class AvailabilityTest extends TestCase
 
     /**
      * @dataProvider extendedDataMeDataProvider
-     * @param $flagValue
+     * @param $meData
+     * @param $result
      * @return void
      * @throws AlmaInsuranceFlagException
      */

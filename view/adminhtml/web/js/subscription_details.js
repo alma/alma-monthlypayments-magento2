@@ -26,7 +26,6 @@ define([
                         cancelReason: reasonContent
                     },
                     success: function (result) {
-                        console.log(result.message)
                         sendNotificationToIFrame([
                             {subscriptionBrokerId: brokerId, newStatus: result.state},
                         ])

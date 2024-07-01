@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\Collection;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory;
 use Alma\MonthlyPayments\Model\Insurance\Subscription;
@@ -34,7 +35,7 @@ class InsuranceSubscriptionHelperTest extends TestCase
     // Givent a unknown subscription id when getDbSubscription then throw exception
     public function testShouldReturnAValidatorExceptionForAnEmptySubscriptionId()
     {
-        $this->expectException(\Magento\Framework\Validator\Exception::class);
+        $this->expectException(AlmaInsuranceSubscriptionException::class);
         $this->expectExceptionMessage('Subscription not found');
         $this->subscriptionMock->method('getId')->willReturn(null);
         $this->subscriptionHelper->getDbSubscription(1);
@@ -55,7 +56,7 @@ class InsuranceSubscriptionHelperTest extends TestCase
     {
         $this->assertEquals($expected, $this->subscriptionHelper->getNameStatus($key));
     }
-    
+
     protected function keyAndExpectedStatusName(): array
     {
         return [

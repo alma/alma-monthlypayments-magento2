@@ -52,7 +52,6 @@ class CheckoutSubmitAllAfter implements ObserverInterface
         $quote = $observer->getEvent()->getData('quote');
 
         $orderItems = $order->getAllVisibleItems();
-        $this->logger->info('$orderItems', [$orderItems]);
 
         $saveInsuranceData = false;
 

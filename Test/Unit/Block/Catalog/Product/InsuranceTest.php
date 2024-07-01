@@ -193,7 +193,7 @@ class InsuranceTest extends TestCase
         $insuranceConfig->method('isAllowed')->willReturn(false);
         $insuranceConfig->method('isPopupActivated')->willReturn(true);
         $this->insuranceHelper->method('getConfig')->willReturn($insuranceConfig);
-        $this->assertFalse($this->insuranceBlock->isActivatedWidgetInProductPage());
+        $this->assertFalse($this->insuranceBlock->isActivatedPopupInProductPage());
     }
     public function testIsStringIframeUrl():void
     {

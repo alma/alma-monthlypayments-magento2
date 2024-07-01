@@ -8,6 +8,7 @@ use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Magento\Backend\Model\Url;
 use Magento\Framework\Exception\AlreadyExistsException;
@@ -36,6 +37,12 @@ class InsuranceUpdate implements InsuranceUpdateInterface
     /**
      * @param Request $request
      * @param Logger $logger
+     * @param AlmaClient $almaClient
+     * @param InsuranceSubscriptionHelper $insuranceSubscriptionHelper
+     * @param Subscription $subscription
+     * @param NotifierPool $notifierPool
+     * @param OrderRepository $orderRepository
+     * @param Url $url
      */
     public function __construct(
         Request                     $request,
@@ -46,8 +53,7 @@ class InsuranceUpdate implements InsuranceUpdateInterface
         NotifierPool                $notifierPool,
         OrderRepository             $orderRepository,
         Url                         $url
-    )
-    {
+    ) {
         $this->request = $request;
         $this->logger = $logger;
         $this->almaClient = $almaClient;
@@ -65,16 +71,16 @@ class InsuranceUpdate implements InsuranceUpdateInterface
     public function update(): void
     {
         $params = $this->request->getParams();
-        $this->checkQeuryParams($params);
+        $this->checkQueryParams($params);
 
         $subscriptionId = $params['subscription_id'];
-        $subscriptions = $this->getSubscription($subscriptionId);
+        $subscriptions = $this->getSubscriptions($subscriptionId);
         $this->checkSubscriptionResponseNotEmpty($subscriptions['subscriptions']);
 
         $subscription = $subscriptions['subscriptions'][0];
         try {
             $dbSubscription = $this->insuranceSubscriptionHelper->getDbSubscription($subscriptionId);
-        } catch (\Magento\Framework\Validator\Exception $e) {
+        } catch (AlmaInsuranceSubscriptionException $e) {
             throw new Exception(__('Invalid subscription_id'), 0, 404);
         }
 
@@ -98,17 +104,16 @@ class InsuranceUpdate implements InsuranceUpdateInterface
         } catch (AlreadyExistsException|\Exception $e) {
             throw new Exception(__('Impossible to save subscription data'), 0, 500);
         }
-
     }
 
     /**
-     * @param $subscriptions1
+     * @param $subscriptions
      * @return void
      * @throws Exception
      */
-    private function checkSubscriptionResponseNotEmpty($subscriptions1): void
+    private function checkSubscriptionResponseNotEmpty($subscriptions): void
     {
-        if (!count($subscriptions1)) {
+        if (!count($subscriptions)) {
             throw new Exception(__('Impossible to get subscription_id'), 0, 400);
         }
     }
@@ -117,20 +122,19 @@ class InsuranceUpdate implements InsuranceUpdateInterface
      * @param array $params
      * @throws Exception
      */
-    private function checkQeuryParams(array $params): void
+    private function checkQueryParams(array $params): void
     {
         if (!isset($params['subscription_id'])) {
             throw new Exception(__('Invalid subscription_id'), 0, 404);
         }
     }
 
-
     /**
      * @param string $subscriptionId
      * @return array
      * @throws Exception
      */
-    private function getSubscription(string $subscriptionId): array
+    private function getSubscriptions(string $subscriptionId): array
     {
         try {
             $subscriptions = $this->almaClient->getDefaultClient()->insurance->getSubscription(['id' => $subscriptionId]);

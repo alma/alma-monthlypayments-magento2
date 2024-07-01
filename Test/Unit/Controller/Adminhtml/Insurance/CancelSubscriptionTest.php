@@ -10,6 +10,7 @@ use Alma\MonthlyPayments\Controller\Adminhtml\Insurance\CancelSubscription;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -92,7 +93,7 @@ class CancelSubscriptionTest extends TestCase
             $this->subscriptionResourceModel,
             $this->logger,
             $this->jsonFactory,
-            $this->context,
+            $this->context
         );
     }
 
@@ -113,7 +114,7 @@ class CancelSubscriptionTest extends TestCase
     }
 
     // Given a request with post subscriptionId data but no cancellation_reaseon when subscriptionId is present and Api Error
-    public function testShouldCallApiClientCancelEndpointWithSubscriptionIdAndReturnAnErrorNoCallsetCancellationReason()
+    public function testShouldCallApiClientCancelEndpointWithSubscriptionIdAndReturnAnErrorNoCallSetCancellationReason()
     {
         $subscriptionId = 'subscription_id1234';
         $this->request->method('getPostValue')->willReturn(['subscriptionId' => $subscriptionId]);
@@ -123,7 +124,6 @@ class CancelSubscriptionTest extends TestCase
             ->method('cancelSubscription')
             ->with($subscriptionId)
             ->willThrowException(new RequestException('Error cancelling subscription'));
-        $this->dbSubscriptionMock->method('getId')->willReturn(1);
         $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionState')->with('failed');
         $this->dbSubscriptionMock->expects($this->once())->method('setCancellationReason')->with('');
         $this->subscriptionResourceModel->expects($this->once())->method('save')->with($this->dbSubscriptionMock);
@@ -142,7 +142,7 @@ class CancelSubscriptionTest extends TestCase
             ->expects($this->never())
             ->method('cancelSubscription');
 
-        $this->insuranceSubscriptionHelper->expects($this->once())->method('getDbSubscription')->with($subscriptionId)->willThrowException(new Exception(__('Impossible to load subscription data')));
+        $this->insuranceSubscriptionHelper->expects($this->once())->method('getDbSubscription')->with($subscriptionId)->willThrowException(new AlmaInsuranceSubscriptionException(__('Impossible to load subscription data')));
         $this->jsonResponse->expects($this->once())->method('setData')->with(['state' => 'failed', 'message' => 'Impossible to load subscription data']);
         $this->dbSubscriptionMock->expects($this->never())->method('setSubscriptionState');
         $this->dbSubscriptionMock->expects($this->never())->method('setCancellationReason');
@@ -157,7 +157,6 @@ class CancelSubscriptionTest extends TestCase
             ->expects($this->once())
             ->method('cancelSubscription')
             ->with($subscriptionId);
-        $this->dbSubscriptionMock->method('getId')->willReturn(1);
         $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionState')->with('canceled');
         $this->dbSubscriptionMock->expects($this->once())->method('setCancellationReason')->with(self::CANCELLATION_REASON);
         $this->subscriptionResourceModel->expects($this->once())->method('save')->with($this->dbSubscriptionMock)->willThrowException(new \Exception('Impossible to save subscription data'));
@@ -174,7 +173,6 @@ class CancelSubscriptionTest extends TestCase
             ->expects($this->once())
             ->method('cancelSubscription')
             ->with($subscriptionId);
-        $this->dbSubscriptionMock->method('getId')->willReturn(1);
         $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionState')->with('canceled');
         $this->dbSubscriptionMock->expects($this->once())->method('setCancellationReason')->with(self::CANCELLATION_REASON);
         $this->subscriptionResourceModel->expects($this->once())->method('save')->with($this->dbSubscriptionMock);
@@ -193,7 +191,6 @@ class CancelSubscriptionTest extends TestCase
             ->with($subscriptionId)
             ->willThrowException(new InsuranceCancelPendingException('Out of delay'));
 
-        $this->dbSubscriptionMock->method('getId')->willReturn(1);
         $this->dbSubscriptionMock->expects($this->once())->method('setSubscriptionState')->with('pending_cancellation');
         $this->dbSubscriptionMock->expects($this->once())->method('setCancellationReason')->with(self::CANCELLATION_REASON);
         $this->subscriptionResourceModel->expects($this->once())->method('save')->with($this->dbSubscriptionMock);

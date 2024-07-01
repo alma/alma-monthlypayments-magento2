@@ -32,7 +32,7 @@ class InsuranceConfig
     private $cartActivated;
     private $popupActivated;
     /**
-     * @var string
+     * @var array
      */
     private $arrayData;
     /**
@@ -67,7 +67,6 @@ class InsuranceConfig
                         break;
                     case 'isInCartWidgetActivated':
                         $this->cartActivated = $this->arrayData[$key];
-
                         break;
                     default:
                         break;

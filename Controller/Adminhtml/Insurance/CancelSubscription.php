@@ -8,12 +8,12 @@ use Alma\API\Exceptions\InsuranceCancelPendingException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
+use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription as SubscriptionResourceModel;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Validator\Exception;
-
 
 class CancelSubscription extends Action
 {
@@ -28,21 +28,22 @@ class CancelSubscription extends Action
     private $subscriptionResourceModel;
     private $insuranceSubscriptionHelper;
 
-
     /**
+     * @param AlmaClient $almaClient
+     * @param InsuranceSubscriptionHelper $insuranceSubscriptionHelper
+     * @param SubscriptionResourceModel $subscriptionResourceModel
      * @param Logger $logger
      * @param JsonFactory $resultJsonFactory
      * @param Context $context
      */
     public function __construct(
-        AlmaClient  $almaClient,
+        AlmaClient                  $almaClient,
         InsuranceSubscriptionHelper $insuranceSubscriptionHelper,
-        \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription $subscriptionResourceModel,
-        Logger      $logger,
-        JsonFactory $resultJsonFactory,
-        Context     $context
-    )
-    {
+        SubscriptionResourceModel   $subscriptionResourceModel,
+        Logger                      $logger,
+        JsonFactory                 $resultJsonFactory,
+        Context                     $context
+    ) {
         parent::__construct(
             $context
         );
@@ -66,7 +67,7 @@ class CancelSubscription extends Action
 
         try {
             $dbSubscription = $this->insuranceSubscriptionHelper->getDbSubscription($post['subscriptionId']);
-        } catch (Exception $e) {
+        } catch (AlmaInsuranceSubscriptionException $e) {
             $this->logger->error('Impossible to load subscription data', [$e->getMessage()]);
             $response = ['state' => Subscription::STATE_FAILED, 'message' => 'Impossible to load subscription data'];
             return $result->setData($response);
@@ -93,5 +94,4 @@ class CancelSubscription extends Action
 
         return $result->setData($response);
     }
-
 }

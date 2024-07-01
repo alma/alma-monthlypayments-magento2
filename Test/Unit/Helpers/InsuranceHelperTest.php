@@ -146,7 +146,11 @@ class InsuranceHelperTest extends TestCase
     }
 
     /**
-     * @param $result
+     * @param $activated
+     * @param $pageActivated
+     * @param $cartActivated
+     * @param $popupActivated
+     * @param $isAllowed
      * @param $dbValue
      * @return void
      * @dataProvider configObjectIsCreatedWithDbDataDataProvider
@@ -257,6 +261,8 @@ class InsuranceHelperTest extends TestCase
 
     /**
      * @dataProvider iframeUrlDataProvider
+     * @param $expectedURL
+     * @param string $mode
      * @return void
      */
     public function testIframeHasDbGetParams($expectedURL, string $mode): void
@@ -445,6 +451,9 @@ class InsuranceHelperTest extends TestCase
 
     /**
      * @dataProvider dataForSetAlmaInsurance
+     * @param $data
+     * @param $type
+     * @param $result
      * @return void
      */
     public function testSetDataToAlmaInsurance($data, $type, $result): void
@@ -485,6 +494,8 @@ class InsuranceHelperTest extends TestCase
 
     /**
      * @dataProvider insuranceInRequest
+     * @param $insuranceId
+     * @param $expected
      * @return void
      */
     public function testHasInsuranceInRequest($insuranceId, $expected): void
@@ -527,7 +538,7 @@ class InsuranceHelperTest extends TestCase
         );
         $insuranceProductExpected = new InsuranceProduct($contract, $parentName, 12.50);
         $insuranceEndpoint = $this->createMock(Insurance::class);
-        $insuranceEndpoint->method('getInsuranceContract')->with('alm_insurance_id123456789', 'superSku', 1250 )->willReturn($contract);
+        $insuranceEndpoint->method('getInsuranceContract')->with('alm_insurance_id123456789', 'superSku', 1250)->willReturn($contract);
         $almaClient = $this->createMock(Client::class);
         $almaClient->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($almaClient);
@@ -535,19 +546,12 @@ class InsuranceHelperTest extends TestCase
         $this->assertEquals($insuranceProductExpected, $this->insuranceHelper->getInsuranceProduct(12.50, $item, $insuranceId, $quoteId));
     }
 
-    public function testGetSubscriptionDataReturnMustBeAnArray(): void
-    {
-        $itemWithoutInsurance1 = $this->invoiceItemFactory('mySku1');
-        $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
-        $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithoutInsurance1, $itemWithoutInsurance2]);
-        $this->assertIsArray($this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $this->subscriberFactory()));
-    }
-
     public function testForCollectionWithoutProductWithInsuranceReturnMustBeAnEmptyArray(): void
     {
         $itemWithoutInsurance1 = $this->invoiceItemFactory('mySku1');
         $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
         $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithoutInsurance1, $itemWithoutInsurance2]);
+        $this->assertIsArray($this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $this->subscriberFactory()));
         $this->assertEmpty($this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $this->subscriberFactory()));
     }
 
@@ -783,8 +787,7 @@ class InsuranceHelperTest extends TestCase
         string $contractId = 'contract_id_123',
         string $price = '11',
         int    $parentPrice = 5300
-    ): InvoiceItem
-    {
+    ): InvoiceItem {
         $invoiceItem = $this->createMock(InvoiceItem::class);
         $orderItem = $this->createMock(OrderItem::class);
         if ($hasInsuranceData) {
@@ -849,7 +852,6 @@ class InsuranceHelperTest extends TestCase
         return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '", "parent_price": "5300"}';
     }
 
-
     private function quoteItemFactory(string $sku, string $linkToken = null): Item
     {
         $item = $this->createMock(Item::class);
@@ -857,7 +859,6 @@ class InsuranceHelperTest extends TestCase
         $item->method('getData')->willReturn($this->getInsuranceData($linkToken));
         return $item;
     }
-
 
     private function createNewInsuranceHelper(): InsuranceHelper
     {

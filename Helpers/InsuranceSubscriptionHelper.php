@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory;
 use Alma\MonthlyPayments\Model\Insurance\Subscription;
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -22,7 +23,7 @@ class InsuranceSubscriptionHelper extends AbstractHelper
     /**
      * @param string $subscriptionId
      * @return mixed
-     * @throws Exception
+     * @throws AlmaInsuranceSubscriptionException
      */
     public function getDbSubscription(string $subscriptionId): Subscription
     {
@@ -31,10 +32,16 @@ class InsuranceSubscriptionHelper extends AbstractHelper
         $this->checkSubscriptionExistInDb($collection);
         return $collection->getFirstItem();
     }
+
+    /**
+     * @param $collection
+     * @return void
+     * @throws AlmaInsuranceSubscriptionException
+     */
     private function checkSubscriptionExistInDb($collection): void
     {
         if (!$collection->getFirstItem()->getId()) {
-            throw new Exception(__('Subscription not found'));
+            throw new AlmaInsuranceSubscriptionException(__('Subscription not found'));
         }
     }
 

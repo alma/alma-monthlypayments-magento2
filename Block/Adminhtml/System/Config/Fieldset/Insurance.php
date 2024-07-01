@@ -47,11 +47,11 @@ class Insurance extends Fieldset
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Context      $context,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\View\Helper\Js   $jsHelper,
-        InsuranceHelper                     $insuranceHelper,
-        array                               $data = []
+        Context         $context,
+        Session         $authSession,
+        Js              $jsHelper,
+        InsuranceHelper $insuranceHelper,
+        array           $data = []
     ) {
         parent::__construct($context, $authSession, $jsHelper, $data);
         $this->insuranceHelper = $insuranceHelper;

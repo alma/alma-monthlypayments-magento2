@@ -8,6 +8,7 @@ use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Api\Insurance\InsuranceUpdate;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
 use Magento\Framework\Validator\Exception;
 use Magento\Framework\Webapi\Rest\Request;
@@ -133,7 +134,7 @@ class InsuranceUpdateTest extends TestCase
         $insuranceEndpoint->expects($this->once())->method('getSubscription')->with(['id' => 'valid_subscription_key'])->willReturn($this->getSubscriptionResultData());
         $this->client->insurance = $insuranceEndpoint;
         $this->almaClient->method('getDefaultClient')->willReturn($this->client);
-        $this->insuranceSubscriptionHelper->method('getDbSubscription')->willThrowException(new Exception(__('Subscription not found')));
+        $this->insuranceSubscriptionHelper->method('getDbSubscription')->willThrowException(new AlmaInsuranceSubscriptionException(__('Subscription not found')));
         $this->expectException(\Magento\Framework\Webapi\Exception::class);
         $instance = $this->createInstance();
         $instance->update();

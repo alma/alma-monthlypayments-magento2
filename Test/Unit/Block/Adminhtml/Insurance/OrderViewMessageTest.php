@@ -51,9 +51,7 @@ class OrderViewMessageTest extends TestCase
             $this->insuranceSubscriptionHelper,
             $this->context,
             $this->url,
-            [],
-            $this->jsonHelper,
-            $this->directoryHelper
+            []
         );
     }
 
@@ -70,12 +68,10 @@ class OrderViewMessageTest extends TestCase
     }
 
 
-
-
     /**
      * Given request subscription are found with "subscription_state" inactive
      * @dataProvider inactiveStatusDataProvider
-     * @param $activeStatus
+     * @param $inactiveStatus
      * @return void
      */
     public function testShouldReturnFalseWhenSubscriptionIsFoundWithAnInactiveStatus($inactiveStatus): void
@@ -101,6 +97,8 @@ class OrderViewMessageTest extends TestCase
     /**
      * Given request subscription are found with 2 subscription with at least on active "subscription_state"
      * @dataProvider mixedStatusWithOneActiveDataProvider
+     * @param $firstState
+     * @param $secondState
      * @return void
      */
     public function testShouldReturnTrueIfAtLeast1StateIsInActiveList($firstState, $secondState): void
