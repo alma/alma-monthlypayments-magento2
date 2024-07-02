@@ -536,7 +536,7 @@ class InsuranceHelperTest extends TestCase
             500,
             []
         );
-        $insuranceProductExpected = new InsuranceProduct($contract, $parentName, 12.50);
+        $insuranceProductExpected = new InsuranceProduct($contract, 'superSku', $parentName, 12.50);
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $insuranceEndpoint->method('getInsuranceContract')->with('alm_insurance_id123456789', 'superSku', 1250)->willReturn($contract);
         $almaClient = $this->createMock(Client::class);
@@ -564,35 +564,34 @@ class InsuranceHelperTest extends TestCase
         $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true);
         $itemInsurance->method('getQty')->willReturn('1.00000');
         $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2]);
-        $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
-        foreach ([$subscription] as $key => $subscription) {
+        foreach ($subscriptionArray as $key => $subscription) {
             $this->assertEquals($subscription->getContractId(), $subscriptionArray[$key]->getContractId());
             $this->assertEquals($subscription->getCmsReference(), $subscriptionArray[$key]->getCmsReference());
-            $this->assertEquals($subscription->getProductPrice(), $subscriptionArray[$key]->getProductPrice());
+            $this->assertEquals(5300, $subscriptionArray[$key]->getProductPrice());
             $this->assertEquals($subscription->getSubscriber(), $subscriptionArray[$key]->getSubscriber());
             $this->assertTrue(boolval($subscriptionArray[$key]->getSubscriber()));
         }
     }
 
-    public function testForCollectionProductWithQty2return2subscriptions(): void
+    public function testForCollectionProductWith5QtyAddedAnd2insuranceReturn2subscriptions(): void
     {
         $subscriber = $this->subscriberFactory();
         $itemWithInsurance1 = $this->invoiceItemFactory('mySku', true);
-        $itemWithInsurance1->method('getQty')->willReturn('2.00000');
+        $itemWithInsurance1->method('getQty')->willReturn('5.00000');
         $itemWithoutInsurance2 = $this->invoiceItemFactory('mySku2');
         $itemInsurance = $this->invoiceItemFactory(InsuranceHelper::ALMA_INSURANCE_SKU, true);
         $itemInsurance->method('getQty')->willReturn('2.00000');
 
         $collectionWithoutInsurance = $this->newCollectionFactory([$itemWithInsurance1, $itemInsurance, $itemWithoutInsurance2]);
-        $subscription = $this->subscriptionFactory($subscriber);
         $subscriptionArray = $this->insuranceHelper->getSubscriptionData($collectionWithoutInsurance, $subscriber);
         $this->assertContainsOnlyInstancesOf(Subscription::class, $subscriptionArray);
-        foreach ([$subscription, $subscription] as $key => $subscription) {
+        $this->assertTrue(count($subscriptionArray) === 2);
+        foreach ($subscriptionArray as $key => $subscription) {
             $this->assertEquals($subscription->getContractId(), $subscriptionArray[$key]->getContractId());
             $this->assertEquals($subscription->getCmsReference(), $subscriptionArray[$key]->getCmsReference());
-            $this->assertEquals($subscription->getProductPrice(), $subscriptionArray[$key]->getProductPrice());
+            $this->assertEquals(5300, $subscriptionArray[$key]->getProductPrice());
             $this->assertEquals($subscription->getSubscriber(), $subscriptionArray[$key]->getSubscriber());
             $this->assertTrue(boolval($subscriptionArray[$key]->getSubscriber()));
         }
@@ -756,18 +755,6 @@ class InsuranceHelperTest extends TestCase
         }
     }
 
-    private function subscriptionFactory(Subscriber $subscriber, string $contractId = 'contract_id_123', string $sku = 'mySku', int $amount = 11): Subscription
-    {
-        return new Subscription(
-            $contractId,
-            $amount,
-            $sku,
-            12012,
-            $subscriber,
-            'https://my-website.com/rest/V1/alma/insurance/update'
-        );
-    }
-
     private function newCollectionFactory(array $items): Collection
     {
         $itemsCollection = $this->createMock(Collection::class);
@@ -787,12 +774,12 @@ class InsuranceHelperTest extends TestCase
         string $contractId = 'contract_id_123',
         string $price = '11',
         int    $parentPrice = 5300
-    ): InvoiceItem {
+    ): InvoiceItem
+    {
         $invoiceItem = $this->createMock(InvoiceItem::class);
         $orderItem = $this->createMock(OrderItem::class);
         if ($hasInsuranceData) {
             $orderItem->method('getData')->willReturn($this->getInsuranceData('1234', $contractId, $price, $parentPrice));
-            $orderItem->method('getOriginalPrice')->willReturn(120.12);
             $orderItem->method('getOrderId')->willReturn($orderId);
             $orderItem->method('getItemId')->willReturn($orderItemId);
             $orderItem->method('getSku')->willReturn($sku);
@@ -841,7 +828,7 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack", "parent_price":"' . $parentPrice . '"}';
+        return '{"id":"' . $contractId . '","name":"Alma outillage thermique 3 ans (Vol + casse)","price":' . $price . ',"link":"' . $linkToken . '","parent_name":"Fusion Backpack","parent_sku":"mySku", "parent_price":"' . $parentPrice . '"}';
     }
 
     private function getInsuranceDataWithType(string $type, string $linkToken = null): ?string
@@ -849,7 +836,7 @@ class InsuranceHelperTest extends TestCase
         if (!$linkToken) {
             return null;
         }
-        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","type":"' . $type . '", "parent_price": "5300"}';
+        return '{"id":"contract_id_123","name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":"' . $linkToken . '","parent_name":"Fusion Backpack","parent_sku":"mySku","type":"' . $type . '", "parent_price": "5300"}';
     }
 
     private function quoteItemFactory(string $sku, string $linkToken = null): Item

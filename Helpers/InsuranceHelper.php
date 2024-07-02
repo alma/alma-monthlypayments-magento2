@@ -190,7 +190,7 @@ class InsuranceHelper extends AbstractHelper
             return null;
         }
 
-        return new InsuranceProduct($insuranceContract, $addedItemToQuote->getName(), $addItemPrice);
+        return new InsuranceProduct($insuranceContract, $parentSku, $addedItemToQuote->getName(), $addItemPrice);
     }
 
     /**
@@ -370,7 +370,7 @@ class InsuranceHelper extends AbstractHelper
             $orderItem = $item->getOrderItem();
             $orderItemQty = (int)$item->getQty();
             $insuranceData = $orderItem->getData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
-            if (!$insuranceData || $item->getSku() === InsuranceHelper::ALMA_INSURANCE_SKU) {
+            if (!$insuranceData || $item->getSku() !== InsuranceHelper::ALMA_INSURANCE_SKU) {
                 continue;
             }
             $insuranceData = json_decode($insuranceData, true);
@@ -379,8 +379,8 @@ class InsuranceHelper extends AbstractHelper
                     $subscriptionArray[] = new Subscription(
                         $insuranceData['id'],
                         $insuranceData['price'],
-                        $item->getSku(),
-                        Functions::priceToCents($orderItem->getOriginalPrice()),
+                        $insuranceData['parent_sku'],
+                        $insuranceData['parent_price'],
                         $subscriber,
                         $this->getCallbackUrl()
                     );
