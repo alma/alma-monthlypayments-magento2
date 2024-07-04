@@ -44,7 +44,7 @@ class InsuranceHelper extends AbstractHelper
     const CUSTOMER_CART_ID_PARAM_KEY = 'cart_id';
     const IS_ALLOWED_INSURANCE_PATH = 'insurance_allowed';
 
-    const CALLBACK_URI = '/rest/V1/alma/insurance/update?subscription_id=<subscription_id>&trace=<trace>';
+    const CALLBACK_URI = 'rest/V1/alma/insurance/update?subscription_id=<subscription_id>&trace=<trace>';
 
     /**
      * @var ProductRepository
