@@ -373,6 +373,7 @@
                     <config_path>payment/alma_monthly_payments/insurance_config</config_path>
                     <label>Alma Insurance</label>
                     <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\Form\Field\InsuranceWidget</frontend_model>
+                    <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\Insurance\ConfigurationSave</backend_model>
                 </field>
             </group>
         </section>
