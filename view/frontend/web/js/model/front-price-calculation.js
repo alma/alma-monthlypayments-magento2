@@ -35,7 +35,7 @@ define([
 
     var widgetSku = '';
 
-    function getProductRegularPrice(basePrice, productId) {
+    function getProductBasePrice(basePrice, productId) {
         let finalPrice = basePrice;
         const productPriceBlock = $('#product-price-' +productId +' .price');
         if (productPriceBlock.length){
@@ -50,7 +50,7 @@ define([
         },
         refreshWidget: function (basePrice, productID, productName, merchantId, quoteId, sessionId){
             const insuranceSelected = false;
-            var finalPrice = getProductRegularPrice(basePrice, productID);
+            var finalPrice = getProductBasePrice(basePrice, productID);
             getProductDataForApiCall(
                 widgetSku,
                 finalPrice,
