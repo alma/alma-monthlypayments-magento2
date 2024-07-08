@@ -39,4 +39,7 @@
     <event name="sales_order_invoice_pay">
         <observer name="alma_insurance_sales_order_invoice_pay" instance="Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver" />
     </event>
+    <event name="sales_order_save_after">
+        <observer name="sales_order_save_after_order_status" instance="Alma\MonthlyPayments\Observer\OrderStatusObserver" />
+    </event>
 </config>

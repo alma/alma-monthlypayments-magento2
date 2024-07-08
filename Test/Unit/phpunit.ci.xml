@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap = "/home/phpuser/magento2/dev/tests/unit/framework/bootstrap.php"
+         backupGlobals               = "false"
+         backupStaticAttributes      = "false"
+         colors                      = "true"
+         convertErrorsToExceptions   = "true"
+         convertNoticesToExceptions  = "true"
+         convertWarningsToExceptions = "true"
+         processIsolation            = "false"
+         stopOnFailure               = "false"
+         testdox                     = "true"
+         beStrictAboutTestsThatDoNotTestAnything="false">
+
+    <coverage includeUncoveredFiles="true"
+          pathCoverage="false"
+          ignoreDeprecatedCodeUnits="true"
+          disableCodeCoverageIgnore="true">
+        <include>
+            <directory suffix=".php">.</directory>
+        </include>
+    </coverage>
+
+    <testsuites>
+        <testsuite name="Alma Monthly Payment for Magento 2 Unit Test Suite">
+            <directory>.</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

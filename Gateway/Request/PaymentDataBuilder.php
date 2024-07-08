@@ -127,10 +127,10 @@ class PaymentDataBuilder implements BuilderInterface
                 'quote_id' => $quoteId,
             ],
         ];
-        if (Eligibility::SPREAD_TYPE === Functions::getPaymentType($planKey)) {
-            $cartData = $this->cartDataBuilder->build($buildSubject);
-            $configArray = array_merge($cartData, $configArray);
-        }
+		
+		$cartData = $this->cartDataBuilder->build($buildSubject);
+		$configArray = array_merge($cartData, $configArray);
+
         $configArray = $this->trigger($configArray, $planConfig);
         return ['payment' => array_merge($planConfig->getPaymentData(), $configArray)];
     }
