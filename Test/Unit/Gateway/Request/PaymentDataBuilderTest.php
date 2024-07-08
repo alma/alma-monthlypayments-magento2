@@ -142,7 +142,7 @@ class PaymentDataBuilderTest extends TestCase
                     'inpage' => false,
                 ],
                 'final_payload' => [
-                    'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT, true)
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT)
                 ]
             ],
             'Payload with In page Installment key' => [
@@ -154,7 +154,7 @@ class PaymentDataBuilderTest extends TestCase
                     'inpage' => true,
                 ],
                 'final_payload' => [
-                    'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT, true, self::ORIGIN_INPAGE)
+                    'payment' => $this->paymentFactory(self::INSTALLMENT_CREDIT_COUNT, self::ORIGIN_INPAGE)
                 ]
             ],
             'Payload without trigger' => [
@@ -212,11 +212,10 @@ class PaymentDataBuilderTest extends TestCase
 
     /**
      * @param string $installmentCount
-     * @param bool $cart
      * @param string $inpage
      * @return array
      */
-    private function paymentFactory(string $installmentCount, bool $cart = false, string $inpage = self::ORIGIN_ONLINE): array
+    private function paymentFactory(string $installmentCount,  string $inpage = self::ORIGIN_ONLINE): array
     {
         $cartData = [
             'installments_count' => $installmentCount,
@@ -236,13 +235,12 @@ class PaymentDataBuilderTest extends TestCase
             ]
         ];
 
-        if ($cart) {
-            $cartData['cart'] = [
-                'items' => [
-                    'item1'
-                ]
-            ];
-        }
+		$cartData['cart'] = [
+			'items' => [
+				'item1'
+			]
+		];
+
         return $cartData;
     }
 

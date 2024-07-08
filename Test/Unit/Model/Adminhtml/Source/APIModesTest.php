@@ -10,6 +10,16 @@ use PHPUnit\Framework\TestCase;
 
 class APIModesTest extends TestCase
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfig;
+
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);

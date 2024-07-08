@@ -1,0 +1,29 @@
+<?php /** @var \Alma\MonthlyPayments\Block\Catalog\Product\Insurance $block */ ?>
+<script >
+    require([
+        'jquery',
+        'Alma_MonthlyPayments/js/model/front-price-calculation'
+    ], function ($,utils) {
+        'use strict';
+        var childsConfig = <?= $block->getProductChild() ?>;
+        var arrayParams = {};
+        $('body').on('change','.super-attribute-select', function () {
+            $('#product-options-wrapper').find('input[name*="super"]').each(function (index, item) {
+                arrayParams[$(item).parent().data('attribute-id')] = $(item).val();
+            });
+            for (const index in childsConfig) {
+                if ( JSON.stringify(childsConfig[index].attributes) === JSON.stringify(arrayParams)) {
+                    utils.setSkuForWifget(childsConfig[index].sku);
+                    utils.refreshWidget(
+                        '<?= $block->getProductPriceInCent() ?>',
+                        '<?= $block->getBaseProductId() ?>',
+                        '<?= $block->getProductName() ?>',
+                        '<?= $block->getMerchantId()?>',
+                        '<?= $block->getQuoteId()?>',
+                        '<?= $block->getCustomerSessionId()?>'
+                    );
+                }
+            }
+        });
+    });
+</script>
