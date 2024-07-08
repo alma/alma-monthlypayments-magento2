@@ -2,21 +2,8 @@
 
 ## v5.0.0 - 2024-07-08
 
-- Feature/insurance
-- [DEVX] Add a task to install pre-commits
-- Feature/ecom 1844 ac create insurance product on conf save
-- fix: remove double slash in calback_url
-- [DEVX] Fix release zip filename
-- Fix insurance qty subscription
-- Feature improve design insurance in cart
-- feat: with cloudflare we don't want rename our module script
-- Add selected qty insurance product to cart
-- Fix configuration iframe parameters and insurance parent product price
+- Beta Alma Insurance
 - Gather cart data from pnx and deferred payments
-- [DEX-890] Add Taskfile, update CI, pre-commit and release workflow
-- Add dockerfile, compose.yml for Magento PHP tooling
-- [DEX-866] Add infos in PR about E2E tests run status
-- [DEX-866] Add infos in PR about E2E tests run status
 
 ## v4.3.0
 
