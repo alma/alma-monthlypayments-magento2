@@ -10,6 +10,26 @@ tasks:
     cmds:
       - task -l
 
+  brew:
+    preconditions:
+      - sh: brew -v
+        msg: 'This task requires `brew`. Please refer to this documentation: https://brew.sh/'
+
+  pre-commit:
+    desc: Install pre-commit tool
+    internal: true
+    deps: [brew]
+    status:
+      - pre-commit --version
+    cmds:
+      - brew install pre-commit
+
+  pre-commit:install:
+    desc: Install and set up pre-commit hooks
+    deps: [pre-commit]
+    cmds:
+      - pre-commit install --hook-type pre-commit --hook-type commit-msg
+
   docker:build:
     desc: Build magento docker image
     cmds:
