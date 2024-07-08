@@ -19,6 +19,10 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
      * @var Logger
      */
     private $logger;
+    /**
+     * @var OrderHelper
+     */
+    private $orderHelper;
 
     /**
      * @return void

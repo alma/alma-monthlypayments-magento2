@@ -12,6 +12,14 @@ use PHPUnit\Framework\TestCase;
 class PayloadBuilderTest extends TestCase
 {
     private $payloadBuilder;
+    /**
+     * @var DateHelper
+     */
+    private $dateHelper;
+    /**
+     * @var OrderHelper
+     */
+    private $orderHelper;
 
     public function setUp(): void
     {

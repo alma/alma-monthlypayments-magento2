@@ -23,6 +23,39 @@ use PHPUnit\Framework\TestCase;
 class SOCConsentFieldTest extends TestCase
 {
     /**
+     * @var SOCHelper
+     */
+    private $socHelper;
+    /**
+     * @var Context
+     */
+    private $context;
+    /**
+     * @var Registry
+     */
+    private $registry;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfigInterface;
+    /**
+     * @var TypeListInterface
+     */
+    private $typeListInterface;
+    /**
+     * @var AlmaClient
+     */
+    private $almaClient;
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+
+    /**
      * @return void
      */
     public function setUp(): void

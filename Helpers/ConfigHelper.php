@@ -23,7 +23,6 @@ class ConfigHelper extends AbstractHelper
     const IN_PAGE_ENABLED = 'in_page_enabled';
     const PAYMENT_EXPIRATION_TIME = 'payment_expiration';
     const BASE_PLANS_CONFIG = 'base_config_plans';
-
     /**
      * @var WriterInterface
      */
@@ -222,6 +221,28 @@ class ConfigHelper extends AbstractHelper
         $this->saveConfig(self::BASE_PLANS_CONFIG, $this->serializer->serialize($plans), $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
         $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
+
+    public function saveIsAllowedInsurance($merchant, $scope, $storeId):void
+    {
+        $isAllowedInsurance = 0;
+        if ($merchant) {
+            $isAllowedInsurance = 1;
+            if (isset($merchant->cms_insurance)) {
+                $isAllowedInsurance = $merchant->cms_insurance ? 1 : 0;
+            }
+        }
+        $this->saveIsAllowedInsuranceValue($isAllowedInsurance, $scope, $storeId);
+    }
+
+    public function saveIsAllowedInsuranceValue($value, $scope, $storeId):void
+    {
+        $this->saveConfig(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH, $value, $scope, $storeId);
+    }
+    public function clearInsuranceConfig($scope, $storeId):void
+    {
+        $this->saveConfig(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE, null, $scope, $storeId);
+    }
+
 
     /**
      * @return FeePlan[]

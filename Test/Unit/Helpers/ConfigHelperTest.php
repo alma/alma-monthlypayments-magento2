@@ -5,7 +5,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 use Alma\API\Entities\FeePlan;
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -23,6 +23,7 @@ class ConfigHelperTest extends TestCase
     protected $writerInterface;
     protected $serializer;
     protected $typeList;
+
     protected function setUp(): void
     {
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
@@ -48,6 +49,91 @@ class ConfigHelperTest extends TestCase
             $this->assertInstanceOf(FeePlan::class, $feePlan);
         }
     }
+
+    public function testCmsInsuranceNotExistSaveTrue(): void
+    {
+        $merchant = $this->createMock(Merchant::class);
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
+            1,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
+    }
+
+    public function testCmsAllowInsuranceIsTrueSave1(): void
+    {
+        $merchant = $this->createMock(Merchant::class);
+        $merchant->cms_insurance = true;
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
+            1,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
+    }
+
+    public function testCmsAllowInsuranceIsFalseSave0(): void
+    {
+        $merchant = $this->createMock(Merchant::class);
+        $merchant->cms_insurance = false;
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
+            0,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
+    }
+
+    public function testIfNoMerchantSave0(): void
+    {
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
+            0,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsurance(null, 0, 1);
+    }
+
+    public function testSaveIsAllowedInsuranceValue0()
+    {
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
+            0,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsuranceValue(0, 0, 1);
+    }
+
+    public function testSaveIsAllowedInsuranceValue1()
+    {
+        $this->writerInterface->expects($this->once())->method('save')->with(
+            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
+            1,
+            0,
+            1
+        );
+        $this->createConfigHelper()->saveIsAllowedInsuranceValue(1, 0, 1);
+    }
+
+    public function testClearInsuranceConfig(): void
+    {
+        $this->writerInterface->expects($this->once())
+            ->method('save')
+            ->with(
+                ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE,
+                null,
+                0,
+                1
+            );
+        $this->createConfigHelper()->clearInsuranceConfig(0, 1);
+    }
+
 
     private function createConfigHelper(): ConfigHelper
     {

@@ -32,7 +32,38 @@ class PaymentValidationTest extends TestCase
     const PAYMENT_ID = 'payment_11upE7m4owxuD78NBymjsYGD6xzxL3KKpZ';
     const INCREMENT_ID = '0000000001';
     const ORDER_ID = '23';
-
+    /**
+     * @var Logger
+     */
+    private $logger;
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+    /**
+     * @var AlmaClient
+     */
+    private $almaClient;
+    /**
+     * @var Processor
+     */
+    private $paymentProcessor;
+    /**
+     * @var QuoteRepository
+     */
+    private $quoteRepository;
+    /**
+     * @var BuilderInterface
+     */
+    private $builderInterface;
+    /**
+     * @var OrderHelper
+     */
+    private $orderHelper;
+    /**
+     * @var ConfigHelper
+     */
+    private $configHelper;
 
     public function setUp(): void
     {
@@ -109,8 +140,8 @@ class PaymentValidationTest extends TestCase
         $paymentValidation = $this->getPaymentValidationMockPartial();
         $paymentValidation->shouldReceive('createPaymentData')->once();
         $paymentValidation->shouldReceive('addTransactionComment')
-             ->once()
-             ->andReturn($paymentMock);
+            ->once()
+            ->andReturn($paymentMock);
         $paymentValidation->addTransactionToPayment($paymentMock, $orderMock, $almaPaymentMock);
     }
 
@@ -240,6 +271,7 @@ class PaymentValidationTest extends TestCase
     {
         return new PaymentValidation(...$this->getConstructorDependency());
     }
+
     private function getConstructorDependency(): array
     {
         return [
@@ -257,8 +289,7 @@ class PaymentValidationTest extends TestCase
     public function paymentDataProvider(): array
     {
         return [
-            'Check with deferred Trigger True' =>
-                [
+            'Check with deferred Trigger True' => [
                     [
                         'created' => self::FIXED_TIMESTAMP,
                         'deferred_days' => self::DEFFERED_DAYS_30,

@@ -8,17 +8,40 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\State;
+use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\StoreResolver;
 use PHPUnit\Framework\TestCase;
 
 class StoreHelperTest extends TestCase
 {
+    /**
+     * @var Context
+     */
+    private $context;
+    /**
+     * @var State
+     */
+    private $state;
+    /**
+     * @var StoreResolver
+     */
+    private $storeManager;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->context = $this->createMock(Context::class);
         $this->state = $this->createMock(State::class);
-        $this->storeResolver = $this->createMock(StoreResolver::class);
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->request = $this->createMock(RequestInterface::class);
         $this->logger = $this->createMock(Logger::class);
     }
@@ -33,9 +56,11 @@ class StoreHelperTest extends TestCase
     public function testStoreId($data): void
     {
         $this->state->method('getAreaCode')->willReturn($data['area']);
-        $this->storeResolver->method('getCurrentStoreId')->willReturn($data['currentStoreId']);
+        $mockStoreInterface = $this->createMock(StoreInterface::class);
+        $mockStoreInterface->method('getId')->willReturn($data['currentStoreId']);
+        $this->storeManager->method('getStore')->willReturn($mockStoreInterface);
         $this->request->method('getParam')->willReturnOnConsecutiveCalls($data['store'], $data['website']);
-        $this->assertEquals($data['expectedStoreId'], $this->createNewStoreHelper()->getStoreId($data['storeId']));
+        $this->assertEquals($data['expectedStoreId'], $this->createNewStoreHelper()->getStoreId());
     }
 
     /**
@@ -49,7 +74,7 @@ class StoreHelperTest extends TestCase
     {
         $this->state->method('getAreaCode')->willReturn($data['area']);
         $this->request->method('getParam')->willReturnOnConsecutiveCalls($data['store'], $data['website']);
-        $this->assertEquals($data['expectedScope'], $this->createNewStoreHelper()->getScope($data['scope']));
+        $this->assertEquals($data['expectedScope'], $this->createNewStoreHelper()->getScope());
     }
 
     public function dataProviderForTestStoreIdAndScope(): array
@@ -134,7 +159,7 @@ class StoreHelperTest extends TestCase
         return [
             $this->context,
             $this->state,
-            $this->storeResolver,
+            $this->storeManager,
             $this->request,
             $this->logger,
         ];

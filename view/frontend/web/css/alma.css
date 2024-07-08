@@ -64,3 +64,21 @@
     position:relative;
     bottom: 20px;
 }
+.alma-insurance-iframe {
+    height: 100%;
+    width: 100%;
+    border: none;
+}
+.cart.table-wrapper .cart > .alma-cart-with-insurance {
+    border-bottom: none;
+}
+.table > tbody + tbody.alma-cart-insurance {
+    border-top: none;
+}
+
+.insuranceqty {
+    padding-right: 1.8em;
+}
+.checkout-agreements .alma-validation-input {
+    align-items: start;
+}

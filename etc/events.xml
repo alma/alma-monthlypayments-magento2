@@ -27,6 +27,18 @@
         <observer name="alma_monthly_payments_gateway_data_assign"
                   instance="Alma\MonthlyPayments\Observer\PaymentDataAssignObserver"/>
     </event>
+    <event name="checkout_cart_product_add_after">
+        <observer name="checkout_cart_product_add_after_alma_insurance" instance="Alma\MonthlyPayments\Observer\AddToCartInsuranceObserver" />
+    </event>
+    <event name="sales_quote_remove_item">
+        <observer name="checkout_cart_product_remove_after_alma_insurance" instance="Alma\MonthlyPayments\Observer\RemoveToCartInsuranceObserver" />
+    </event>
+    <event name="checkout_submit_all_after">
+        <observer name="alma_insurance_checkout_submit_all_after" instance="Alma\MonthlyPayments\Observer\CheckoutSubmitAllAfter" />
+    </event>
+    <event name="sales_order_invoice_pay">
+        <observer name="alma_insurance_sales_order_invoice_pay" instance="Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver" />
+    </event>
     <event name="sales_order_save_after">
         <observer name="sales_order_save_after_order_status" instance="Alma\MonthlyPayments\Observer\OrderStatusObserver" />
     </event>
