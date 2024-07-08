@@ -1,106 +1,65 @@
 <?php
 
-namespace Alma\MonthlyPayments\Setup\Patch\Data;
+namespace Alma\MonthlyPayments\Helpers;
 
-use Alma\MonthlyPayments\Helpers\InsuranceHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository;
-use Magento\Framework\App\Area;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\App\State;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Module\Dir;
-use Magento\Framework\Setup\Patch\DataPatchInterface;
 
-/**
- *  Get merchant_id value and clone it in test_merchant_id and live_merchant_id by store view
- *  Delete old merchant_id config
- */
-class UpdateCreateInsuranceProduct implements DataPatchInterface
+class InsuranceProductHelper extends AbstractHelper
 {
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-    /**
-     * @var ProductFactory
-     */
     private $productFactory;
-    /**
-     * @var InsuranceHelper
-     */
-    private $insuranceHelper;
-    /**
-     * @var ProductRepository
-     */
-    private $productRepository;
-    /**
-     * @var State
-     */
-    private $state;
-    /**
-     * @var Dir
-     */
-    private $directory;
-    /**
-     * @var File
-     */
     private $fileProcessor;
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
+    private $logger;
+    private $directory;
+    private $productRepository;
 
+    /**
+     * @param Context $context
+     * @param Logger $logger
+     * @param ProductFactory $productFactory
+     * @param Dir $directory
+     * @param File $fileProcessor
+     * @param Filesystem $filesystem
+     * @param ProductRepository $productRepository
+     */
     public function __construct(
-        Logger $logger,
-        ProductFactory $productFactory,
-        ProductRepository $productRepository,
-        State $state,
-        InsuranceHelper $insuranceHelper,
-        Dir $directory,
-        File $fileProcessor,
-        Filesystem $filesystem
+        Context           $context,
+        Logger            $logger,
+        ProductFactory    $productFactory,
+        Dir               $directory,
+        File              $fileProcessor,
+        Filesystem        $filesystem,
+        ProductRepository $productRepository
+
     ) {
-        $this->logger = $logger;
+
+        parent::__construct($context);
         $this->productFactory = $productFactory;
-        $this->insuranceHelper = $insuranceHelper;
-        $this->productRepository = $productRepository;
-        $this->state = $state;
-        $this->directory = $directory;
         $this->fileProcessor = $fileProcessor;
         $this->filesystem = $filesystem;
+        $this->logger = $logger;
+        $this->directory = $directory;
+        $this->productRepository = $productRepository;
     }
 
     /**
-     * @return array
+     * @return void
      */
-    public static function getDependencies(): array
+    public function createInsuranceProduct(): void
     {
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAliases(): array
-    {
-        return [];
-    }
-
-    public function apply()
-    {
-        try {
-            $this->state->setAreaCode(Area::AREA_GLOBAL);
-        } catch (LocalizedException $e) {
-            $this->logger->info('Area Code is already set continue', [$e->getMessage()]);
-        }
-
+        // Create a new product with the insurance SKU
         /** @var Product $insuranceProduct */
         $insuranceProduct = $this->productFactory->create();
         $insuranceProduct->setSku(InsuranceHelper::ALMA_INSURANCE_SKU);
@@ -117,7 +76,7 @@ class UpdateCreateInsuranceProduct implements DataPatchInterface
             "use_config_notify_stock_qty" => 0
         ]);
         // Not visible individualy ID 1
-        $insuranceProduct->setVisibility(1);
+        $insuranceProduct->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE);
         // ID de la classe de taxe (0 pour non applicable)
         $insuranceProduct->setTaxClassId(0);
         $insuranceProduct->setDescription('Alma Insurance product');

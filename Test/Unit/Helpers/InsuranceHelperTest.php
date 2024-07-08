@@ -106,7 +106,7 @@ class InsuranceHelperTest extends TestCase
         $this->dbSubscriptionFactory->method('create')->willReturn($subscriptionMock);
         $this->storeManagerInterface = $this->createMock(StoreManager::class);
         $store = $this->createMock(Store::class);
-        $store->method('getBaseUrl')->willReturn('https://my-website.com');
+        $store->method('getBaseUrl')->willReturn('https://my-website.com/');
         $this->storeManagerInterface->method('getStore')->willReturn($store);
 
         $this->insuranceHelper = $this->createNewInsuranceHelper();
