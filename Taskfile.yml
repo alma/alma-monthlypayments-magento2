@@ -57,7 +57,7 @@ tasks:
   lint:
     desc: Run linter
     cmds:
-      - docker compose run -T --rm magento composer exec phpcs -- --standard=Magento2 ./app/code/Alma/MonthlyPayments/ | grep ERROR
+      - docker compose run -T --rm magento composer exec phpcs -- --standard=Magento2 ./app/code/Alma/MonthlyPayments/
 
   lint:fix:
     desc: Run linter and apply fixes
