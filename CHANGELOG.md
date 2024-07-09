@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.0.1 - 2024-07-09
+
+- Change array_search to in_array for adobe commerce php_cs
+
 ## v5.0.0 - 2024-07-08
 
 - Beta Alma Insurance
