@@ -1,5 +1,12 @@
 # Changelog
 
+## v5.0.1 - 2024-07-09
+
+- [DEVX] Remove internal changes from changelog
+- Backport main to develop
+- Change array_search to in_array for adobe commerce php_cs
+- [DEVX] Ensure release-drafter is based on develop and the release points to main
+
 ## v5.0.0 - 2024-07-08
 
 - Beta Alma Insurance
