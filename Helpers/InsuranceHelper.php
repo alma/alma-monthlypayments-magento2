@@ -96,7 +96,9 @@ class InsuranceHelper extends AbstractHelper
      * @param ConfigHelper $configHelper
      * @param CartRepositoryInterface $cartRepository
      * @param AlmaClient $almaClient
+     * @param SubscriptionFactory $subscriptionFactory
      * @param Session $session
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context                 $context,
@@ -110,8 +112,7 @@ class InsuranceHelper extends AbstractHelper
         SubscriptionFactory     $subscriptionFactory,
         Session                 $session,
         StoreManagerInterface   $storeManager
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -397,7 +398,6 @@ class InsuranceHelper extends AbstractHelper
     /**
      * @param Collection $itemsCollection
      * @param array $subscriptionResult
-     * @param int $orderId // same for all subscription
      * @param string $mode // same for all subscription
      * @return \Alma\MonthlyPayments\Model\Insurance\Subscription[]
      * @throws NoSuchEntityException
@@ -418,7 +418,7 @@ class InsuranceHelper extends AbstractHelper
             $subscriptionResultContractData = [];
             for ($i = 0; $i < $orderItemQty; $i++) {
                 foreach ($subscriptionResult as $key => $result) {
-                    if (array_search($orderItemInsuranceData['id'], $result)) {
+                    if (in_array($orderItemInsuranceData['id'], $result)) {
                         $subscriptionResultContractData = $result;
                         unset($subscriptionResult[$key]);
                         break;

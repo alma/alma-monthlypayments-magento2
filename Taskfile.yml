@@ -57,7 +57,7 @@ tasks:
   lint:
     desc: Run linter
     cmds:
-      - docker compose run -T --rm magento composer exec phpcs -- ./app/code/Alma/MonthlyPayments/
+      - docker compose run -T --rm magento composer exec phpcs -- --standard=Magento2 ./app/code/Alma/MonthlyPayments/
 
   lint:fix:
     desc: Run linter and apply fixes
@@ -99,7 +99,7 @@ tasks:
     deps:
       - gh-cli
     desc: Create a release pull request
-    cmds: 
+    cmds:
       - gh workflow run release-pull-request.yml
       - cmd: sleep 2
         silent: true
@@ -121,7 +121,7 @@ tasks:
         msg: |
           ⚠️ This task requires a changelog message.
           Please provide a changelog message. Example: `task hotfix CHANGELOG_MESSAGE='This is a message'`.
-    cmds: 
+    cmds:
       - gh workflow run hotfix-pull-request.yml -F changelog-message='{{.CHANGELOG_MESSAGE}}'
       - cmd: sleep 2
         silent: true
