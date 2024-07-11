@@ -10,8 +10,6 @@
     <input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="">
     <input type="hidden" name="alma_insurance_qty" form="product_addtocart_form" value="">
     <div id="alma-insurance-modal"></div>
-<?php } ?>
-<?php if ($widgetIsActivated) { ?>
     <script>
         require([
             'jquery',
@@ -38,6 +36,20 @@
             var isAddToCartFlow = false;
             var selectedAlmaInsurance = null
             window.addEventListener('message', (e) => {
+                if(e.data.type === 'almaEligibilityAnswer'){
+                    <?php if ($popupIsActivated) { ?>
+                    if (e.data?.eligibilityCallResponseStatus?.response?.eligibleProduct){
+                        document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
+                            if (!madeChoiceForInsurance){
+                                e.preventDefault();
+                                openModal('popupModal', parseInt(document.getElementById('qty').value));
+                                madeChoiceForInsurance = true;
+                                isAddToCartFlow = true;
+                            }
+                        })
+                    }
+                    <?php } ?>
+                }
                 if(e.data.type === 'getResetInsuranceData'){
                     $('input[name=alma_insurance_id]').val('');
                     $('input[name=alma_insurance_qty]').val('')
@@ -78,16 +90,6 @@
                 }
             });
 
-            <?php if ($popupIsActivated) { ?>
-            document.getElementById('product-addtocart-button').addEventListener('click', function (e) {
-                if (!madeChoiceForInsurance){
-                    e.preventDefault();
-                    openModal('popupModal', parseInt(document.getElementById('qty').value));
-                    madeChoiceForInsurance = true;
-                    isAddToCartFlow = true;
-                }
-            })
-            <?php } ?>
         });
     </script>
 <?php } ?>
