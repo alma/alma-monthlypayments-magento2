@@ -42,4 +42,7 @@
     <event name="sales_order_save_after">
         <observer name="sales_order_save_after_order_status" instance="Alma\MonthlyPayments\Observer\OrderStatusObserver" />
     </event>
+    <event name="sales_order_shipment_track_save_after">
+        <observer name="sales_order_shipment_track_save_after" instance="Alma\MonthlyPayments\Observer\ShipmentTrackObserver" />
+    </event>
 </config>
