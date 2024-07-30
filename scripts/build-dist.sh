@@ -16,6 +16,7 @@ zip -9 -r "dist/almapay-monthlypayments-magento2.zip" \
     Observer/ \
     Plugin/ \
     Setup/ \
+    Ui/ \
     view/ \
     CHANGELOG.md \
     composer.json \
