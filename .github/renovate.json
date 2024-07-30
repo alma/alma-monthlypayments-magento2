@@ -20,11 +20,6 @@
     {
       "matchManagers": ["dockerfile", "docker-compose"],
       "groupName": "docker updates"
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchPackageNames": ["LoveToKnow/slackify-markdown-action"],
-      "enabled": false
     }
   ]
 }
