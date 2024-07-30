@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.0.2 - 2024-07-30
+
+### Changes
+
+- Fix add insurance pop up click event listener only for eligible products (#179)
+
+#### Contributors
+
+@Francois-Gomis, @carine-bonnafous and @github-actions
+
 ## v5.0.1 - 2024-07-09
 
 - Change array_search to in_array for adobe commerce php_cs
