@@ -25,10 +25,10 @@
 
 namespace Alma\MonthlyPayments\Gateway\Validator;
 
+use Alma\MonthlyPayments\Gateway\Http\Client\Client;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use Alma\MonthlyPayments\Gateway\Http\Client\Client;
 
 class ResponseValidator extends AbstractValidator
 {

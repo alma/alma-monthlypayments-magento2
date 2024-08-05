@@ -26,7 +26,6 @@ class AlmaInsuranceRenderer extends DefaultRenderer
      */
     private $insuranceHelper;
 
-
     public function __construct(
         Context           $context,
         StringUtils       $string,
@@ -69,10 +68,7 @@ class AlmaInsuranceRenderer extends DefaultRenderer
                 ->getFirstItem();
 
             $item->setName($this->insuranceHelper->getInsuranceName($quoteItem));
-
         }
         return parent::getItem();
     }
-
-
 }

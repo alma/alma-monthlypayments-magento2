@@ -774,8 +774,7 @@ class InsuranceHelperTest extends TestCase
         string $contractId = 'contract_id_123',
         string $price = '11',
         int    $parentPrice = 5300
-    ): InvoiceItem
-    {
+    ): InvoiceItem {
         $invoiceItem = $this->createMock(InvoiceItem::class);
         $orderItem = $this->createMock(OrderItem::class);
         if ($hasInsuranceData) {

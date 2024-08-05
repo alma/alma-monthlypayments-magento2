@@ -44,6 +44,4 @@ class PayloadBuilder extends AbstractHelper
             "payment_methods" => $this->orderHelper->getSOCByPaymentMethods()
         ];
     }
-
-
 }

@@ -58,7 +58,6 @@ class LoadConfigObserver implements ObserverInterface
         $currentUrl = $this->url->getCurrentUrl();
         if (preg_match('!section\/(alma_insurance_section|payment)!', $currentUrl, $matches)) {
             if ($matches[1] === 'payment') {
-
                 $this->paymentPlansHelper->saveBaseApiPlansConfig();
             }
             try {
@@ -69,7 +68,6 @@ class LoadConfigObserver implements ObserverInterface
             }
             $cacheTypeList = ["config","layout","block_html","compiled_config","config_integration","config_integration_api","full_page"];
             if (!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1') {
-
                 $this->saveIsAllowedInsurance(0);
                 $this->getClearInsuranceConfig();
                 $this->cacheManager->clean($cacheTypeList);
@@ -80,7 +78,6 @@ class LoadConfigObserver implements ObserverInterface
                 $this->cacheManager->clean($cacheTypeList);
                 $controller->getResponse()->setRedirect($currentUrl);
             }
-
         }
         return $this;
     }
@@ -108,5 +105,4 @@ class LoadConfigObserver implements ObserverInterface
             $this->storeHelper->getStoreId()
         );
     }
-
 }

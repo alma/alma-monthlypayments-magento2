@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Model\Insurance\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use Magento\Framework\Model\ResourceModel\Db\Context;
 
 class Subscription extends AbstractDb
 {

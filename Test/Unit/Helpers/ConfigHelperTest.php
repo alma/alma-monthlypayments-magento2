@@ -134,7 +134,6 @@ class ConfigHelperTest extends TestCase
         $this->createConfigHelper()->clearInsuranceConfig(0, 1);
     }
 
-
     private function createConfigHelper(): ConfigHelper
     {
         return new ConfigHelper(...$this->getDependency());

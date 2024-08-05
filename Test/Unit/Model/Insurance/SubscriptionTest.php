@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-
     const ORDER_ID = 123;
     const ORDER_ITEM_ID = 456;
     const SUBSCRIPTION_ID = 'subscription_123';
@@ -26,7 +25,6 @@ class SubscriptionTest extends TestCase
     const CANCELATION_REASON = 'Receive to late';
     const IS_REFUNDED = false;
     const CALLBACK_URL = 'https://www.example.com';
-
 
     /**
      * @var Subscription

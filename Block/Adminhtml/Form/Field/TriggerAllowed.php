@@ -36,7 +36,7 @@ class TriggerAllowed extends Field
     protected function _getElementHtml(AbstractElement $element)
     {
         $element->setReadonly(true);
-        if (!$this->paymentPlansHelper->paymentTriggerIsAllowed()){
+        if (!$this->paymentPlansHelper->paymentTriggerIsAllowed()) {
             $element->setComment(__("If you are interested in this feature, get in touch with your Alma contact or by sending an email to support@getalma.eu"));
         }
         return $element->getElementHtml();

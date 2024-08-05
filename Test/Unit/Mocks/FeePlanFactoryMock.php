@@ -6,10 +6,10 @@ use Alma\API\Entities\FeePlan;
 
 class FeePlanFactoryMock
 {
-    CONST KEY_2 = 'general:2:0:0';
-    CONST KEY_3 = 'general:3:0:0';
-    CONST KEY_4 = 'general:4:0:0';
-    CONST KEY_15 = 'general:1:15:0';
+    const KEY_2 = 'general:2:0:0';
+    const KEY_3 = 'general:3:0:0';
+    const KEY_4 = 'general:4:0:0';
+    const KEY_15 = 'general:1:15:0';
 
     public static function feePlanFactory(
         string $key,

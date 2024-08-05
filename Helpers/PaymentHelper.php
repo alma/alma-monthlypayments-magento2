@@ -39,5 +39,4 @@ class PaymentHelper extends AbstractHelper
     {
         return sprintf('general:%s:%s:%s', $almaPayment->installments_count, $almaPayment->deferred_days, $almaPayment->deferred_months);
     }
-
 }

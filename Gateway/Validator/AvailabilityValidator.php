@@ -27,10 +27,10 @@ namespace Alma\MonthlyPayments\Gateway\Validator;
 
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\Eligibility;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class AvailabilityValidator extends AbstractValidator
 {

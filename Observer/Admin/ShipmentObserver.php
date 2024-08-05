@@ -8,11 +8,11 @@ use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
+use InvalidArgumentException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Sales\Model\Order;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
-use \InvalidArgumentException;
+use Magento\Sales\Model\Order;
 
 class ShipmentObserver implements ObserverInterface
 {

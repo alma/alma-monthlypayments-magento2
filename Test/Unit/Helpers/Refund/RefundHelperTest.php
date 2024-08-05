@@ -59,5 +59,4 @@ class RefundHelperTest extends TestCase
         $refundHelper = new RefundHelper($this->context, $this->logger, $almaClientMock);
         $refundHelper->makePartialRefund($paymentId, $price);
     }
-
 }

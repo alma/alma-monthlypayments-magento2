@@ -33,6 +33,7 @@ use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Model\Data\PaymentPlanEligibility;
 use Alma\MonthlyPayments\Model\Data\Quote as AlmaQuote;
+use InvalidArgumentException;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Exception\InputException;
@@ -40,7 +41,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data;
 use Magento\Quote\Api\Data\CartInterface;
-use \InvalidArgumentException;
 
 class Eligibility extends AbstractHelper
 {
@@ -542,7 +542,6 @@ class Eligibility extends AbstractHelper
         }
         return $type;
     }
-
 
     /**
      * @return CartInterface|null

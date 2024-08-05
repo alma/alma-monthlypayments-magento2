@@ -28,8 +28,8 @@ class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
                 '*/*/markAsRead/',
                 ['_current' => true, 'id' => $row->getNotificationId()]
             ) . '">' . __(
-                    'Mark as Read'
-                ) . '</a>' : '';
+                'Mark as Read'
+            ) . '</a>' : '';
 
             $encodedUrl = $this->_urlHelper->getEncodedUrl();
             return sprintf(

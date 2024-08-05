@@ -11,7 +11,6 @@ use Magento\Sales\Model\OrderRepository;
 class RefundDataBuilder implements BuilderInterface
 {
 
-
     /**
      * @var Config
      */
@@ -55,7 +54,4 @@ class RefundDataBuilder implements BuilderInterface
         $refundPayload['store_id'] = $order->getStoreId();
         return $refundPayload;
     }
-
-
-
 }

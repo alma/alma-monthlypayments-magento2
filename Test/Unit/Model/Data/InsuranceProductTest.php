@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Model\Data;
 
-
 use Alma\API\Entities\Insurance\Contract;
 use Alma\MonthlyPayments\Model\Data\InsuranceProduct;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +24,7 @@ class InsuranceProductTest extends TestCase
             'parent_price' => 1410,
             'files' => []
         ];
-        $insuranceProduct = new InsuranceProduct($insuranceContract,'my_sku', 'my parent name', 14.10);
+        $insuranceProduct = new InsuranceProduct($insuranceContract, 'my_sku', 'my parent name', 14.10);
         $this->assertEquals($expectedReturn, $insuranceProduct->toArray());
     }
 
@@ -35,7 +34,7 @@ class InsuranceProductTest extends TestCase
         $name = 'insurance test';
         $insuranceContract = $this->contractFactory($id, $name);
 
-        $insuranceProduct = new InsuranceProduct($insuranceContract,'my_sku', 'my parent name', 14.20);
+        $insuranceProduct = new InsuranceProduct($insuranceContract, 'my_sku', 'my parent name', 14.20);
 
         $this->assertEquals(100.23, $insuranceProduct->getFloatPrice());
         $this->assertEquals(1420, $insuranceProduct->getParentPrice());
@@ -64,5 +63,4 @@ class InsuranceProductTest extends TestCase
             $files
         );
     }
-
 }

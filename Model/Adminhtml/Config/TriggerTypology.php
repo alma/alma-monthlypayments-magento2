@@ -17,8 +17,7 @@ class TriggerTypology implements OptionSourceInterface
 
     public function __construct(
         Logger $logger
-    )
-    {
+    ) {
         $this->logger = $logger;
     }
 
@@ -35,5 +34,4 @@ class TriggerTypology implements OptionSourceInterface
         }
         return $optionArray;
     }
-
 }

@@ -54,7 +54,6 @@ class Customer
      */
     public function dataFromCustomer(?CustomerInterface $customer, array $addresses): array
     {
-
         if ($customer) {
             $customerData = [
                 'first_name' => $customer->getFirstname(),

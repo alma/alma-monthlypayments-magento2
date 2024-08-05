@@ -20,7 +20,6 @@ class ActionsTest extends TestCase
 
     public function setUp(): void
     {
-
         $escaper = $this->createMock(\Magento\Framework\Escaper::class);
         $builder = $this->createMock(\Magento\Framework\UrlInterface::class);
         $this->context = $this->createMock(\Magento\Backend\Block\Context::class);

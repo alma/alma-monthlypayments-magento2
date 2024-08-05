@@ -23,7 +23,6 @@ class WidgetConfigHelper extends Config
         return ((bool)(int)$this->get(self::WIDGET_ACTIVE) && $this->getIsActive());
     }
 
-
     /**
      * @return string
      */

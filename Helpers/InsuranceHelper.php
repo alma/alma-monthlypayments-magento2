@@ -126,7 +126,6 @@ class InsuranceHelper extends AbstractHelper
         $this->storeManager = $storeManager;
     }
 
-
     /**
      * @return InsuranceConfig
      */
@@ -389,8 +388,6 @@ class InsuranceHelper extends AbstractHelper
                     $this->logger->info('Impossible to create subscription Data : ', ['exception message :' => $e->getMessage(), 'Data' => $insuranceData]);
                 }
             }
-
-
         }
         return $subscriptionArray;
     }
@@ -473,5 +470,4 @@ class InsuranceHelper extends AbstractHelper
     {
         return $this->storeManager->getStore()->getBaseUrl() . self::CALLBACK_URI;
     }
-
 }

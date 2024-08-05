@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Alma\MonthlyPayments\Model\Api\Data;
-
 
 use Alma\API\Entities\Instalment;
 use Alma\MonthlyPayments\Api\Data\InstallmentInterface;

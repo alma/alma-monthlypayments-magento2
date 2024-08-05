@@ -171,5 +171,4 @@ class SubscriptionDetails extends Template
     {
         return $this->getOrder()->getCustomerLastname();
     }
-
 }

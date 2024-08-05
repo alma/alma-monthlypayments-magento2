@@ -10,7 +10,6 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Api\Insurance\InsuranceUpdate;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceSubscriptionException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
-use Magento\Framework\Validator\Exception;
 use Magento\Framework\Webapi\Rest\Request;
 use PHPUnit\Framework\TestCase;
 
@@ -104,7 +103,6 @@ class InsuranceUpdateTest extends TestCase
 
     public function testGivenSubscriptionIdReturnApiErrorMustReturnError(): void
     {
-
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $insuranceEndpoint->expects($this->once())->method('getSubscription')->willThrowException(new \Alma\API\Exceptions\AlmaException('error'));
         $this->client->insurance = $insuranceEndpoint;
@@ -116,7 +114,6 @@ class InsuranceUpdateTest extends TestCase
 
     public function testGivenSubscriptionIdReturnEmptySubscriptionListMustReturnError(): void
     {
-
         $insuranceEndpoint = $this->createMock(Insurance::class);
         $insuranceEndpoint->expects($this->once())->method('getSubscription')->willReturn(
             ['subscriptions' => []]
@@ -208,9 +205,7 @@ class InsuranceUpdateTest extends TestCase
         $this->dbSubscriptionMock->expects($this->never())->method('setCancellationDate');
         $instance = $this->createInstance();
         $this->assertNull($instance->update());
-
     }
-
 
     private function getSubscriptionResultData(string $state = 'started '): array
     {

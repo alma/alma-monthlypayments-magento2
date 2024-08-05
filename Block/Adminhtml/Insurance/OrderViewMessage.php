@@ -7,8 +7,6 @@ use Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Model\Url;
-use Magento\Directory\Helper\Data as DirectoryHelper;
-use Magento\Framework\Json\Helper\Data as JsonHelper;
 
 class OrderViewMessage extends Template
 {

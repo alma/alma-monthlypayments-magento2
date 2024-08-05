@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Alma\MonthlyPayments\Model\Api\Data;
-
 
 use Alma\API\Endpoints\Results\Eligibility;
 use Alma\MonthlyPayments\Api\Data\EligiblePlansResultInterface;

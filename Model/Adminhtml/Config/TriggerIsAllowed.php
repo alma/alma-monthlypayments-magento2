@@ -18,8 +18,7 @@ class TriggerIsAllowed extends Yesno
 
     public function __construct(
         PaymentPlansHelper $paymentPlansHelper
-    )
-    {
+    ) {
         $this->paymentPlansHelper = $paymentPlansHelper;
     }
 
@@ -38,7 +37,7 @@ class TriggerIsAllowed extends Yesno
     {
         $isAllowedValue = 0;
         $isAllowedLabel = self::NOT_ALLOWED_LABEL;
-        if($this->paymentPlansHelper->paymentTriggerIsAllowed()){
+        if ($this->paymentPlansHelper->paymentTriggerIsAllowed()) {
             $isAllowedValue = 1;
             $isAllowedLabel = self::ALLOWED_LABEL;
         }

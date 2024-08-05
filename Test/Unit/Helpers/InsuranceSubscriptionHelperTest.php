@@ -11,8 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class InsuranceSubscriptionHelperTest extends TestCase
 {
-
-
     private $subscriptionMock;
     private $collectionMock;
     private $collectionFactory;
@@ -29,7 +27,6 @@ class InsuranceSubscriptionHelperTest extends TestCase
         $this->collectionFactory->method('create')->willReturn($this->collectionMock);
         $this->context = $this->createMock(Context::class);
         $this->subscriptionHelper = new \Alma\MonthlyPayments\Helpers\InsuranceSubscriptionHelper($this->collectionFactory, $this->context);
-
     }
 
     // Givent a unknown subscription id when getDbSubscription then throw exception
@@ -46,7 +43,6 @@ class InsuranceSubscriptionHelperTest extends TestCase
         $this->subscriptionMock->method('getId')->willReturn(1);
         $this->assertEquals($this->subscriptionMock, $this->subscriptionHelper->getDbSubscription(1));
     }
-
 
     /**
      * @dataProvider keyAndExpectedStatusName
@@ -69,5 +65,4 @@ class InsuranceSubscriptionHelperTest extends TestCase
             'failed' => ['failed', 'Failed'],
         ];
     }
-
 }

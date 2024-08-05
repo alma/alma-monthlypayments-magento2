@@ -9,7 +9,6 @@ use Alma\API\RequestError;
 use Alma\API\Response;
 use Alma\MonthlyPayments\Gateway\Http\Client\RefundClient;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
-use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\Transfer;
@@ -121,8 +120,6 @@ class RefundClientTest extends TestCase
             $refundClient->placeRequest($this->getMockTransferObject($this->mockAmount, '2500', '500'))
         );
     }
-
-
 
     private function getMockTransferObject($amount, $orderTotal, $totalRefund): Transfer
     {

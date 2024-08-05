@@ -89,10 +89,8 @@ class OrderStatusObserverTest extends TestCase
 
         $this->event->method('getData')->willReturn($order);
 
-
         $this->paymentsEndpoint->expects($this->never())->method('fetch');
         $this->createOrderStatusObserverObject()->execute($this->observer);
-
     }
 
     public function testGivenAnAlmaPaymentWithoutOrdersShouldNotCallSendStatus(): void

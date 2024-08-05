@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Model\Adminhtml\Source;
 
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Model\Adminhtml\Source\APIModes;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +17,6 @@ class APIModesTest extends TestCase
      * @var ApiConfigHelper
      */
     private $apiConfig;
-
 
     public function setUp(): void
     {
@@ -63,5 +61,4 @@ class APIModesTest extends TestCase
         $resultArray[] = ['value' => 'live', 'label' => __('Live')];
         return $resultArray;
     }
-
 }

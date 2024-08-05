@@ -34,7 +34,6 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
-use Magento\Store\Model\StoreManagerInterface;
 
 class ApiUrlValue extends Value implements ProcessorInterface
 {

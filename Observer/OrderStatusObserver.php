@@ -93,7 +93,6 @@ class OrderStatusObserver implements ObserverInterface
         }
     }
 
-
     /**
      * @param Payment $almaPayment
      * @param string $incrementId
@@ -112,5 +111,4 @@ class OrderStatusObserver implements ObserverInterface
         }
         throw new OrderStatusException(sprintf('No Order with merchant reference %s in Alma payment %s', $incrementId, $almaPayment->id), $this->logger);
     }
-
 }

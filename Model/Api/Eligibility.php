@@ -47,7 +47,6 @@ class Eligibility implements EligibilityInterface
      */
     public function __construct(EligibilityHelper $eligibilityHelper, EligiblePlansResultInterfaceFactory $eligiblePlansResultFactory)
     {
-
         $this->eligibilityHelper = $eligibilityHelper;
         $this->eligiblePlansResultFactory = $eligiblePlansResultFactory;
     }

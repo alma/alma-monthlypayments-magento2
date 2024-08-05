@@ -77,11 +77,9 @@ class AvailabilityTest extends TestCase
      */
     public function testGivenCmsInsuranceFlagInMeReturnFlagValue($meData, $result):void
     {
-
         $this->merchantsEndpoint->method('me')->willReturn($meData);
         $this->assertEquals($result, $this->createAvailability()->isMerchantInsuranceAvailable());
     }
-
 
     public function extendedDataMe($cmsInsurance = true)
     {
@@ -106,5 +104,4 @@ class AvailabilityTest extends TestCase
             ]
         ];
     }
-
 }
