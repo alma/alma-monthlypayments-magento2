@@ -25,12 +25,10 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Alma\API\Entities\Instalment;
 use Alma\API\Entities\Payment as AlmaPayment;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
-use InvalidArgumentException;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
@@ -144,7 +142,6 @@ class PaymentValidation
         }
         return $order;
     }
-
 
     /**
      * @param string $paymentId

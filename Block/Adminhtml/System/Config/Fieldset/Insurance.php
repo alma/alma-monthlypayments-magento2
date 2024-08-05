@@ -57,7 +57,6 @@ class Insurance extends Fieldset
         $this->insuranceHelper = $insuranceHelper;
     }
 
-
     /**
      * Return header title part of html for payment solution
      *

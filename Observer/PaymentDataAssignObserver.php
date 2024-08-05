@@ -24,10 +24,10 @@
 
 namespace Alma\MonthlyPayments\Observer;
 
+use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\Event\Observer;
 use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Quote\Api\Data\PaymentInterface;
-use Alma\MonthlyPayments\Helpers\Logger;
 
 class PaymentDataAssignObserver extends AbstractDataAssignObserver
 {
@@ -49,7 +49,6 @@ class PaymentDataAssignObserver extends AbstractDataAssignObserver
     ) {
         $this->logger = $logger;
     }
-
 
     /**
      * @param Observer $observer

@@ -41,8 +41,7 @@ class ShipmentTrackObserver implements ObserverInterface
         OrderRepository $orderRepository,
         AlmaClient      $almaClient,
         Logger          $logger
-    )
-    {
+    ) {
         $this->orderRepository = $orderRepository;
         $this->logger = $logger;
         $this->almaClient = $almaClient;
@@ -77,16 +76,16 @@ class ShipmentTrackObserver implements ObserverInterface
             }
 
             if (!isset($orderExternalId)) {
-                $almaOrder = $almaClient->payments->addOrder($almaPaymentId, [
+                $almaOrder = $almaClient->payments->addOrder(
+                    $almaPaymentId,
+                    [
                         'merchant_reference' => $order->getIncrementId()
                     ]
                 );
                 $orderExternalId = $almaOrder->getExternalId();
             }
             $almaClient->orders->addTracking($orderExternalId, $track->getCarrierCode(), $track->getTrackNumber());
-
         } catch (AlmaException $e) {
-
             $this->logger->error('Shipment Track observer Alma client error', [$e]);
             return;
         }

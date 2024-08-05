@@ -31,7 +31,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      */
     private $paymentPlansHelper;
 
-
     /**
      * @param PaymentPlansHelper $paymentPlansHelper
      * @param Context $context
@@ -123,7 +122,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
         }
         $row->setData('option_extra_attrs', $options);
     }
-
 
     /**
      * @return BlockInterface

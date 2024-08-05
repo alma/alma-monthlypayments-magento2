@@ -46,9 +46,7 @@ class ProductTypes implements \Magento\Framework\Option\ArrayInterface
      */
     public function __construct(
         ProductTypeList $productTypeList
-    )
-    {
-
+    ) {
         $this->productTypeList = $productTypeList;
     }
 

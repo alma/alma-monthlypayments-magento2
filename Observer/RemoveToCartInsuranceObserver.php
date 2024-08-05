@@ -22,8 +22,7 @@ class RemoveToCartInsuranceObserver implements ObserverInterface
     public function __construct(
         Logger          $logger,
         InsuranceHelper $insuranceHelper
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
     }

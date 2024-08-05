@@ -99,7 +99,6 @@ class Pay extends Action
         OrderHelper $orderHelper,
         JsonFactory $jsonFactory,
         AlmaClient $almaClient
-
     ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
@@ -127,25 +126,21 @@ class Pay extends Action
 
         $payment = $order->getPayment();
         if (!$payment) {
-
             return $this->errorProcess($order, 'Error: getting payment information from session');
         }
 
         $paymentID = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_ID];
         if (empty($paymentID)) {
-
             return $this->errorProcess($order, 'Error: no payment id found in session');
         }
 
         $url = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_URL];
         if (empty($url)) {
-
             return $this->errorProcess($order, 'Error: no payment URL found in session', $paymentID);
         }
 
         $paymentPlanKey = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_PLAN_KEY];
         if (empty($paymentPlanKey)) {
-
             return $this->errorProcess($order, 'Error: no payment payment plan key found in session', $paymentID);
         }
 
@@ -153,11 +148,9 @@ class Pay extends Action
             try {
                 $postPaymentPlanKey = $this->getRequestPaymentPlanKey();
             } catch (InPagePayException $e) {
-
                 return $this->errorProcess($order, $e->getMessage(), $paymentID);
             }
             if ($paymentPlanKey != $postPaymentPlanKey) {
-
                 return $this->errorProcess($order, 'Error: posted payment plan key and order payment plan key are not the same', $paymentID);
             }
         }
@@ -173,7 +166,6 @@ class Pay extends Action
         $redirect->setUrl($url);
 
         return $redirect;
-
     }
 
     /**
@@ -191,7 +183,6 @@ class Pay extends Action
             || !isset($requestContent['planKey'])
             || !preg_match('!general:([\d]+):([\d]+):([\d]+)!', $requestContent['planKey'])
         ) {
-
             throw new InPagePayException('Request data are not valid', $this->logger);
         }
 

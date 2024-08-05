@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
@@ -42,9 +41,7 @@ class InsuranceProductHelper extends AbstractHelper
         File              $fileProcessor,
         Filesystem        $filesystem,
         ProductRepository $productRepository
-
     ) {
-
         parent::__construct($context);
         $this->productFactory = $productFactory;
         $this->fileProcessor = $fileProcessor;

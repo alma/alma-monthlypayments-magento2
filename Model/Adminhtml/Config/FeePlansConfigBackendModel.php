@@ -28,7 +28,6 @@ class FeePlansConfigBackendModel extends Value
      */
     private $configHelper;
 
-
     public function __construct(
         Context $context,
         Registry $registry,
@@ -60,7 +59,6 @@ class FeePlansConfigBackendModel extends Value
      */
     public function beforeSave(): void
     {
-
         $value = $this->getValue();
         if (isset($value['__empty'])) {
             unset($value['__empty']);

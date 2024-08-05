@@ -107,8 +107,6 @@ class InsuranceTest extends TestCase
         $productMock = $this->createMock(\Magento\Catalog\Model\Product::class);
         $productMock->method('getSku')->willReturn('mysku');
 
-
-
         $priceInterface = $this->createMock(PriceInterface::class);
         $priceInterface->method('getValue')->willReturn(100.10);
 

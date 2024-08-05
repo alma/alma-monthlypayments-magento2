@@ -198,5 +198,4 @@ class CancelSubscriptionTest extends TestCase
 
         $this->newCancelSubscription()->execute();
     }
-
 }

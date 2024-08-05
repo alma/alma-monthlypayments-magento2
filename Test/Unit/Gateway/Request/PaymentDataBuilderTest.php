@@ -215,7 +215,7 @@ class PaymentDataBuilderTest extends TestCase
      * @param string $inpage
      * @return array
      */
-    private function paymentFactory(string $installmentCount,  string $inpage = self::ORIGIN_ONLINE): array
+    private function paymentFactory(string $installmentCount, string $inpage = self::ORIGIN_ONLINE): array
     {
         $cartData = [
             'installments_count' => $installmentCount,
@@ -235,11 +235,11 @@ class PaymentDataBuilderTest extends TestCase
             ]
         ];
 
-		$cartData['cart'] = [
-			'items' => [
-				'item1'
-			]
-		];
+        $cartData['cart'] = [
+            'items' => [
+                'item1'
+            ]
+        ];
 
         return $cartData;
     }

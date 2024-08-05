@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Request\RefundDataBuilder;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Request\BuilderInterface;

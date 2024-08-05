@@ -36,7 +36,8 @@ class CartDataBuilderTest extends TestCase
                     'items' => []
                 ]
             ],
-            $this->createCartDataBuilderTest()->build(["payment" => $this->createPaymentDataObject()]));
+            $this->createCartDataBuilderTest()->build(["payment" => $this->createPaymentDataObject()])
+        );
     }
     private function createPaymentDataObject():PaymentDataObjectInterface
     {

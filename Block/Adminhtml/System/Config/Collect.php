@@ -7,7 +7,6 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Exception\LocalizedException;
 
-
 class Collect extends Field
 {
     /**
@@ -22,8 +21,7 @@ class Collect extends Field
     public function __construct(
         Context $context,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
     }
 
@@ -79,7 +77,4 @@ class Collect extends Field
     {
         return $this->getUrl('alma_monthly/system_config/collect');
     }
-
-
-
 }

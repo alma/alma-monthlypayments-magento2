@@ -223,7 +223,7 @@ class Subscription extends AbstractModel implements IdentityInterface
     {
         $this->setData(self::LINKED_PRODUCT_NAME_KEY, $linkedProductName);
     }
-        /**
+    /**
      * @return string
      */
     public function getLinkedProductPrice(): int

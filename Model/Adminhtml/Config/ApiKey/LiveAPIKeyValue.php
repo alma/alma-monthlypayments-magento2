@@ -32,7 +32,6 @@ class LiveAPIKeyValue extends APIKeyValue
     protected $apiKeyType = 'live';
     protected $merchantIdPath = 'live_merchant_id';
 
-
     /**
      * @return Phrase
      */

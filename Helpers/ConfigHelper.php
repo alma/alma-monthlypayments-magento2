@@ -243,7 +243,6 @@ class ConfigHelper extends AbstractHelper
         $this->saveConfig(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE, null, $scope, $storeId);
     }
 
-
     /**
      * @return FeePlan[]
      */

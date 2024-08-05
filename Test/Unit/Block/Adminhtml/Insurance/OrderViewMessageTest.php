@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class OrderViewMessageTest extends TestCase
 {
-
     private $logger;
     private $insuranceSubscriptionHelper;
     private $context;
@@ -55,7 +54,6 @@ class OrderViewMessageTest extends TestCase
         );
     }
 
-
     /**
      * Given request no subscription is found
      * @return void
@@ -66,7 +64,6 @@ class OrderViewMessageTest extends TestCase
         $orderViewMessage = $this->createOrderViewMessage();
         $this->assertFalse($orderViewMessage->hasActiveInsurance());
     }
-
 
     /**
      * Given request subscription are found with "subscription_state" inactive
@@ -151,5 +148,4 @@ class OrderViewMessageTest extends TestCase
         $this->url->expects($this->once())->method('getUrl')->with('alma_monthly/insurance/subscriptiondetails', ['order_id' => '42'])->willReturn('https://mywebsite/alma_monthly/insurance/subscriptiondetails/order_id/42');
         $this->createOrderViewMessage()->getOrderDetailsLink();
     }
-
 }

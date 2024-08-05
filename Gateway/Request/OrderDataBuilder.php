@@ -52,7 +52,6 @@ class OrderDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
-
         $paymentDO = SubjectReader::readPayment($buildSubject);
         /** @var OrderAdapter $order */
         $order = $paymentDO->getOrder();

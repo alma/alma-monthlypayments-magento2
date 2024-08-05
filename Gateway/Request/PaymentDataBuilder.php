@@ -28,7 +28,6 @@ namespace Alma\MonthlyPayments\Gateway\Request;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Eligibility;
 use Alma\MonthlyPayments\Helpers\Functions;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Model\Data\Address;
@@ -127,9 +126,9 @@ class PaymentDataBuilder implements BuilderInterface
                 'quote_id' => $quoteId,
             ],
         ];
-		
-		$cartData = $this->cartDataBuilder->build($buildSubject);
-		$configArray = array_merge($cartData, $configArray);
+
+        $cartData = $this->cartDataBuilder->build($buildSubject);
+        $configArray = array_merge($cartData, $configArray);
 
         $configArray = $this->trigger($configArray, $planConfig);
         return ['payment' => array_merge($planConfig->getPaymentData(), $configArray)];

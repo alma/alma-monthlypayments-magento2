@@ -13,7 +13,6 @@ use Magento\ConfigurableProduct\Model\Product\Configuration\Item\ItemProductReso
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Quote\Model\Quote\Item;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AddToCartInsuranceObserverTest extends TestCase

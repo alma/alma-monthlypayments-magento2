@@ -97,9 +97,7 @@ class ApiKeyValueTest extends TestCase
 
         $this->assertNull($ApiKeyObject->beforeSave());
         $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
-
     }
-
 
     public function testStarsValueReturnEmptyAndDisallowSave(): void
     {
@@ -111,7 +109,6 @@ class ApiKeyValueTest extends TestCase
         $this->assertNull($ApiKeyObject->beforeSave());
         $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
         $ApiKeyObject->shouldNotHaveReceived('saveAndEncryptValue');
-
     }
 
     public function testEmptyValueSave(): void
@@ -134,7 +131,6 @@ class ApiKeyValueTest extends TestCase
         $ApiKeyObject->shouldNotHaveReceived('disallowDataSave');
         $ApiKeyObject->shouldHaveReceived('saveAndEncryptValue')->once();
     }
-
 
     private function createTestApiKeyObject(): TestAPIKeyValue
     {
@@ -179,5 +175,4 @@ class ApiKeyValueTest extends TestCase
             $this->apiConfigHelper
         ];
     }
-
 }

@@ -5,7 +5,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 use Alma\API\Entities\Payment as AlmaPayment;
 use Alma\API\Entities\Refund;
 use Alma\MonthlyPayments\Gateway\Response\RefundHandler;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
@@ -15,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class RefundHandlerTest extends TestCase
 {
-
     const FIXED_TIMESTAMP = '1654472730';
 
     public function testRefundHandlerIsInstanceOffHandlerInterface(): void

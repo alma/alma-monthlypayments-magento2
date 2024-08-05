@@ -10,12 +10,9 @@ use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceFlagException;
 use Alma\MonthlyPayments\Observer\Admin\LoadConfigObserver;
 use Magento\Backend\Model\UrlInterface;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Response\HttpInterface;
-use Magento\Framework\App\ResponseFactory;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use PHPUnit\Framework\TestCase;
@@ -85,7 +82,6 @@ class LoadConfigObserverTest extends TestCase
         );
     }
 
-
     public function testNeverCallSaveBaseApiPlansConfigForNonPaymentUrl(): void
     {
         $this->urlInterface->expects($this->once())
@@ -123,7 +119,6 @@ class LoadConfigObserverTest extends TestCase
             ->method('isMerchantInsuranceAvailable');
         $this->createLoadConfigObserver()->execute($this->observer);
     }
-
 
     public function testGivenApiMeThrowExceptionMustReturnThisWithoutCallSaveButCallingFeePlans(): void
     {

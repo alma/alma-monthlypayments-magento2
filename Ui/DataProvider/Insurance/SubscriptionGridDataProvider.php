@@ -6,5 +6,4 @@ use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 
 class SubscriptionGridDataProvider extends DataProvider
 {
-
 }

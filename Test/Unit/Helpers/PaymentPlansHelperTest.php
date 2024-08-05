@@ -30,7 +30,6 @@ class PaymentPlansHelperTest extends TestCase
      */
     private $configHelper;
 
-
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
@@ -216,7 +215,6 @@ class PaymentPlansHelperTest extends TestCase
         ];
     }
 
-
     public function formatFeePlanDataProviderForDisplay(): array
     {
         $dataToDisplayDefaultValue = FeePlanConfigFactoryMock::getDefaultDataPlan();
@@ -309,5 +307,4 @@ class PaymentPlansHelperTest extends TestCase
             ]
         ];
     }
-
 }

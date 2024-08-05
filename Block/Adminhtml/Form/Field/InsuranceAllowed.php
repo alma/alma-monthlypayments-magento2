@@ -9,7 +9,6 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class InsuranceAllowed extends Field
 {
 
-
     /**
      * @param Context $context
      * @param array $data

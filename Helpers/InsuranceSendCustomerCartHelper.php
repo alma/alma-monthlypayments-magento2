@@ -18,8 +18,7 @@ class InsuranceSendCustomerCartHelper extends AbstractHelper
         Context    $context,
         AlmaClient $almaClient,
         Logger     $logger
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->almaClient = $almaClient;
         $this->logger = $logger;

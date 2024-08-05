@@ -82,21 +82,18 @@ class OrderHelperTest extends TestCase
 
         $this->collectionFactory->expects($this->once())
             ->method('create')
-            ->willReturn($mockCollection)
-        ;
+            ->willReturn($mockCollection);
         $mockCollection->expects($this->once())
             ->method('addAttributeToSelect')
             ->with('*')
-            ->willReturnSelf()
-        ;
+            ->willReturnSelf();
         $mockCollection->expects($this->exactly(2))
             ->method('addFieldToFilter')
             ->withConsecutive(
                 ['created_at', ['from' => [''], 'to' => ['']]],
                 ['state', ['in' => ['processing', 'complete']]]
             )
-            ->willReturnSelf()
-        ;
+            ->willReturnSelf();
         $this->createNewOrderHelper()->createOrderCollection();
     }
 
@@ -226,7 +223,6 @@ class OrderHelperTest extends TestCase
         ];
     }
 
-
     private function getMockOrderCollection()
     {
         $objectManagerHelper = new ObjectManagerHelper($this);
@@ -262,5 +258,4 @@ class OrderHelperTest extends TestCase
             ->willReturn($currencyCode);
         return $order;
     }
-
 }

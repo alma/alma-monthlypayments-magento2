@@ -26,7 +26,6 @@ use PHPUnit\Framework\TestCase;
 
 class ShipmentTrackObserverTest extends TestCase
 {
-
     private const TRACK_ORDER_INCREMENT_ID = '000000003';
     /**
      * @var Logger
@@ -65,7 +64,6 @@ class ShipmentTrackObserverTest extends TestCase
      */
     private $trackOrder;
 
-
     protected function setUp(): void
     {
         $this->orderPayment = $this->createMock(OrderPaymentInterface::class);
@@ -93,7 +91,6 @@ class ShipmentTrackObserverTest extends TestCase
         $this->orders = null;
         $this->payment = null;
         $this->trackOrder = null;
-
     }
 
     /**
@@ -103,9 +100,7 @@ class ShipmentTrackObserverTest extends TestCase
     {
         $this->orderRepository->method('get')->willThrowException($exception);
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
-
 
     public function testDirectReturnForOrderWithoutPayment(): void
     {
@@ -114,20 +109,16 @@ class ShipmentTrackObserverTest extends TestCase
         $this->givenOrderRepositoryReturnTheOrder();
 
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
 
     public function testDirectReturnForOrderWithNonAlmaOrder(): void
     {
-
         $this->givenNonAnAlmaPayment();
         $this->givenAnOrderWithPayment();
         $this->givenOrderRepositoryReturnTheOrder();
 
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
-
 
     public function testNoPaymentIdInAdditionalInformationDirectReturn(): void
     {
@@ -163,9 +154,7 @@ class ShipmentTrackObserverTest extends TestCase
         $this->expectAddOrderIsNeverCalled();
         $this->expectAddTrackingIsNeverCalled();
 
-
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
 
     public function testAlmaApiAddOrderThrowExceptionDirectReturn(): void
@@ -179,9 +168,7 @@ class ShipmentTrackObserverTest extends TestCase
         $this->expectAddOrderThrowExceptionAndCalledWith('payment_123456');
         $this->expectAddTrackingIsNeverCalled();
 
-
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
 
     public function testCreateOrderAndCallAddTrackingForAlmaPaymentWithoutOrder(): void
@@ -194,7 +181,6 @@ class ShipmentTrackObserverTest extends TestCase
         $this->expectAlmaPaymentFetchReturnAlmaPaymentWithoutOrderAndCalledWith('payment_123456');
         $this->expectAddOrderReturnAlmaOrderAndCalledWith('payment_123456');
         $this->expectAddTrackingIsCalledWith('order_654987');
-
 
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
     }
@@ -223,7 +209,6 @@ class ShipmentTrackObserverTest extends TestCase
 
         $this->expectAddTrackingIsCalledWith('order_987654321');
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
 
     public function testWithMultiplesOrderWithoutMerchantReferenceCreateOrderAndAddTracking(): void
@@ -238,7 +223,6 @@ class ShipmentTrackObserverTest extends TestCase
 
         $this->expectAddTrackingIsCalledWith('order_654987');
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
-
     }
 
     private function expectAddOrderReturnAlmaOrderAndCalledWith($paymentId): void
@@ -263,7 +247,6 @@ class ShipmentTrackObserverTest extends TestCase
     {
         $this->payment->expects($this->once())->method('fetch')->with($paymentId)->willThrowException(new AlmaException('Impossible to fetch payment'));
     }
-
 
     private function expectAlmaPaymentFetchReturnAlmaPaymentWithoutOrderAndCalledWith($paymentId): void
     {
@@ -391,6 +374,4 @@ class ShipmentTrackObserverTest extends TestCase
             ],
         ];
     }
-
-
 }

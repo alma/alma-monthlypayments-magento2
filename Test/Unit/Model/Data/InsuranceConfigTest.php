@@ -27,7 +27,6 @@ class InsuranceConfigTest extends TestCase
 
     protected function jsonDataProvider(): array
     {
-
         return [
             'json with mixed data' => [
                 'isAllowed' => true,

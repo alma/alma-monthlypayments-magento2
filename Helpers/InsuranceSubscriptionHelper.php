@@ -7,7 +7,6 @@ use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFa
 use Alma\MonthlyPayments\Model\Insurance\Subscription;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Validator\Exception;
 
 class InsuranceSubscriptionHelper extends AbstractHelper
 {

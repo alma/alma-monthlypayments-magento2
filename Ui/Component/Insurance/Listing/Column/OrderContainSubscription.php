@@ -9,7 +9,6 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class OrderContainSubscription extends Column
 {
-
     private $collection;
 
     /**
@@ -36,13 +35,11 @@ class OrderContainSubscription extends Column
      */
     public function prepareDataSource(array $dataSource): array
     {
-
         $ordersIds = $this->extractOrdersIds($dataSource);
         $subscriptionOrderId = $this->getSubscriptionOrderId($ordersIds);
 
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-
                 if (in_array($item['entity_id'], $subscriptionOrderId)) {
                     $item[$this->getData('name')] = __('Yes');
                 } else {

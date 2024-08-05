@@ -54,5 +54,4 @@ class PayloadBuilderTest extends TestCase
         ];
         $this->assertEquals($expectedResult, $this->payloadBuilder->getPayload());
     }
-
 }

@@ -17,9 +17,8 @@ use Magento\Framework\Event\Observer;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Invoice;
-use PHPUnit\Framework\TestCase;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
-
+use PHPUnit\Framework\TestCase;
 
 class SalesOrderInvoicePayObserverTest extends TestCase
 {
@@ -48,7 +47,6 @@ class SalesOrderInvoicePayObserverTest extends TestCase
      */
     private $insuranceSendCustomerCartHelper;
 
-
     protected function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
@@ -57,7 +55,6 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->subscriptionResourceModel = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription::class);
         $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
         $this->insuranceSendCustomerCartHelper = $this->createMock(InsuranceSendCustomerCartHelper::class);
-
     }
 
     public function testObserverMustCallGetSubscriberAndSubscriptionDataAndNullSubscriptionNotCallAlmaClient(): void

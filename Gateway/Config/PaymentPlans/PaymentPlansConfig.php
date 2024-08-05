@@ -28,8 +28,8 @@ use Alma\API\Entities\FeePlan;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
-use Magento\Framework\Serialize\Serializer\Json;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Serialize\Serializer\Json;
 
 class PaymentPlansConfig implements PaymentPlansConfigInterface
 {
@@ -50,7 +50,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     /**
      * @var Logger
      */
-    private  $logger;
+    private $logger;
 
     /**
      * PaymentPlansConfig constructor.
@@ -96,7 +96,6 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
             $this->updatePlanDefaults($key, PaymentPlanConfig::defaultConfigForFeePlan($plan));
         }
     }
-
 
     /**
      * @return FeePlan[]

@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\CustomerData;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\App\ObjectManager;
 
 class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
@@ -19,7 +18,6 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
         $result['isInsuranceProduct'] = $this->isInsuranceProduct();
         $result['isProductWithInsurance'] = $this->isProductWithInsurance();
         if ($this->hasInsurance()) {
-
             $insuranceData = json_decode($this->item->getAlmaInsurance(), true);
             $result['insuranceName'] = $insuranceData['name'];
             $result['insuranceFiles'] = $insuranceData['files'];

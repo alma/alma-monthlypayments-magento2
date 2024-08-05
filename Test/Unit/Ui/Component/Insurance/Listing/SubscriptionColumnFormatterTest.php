@@ -21,7 +21,6 @@ class SubscriptionColumnFormatterTest extends TestCase
     private $orderRepository;
     private $priceCurrency;
 
-
     protected function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
@@ -106,5 +105,4 @@ class SubscriptionColumnFormatterTest extends TestCase
         ];
         $this->assertEquals($expected, $subscriptionColumnFormatter->prepareDataSource($dataSource));
     }
-
 }
