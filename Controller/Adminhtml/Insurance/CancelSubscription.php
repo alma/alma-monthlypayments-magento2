@@ -17,15 +17,34 @@ use Magento\Framework\Controller\Result\JsonFactory;
 
 class CancelSubscription extends Action
 {
-    const NO_SUBSCRIPTION_ID_MESSAGE = 'No subscription Id in post data';
-    const CANCEL_ERROR_MESSAGE = 'Impossible to cancel subscription';
-    const CANCEL_SUCCESS_MESSAGE = 'Subscription cancelled';
-    const CANCEL_PENDING_MESSAGE = 'Out of delay to cancel subscription';
+    public const NO_SUBSCRIPTION_ID_MESSAGE = 'No subscription Id in post data';
+    public const CANCEL_ERROR_MESSAGE = 'Impossible to cancel subscription';
+    public const CANCEL_SUCCESS_MESSAGE = 'Subscription cancelled';
+    public const CANCEL_PENDING_MESSAGE = 'Out of delay to cancel subscription';
 
+    /**
+     * @var JsonFactory
+     */
     private $resultJsonFactory;
+
+    /**
+     * @var Logger
+     */
     private $logger;
+
+    /**
+     * @var AlmaClient
+     */
     private $almaClient;
+
+    /**
+     * @var SubscriptionResourceModel
+     */
     private $subscriptionResourceModel;
+
+    /**
+     * @var InsuranceSubscriptionHelper
+     */
     private $insuranceSubscriptionHelper;
 
     /**
@@ -54,6 +73,11 @@ class CancelSubscription extends Action
         $this->insuranceSubscriptionHelper = $insuranceSubscriptionHelper;
     }
 
+    /**
+     * Cancel Alma insurance subscription
+     *
+     * @return Json
+     */
     public function execute(): Json
     {
         $result = $this->resultJsonFactory->create();
@@ -61,7 +85,10 @@ class CancelSubscription extends Action
 
         $post = $this->getRequest()->getPostValue();
         if (empty($post) || !is_array($post) || !array_key_exists('subscriptionId', $post)) {
-            $response = ['state' => Subscription::STATE_FAILED, 'message' => self::NO_SUBSCRIPTION_ID_MESSAGE];
+            $response = [
+                'state' => Subscription::STATE_FAILED,
+                'message' => self::NO_SUBSCRIPTION_ID_MESSAGE
+            ];
             return $result->setData($response);
         }
 
@@ -69,7 +96,10 @@ class CancelSubscription extends Action
             $dbSubscription = $this->insuranceSubscriptionHelper->getDbSubscription($post['subscriptionId']);
         } catch (AlmaInsuranceSubscriptionException $e) {
             $this->logger->error('Impossible to load subscription data', [$e->getMessage()]);
-            $response = ['state' => Subscription::STATE_FAILED, 'message' => 'Impossible to load subscription data'];
+            $response = [
+                'state' => Subscription::STATE_FAILED,
+                'message' => 'Impossible to load subscription data'
+            ];
             return $result->setData($response);
         }
 
@@ -78,7 +108,10 @@ class CancelSubscription extends Action
             $this->almaClient->getDefaultClient()->insurance->cancelSubscription($post['subscriptionId']);
             $dbSubscription->setCancellationDate(new \DateTime());
         } catch (InsuranceCancelPendingException $e) {
-            $response = ['state' => Subscription::STATE_PENDING_CANCELLATION, 'message' => self::CANCEL_PENDING_MESSAGE];
+            $response = [
+                'state' => Subscription::STATE_PENDING_CANCELLATION,
+                'message' => self::CANCEL_PENDING_MESSAGE
+            ];
         } catch (AlmaException $e) {
             $this->logger->error('Error cancelling subscription', [$e->getMessage()]);
             $response = ['state' => Subscription::STATE_FAILED, 'message' => self::CANCEL_ERROR_MESSAGE];

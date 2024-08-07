@@ -30,6 +30,9 @@ class CancelInPagePayment implements ActionInterface
      * @var OrderHelper
      */
     private $orderHelper;
+    /**
+     * @var AlmaClient
+     */
     private $almaClient;
 
     /**
@@ -37,13 +40,14 @@ class CancelInPagePayment implements ActionInterface
      * @param JsonFactory $jsonFactory
      * @param Session $session
      * @param OrderHelper $orderHelper
+     * @param AlmaClient $almaClient
      */
     public function __construct(
-        Logger $logger,
+        Logger      $logger,
         JsonFactory $jsonFactory,
-        Session $session,
+        Session     $session,
         OrderHelper $orderHelper,
-        AlmaClient $almaClient
+        AlmaClient  $almaClient
     ) {
         $this->logger = $logger;
         $this->jsonFactory = $jsonFactory;
@@ -53,6 +57,8 @@ class CancelInPagePayment implements ActionInterface
     }
 
     /**
+     * Cancel an in page payment
+     *
      * @return Json
      */
     public function execute(): Json
@@ -87,6 +93,8 @@ class CancelInPagePayment implements ActionInterface
     }
 
     /**
+     * Create an error response with a message and status 400
+     *
      * @param Json $response
      * @param string $message
      * @return Json

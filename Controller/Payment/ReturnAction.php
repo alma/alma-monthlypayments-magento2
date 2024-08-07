@@ -43,7 +43,7 @@ class ReturnAction extends Action
      * @param PaymentValidation $paymentValidationHelper
      */
     public function __construct(
-        Context $context,
+        Context           $context,
         PaymentValidation $paymentValidationHelper
     ) {
         parent::__construct($context);
@@ -51,6 +51,8 @@ class ReturnAction extends Action
     }
 
     /**
+     * Validate payment and return to success page
+     *
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
      */
     public function execute()
@@ -67,9 +69,17 @@ class ReturnAction extends Action
         return $this->_redirect($redirectTo);
     }
 
-    private function addError($message)
+    /**
+     * Add error message in message manager
+     *
+     * @param string $message
+     * @return void
+     */
+    private function addError(string $message)
     {
-        if (method_exists($this->messageManager, 'addErrorMessage') && is_callable([$this->messageManager, 'addErrorMessage'])) {
+        if (method_exists($this->messageManager, 'addErrorMessage') &&
+            is_callable([$this->messageManager, 'addErrorMessage'])
+        ) {
             $this->messageManager->addErrorMessage($message);
         } else {
             $this->messageManager->addError($message);

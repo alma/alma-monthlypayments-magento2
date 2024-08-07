@@ -88,17 +88,18 @@ class Pay extends Action
      * @param PaymentPlansHelper $paymentPlansHelper
      * @param OrderHelper $orderHelper
      * @param JsonFactory $jsonFactory
+     * @param AlmaClient $almaClient
      */
     public function __construct(
-        Logger $logger,
-        Http $request,
-        Context $context,
-        CheckoutSession $checkoutSession,
-        QuoteHelper $quoteHelper,
+        Logger             $logger,
+        Http               $request,
+        Context            $context,
+        CheckoutSession    $checkoutSession,
+        QuoteHelper        $quoteHelper,
         PaymentPlansHelper $paymentPlansHelper,
-        OrderHelper $orderHelper,
-        JsonFactory $jsonFactory,
-        AlmaClient $almaClient
+        OrderHelper        $orderHelper,
+        JsonFactory        $jsonFactory,
+        AlmaClient         $almaClient
     ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
@@ -112,6 +113,8 @@ class Pay extends Action
     }
 
     /**
+     * Redirect to Alma payment page with last real order
+     *
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
      * @throws LocalizedException
      */
@@ -151,7 +154,11 @@ class Pay extends Action
                 return $this->errorProcess($order, $e->getMessage(), $paymentID);
             }
             if ($paymentPlanKey != $postPaymentPlanKey) {
-                return $this->errorProcess($order, 'Error: posted payment plan key and order payment plan key are not the same', $paymentID);
+                return $this->errorProcess(
+                    $order,
+                    'Error: posted payment plan key and order payment plan key are not the same',
+                    $paymentID
+                );
             }
         }
 
@@ -178,8 +185,7 @@ class Pay extends Action
     {
         $requestContent = json_decode($this->request->getContent(), true);
 
-        if (
-            !isset($requestContent)
+        if (!isset($requestContent)
             || !isset($requestContent['planKey'])
             || !preg_match('!general:([\d]+):([\d]+):([\d]+)!', $requestContent['planKey'])
         ) {

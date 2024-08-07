@@ -6,5 +6,5 @@ use Alma\MonthlyPayments\Helpers\CancelOrderAction;
 
 class Cancel extends CancelOrderAction
 {
-    const CANCEL_MESSAGE = "Order canceled by customer";
+    public const CANCEL_MESSAGE = "Order canceled by customer";
 }

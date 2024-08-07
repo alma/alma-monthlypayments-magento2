@@ -6,5 +6,5 @@ use Alma\MonthlyPayments\Helpers\CancelOrderAction;
 
 class Failure extends CancelOrderAction
 {
-    const CANCEL_MESSAGE = 'Rejected payment';
+    public const CANCEL_MESSAGE = 'Rejected payment';
 }

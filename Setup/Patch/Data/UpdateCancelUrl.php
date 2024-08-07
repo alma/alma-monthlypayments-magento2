@@ -16,7 +16,7 @@ use Magento\Payment\Gateway\Config\Config as ConfigGateway;
  */
 class UpdateCancelUrl implements DataPatchInterface
 {
-    const PATH_EQUAL = 'path = ?';
+    private const PATH_EQUAL = 'path = ?';
 
     /**
      * @var Logger
@@ -31,6 +31,11 @@ class UpdateCancelUrl implements DataPatchInterface
      */
     private $resourceConnection;
 
+    /**
+     * @param Logger $logger
+     * @param CustomerCancelUrl $customerCancelUrl
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(
         Logger $logger,
         CustomerCancelUrl $customerCancelUrl,
@@ -42,7 +47,7 @@ class UpdateCancelUrl implements DataPatchInterface
     }
 
     /**
-     * @return array|string[]
+     * @inheritdoc
      */
     public function getAliases(): array
     {
@@ -50,8 +55,7 @@ class UpdateCancelUrl implements DataPatchInterface
     }
 
     /**
-     * @return void
-     * @throws NoSuchEntityException
+     * @inheritdoc
      */
     public function apply(): void
     {
@@ -69,7 +73,7 @@ class UpdateCancelUrl implements DataPatchInterface
     }
 
     /**
-     * @return array|string[]
+     * @inheritdoc
      */
     public static function getDependencies(): array
     {

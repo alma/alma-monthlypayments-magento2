@@ -20,7 +20,7 @@ use Magento\Payment\Gateway\Config\Config as ConfigGateway;
  */
 class UpdateMerchantIdPath implements DataPatchInterface
 {
-    const PATH_EQUAL = 'path = ?';
+    private const  PATH_EQUAL = 'path = ?';
     /**
      * @var Logger
      */
@@ -42,12 +42,19 @@ class UpdateMerchantIdPath implements DataPatchInterface
      */
     private $configHelper;
 
+    /**
+     * @param Logger $logger
+     * @param ResourceConnection $resourceConnection
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ConfigHelper $configHelper
+     * @param AlmaClient $almaClient
+     */
     public function __construct(
-        Logger $logger,
-        ResourceConnection $resourceConnection,
+        Logger               $logger,
+        ResourceConnection   $resourceConnection,
         ScopeConfigInterface $scopeConfig,
-        ConfigHelper $configHelper,
-        AlmaClient $almaClient
+        ConfigHelper         $configHelper,
+        AlmaClient           $almaClient
     ) {
         $this->logger = $logger;
         $this->resourceConnection = $resourceConnection;
@@ -57,7 +64,7 @@ class UpdateMerchantIdPath implements DataPatchInterface
     }
 
     /**
-     * @return array
+     * @inheritdoc
      */
     public static function getDependencies(): array
     {
@@ -65,7 +72,7 @@ class UpdateMerchantIdPath implements DataPatchInterface
     }
 
     /**
-     * @return array
+     * @inheritdoc
      */
     public function getAliases(): array
     {
@@ -73,8 +80,7 @@ class UpdateMerchantIdPath implements DataPatchInterface
     }
 
     /**
-     * @return void
-     * @throws RequestError
+     * @inheritdoc
      */
     public function apply(): void
     {
@@ -84,10 +90,12 @@ class UpdateMerchantIdPath implements DataPatchInterface
         $oldMerchantIdQuery = $this->resourceConnection->getConnection()->select()
             ->from($tableName, ['value'])->where(self::PATH_EQUAL, $oldMerchantIdPath);
 
-        $oldMerchant = new Merchant(['id' => $this->resourceConnection->getConnection()->fetchOne($oldMerchantIdQuery)]);
+        $oldMerchant = new Merchant(
+            ['id' => $this->resourceConnection->getConnection()->fetchOne($oldMerchantIdQuery)]
+        );
 
         $apiQuery = $this->resourceConnection->getConnection()->select()
-            ->from($tableName, ['config_id','scope','scope_id', 'path', 'value'])
+            ->from($tableName, ['config_id', 'scope', 'scope_id', 'path', 'value'])
             ->where(self::PATH_EQUAL, 'payment/alma_monthly_payments/live_api_key')
             ->orWhere(self::PATH_EQUAL, 'payment/alma_monthly_payments/test_api_key');
 
@@ -101,6 +109,8 @@ class UpdateMerchantIdPath implements DataPatchInterface
     }
 
     /**
+     * Get core table name with prefix
+     *
      * @return string
      */
     private function getCoreTable(): string
@@ -109,23 +119,41 @@ class UpdateMerchantIdPath implements DataPatchInterface
     }
 
     /**
-     * @param $apiKeysRow
-     * @param Merchant $oldMerchant
+     * Save merchant id in test_merchant_id and live_merchant_id
      *
-     * @return mixed
+     * @param array $apiKeysRow
+     * @param Merchant $oldMerchant
+     * @return array
      * @throws RequestError
      */
-    protected function saveNewMerchantId($apiKeysRow, Merchant $oldMerchant)
+    protected function saveNewMerchantId(array $apiKeysRow, Merchant $oldMerchant): array
     {
         preg_match('/(live|test)/', $apiKeysRow['path'], $matches);
-        $apiKey = $this->scopeConfig->getValue($apiKeysRow['path'], $apiKeysRow['scope'], $apiKeysRow['scope_id']);
+        $apiKey = $this->scopeConfig->getValue(
+            $apiKeysRow['path'],
+            $apiKeysRow['scope'],
+            $apiKeysRow['scope_id']
+        );
         $apiMode = $matches[0];
         try {
-            $merchant = $this->almaClient->createInstance($apiKey, $apiMode)->merchants->me();
-            $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $merchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
+            $merchant = $this->almaClient->createInstance(
+                $apiKey,
+                $apiMode
+            )->merchants->me();
+            $this->configHelper->saveMerchantId(
+                $apiMode . '_merchant_id',
+                $merchant,
+                $apiKeysRow['scope'],
+                $apiKeysRow['scope_id']
+            );
         } catch (AlmaClientException $e) {
             $this->logger->error('Error in upgrade data', [$e->getMessage()]);
-            $this->configHelper->saveMerchantId($apiMode . '_merchant_id', $oldMerchant, $apiKeysRow['scope'], $apiKeysRow['scope_id']);
+            $this->configHelper->saveMerchantId(
+                $apiMode . '_merchant_id',
+                $oldMerchant,
+                $apiKeysRow['scope'],
+                $apiKeysRow['scope_id']
+            );
         }
         return $matches;
     }

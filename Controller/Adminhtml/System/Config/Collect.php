@@ -6,6 +6,8 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Response\Http\FileFactory;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 class Collect extends Action
 {
@@ -27,6 +29,12 @@ class Collect extends Action
         $this->fileFactory = $fileFactory;
     }
 
+    /**
+     * Collect alma logs
+     *
+     * @return ResponseInterface|ResultInterface
+     * @throws \Exception
+     */
     public function execute()
     {
         $filepath = 'alma.log';

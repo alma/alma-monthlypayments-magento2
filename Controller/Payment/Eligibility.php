@@ -61,7 +61,7 @@ class Eligibility extends Action
     }
 
     /**
-     * @return false|Json
+     * @inheritdoc
      */
     public function execute()
     {
