@@ -46,7 +46,7 @@ class Ipn extends Action
      * @param PaymentValidation $paymentValidationHelper
      */
     public function __construct(
-        Context $context,
+        Context           $context,
         PaymentValidation $paymentValidationHelper
     ) {
         parent::__construct($context);
@@ -54,6 +54,8 @@ class Ipn extends Action
     }
 
     /**
+     * Validate payment and complete order with IPN
+     *
      * @return ResultInterface
      */
     public function execute()
