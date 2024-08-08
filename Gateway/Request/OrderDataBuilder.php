@@ -36,6 +36,9 @@ class OrderDataBuilder implements BuilderInterface
      */
     private $logger;
 
+    /**
+     * @param Logger $logger
+     */
     public function __construct(
         Logger $logger
     ) {
@@ -47,8 +50,6 @@ class OrderDataBuilder implements BuilderInterface
      *
      * @param array $buildSubject
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function build(array $buildSubject)
     {

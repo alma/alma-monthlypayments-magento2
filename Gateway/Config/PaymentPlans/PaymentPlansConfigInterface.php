@@ -24,28 +24,40 @@
 
 namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
+use Alma\API\Entities\FeePlan;
+
 interface PaymentPlansConfigInterface
 {
+
     /**
      * Update instance's default data with fresh fee plans fetched from Alma API
      *
+     * @return void
      */
     public function updateFromApi();
 
     /**
      * Get fee plans from Alma API
      *
+     * @return FeePlan[]
      */
-    public function getFeePlansFromApi();
+    public function getFeePlansFromApi(): array;
 
     /**
-     *  Merge in default config data for given plan
+     * Merge in default config data for given plan
+     *
+     * @param string $planKey
+     * @param array $defaultConfig
+     * @return mixed
      */
     public function updatePlanDefaults(string $planKey, array $defaultConfig);
 
     /**
-     *  Update given plan's allowed state – use this instead of updatePlanDefaults for `allowed`, as it's not about
-     *  being a default but really to override any existing value with a fresher one from the API
+     * Update given plan's allowed state – use this instead of updatePlanDefaults
+     *
+     * @param string $planKey
+     * @param bool $allowed
+     * @return mixed
      */
     public function setPlanAllowed(string $planKey, bool $allowed);
 

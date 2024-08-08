@@ -2,6 +2,7 @@
 
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
+use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlanConfig;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
@@ -13,26 +14,36 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentPlansHelperTest extends TestCase
 {
+
     /**
      * @var Logger
      */
     private $logger;
+
     /**
      * @var PaymentPlansConfigInterface
      */
     private $paymentPlansConfig;
+
     /**
      * @var MessageManager
      */
     private $messageManager;
+
     /**
      * @var ConfigHelper
      */
     private $configHelper;
 
+    /**
+     * @var PaymentPlanConfig
+     */
+    private $paymentPlanConfig;
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
+        $this->paymentPlanConfig = $this->createMock(PaymentPlanConfig::class);
         $this->paymentPlansConfig = $this->createMock(PaymentPlansConfigInterface::class);
         $this->messageManager = $this->createMock(MessageManager::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
@@ -42,6 +53,7 @@ class PaymentPlansHelperTest extends TestCase
     {
         return [
             $this->logger,
+            $this->paymentPlanConfig,
             $this->paymentPlansConfig,
             $this->messageManager,
             $this->configHelper

@@ -36,7 +36,9 @@ class RefundHandler implements HandlerInterface
             ];
         }
         if ($response['isFullRefund']) {
-            $lastRefundData['customer_fee'] = $payment->formatPrice(Functions::priceFromCents($almaPayment->customer_fee));
+            $lastRefundData['customer_fee'] = $payment->formatPrice(
+                Functions::priceFromCents($almaPayment->customer_fee)
+            );
             $lastRefundData['magento_refund'] = $payment->formatPrice($amountDO);
         }
         $payment->setTransactionId($lastRefundId);

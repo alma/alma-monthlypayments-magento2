@@ -38,11 +38,16 @@ class WebsiteCustomerDetailsDataBuilder implements BuilderInterface
      * @var Logger
      */
     private $logger;
+
     /**
      * @var OrderHelper
      */
     private $orderHelper;
 
+    /**
+     * @param Logger $logger
+     * @param OrderHelper $orderHelper
+     */
     public function __construct(
         Logger $logger,
         OrderHelper $orderHelper

@@ -9,6 +9,8 @@ use Magento\Payment\Gateway\Validator\ResultInterface;
 class RefundResponseValidator extends AbstractValidator
 {
     /**
+     * Validate refund response
+     *
      * @param array $validationSubject
      *
      * @return ResultInterface
@@ -22,7 +24,11 @@ class RefundResponseValidator extends AbstractValidator
             $apiResponse = $validationSubject['response']['fails'];
             $errorCodes[] = $apiResponse->responseCode;
             if ($apiResponse->responseCode == '404') {
-                $fails[] = $apiResponse->json['object_type'] . ' ' . $apiResponse->json['value'] . ' ' . $apiResponse->json['error_code'];
+                $fails[] = (
+                    $apiResponse->json['object_type'] . ' ' .
+                    $apiResponse->json['value'] . ' ' .
+                    $apiResponse->json['error_code']
+                );
             }
             if ($apiResponse->responseCode == '400') {
                 $fails[] = $apiResponse->json['error_code'] . ' : ' . $apiResponse->json['errors'][0]['message'];
