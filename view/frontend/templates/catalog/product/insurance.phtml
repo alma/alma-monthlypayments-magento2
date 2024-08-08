@@ -5,8 +5,14 @@
 
 ?>
 <?php if ($widgetIsActivated) { ?>
-<script data-cfasync="false" type="module" src="<?= $block->getScriptUrl()?>"></script>
-    <iframe title="Product alma Iframe" id="product-alma-iframe" class="alma-insurance-iframe" scrolling="no" src="<?= $block->getIframeUrl()?>"></iframe>
+<script data-cfasync="false" type="module" src="<?= $block->escapeUrl($block->getScriptUrl()) ?>"></script>
+    <iframe
+        title="Product alma Iframe"
+        id="product-alma-iframe"
+        class="alma-insurance-iframe"
+        scrolling="no"
+        src="<?= $block->escapeUrl($block->getIframeUrl()) ?>"
+    ></iframe>
     <input type="hidden" name="alma_insurance_id" form="product_addtocart_form" value="">
     <input type="hidden" name="alma_insurance_qty" form="product_addtocart_form" value="">
     <div id="alma-insurance-modal"></div>
@@ -20,7 +26,7 @@
             customerData,
             utils
         ) {
-            utils.setSkuForWifget('<?= $block->getBaseProductSku() ?>')
+            utils.setSkuForWifget('<?= $block->escapeHtml($block->getBaseProductSku()) ?>')
             var cart = customerData.get('cart');
             var baseCount = 0;
             cart.subscribe(function () {
@@ -80,12 +86,12 @@
                 var qty = e.target.value;
                 if(qty > 0){
                     utils.refreshWidget(
-                        '<?= $block->getProductPriceInCent() ?>',
-                        '<?= $block->getBaseProductId() ?>',
-                        '<?= $block->getProductName() ?>',
-                        '<?= $block->getMerchantId()?>',
-                        '<?= $block->getQuoteId()?>',
-                        '<?= $block->getCustomerSessionId()?>'
+                        '<?= $block->escapeHtml($block->getProductPriceInCent()) ?>',
+                        '<?= $block->escapeHtml($block->getBaseProductId()) ?>',
+                        '<?= $block->escapeHtml($block->getProductName()) ?>',
+                        '<?= $block->escapeHtml($block->getMerchantId())?>',
+                        '<?= $block->escapeHtml($block->getQuoteId())?>',
+                        '<?= $block->escapeHtml($block->getCustomerSessionId())?>'
                     );
                 }
             });

@@ -41,7 +41,7 @@
                     </strong>
                     <?php if (preg_match('/^Alma/', $notification->getTitle())): ?>
                         <p class="notifications-entry-description">
-                            <?= ($notificationDescription) ?>
+                            <?= $block->escapeHtml($notificationDescription) ?>
                         </p>
                     <?php else: ?>
                         <?php if (strlen($notificationDescription) > $notificationDescriptionLength): ?>
