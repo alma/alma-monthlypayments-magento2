@@ -1,24 +1,28 @@
 <?php
 /** @var Alma\MonthlyPayments\Block\Adminhtml\System\SOCBlockLegal $block */
-$position = $block->getPosition()
+$position = $block->escapeHtml($block->getPosition());
 ?>
 <div style="margin-left: 10px">
-    <div><strong><?= $block->getBlockTitle() ?></strong></div>
-    <div><?= $block->getDescription() ?></div>
+    <div><strong><?= $block->escapeHtml($block->getBlockTitle()) ?></strong></div>
+    <div><?= $block->escapeHtml($block->getDescription()) ?></div>
     <div>
-        <div id="alma_soc_detail_title_<?=$position?>" class="alma_collapse"><u><?= $block->getDetailTitle() ?></u></div>
-        <div id="alma_soc_detail_content_<?=$position?>">
+        <div id="alma_soc_detail_title_<?=$block->escapeHtmlAttr($position)?>" class="alma_collapse">
+            <u><?= $block->escapeHtml($block->getDetailTitle()) ?></u>
+        </div>
+        <div id="alma_soc_detail_content_<?=$block->escapeHtmlAttr($position)?>">
             <ul>
-                <?php foreach ($block->getDetailsArgs() as $arg) :?>
+                <?php foreach ($block->getDetailsArgs() as $arg): ?>
                     <li>
-                        <?= $arg ?>
+                        <?= $block->escapeHtml($arg) ?>
                     </li>
                 <?php endforeach; ?>
             </ul>
         </div>
     </div>
     <?php if ($block->hasLink()): ?>
-        <a href="<?= $block->getConfigPageUrl() ?>" > <?= $block->getLinkTitle() ?> </a>
+        <a href="<?= $block->escapeUrl($block->getConfigPageUrl()) ?>">
+            <?= $block->escapeHtml($block->getLinkTitle()) ?>
+        </a>
     <?php endif; ?>
 </div>
 
@@ -27,14 +31,14 @@ $position = $block->getPosition()
         'jquery'
     ], function(jQuery){
         var isOpen = false;
-        jQuery('#alma_soc_detail_title_<?=$position?>').click(function () {
+        jQuery('#alma_soc_detail_title_<?=$block->escapeHtmlAttr($position)?>').click(function () {
             if (isOpen) {
-                jQuery('#alma_soc_detail_title_<?=$position?>').removeClass('open');
-                jQuery('#alma_soc_detail_content_<?=$position?>').hide();
+                jQuery('#alma_soc_detail_title_<?=$block->escapeHtmlAttr($position)?>').removeClass('open');
+                jQuery('#alma_soc_detail_content_<?=$block->escapeHtmlAttr($position)?>').hide();
                 isOpen = false;
             } else {
-                jQuery('#alma_soc_detail_title_<?=$position?>').addClass('open');
-                jQuery('#alma_soc_detail_content_<?=$position?>').show();
+                jQuery('#alma_soc_detail_title_<?=$block->escapeHtmlAttr($position)?>').addClass('open');
+                jQuery('#alma_soc_detail_content_<?=$block->escapeHtmlAttr($position)?>').show();
                 isOpen = true;
             }
         });

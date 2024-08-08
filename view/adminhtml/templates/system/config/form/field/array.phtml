@@ -18,7 +18,7 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
         <table class="admin__control-table" id="<?= $block->escapeHtmlAttr($block->getElement()->getId()) ?>">
             <thead>
             <tr>
-                <?php foreach ($block->getColumns() as $columnName => $column) : ?>
+                <?php foreach ($block->getColumns() as $columnName => $column): ?>
                     <th><?= $block->escapeHtml($column['label']) ?></th>
                 <?php endforeach; ?>
             </tr>
@@ -39,13 +39,13 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
                 // define row prototypeJS template
                 template: mageTemplate(
                     '<tr id="<%- _id %>">'
-                    <?php foreach ($block->getColumns() as $columnName => $column) : ?>
+                    <?php foreach ($block->getColumns() as $columnName => $column): ?>
                     + '<td>'
                     + '<?= $block->escapeJs($block->renderCellTemplate($columnName)) ?>'
                     + '<\/td>'
                     <?php endforeach; ?>
 
-                    <?php if ($block->isAddAfter()) : ?>
+                    <?php if ($block->isAddAfter()): ?>
                     + '<td><button class="action-add" type="button" id="addAfterBtn<%- _id %>"><span>'
                     + '<?= $block->escapeJs($block->escapeHtml(__('Add after'))) ?>'
                     + '<\/span><\/button><\/td>'
@@ -64,9 +64,9 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
                     } else {
                         var d = new Date();
                         templateValues = {
-                            <?php foreach ($block->getColumns() as $columnName => $column) : ?>
-                            <?= $block->escapeJs($columnName) ?>: '',
-                            'option_extra_attrs': {},
+                            <?php foreach ($block->getColumns() as $columnName => $column): ?>
+                                <?= $block->escapeJs($columnName) ?>: '',
+                                'option_extra_attrs': {},
                             <?php endforeach; ?>
                             _id: '_' + d.getTime() + '_' + d.getMilliseconds()
                         };
@@ -76,7 +76,10 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
                     if (insertAfterId) {
                         Element.insert($(insertAfterId), {after: this.template(templateValues)});
                     } else {
-                        Element.insert($('addRow<?= $block->escapeJs($_htmlId) ?>'), {bottom: this.template(templateValues)});
+                        Element.insert(
+                            $('addRow<?= $block->escapeJs($_htmlId) ?>'),
+                            {bottom: this.template(templateValues)}
+                        );
                     }
 
                     // Fill controls with data
@@ -86,7 +89,12 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
                             if ($(rowInputElementNames[i])) {
                                 $(rowInputElementNames[i]).setValue(rowData.column_values[rowInputElementNames[i]]);
 
-                                if ($(rowInputElementNames[i]).id === "<?= PaymentPlansHelper::PAY_NOW_KEY?>_<?=PaymentPlansHelper::CUSTOM_MIN_PURCHASE_KEY?>"){
+                                if (
+                                    $(
+                                        rowInputElementNames[i]
+                                    ).id === "<?= $block->escapeHtml(PaymentPlansHelper::PAY_NOW_KEY)?>_".
+                                    "<?=$block->escapeHtml(PaymentPlansHelper::CUSTOM_MIN_PURCHASE_KEY)?>"
+                                ){
                                     $(rowInputElementNames[i]).setAttribute("readonly", true)
                                 }
                             }
@@ -105,12 +113,15 @@ $_colspan = $block->isAddAfter() ? 2 : 1;
             // add existing rows
             <?php
             foreach ($block->getArrayRows() as $_rowId => $_row) {
-                echo /** @noEscape */ "arrayRow{$block->escapeJs($_htmlId)}.add(" . /** @noEscape */ $_row->toJson() . ");\n";
+                echo (
+                    /** @noEscape */ "arrayRow{$block->escapeJs($_htmlId)}.add(" .
+                    /** @noEscape */ $_row->toJson() . ");\n"
+                );
             }
             ?>
 
             // Toggle the grid availability, if element is disabled (depending on scope)
-            <?php if ($block->getElement()->getDisabled()) : ?>
+            <?php if ($block->getElement()->getDisabled()): ?>
             toggleValueElements({checked: true}, $('grid<?= $block->escapeJs($_htmlId) ?>').parentNode);
             <?php endif; ?>
         });

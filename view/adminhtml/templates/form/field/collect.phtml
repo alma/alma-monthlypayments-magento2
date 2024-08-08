@@ -11,13 +11,17 @@
                 'form_key': window.FORM_KEY
             };
             jQuery.ajax({
-                url : '<?php echo $block->getAjaxUrl() ?>',
+                url : '<?= $block->escapeUrl($block->getAjaxUrl()) ?>',
                 data: data,
                 showLoader: true,
                 success: function(response) {
                     var lines = response.trim().split('\n').slice(-100);
                     var element = document.createElement('a');
-                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(lines.join('\n')));
+                    element.setAttribute(
+                        'href',
+                        'data:text/plain;charset=utf-8,' + encodeURIComponent(lines.join('\n')
+                        )
+                    );
                     element.setAttribute('download', 'alma'+Date.now()+'.log');
                     element.click();
                 }
@@ -28,5 +32,5 @@
     });
 </script>
 
-<?php echo $block->getButtonHtml() ?>
+<?= $block->getButtonHtml() ?>
 

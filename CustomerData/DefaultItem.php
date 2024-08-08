@@ -7,6 +7,11 @@ use Magento\Framework\App\ObjectManager;
 
 class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
 {
+    /**
+     * Get item data. Template method
+     *
+     * @return array
+     */
     protected function doGetItemData(): array
     {
         $objectManager = ObjectManager::getInstance();
@@ -28,16 +33,31 @@ class DefaultItem extends \Magento\Checkout\CustomerData\DefaultItem
         return $result;
     }
 
+    /**
+     * Item has insurance data
+     *
+     * @return bool
+     */
     protected function hasInsurance(): bool
     {
         return (bool)$this->item->getAlmaInsurance();
     }
 
+    /**
+     * Check if it's a product with insurance
+     *
+     * @return bool
+     */
     protected function isProductWithInsurance(): bool
     {
         return $this->hasInsurance() && $this->item->getProduct()->getSku() != InsuranceHelper::ALMA_INSURANCE_SKU;
     }
 
+    /**
+     * Check if it's an insurance product
+     *
+     * @return bool
+     */
     protected function isInsuranceProduct(): bool
     {
         return $this->hasInsurance() && !$this->isProductWithInsurance();
