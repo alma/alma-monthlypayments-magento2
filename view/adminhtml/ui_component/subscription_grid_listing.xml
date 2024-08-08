@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+<listing
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+>
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">subscription_grid_listing.subscription_grid_listing_data_source
+            <item
+                name="provider"
+                xsi:type="string">
+                    subscription_grid_listing.subscription_grid_listing_data_source
             </item>
-            <item name="deps" xsi:type="string">subscription_grid_listing.subscription_grid_listing_data_source</item>
+            <item
+                name="deps"
+                xsi:type="string">
+                subscription_grid_listing.subscription_grid_listing_data_source
+            </item>
         </item>
         <item name="spinner" xsi:type="string">subscription_grid_columns</item>
         <item name="buttons" xsi:type="array">
@@ -16,7 +25,11 @@
     </argument>
     <dataSource name="subscription_grid_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">Alma\MonthlyPayments\Ui\DataProvider\Insurance\SubscriptionGridDataProvider</argument>
+            <argument
+                name="class"
+                xsi:type="string">
+                Alma\MonthlyPayments\Ui\DataProvider\Insurance\SubscriptionGridDataProvider
+            </argument>
             <argument name="name" xsi:type="string">subscription_grid_listing_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
             <argument name="requestFieldName" xsi:type="string">entity_id</argument>
@@ -41,7 +54,8 @@
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="subscription_grid_columns"
-             class="Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column\SubscriptionColumnFormatter">
+             class="Alma\MonthlyPayments\Ui\Component\Insurance\Listing\Column\SubscriptionColumnFormatter"
+    >
         <selectionsColumn name="ids">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
