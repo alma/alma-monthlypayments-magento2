@@ -7,7 +7,6 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl\CustomerCancelUrl;
 use Exception;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Payment\Gateway\Config\Config as ConfigGateway;
 

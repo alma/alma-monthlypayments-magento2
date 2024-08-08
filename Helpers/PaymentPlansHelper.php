@@ -57,19 +57,27 @@ class PaymentPlansHelper
     private $messageManager;
 
     /**
+     * @var PaymentPlanConfig
+     */
+    private $paymentPlanConfig;
+
+    /**
      * @param Logger $logger
+     * @param PaymentPlanConfig $paymentPlanConfig
      * @param PaymentPlansConfigInterface $paymentPlansConfig
      * @param MessageManager $messageManager
      * @param ConfigHelper $configHelper
      */
     public function __construct(
         Logger $logger,
+        PaymentPlanConfig $paymentPlanConfig,
         PaymentPlansConfigInterface $paymentPlansConfig,
         MessageManager $messageManager,
         ConfigHelper $configHelper
     ) {
         $this->logger = $logger;
         $this->configHelper = $configHelper;
+        $this->paymentPlanConfig = $paymentPlanConfig;
         $this->paymentPlansConfig = $paymentPlansConfig;
         $this->messageManager = $messageManager;
     }
@@ -115,7 +123,7 @@ class PaymentPlansHelper
             $apiPlans = $this->paymentPlansConfig->getFeePlansFromApi();
             $baseFeePlans = [];
             foreach ($apiPlans as $feePlan) {
-                $planKey = PaymentPlanConfig::keyForFeePlan($feePlan);
+                $planKey = $this->paymentPlanConfig->keyForFeePlan($feePlan);
                 // Fix min purchase amount to 1€
                 if ($planKey === self::PAY_NOW_KEY) {
                     $feePlan->min_purchase_amount = 100;
@@ -207,7 +215,7 @@ class PaymentPlansHelper
      */
     public function formatLocalFeePlanConfig(FeePlan $feePlan, ?array $feePlanConfig): array
     {
-        $key = PaymentPlanConfig::keyForFeePlan($feePlan);
+        $key = $this->paymentPlanConfig->keyForFeePlan($feePlan);
         return [
             'key' => $key,
             'pnx_label' => $this->planLabelByKey($key),
@@ -228,7 +236,7 @@ class PaymentPlansHelper
      */
     private function getEnabledDefaultValue(FeePlan $feePlan, array $feePlanConfig = null) : int
     {
-        $key = PaymentPlanConfig::keyForFeePlan($feePlan);
+        $key = $this->paymentPlanConfig->keyForFeePlan($feePlan);
         $defaultEnabled = 0;
         if ($key === 'general:3:0:0') {
             $defaultEnabled = 1;
@@ -257,7 +265,7 @@ class PaymentPlansHelper
      */
     public function formatFeePlanConfigForSave(FeePlan $feePlan, array $configInput): array
     {
-        $newFeePlan = PaymentPlanConfig::defaultConfigForFeePlan($feePlan);
+        $newFeePlan = $this->paymentPlanConfig->defaultConfigForFeePlan($feePlan);
         if (!empty($configInput)) {
             $newFeePlan['enabled'] = $configInput['enabled'];
             $newFeePlan['minAmount'] = Functions::priceToCents($configInput[self::CUSTOM_MIN_PURCHASE_KEY]);

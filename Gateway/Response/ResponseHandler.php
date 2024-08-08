@@ -29,6 +29,7 @@ use Alma\API\Entities\Payment;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentHelper;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order;
@@ -44,6 +45,10 @@ class ResponseHandler implements HandlerInterface
      */
     private $paymentHelper;
 
+    /**
+     * @param PaymentHelper $paymentHelper
+     * @param Logger $logger
+     */
     public function __construct(
         PaymentHelper $paymentHelper,
         Logger $logger
@@ -58,7 +63,7 @@ class ResponseHandler implements HandlerInterface
      * @param array $handlingSubject
      * @param array $response
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function handle(array $handlingSubject, array $response)
     {

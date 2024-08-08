@@ -146,10 +146,10 @@ class OrderHelper extends AbstractHelper
 
     /**
      * Get payment methode by order
-     * @param Order $order
+     * @param OrderInterface $order
      * @return string
      */
-    public function getOrderPaymentMethodName(Order $order): string
+    public function getOrderPaymentMethodName(OrderInterface $order): string
     {
         return $order->getPayment()->getMethod();
     }
@@ -159,7 +159,7 @@ class OrderHelper extends AbstractHelper
      * @param Order $order
      * @return string
      */
-    public function getOrderShippingMethodName(Order $order): string
+    public function getOrderShippingMethodName(OrderInterface $order): string
     {
         return $order->getShippingMethod();
     }

@@ -25,6 +25,7 @@
 
 namespace Alma\MonthlyPayments\Gateway\Http\Client;
 
+use Alma\API\ParamsError;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
@@ -34,15 +35,17 @@ use Magento\Payment\Gateway\Http\TransferInterface;
 
 class Client implements ClientInterface
 {
-    const SUCCESS = 1;
-    const FAILURE = 0;
+    public const SUCCESS = 1;
+    public const FAILURE = 0;
 
     /**
      * @var Logger
      */
     private $logger;
 
-    /** @var AlmaClient */
+    /**
+     * @var AlmaClient
+     */
     private $alma;
 
     /**
@@ -50,7 +53,7 @@ class Client implements ClientInterface
      * @param AlmaClient $almaClient
      */
     public function __construct(
-        Logger $logger,
+        Logger     $logger,
         AlmaClient $almaClient
     ) {
         $this->logger = $logger;
@@ -62,12 +65,13 @@ class Client implements ClientInterface
      *
      * @param TransferInterface $transferObject
      * @return array
+     * @throws ParamsError
      */
     public function placeRequest(TransferInterface $transferObject): array
     {
         try {
             $payment = $this->alma->getDefaultClient()->payments->create($transferObject->getBody());
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error("Error creating payment:", [$e->getMessage()]);
             return [
                 'resultCode' => self::FAILURE,

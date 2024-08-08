@@ -31,22 +31,22 @@ use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 
 class PaymentPlanConfig implements PaymentPlanConfigInterface
 {
-    const TRANSIENT_KEY_MIN_ALLOWED_AMOUNT = 'minAllowedAmount';
-    const KEY_MIN_AMOUNT = 'minAmount';
-    const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
-    const KEY_MAX_AMOUNT = 'maxAmount';
-    const TRANSIENT_KEY_MERCHANT_FEES = 'merchantFees';
-    const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
-    const ALLOWED_MONTHLY_PLANS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    public const TRANSIENT_KEY_MIN_ALLOWED_AMOUNT = 'minAllowedAmount';
+    public const TRANSIENT_KEY_MAX_ALLOWED_AMOUNT = 'maxAllowedAmount';
+    private const TRANSIENT_KEY_MERCHANT_FEES = 'merchantFees';
+    private const TRANSIENT_KEY_CUSTOMER_FEES = 'customerFees';
+    private const ALLOWED_MONTHLY_PLANS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     /**
      * @var array
      */
     private $data;
+
     /**
      * @var PaymentPlansHelper
      */
     private $paymentPlansHelper;
+
     /**
      * @var Logger
      */
@@ -54,6 +54,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
 
     /**
      * PaymentPlanConfig constructor.
+     *
      * @param PaymentPlansHelper $paymentPlansHelper
      * @param Logger $logger
      * @param array $data
@@ -69,9 +70,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     }
 
     /**
-     * @return string[]
+     * @inheritDoc
      */
-    public static function transientKeys(): array
+    public function transientKeys(): array
     {
         return [
             self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT,
@@ -84,20 +85,20 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     /**
      * @inheritDoc
      */
-    public static function keyForFeePlan(FeePlan $plan): string
+    public function keyForFeePlan(FeePlan $plan): string
     {
-        return self::key(
+        return $this->key(
             $plan->kind,
-            intval($plan->installments_count),
-            intval($plan->deferred_days),
-            intval($plan->deferred_months)
+            (int)$plan->installments_count,
+            (int)$plan->deferred_days,
+            (int)$plan->deferred_months
         );
     }
 
     /**
      * @inheritDoc
      */
-    public static function defaultConfigForFeePlan(FeePlan $plan): array
+    public function defaultConfigForFeePlan(FeePlan $plan): array
     {
         $deferred_trigger_limit_days = $plan->getDeferredTriggerLimitDays();
         return [
@@ -106,11 +107,11 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
 
             'installmentsCount' => $plan->installments_count,
 
-            'deferredDays' => intval($plan->deferred_days),
-            'deferredMonths' => intval($plan->deferred_months),
+            'deferredDays' => (int)$plan->deferred_days,
+            'deferredMonths' => (int)$plan->deferred_months,
 
             'deferredTriggerEnable' => !empty($deferred_trigger_limit_days),
-            'deferredTriggerDays' => intval($deferred_trigger_limit_days),
+            'deferredTriggerDays' => (int)$deferred_trigger_limit_days,
 
             'enabled' => 0,
 
@@ -134,13 +135,15 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     }
 
     /**
+     * Generate key at local format
+     *
      * @param string $planKind
      * @param int $installmentsCount
      * @param int $deferredDays
      * @param int $deferredMonths
      * @return string
      */
-    private static function key(
+    private function key(
         string $planKind,
         int $installmentsCount,
         int $deferredDays,
@@ -150,13 +153,15 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     }
 
     /**
+     * Generate key at alma format
+     *
      * @param string $planKind
      * @param int $installmentsCount
      * @param int $deferredDays
      * @param int $deferredMonths
      * @return string
      */
-    private static function almaKey(
+    private function almaKey(
         string $planKind,
         int $installmentsCount,
         int $deferredDays,
@@ -181,7 +186,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function planKey(): string
     {
-        return self::key($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
+        return $this->key($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
     }
 
     /**
@@ -189,7 +194,12 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function almaPlanKey(): string
     {
-        return self::almaKey($this->kind(), $this->installmentsCount(), $this->deferredDays(), $this->deferredMonths());
+        return $this->almaKey(
+            $this->kind(),
+            $this->installmentsCount(),
+            $this->deferredDays(),
+            $this->deferredMonths()
+        );
     }
 
     /**
@@ -254,9 +264,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
-    public function deferredType()
+    public function deferredType(): ?string
     {
         if (!$this->isDeferred()) {
             return null;
@@ -270,7 +280,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function deferredDays(): int
     {
-        return intval($this->data['deferredDays']);
+        return (int)$this->data['deferredDays'];
     }
 
     /**
@@ -278,7 +288,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function deferredMonths(): int
     {
-        return intval($this->data['deferredMonths']);
+        return (int)$this->data['deferredMonths'];
     }
 
     /**
@@ -294,7 +304,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function maxDeferredTriggerDays(): int
     {
-        return intval($this->data['deferredTriggerDays']);
+        return (int)$this->data['deferredTriggerDays'];
     }
 
     /**
@@ -348,7 +358,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     /**
      * @inheritDoc
      */
-    public function setMaximumAmount(int $amount)
+    public function setMaximumAmount(int $amount): void
     {
         $this->data['maxAmount'] = $amount;
     }
@@ -394,9 +404,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
-    public function logoFileName()
+    public function logoFileName(): ?string
     {
         if (!$this->isDeferred() && in_array($this->installmentsCount(), self::ALLOWED_MONTHLY_PLANS)) {
             return 'p' . $this->installmentsCount() . 'x_logo.svg';

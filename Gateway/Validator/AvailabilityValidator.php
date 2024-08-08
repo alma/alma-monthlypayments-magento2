@@ -38,10 +38,12 @@ class AvailabilityValidator extends AbstractValidator
      * @var Availability
      */
     private $availabilityHelper;
+
     /**
      * @var Eligibility
      */
     private $eligibilityHelper;
+
     /**
      * @var Logger
      */
@@ -79,6 +81,9 @@ class AvailabilityValidator extends AbstractValidator
      */
     public function validate(array $validationSubject)
     {
-        return $this->createResult($this->availabilityHelper->isAvailable() && $this->eligibilityHelper->checkEligibility());
+        return $this->createResult(
+            $this->availabilityHelper->isAvailable() &&
+            $this->eligibilityHelper->checkEligibility()
+        );
     }
 }

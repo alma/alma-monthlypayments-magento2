@@ -3,6 +3,8 @@
 namespace Alma\MonthlyPayments\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -15,6 +17,7 @@ class RefundDataBuilder implements BuilderInterface
      * @var Config
      */
     private $config;
+
     /**
      * @var OrderRepository
      */
@@ -33,11 +36,13 @@ class RefundDataBuilder implements BuilderInterface
     }
 
     /**
+     *  Build refund payload
+     *
      * @param array $buildSubject
      *
      * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws InputException
+     * @throws NoSuchEntityException
      */
     public function build(array $buildSubject): array
     {

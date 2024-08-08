@@ -39,6 +39,7 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 
 class PaymentDataBuilder implements BuilderInterface
 {
+
     /**
      * @var Resolver
      */
@@ -53,14 +54,17 @@ class PaymentDataBuilder implements BuilderInterface
      * @var Config
      */
     private $config;
+
     /**
      * @var ConfigHelper
      */
     private $configHelper;
+
     /**
      * @var CartDataBuilder
      */
     private $cartDataBuilder;
+
     /**
      * @var PaymentPlansHelper
      */
@@ -74,6 +78,7 @@ class PaymentDataBuilder implements BuilderInterface
      * @param Resolver $locale
      * @param ConfigHelper $configHelper
      * @param CartDataBuilder $cartDataBuilder
+     * @param PaymentPlansHelper $paymentPlansHelper
      */
     public function __construct(
         CheckoutSession $checkoutSession,

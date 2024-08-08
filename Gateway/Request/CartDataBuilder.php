@@ -34,7 +34,13 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
  */
 class CartDataBuilder implements BuilderInterface
 {
+    /**
+     * @var Logger
+     */
     private $logger;
+    /**
+     * @var OrderHelper
+     */
     private $orderHelper;
 
     /**

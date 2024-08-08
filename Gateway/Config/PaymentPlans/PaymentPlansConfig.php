@@ -53,17 +53,24 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     private $logger;
 
     /**
+     * @var PaymentPlanConfig
+     */
+    private $paymentPlanConfig;
+
+    /**
      * PaymentPlansConfig constructor.
      *
      * @param AlmaClient $almaClient
+     * @param PaymentPlanConfig $paymentPlanConfig
      * @param PaymentPlanConfigInterfaceFactory $planConfigFactory
-     * @param array|string $data
      * @param Logger $logger
+     * @param array $data
      */
     public function __construct(
-        AlmaClient $almaClient,
+        AlmaClient                        $almaClient,
+        PaymentPlanConfig                 $paymentPlanConfig,
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
-        Logger $logger,
+        Logger                            $logger,
         $data = []
     ) {
         $this->serializer = new Json();
@@ -74,6 +81,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
 
         $this->data = $data;
         $this->almaClient = $almaClient;
+        $this->paymentPlanConfig = $paymentPlanConfig;
         $this->planConfigFactory = $planConfigFactory;
         $this->logger = $logger;
     }
@@ -85,27 +93,27 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     {
         try {
             $feePlans = $this->almaClient->getDefaultClient()->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Update From Api', [$e->getMessage()]);
             return;
         }
 
         foreach ($feePlans as $plan) {
-            $key = PaymentPlanConfig::keyForFeePlan($plan);
+            $key = $this->paymentPlanConfig->keyForFeePlan($plan);
             $this->setPlanAllowed($key, $plan->allowed);
-            $this->updatePlanDefaults($key, PaymentPlanConfig::defaultConfigForFeePlan($plan));
+            $this->updatePlanDefaults($key, $this->paymentPlanConfig->defaultConfigForFeePlan($plan));
         }
     }
 
     /**
-     * @return FeePlan[]
+     * @inheritDoc
      */
     public function getFeePlansFromApi(): array
     {
         $feePlans = [];
         try {
             $feePlans = $this->almaClient->getDefaultClient()->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Error in Get fee plans from Api', [$e->getMessage()]);
         }
         return $feePlans;
