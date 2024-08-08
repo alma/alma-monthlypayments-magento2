@@ -32,26 +32,28 @@
 
 $config = $block->getConfig();
 $widgetConfig = $block->getWidgetConfig();
+$hasCustomPosition = $widgetConfig->isCustomWidgetPosition();
+$customSelector = $widgetConfig->getWidgetContainerSelector();
 $containerId = 'alma-widget';
 if ($widgetConfig->showProductWidget() && $block->getJsonPlans() && $block->getPrice()>0):?>
-    <div id=<?= $containerId ?> ></div>
+    <div id=<?= $block->escapeHtml($containerId) ?> ></div>
     <script type="text/x-magento-init">
         {
-            "#<?=$containerId?>": {
+            "#<?= $block->escapeHtml($containerId) ?>": {
                 "Alma_MonthlyPayments/js/view/catalog/badge": {
                     "customDisplay" : {
-                        "hasCustomPosition" : <?=$widgetConfig->isCustomWidgetPosition()?>,
-                        "customContainerSelector" : "<?=$widgetConfig->getWidgetContainerSelector()?>",
-                        "isPrepend" : <?=$widgetConfig->prependWidgetInContainer()?>
+                        "hasCustomPosition" : <?= $block->escapeHtml($hasCustomPosition) ?>,
+                        "customContainerSelector" :"<?= $block->escapeHtml($customSelector) ?>",
+                        "isPrepend" : <?= $block->escapeHtml($widgetConfig->prependWidgetInContainer()) ?>
                         },
-                    "containerId" : "<?=$containerId?>",
-                    "productPrice" : <?=$block->getPrice()?>,
-                    "useQuantityForWidgetPrice": <?=$widgetConfig->useQuantityForWidgetPrice()?>,
-                    "productId": <?=$block->getProductId()?>,
-                    "merchantId": "<?=$config->getMerchantId()?>",
-                    "activeMode": "<?=$block->getActiveMode()?>",
-                    "locale": "<?=$block->getLocale()?>",
-                    "jsonPlans": <?=$block->getJsonPlans()?>
+                    "containerId" : "<?= $block->escapeHtml($containerId) ?>",
+                    "productPrice" : <?= $block->escapeHtml($block->getPrice()) ?>,
+                    "useQuantityForWidgetPrice": <?= $block->escapeHtml($widgetConfig->useQuantityForWidgetPrice()) ?>,
+                    "productId": <?= $block->escapeHtml($block->getProductId()) ?>,
+                    "merchantId": "<?= $block->escapeHtml($config->getMerchantId()) ?>",
+                    "activeMode": "<?= $block->escapeHtml($block->getActiveMode()) ?>",
+                    "locale": "<?= $block->escapeHtml($block->getLocale()) ?>",
+                    "jsonPlans": <?= $block->escapeHtml($block->getJsonPlans()) ?>
                 }
             }
         }

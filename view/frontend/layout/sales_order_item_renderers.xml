@@ -5,10 +5,18 @@
  * See COPYING.txt for license details.
  */
 -->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+>
     <body>
         <referenceBlock name="sales.order.items.renderers">
-            <block class="Alma\MonthlyPayments\Block\Order\Item\Renderer\AlmaInsuranceRenderer" name="sales.order.items.renderers.insurance" as="alma_insurance" template="Alma_MonthlyPayments::order/items/renderer/default.phtml"/>
+            <block
+                class="Alma\MonthlyPayments\Block\Order\Item\Renderer\AlmaInsuranceRenderer"
+                name="sales.order.items.renderers.insurance"
+                as="alma_insurance"
+                template="Alma_MonthlyPayments::order/items/renderer/default.phtml"
+            />
         </referenceBlock>
     </body>
 </page>
