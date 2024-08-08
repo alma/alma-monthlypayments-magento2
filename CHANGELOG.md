@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.1.0 - 2024-08-08
+
+### Changes
+
+- Shipment info analysis (#182)
+
+#### Contributors
+
+@Francois-Gomis
+
 ## v5.0.2 - 2024-07-30
 
 ### Changes
