@@ -5,22 +5,49 @@
  * See COPYING.txt for license details.
  */
 -->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+>
     <body>
         <referenceBlock name="checkout.cart.item.renderers">
-            <block class="Alma\MonthlyPayments\Block\Cart\Item\Renderer" name="checkout.cart.item.renderers.alma.insurance" as="alma_insurance" template="Alma_MonthlyPayments::cart/item/insurance.phtml">
-                <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions" name="checkout.cart.item.renderers.alma.insurance.actions" as="actions">
-                    <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove" name="checkout.cart.item.renderers.alma.insurance.actions.remove" template="Magento_Checkout::cart/item/renderer/actions/remove.phtml"/>
+            <block class="Alma\MonthlyPayments\Block\Cart\Item\Renderer"
+                   name="checkout.cart.item.renderers.alma.insurance"
+                   as="alma_insurance"
+                   template="Alma_MonthlyPayments::cart/item/insurance.phtml"
+            />
+            <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                   name="checkout.cart.item.renderers.alma.insurance.actions"
+                   as="actions"
+            >
+                <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove"
+                       name="checkout.cart.item.renderers.alma.insurance.actions.remove"
+                       template="Magento_Checkout::cart/item/renderer/actions/remove.phtml"
+                >
                 </block>
             </block>
-            <block class="Magento\Checkout\Block\Cart\Item\Renderer" name="checkout.cart.item.renderers.alma.simple.with.insurance" as="simple_product_with_alma_insurance" template="Alma_MonthlyPayments::cart/item/product_insurance.phtml">
-                <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions" name="checkout.cart.item.renderers.alma.insurance.default.actions" as="actions">
-                    <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove" name="checkout.cart.item.renderers.default.actions.remove" template="Magento_Checkout::cart/item/renderer/actions/remove.phtml"/>
+            <block class="Magento\Checkout\Block\Cart\Item\Renderer"
+                   name="checkout.cart.item.renderers.alma.simple.with.insurance"
+                   as="simple_product_with_alma_insurance"
+                   template="Alma_MonthlyPayments::cart/item/product_insurance.phtml">
+                <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                       name="checkout.cart.item.renderers.alma.insurance.default.actions"
+                       as="actions">
+                    <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove"
+                           name="checkout.cart.item.renderers.default.actions.remove"
+                           template="Magento_Checkout::cart/item/renderer/actions/remove.phtml"/>
                 </block>
             </block>
-            <block class="Magento\ConfigurableProduct\Block\Cart\Item\Renderer\Configurable" name="checkout.cart.item.renderers.configurable.with.insurance" as="configurable_product_with_alma_insurance" template="Alma_MonthlyPayments::cart/item/product_insurance.phtml">
-                <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions" name="checkout.cart.item.renderers.alma.insurance.configurable.actions" as="actions">
-                    <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove" name="checkout.cart.item.renderers.configurable.actions.remove" template="Magento_Checkout::cart/item/renderer/actions/remove.phtml"/>
+            <block class="Magento\ConfigurableProduct\Block\Cart\Item\Renderer\Configurable"
+                   name="checkout.cart.item.renderers.configurable.with.insurance"
+                   as="configurable_product_with_alma_insurance"
+                   template="Alma_MonthlyPayments::cart/item/product_insurance.phtml">
+                <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions"
+                       name="checkout.cart.item.renderers.alma.insurance.configurable.actions"
+                       as="actions">
+                    <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove"
+                           name="checkout.cart.item.renderers.configurable.actions.remove"
+                           template="Magento_Checkout::cart/item/renderer/actions/remove.phtml"/>
                 </block>
             </block>
         </referenceBlock>

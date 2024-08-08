@@ -5,7 +5,7 @@
         'Alma_MonthlyPayments/js/model/front-price-calculation'
     ], function ($,utils) {
         'use strict';
-        var childsConfig = <?= $block->getProductChild() ?>;
+        var childsConfig = <?= $block->escapeHtml($block->getProductChild()) ?>;
         var arrayParams = {};
         $('body').on('change','.super-attribute-select', function () {
             $('#product-options-wrapper').find('input[name*="super"]').each(function (index, item) {
@@ -15,12 +15,12 @@
                 if ( JSON.stringify(childsConfig[index].attributes) === JSON.stringify(arrayParams)) {
                     utils.setSkuForWifget(childsConfig[index].sku);
                     utils.refreshWidget(
-                        '<?= $block->getProductPriceInCent() ?>',
-                        '<?= $block->getBaseProductId() ?>',
-                        '<?= $block->getProductName() ?>',
-                        '<?= $block->getMerchantId()?>',
-                        '<?= $block->getQuoteId()?>',
-                        '<?= $block->getCustomerSessionId()?>'
+                        '<?= $block->escapeHtml($block->getProductPriceInCent()) ?>',
+                        '<?= $block->escapeHtml($block->getBaseProductId()) ?>',
+                        '<?= $block->escapeHtml($block->getProductName()) ?>',
+                        '<?= $block->escapeHtml($block->getMerchantId())?>',
+                        '<?= $block->escapeHtml($block->getQuoteId())?>',
+                        '<?= $block->escapeHtml($block->getCustomerSessionId())?>'
                     );
                 }
             }
