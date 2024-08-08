@@ -4,9 +4,7 @@
 
 ### Changes
 
-### 🚀 New Features
-
-- Implement new call to store shipping data (#182)
+- Shipment info analysis (#182)
 
 #### Contributors
 
