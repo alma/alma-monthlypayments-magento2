@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.1.0 - 2024-08-08
+
+### Changes
+
+### 🚀 New Features
+
+- Implement new call to store shipping data (#182)
+
+#### Contributors
+
+@Francois-Gomis
+
 ## v5.0.1 - 2024-07-09
 
 - Change array_search to in_array for adobe commerce php_cs
