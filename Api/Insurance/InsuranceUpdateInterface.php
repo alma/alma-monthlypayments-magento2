@@ -7,8 +7,8 @@ interface InsuranceUpdateInterface
 
     /**
      * Update insurance subscription
+     *
      * @return void
-     * @api
      */
     public function update();
 }

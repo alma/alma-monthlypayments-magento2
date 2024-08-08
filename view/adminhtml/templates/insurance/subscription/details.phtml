@@ -10,24 +10,24 @@
         class="subscription-alma-iframe"
         width="100%"
         height="100%"
-        src="<?= $block->getOrderDetailsUrl() ?>">
+        src="<?= $block->escapeHtml($block->getOrderDetailsUrl()) ?>">
     </iframe>
     <div id="alma-insurance-modal"></div>
 </div>
 
-<script data-cfasync="false" type="module" src="<?= $block->getScriptUrl() ?>"></script>
+<script data-cfasync="false" type="module" src="<?= $block->escapeUrl($block->getScriptUrl())?>"></script>
 <script type="text/x-magento-init">
     {
         "*": {
             "Alma_MonthlyPayments/js/subscription_details":{
-                "orderId": <?= $block->getOrderId() ?>,
-                "incrementId": "<?= $block->getIncrementId() ?>",
-                "mode": "<?= $block->getActiveMode() ?>",
-                "orderDate": "<?= $block->getOrderDate() ?>",
-                "firstName": "<?= $block->getCustomerFirstName() ?>",
-                "lastName": "<?= $block->getCustomerLastName() ?>",
-                "subscriptions": <?=  json_encode($block->getSubscriptionCollection(), true) ?>,
-                "controllerCancelUrl": "<?= $block->getControllerCancelUrl() ?>"
+                "orderId": <?= $block->escapeHtml($block->getOrderId()) ?>,
+                "incrementId": "<?= $block->escapeHtml($block->getIncrementId()) ?>",
+                "mode": "<?= $block->escapeHtml($block->getActiveMode()) ?>",
+                "orderDate": "<?= $block->escapeHtml($block->getOrderDate()) ?>",
+                "firstName": "<?= $block->escapeHtml($block->getCustomerFirstName()) ?>",
+                "lastName": "<?= $block->escapeHtml($block->getCustomerLastName()) ?>",
+                "subscriptions": <?=  $block->escapeHtml(json_encode($block->getSubscriptionCollection(), true)) ?>,
+                "controllerCancelUrl": "<?= $block->escapeUrl($block->getControllerCancelUrl()) ?>"
             }
         }
     }

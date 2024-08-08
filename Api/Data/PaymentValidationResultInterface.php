@@ -122,7 +122,7 @@ interface PaymentValidationResultInterface
     /**
      * Set the order amount (in cents) for the validated payment (null if invalid)
      *
-     * @param $value
+     * @param int $value
      * @return null
      * @api
      */

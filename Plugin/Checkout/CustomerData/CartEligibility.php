@@ -27,6 +27,8 @@ namespace Alma\MonthlyPayments\Plugin\Checkout\CustomerData;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
+use Magento\Checkout\CustomerData\Cart;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class CartEligibility
 {
@@ -34,14 +36,17 @@ class CartEligibility
      * @var Helpers\Eligibility
      */
     private $eligibilityHelper;
+
     /**
      * @var Config
      */
     private $config;
+
     /**
      * @var Helpers\Logger
      */
     private $logger;
+
     /**
      * @var Helpers\Availability
      */
@@ -68,9 +73,10 @@ class CartEligibility
     /**
      * Add eligibility information to result
      *
-     * @param \Magento\Checkout\CustomerData\Cart $subject
+     * @param Cart $subject
      * @param array $result
      * @return array
+     * @throws NoSuchEntityException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterGetSectionData(\Magento\Checkout\CustomerData\Cart $subject, $result)
@@ -93,9 +99,12 @@ class CartEligibility
     }
 
     /**
+     * Eligibility message should be displayed
+     *
      * @return bool
+     * @throws NoSuchEntityException
      */
-    private function shouldDisplay()
+    private function shouldDisplay(): bool
     {
         return $this->availabilityHelper->isAvailable();
     }

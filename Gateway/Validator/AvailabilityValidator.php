@@ -28,12 +28,16 @@ namespace Alma\MonthlyPayments\Gateway\Validator;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\Eligibility;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 
 class AvailabilityValidator extends AbstractValidator
 {
+
     /**
      * @var Availability
      */
@@ -75,11 +79,11 @@ class AvailabilityValidator extends AbstractValidator
      * @param array $validationSubject
      *
      * @return ResultInterface
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function validate(array $validationSubject)
+    public function validate(array $validationSubject): ResultInterface
     {
         return $this->createResult(
             $this->availabilityHelper->isAvailable() &&

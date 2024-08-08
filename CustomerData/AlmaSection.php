@@ -15,10 +15,12 @@ class AlmaSection implements SectionSourceInterface
      * @var array[]
      */
     private $paymentOptions;
+
     /**
      * @var Eligibility
      */
     private $eligibility;
+
     /**
      * @var CheckoutConfigHelper
      */
@@ -59,6 +61,8 @@ class AlmaSection implements SectionSourceInterface
     }
 
     /**
+     * Get section Data
+     *
      * @return array
      */
     public function getSectionData(): array
@@ -97,10 +101,12 @@ class AlmaSection implements SectionSourceInterface
     }
 
     /**
-     * @param $typeName
+     * Get payment method title and description
+     *
+     * @param string $typeName
      * @return array
      */
-    private function getPaymentMethodTexts($typeName):array
+    private function getPaymentMethodTexts(string $typeName):array
     {
         foreach ($this->paymentOptions as $key => $paymentMethod) {
             if ($key == $typeName) {
