@@ -17,9 +17,20 @@ use Magento\Sales\Model\Order;
 
 class OrderStatusObserver implements ObserverInterface
 {
+    /**
+     * @var Logger
+     */
     private $logger;
+
+    /**
+     * @var AlmaClient
+     */
     private $almaClient;
 
+    /**
+     * @param Logger $logger
+     * @param AlmaClient $almaClient
+     */
     public function __construct(
         Logger     $logger,
         AlmaClient $almaClient
@@ -29,17 +40,18 @@ class OrderStatusObserver implements ObserverInterface
     }
 
     /**
+     * Send order status for orders paid with Alma
+     *
      * @param Observer $observer
      * @return void
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
         $payment = $order->getPayment();
 
-        if (
-            $order->getState() === Order::STATE_NEW
+        if ($order->getState() === Order::STATE_NEW
             || !$payment
             || $payment->getMethod() !== Config::CODE
             || !array_key_exists(Config::ORDER_PAYMENT_ID, $payment->getAdditionalInformation())
@@ -59,13 +71,18 @@ class OrderStatusObserver implements ObserverInterface
         }
 
         try {
-            $almaClient->orders->sendStatus($almaOrder->id, ['status' => $order->getStatus() ?? '', 'is_shipped' => $order->hasShipments()]);
+            $almaClient->orders->sendStatus(
+                $almaOrder->id,
+                ['status' => $order->getStatus() ?? '', 'is_shipped' => $order->hasShipments()]
+            );
         } catch (AlmaException $e) {
             $this->logger->error('Impossible to send order Status', [$e->getMessage()]);
         }
     }
 
     /**
+     * Get Alma Client
+     *
      * @return Client
      * @throws OrderStatusException
      */
@@ -79,6 +96,8 @@ class OrderStatusObserver implements ObserverInterface
     }
 
     /**
+     * Get an Alma Payment from its ID
+     *
      * @param Client $almaClient
      * @param string $almaPaymentId
      * @return Payment
@@ -94,6 +113,8 @@ class OrderStatusObserver implements ObserverInterface
     }
 
     /**
+     * Get Alma Order from Alma Payment
+     *
      * @param Payment $almaPayment
      * @param string $incrementId
      * @return AlmaOrder
@@ -109,6 +130,13 @@ class OrderStatusObserver implements ObserverInterface
                 return $order;
             }
         }
-        throw new OrderStatusException(sprintf('No Order with merchant reference %s in Alma payment %s', $incrementId, $almaPayment->id), $this->logger);
+        throw new OrderStatusException(
+            sprintf(
+                'No Order with merchant reference %s in Alma payment %s',
+                $incrementId,
+                $almaPayment->id
+            ),
+            $this->logger
+        );
     }
 }
