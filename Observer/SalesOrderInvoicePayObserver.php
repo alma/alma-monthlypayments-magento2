@@ -21,24 +21,40 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      * @var Logger
      */
     private $logger;
+
     /**
      * @var InsuranceHelper
      */
     private $insuranceHelper;
+
     /**
      * @var AlmaClient
      */
     private $almaClient;
+
     /**
      * @var Subscription
      */
     private $subscriptionResourceModel;
+
     /**
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+
+    /**
+     * @var InsuranceSendCustomerCartHelper
+     */
     private $insuranceSendCustomerCartHelper;
 
+    /**
+     * @param Logger $logger
+     * @param InsuranceHelper $insuranceHelper
+     * @param AlmaClient $almaClient
+     * @param Subscription $subscriptionResourceModel
+     * @param ApiConfigHelper $apiConfigHelper
+     * @param InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper
+     */
     public function __construct(
         Logger                          $logger,
         InsuranceHelper                 $insuranceHelper,
@@ -89,7 +105,11 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
                 return;
             }
             $return = $return['subscriptions'];
-            $dbSubscriptionToSave = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult($invoicedItems, $return, $this->apiConfigHelper->getActiveMode());
+            $dbSubscriptionToSave = $this->insuranceHelper->createDbSubscriptionArrayFromItemsAndApiResult(
+                $invoicedItems,
+                $return,
+                $this->apiConfigHelper->getActiveMode()
+            );
             foreach ($dbSubscriptionToSave as $dbSubscription) {
                 $this->subscriptionResourceModel->save($dbSubscription);
             }

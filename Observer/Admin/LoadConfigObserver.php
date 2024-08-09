@@ -20,16 +20,46 @@ class LoadConfigObserver implements ObserverInterface
      * @var UrlInterface
      */
     private $url;
+
     /**
      * @var PaymentPlansHelper
      */
     private $paymentPlansHelper;
+
+    /**
+     * @var Logger
+     */
     private $logger;
+
+    /**
+     * @var Availability
+     */
     private $availability;
+
+    /**
+     * @var ConfigHelper
+     */
     private $configHelper;
+
+    /**
+     * @var StoreHelper
+     */
     private $storeHelper;
+
+    /**
+     * @var Manager
+     */
     private $cacheManager;
 
+    /**
+     * @param Logger $logger
+     * @param UrlInterface $url
+     * @param PaymentPlansHelper $paymentPlansHelper
+     * @param Availability $availability
+     * @param ConfigHelper $configHelper
+     * @param StoreHelper $storeHelper
+     * @param Manager $cacheManager
+     */
     public function __construct(
         Logger             $logger,
         UrlInterface       $url,
@@ -49,6 +79,8 @@ class LoadConfigObserver implements ObserverInterface
     }
 
     /**
+     *
+     *
      * @param Observer $observer
      * @return $this
      */
