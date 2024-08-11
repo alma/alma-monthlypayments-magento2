@@ -178,3 +178,5 @@
 "Pending","Pendiente"
 "Alma is currently being tested","Alma está siendo sometida a pruebas"
 "The transaction will be fake and the order will not be completed if you chose the payement method","La transacción será falsa y el pedido no se completará si eligió el método de pago"
+"The module is currently set for test mode (sandbox)","El módulo está actualmente en modo de prueba (sandbox)"
+"Don't forget to switch the live mode to allow your customer to use it.","No olvide activar el modo en directo para que su cliente pueda utilizarlo."

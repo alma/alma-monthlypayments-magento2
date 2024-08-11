@@ -178,3 +178,5 @@
 "Pending","In afwachting van"
 "Alma is currently being tested","Alma wordt momenteel getest"
 "The transaction will be fake and the order will not be completed if you chose the payement method","De transactie wordt vervalst en de bestelling wordt niet voltooid als je de betaalmethode hebt gekozen"
+"The module is currently set for test mode (sandbox)","De module is momenteel ingesteld op testmodus (sandbox)"
+"Don't forget to switch the live mode to allow your customer to use it.","Vergeet niet om de live-modus in te schakelen zodat je klant deze kan gebruiken."

@@ -178,3 +178,5 @@
 "Pending","In attesa"
 "Alma is currently being tested","Alma è attualmente in fase di test"
 "The transaction will be fake and the order will not be completed if you chose the payement method","La transazione sarà falsificata e l'ordine non sarà completato se si è scelto il metodo di pagamento"
+"The module is currently set for test mode (sandbox)","Il modulo è attualmente impostato per la modalità di test (sandbox)."
+"Don't forget to switch the live mode to allow your customer to use it.","Non dimenticate di attivare la modalità live per consentire al cliente di utilizzarla."

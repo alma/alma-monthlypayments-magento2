@@ -90,3 +90,18 @@ display: none;
     background:url('../images/alma-insurance-small.png') no-repeat;
     background-size: 60%;
 }
+.alma-test-mode {
+    display: flex;
+    flex-flow: row;
+    background-color: #FFF5CC;
+    padding: 5px;
+    margin: 20px 0;
+    border-radius: 20px;
+}
+.alma-test-mode-warning{
+    padding: 5px;
+}
+.alma-test-mode-text {
+    padding: 5px;
+}
+
