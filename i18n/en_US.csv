@@ -178,5 +178,5 @@
 "Pending","Pending"
 "Alma is currently being tested","Alma is currently being tested"
 "The transaction will be fake and the order will not be completed if you chose the payement method","The transaction will be fake and the order will not be completed if you chose the payement method"
-"The module is currently set for test mode (sandbox)","The module is currently set for test mode (sandbox)"
-"Don't forget to switch the live mode to allow your customer to use it.","Don't forget to switch the live mode to allow your customer to use it."
+"Sandbox/Test Mode","Sandbox/Test Mode"
+"All transactions are simulated.","All transactions are simulated."

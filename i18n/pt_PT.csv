@@ -179,5 +179,5 @@ e as suas vendas em 20%.<br>Sem encargos de subscrição e sem compromisso, sem 
 "Pending","Pendente"
 "Alma is currently being tested","A Alma está atualmente a ser testada"
 "The transaction will be fake and the order will not be completed if you chose the payement method","A transação será falsa e a encomenda não será concluída se escolher o método de pagamento"
-"The module is currently set for test mode (sandbox)","O módulo está atualmente definido para o modo de teste (sandbox)"
-"Don't forget to switch the live mode to allow your customer to use it.","Não se esqueça de mudar o modo em direto para permitir que o seu cliente o utilize."
+"Sandbox/Test Mode","Modo Sandbox/Teste"
+"All transactions are simulated.","Todas as transacções são simuladas."

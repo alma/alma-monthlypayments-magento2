@@ -94,14 +94,16 @@ display: none;
     display: flex;
     flex-flow: row;
     background-color: #FFF5CC;
-    padding: 5px;
+    padding: 24px;
     margin: 20px 0;
     border-radius: 20px;
 }
 .alma-test-mode-warning{
     padding: 5px;
 }
+
 .alma-test-mode-text {
     padding: 5px;
+    line-height: 24px;
 }
 

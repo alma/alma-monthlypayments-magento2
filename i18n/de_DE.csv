@@ -178,5 +178,5 @@
 "Pending","Anhängig"
 "Alma is currently being tested","Alma wird derzeit getestet"
 "The transaction will be fake and the order will not be completed if you chose the payement method","Die Transaktion wird gefälscht und die Bestellung wird nicht abgeschlossen, wenn Sie die Zahlungsmethode"
-"The module is currently set for test mode (sandbox)","Das Modul befindet sich derzeit im Testmodus (Sandbox)"
-"Don't forget to switch the live mode to allow your customer to use it.","Vergessen Sie nicht, den Live-Modus zu aktivieren, damit Ihr Kunde ihn nutzen kann."
+"Sandbox/Test Mode","Sandbox/Testmodus"
+"All transactions are simulated.","Alle Transaktionen werden simuliert."
