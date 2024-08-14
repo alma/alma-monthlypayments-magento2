@@ -79,7 +79,7 @@ class LoadConfigObserver implements ObserverInterface
     }
 
     /**
-     *
+     * For alma insurance section and payment section, call Alma API to check if merchant feature flag
      *
      * @param Observer $observer
      * @return $this
@@ -98,14 +98,25 @@ class LoadConfigObserver implements ObserverInterface
                 $this->logger->error('Alma Insurance Flag Exception', ['exception' => $e->getMessage()]);
                 return $this;
             }
-            $cacheTypeList = ["config","layout","block_html","compiled_config","config_integration","config_integration_api","full_page"];
-            if (!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1') {
+            $cacheTypeList = [
+                "config",
+                "layout",
+                "block_html",
+                "compiled_config",
+                "config_integration",
+                "config_integration_api","full_page"
+            ];
+            if (!$cmsInsuranceFlagValue &&
+                $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1'
+            ) {
                 $this->saveIsAllowedInsurance(0);
-                $this->getClearInsuranceConfig();
+                $this->clearInsuranceConfig();
                 $this->cacheManager->clean($cacheTypeList);
                 $controller->getResponse()->setRedirect($currentUrl);
             }
-            if ($cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '0') {
+            if ($cmsInsuranceFlagValue &&
+                $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '0'
+            ) {
                 $this->saveIsAllowedInsurance(1);
                 $this->cacheManager->clean($cacheTypeList);
                 $controller->getResponse()->setRedirect($currentUrl);
@@ -115,10 +126,12 @@ class LoadConfigObserver implements ObserverInterface
     }
 
     /**
-     * @param $value
+     * Save is allowed insurance from feature flag
+     *
+     * @param int $value
      * @return void
      */
-    private function saveIsAllowedInsurance($value):void
+    private function saveIsAllowedInsurance(int $value):void
     {
         $this->configHelper->saveIsAllowedInsuranceValue(
             $value,
@@ -128,9 +141,11 @@ class LoadConfigObserver implements ObserverInterface
     }
 
     /**
+     * Clear insurance config
+     *
      * @return void
      */
-    private function getClearInsuranceConfig(): void
+    private function clearInsuranceConfig(): void
     {
         $this->configHelper->clearInsuranceConfig(
             $this->storeHelper->getScope(),

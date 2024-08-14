@@ -11,6 +11,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use InvalidArgumentException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order;
 
@@ -32,6 +33,8 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
+     *
+     *
      * @param Observer $observer
      * @return void
      */
@@ -56,6 +59,8 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
+     * Check if payment has deferred trigger
+     *
      * @param $almaPayment
      * @return bool
      */
@@ -65,6 +70,8 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
+     * Check if payment is already triggered
+     *
      * @param $almaPayment
      * @return bool
      */
@@ -74,18 +81,22 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
-     * @param $almaPaymentId
+     * Get Alma payment by id
+     *
+     * @param string $almaPaymentId
      *
      * @return Payment
      * @throws AlmaClientException
      * @throws RequestError
      */
-    private function getAlmaPaymentById($almaPaymentId): Payment
+    private function getAlmaPaymentById(string $almaPaymentId): Payment
     {
         return $this->almaClient->getDefaultClient()->payments->fetch($almaPaymentId);
     }
 
     /**
+     * Get order from observer
+     *
      * @param $observer
      * @return Order
      */
@@ -95,6 +106,8 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
+     * get payment method name
+     *
      * @param Order $order
      * @return string
      */
@@ -104,10 +117,12 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
-     * @param Order $order
+     * Get order payment
+     *
+     * @param OrderInterface $order
      * @return OrderPaymentInterface|null
      */
-    private function getOrderPayment(Order $order): ?OrderPaymentInterface
+    private function getOrderPayment(OrderInterface $order): ?OrderPaymentInterface
     {
         return $order->getPayment();
     }
@@ -122,7 +137,9 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
-     * @param $order
+     * Check if order is trigger
+     *
+     * @param OrderInterface $order
      * @return bool
      */
     private function orderIsTrigger($order): bool
@@ -135,6 +152,8 @@ class ShipmentObserver implements ObserverInterface
     }
 
     /**
+     * Get payment id from url
+     *
      * @param $order
      * @return string
      * @throws InvalidArgumentException
