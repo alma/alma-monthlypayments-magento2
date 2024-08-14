@@ -25,6 +25,9 @@
 
 namespace Alma\MonthlyPayments\Controller\Payment;
 
+use Alma\API\Lib\PaymentValidator;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentValidation;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaPaymentValidationException;
 use Magento\Framework\App\Action\Action;
@@ -35,40 +38,113 @@ use Magento\Framework\Controller\ResultInterface;
 
 class Ipn extends Action
 {
+
     /**
      * @var PaymentValidation
      */
     private $paymentValidationHelper;
 
     /**
-     * Ipn constructor.
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var PaymentValidator
+     */
+    private $paymentValidator;
+
+    /**
+     * @var ApiConfigHelper
+     */
+    private $apiConfigHelper;
+
+    /**
      * @param Context $context
      * @param PaymentValidation $paymentValidationHelper
+     * @param Logger $logger
+     * @param PaymentValidator $paymentValidator
+     * @param ApiConfigHelper $apiConfigHelper
      */
     public function __construct(
-        Context $context,
-        PaymentValidation $paymentValidationHelper
-    )
-    {
+        Context           $context,
+        PaymentValidation $paymentValidationHelper,
+        Logger            $logger,
+        PaymentValidator  $paymentValidator,
+        ApiConfigHelper   $apiConfigHelper
+    ) {
         parent::__construct($context);
         $this->paymentValidationHelper = $paymentValidationHelper;
+        $this->logger = $logger;
+        $this->paymentValidator = $paymentValidator;
+        $this->apiConfigHelper = $apiConfigHelper;
+    }
+
+
+    /**
+     * @inerhitDoc
+     */
+    public function execute(): Json
+    {
+        $paymentId = $this->getRequest()->getParam('pid');
+
+        try {
+            $apiKey = $this->getApiKey();
+            $this->checkSignature($paymentId, $apiKey);
+            $this->paymentValidationHelper->completeOrderIfValid($paymentId);
+        } catch (AlmaPaymentValidationException $e) {
+            return $this->setHttpResponse(["error" => $e->getMessage()], $e->getCode());
+        }
+        return $this->setHttpResponse(["success" => true], 200);
     }
 
     /**
-     * @return ResultInterface
+     * Get Active API KEY, if not found throw exception
+     *
+     * @return string
+     * @throws AlmaPaymentValidationException
      */
-    public function execute()
+    private function getApiKey(): string
     {
-        /** @var Json $json */
-        $json = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        $apiKey = $this->apiConfigHelper->getActiveAPIKey();
+        if (!$apiKey) {
+            $this->logger->error("Missing API key in IPN request");
+            throw new AlmaPaymentValidationException("Missing API key in IPN request", '', 500);
+        }
+        return $apiKey;
+    }
 
-        try {
-            $paymentId = $this->getRequest()->getParam('pid');
-            $this->paymentValidationHelper->completeOrderIfValid($paymentId);
-        } catch (AlmaPaymentValidationException $e) {
-            return $json->setData(["error" => $e->getMessage()])->setHttpResponseCode(500);
+    /**
+     * Check Alma payment signature
+     *
+     * @param string $paymentId
+     * @param string $apiKey
+     * @return void
+     * @throws AlmaPaymentValidationException
+     */
+    private function checkSignature(string $paymentId, string $apiKey): void
+    {
+        $signature = $this->getRequest()->getHeader(PaymentValidator::HEADER_SIGNATURE_KEY);
+        if (!$signature) {
+            $this->logger->error("Missing signature in IPN request");
+            throw new AlmaPaymentValidationException("Missing signature", '', 401);
         }
 
-        return $json->setData(["success" => true])->setHttpResponseCode(200);
+        if (!$this->paymentValidator->isHmacValidated($paymentId, $apiKey, $signature)) {
+            $this->logger->error("Wrong signature in IPN request");
+            throw new AlmaPaymentValidationException("Wrong signature in IPN request", '', 401);
+        }
+    }
+
+    /**
+     * Set data and code in response
+     *
+     * @param array $data
+     * @param int $code
+     * @return Json
+     */
+    private function setHttpResponse(array $data, int $code): Json
+    {
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($data)->setHttpResponseCode($code);
     }
 }
