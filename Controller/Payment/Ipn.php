@@ -131,7 +131,10 @@ class Ipn extends Action
         }
 
         if (!$this->paymentValidator->isHmacValidated($paymentId, $apiKey, $signature)) {
-            $this->logger->error("Wrong signature in IPN request");
+            $this->logger->error("Wrong signature in IPN request", [
+                'payment_id' => $paymentId,
+                'signature' => $signature
+            ]);
             throw new AlmaPaymentValidationException("Wrong signature in IPN request", '', 401);
         }
     }
