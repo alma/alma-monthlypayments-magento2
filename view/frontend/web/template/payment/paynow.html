@@ -41,6 +41,7 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: paynowPaymentMethod().description"></div>
+        <!-- ko template: 'Alma_MonthlyPayments/payment/mode-warning' --><!-- /ko -->
         <!-- ko if: paynowSelectedPlan().inPageAllowed -->
         <div id="alma-in-page-alma_monthly_payments_paynow" style="display: none"></div>
         <!-- /ko -->
