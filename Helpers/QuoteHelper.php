@@ -153,8 +153,9 @@ class QuoteHelper
     private function getQuoteByContextUserId():?CartInterface
     {
         $quote = null;
+        $userType = $this->getUserType();
         $customerUserId = $this->getContextUserId();
-        if ($customerUserId > 0) {
+        if ($userType != 1 && $customerUserId > 0) {
             $quote = $this->quoteRepository->getActiveForCustomer($customerUserId);
         }
         return $quote;
@@ -173,6 +174,15 @@ class QuoteHelper
             $this->logger->info('getQuoteById Exception : ', [$e->getMessage()]);
         }
         return $quote;
+    }
+
+    /**
+     * @return int|null
+     * default value 0
+     */
+    private function getUserType():?int
+    {
+        return $this->userContext->getUserType();
     }
 
     /**
