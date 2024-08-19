@@ -155,7 +155,7 @@ class QuoteHelper
         $quote = null;
         $userType = $this->getUserType();
         $customerUserId = $this->getContextUserId();
-        if ($userType != 1 && $customerUserId > 0) {
+        if ($userType != UserContextInterface::USER_TYPE_INTEGRATION && $customerUserId > 0) {
             $quote = $this->quoteRepository->getActiveForCustomer($customerUserId);
         }
         return $quote;
