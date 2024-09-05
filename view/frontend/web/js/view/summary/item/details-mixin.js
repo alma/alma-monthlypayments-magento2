@@ -11,13 +11,11 @@ define([
          * @return {String}
          */
         getNameUnsanitizedHtml: function (quoteItem) {
-            var carItems = customerData.get('cart')().items;
-            for (let item of carItems){
-                if(item.item_id == quoteItem.item_id) {
-                    if (item.isInsuranceProduct){
-                        return item.product_name;
-                    }
-                    return this._super();
+            var cartData = customerData.get('cart')();
+            var carItems = (cartData && Array.isArray(cartData.items)) ? cartData.items : [];
+            for (let item of carItems) {
+                if (item.item_id === quoteItem.item_id && item.isInsuranceProduct) {
+                    return item.product_name;
                 }
             }
             return this._super();
