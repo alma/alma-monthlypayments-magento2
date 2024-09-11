@@ -17,6 +17,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Module\Dir;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\Store;
 
 class InsuranceProductHelper extends AbstractHelper
 {
@@ -87,7 +89,9 @@ class InsuranceProductHelper extends AbstractHelper
      */
     public function getInsuranceProduct(): ProductInterface
     {
-        return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU);
+        $this->logger->info('getCurrentStoreId', [$this->getCurrentStoreId()]);
+
+        return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU, true, Store::DEFAULT_STORE_ID);
     }
 
     /**
@@ -105,7 +109,7 @@ class InsuranceProductHelper extends AbstractHelper
             return;
         }
 
-        if ($insuranceProduct->getStatus() === Status::STATUS_DISABLED) {
+        if ((int)$insuranceProduct->getStatus() === Status::STATUS_DISABLED) {
             return;
         }
 
@@ -174,5 +178,15 @@ class InsuranceProductHelper extends AbstractHelper
                 [InsuranceHelper::ALMA_INSURANCE_SKU]
             );
         }
+    }
+
+    /**
+     * Get current store ID
+     *
+     * @return int
+     */
+    private function getCurrentStoreId(): int
+    {
+        return $this->scopeConfig->getValue('store_id', ScopeInterface::SCOPE_STORE);
     }
 }
