@@ -4,6 +4,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Model\Adminhtml\Config\Insurance;
 
 use Alma\MonthlyPayments\Helpers\InsuranceProductHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Helpers\QuoteHelper;
 use Alma\MonthlyPayments\Model\Adminhtml\Config\Insurance\ConfigurationSave;
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -21,9 +22,9 @@ class ConfigurationSaveTest extends TestCase
     private $config;
     private $cacheTypeList;
     private $logger;
-    private $productRepository;
     private $insuranceProductHelper;
     private $configurationSave;
+    private $quoteHelper;
 
     protected function setUp(): void
     {
@@ -32,16 +33,17 @@ class ConfigurationSaveTest extends TestCase
         $this->config = $this->createMock(ScopeConfigInterface::class);
         $this->cacheTypeList = $this->createMock(TypeListInterface::class);
         $this->logger = $this->createMock(Logger::class);
-        $this->productRepository = $this->createMock(ProductRepositoryInterface::class);
         $this->insuranceProductHelper = $this->createMock(InsuranceProductHelper::class);
+        $this->quoteHelper = $this->createMock(QuoteHelper::class);
+
         $this->configurationSave = new ConfigurationSave(
             $this->context,
             $this->registry,
             $this->config,
             $this->cacheTypeList,
             $this->logger,
-            $this->productRepository,
-            $this->insuranceProductHelper
+            $this->insuranceProductHelper,
+            $this->quoteHelper
         );
     }
 
@@ -69,7 +71,6 @@ class ConfigurationSaveTest extends TestCase
     {
         $this->configurationSave->setValue($this->configFactory('true'));
         $this->config->method('getValue')->willReturn($this->configFactory());
-        $this->productRepository->method('get')->willReturn($this->createMock(ProductRepositoryInterface::class));
         $this->assertEquals($this->configurationSave, $this->configurationSave->beforeSave());
     }
 
@@ -77,21 +78,39 @@ class ConfigurationSaveTest extends TestCase
     {
         $this->configurationSave->setValue($this->configFactory('true'));
         $this->config->method('getValue')->willReturn($this->configFactory());
-        $this->productRepository->method('get')->willThrowException(new NoSuchEntityException());
+        $this->insuranceProductHelper->method('enableInsuranceProductIfExist')->willThrowException(new AlmaInsuranceProductException());
         $this->insuranceProductHelper->expects($this->once())->method('createInsuranceProduct');
         $this->assertEquals($this->configurationSave, $this->configurationSave->beforeSave());
     }
 
-    public function testInsuranceProductNotExistCreateInsuranceProductThrowAnError(): void
+    public function testInsuranceProductNotExistCreateInsuranceProductThrowAnErrorReturnThis(): void
     {
         $this->configurationSave->setValue($this->configFactory('true'));
         $this->config->method('getValue')->willReturn($this->configFactory());
-        $this->productRepository->method('get')->willThrowException(new NoSuchEntityException());
+        $this->insuranceProductHelper->method('enableInsuranceProductIfExist')->willThrowException(new AlmaInsuranceProductException());
         $this->insuranceProductHelper->expects($this->once())->method('createInsuranceProduct')->willThrowException(new AlmaInsuranceProductException('Impossible to create insurance product'));
         $this->expectException(AlmaInsuranceProductException::class);
         $this->expectExceptionMessage('Impossible to create insurance product');
         $this->configurationSave->beforeSave();
     }
+
+    public function testIsActivatedFalseCallDisableInsuranceProductAndDeleteInsuranceData(): void
+    {
+        $this->configurationSave->setValue($this->configFactory());
+        $this->config->method('getValue')->willReturn($this->configFactory('true'));
+        $this->insuranceProductHelper->expects($this->once())->method('disableInsuranceProductIfExist');
+        $this->quoteHelper->expects($this->once())->method('deleteInsuranceDataFromQuoteItemForNotConvertedQuote');
+        $this->assertEquals($this->configurationSave, $this->configurationSave->beforeSave());
+    }
+
+    public function testIsActivatedTrueAndInsuranceProductExistCallActivateInsuranceProduct(): void
+    {
+        $this->configurationSave->setValue($this->configFactory('true'));
+        $this->config->method('getValue')->willReturn($this->configFactory());
+        $this->insuranceProductHelper->expects($this->once())->method('enableInsuranceProductIfExist');
+        $this->assertEquals($this->configurationSave, $this->configurationSave->beforeSave());
+    }
+
 
     private function configFactory(
         $isInsuranceActivated = 'false',
