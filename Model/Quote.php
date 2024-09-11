@@ -18,14 +18,13 @@ class Quote extends BaseQuote
         try {
             $almaInsuranceProduct = $insuranceHelper->getAlmaInsuranceProduct();
         } catch (Exceptions\AlmaInsuranceProductException $e) {
-            return false;
         }
 
         if ($insuranceHelper->hasInsuranceInRequest()) {
             return false;
         }
 
-        if ($product->getId() === $almaInsuranceProduct->getId()) {
+        if (isset($almaInsuranceProduct) && $product->getId() === $almaInsuranceProduct->getId()) {
             return false;
         }
 
