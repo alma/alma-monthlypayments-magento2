@@ -116,6 +116,7 @@ class InsuranceProductHelperTest extends TestCase
         $this->productHelper->expects($this->once())->method('disableProduct')->with($product);
         $this->insuranceProductHelper->disableInsuranceProductIfExist();
     }
+
     public function testDisableInsuranceProductThrowExceptionIfErrorOnSave(): void
     {
         $product = $this->getProductMock();
@@ -128,7 +129,22 @@ class InsuranceProductHelperTest extends TestCase
         $this->insuranceProductHelper->disableInsuranceProductIfExist();
     }
 
-    private function getProductMock(): ProductInterface | MockObject
+    public function testEnableInsuranceProductThrowExceptionIfProductNotExist(): void
+    {
+        $this->productRepository->method('get')->willThrowException(new NoSuchEntityException());
+        $this->expectException(AlmaInsuranceProductException::class);
+        $this->insuranceProductHelper->enableInsuranceProductIfExist();
+    }
+
+    public function testEnableInsuranceProductNotCallEnableProductHelperForExistingProductWithEnableStatus(): void
+    {
+        $product = $this->getProductMock();
+        $product->method('getStatus')->willReturn(Status::STATUS_ENABLED);
+        $this->productHelper->expects($this->never())->method('enableProduct');
+        $this->insuranceProductHelper->enableInsuranceProductIfExist();
+    }
+
+    private function getProductMock(): ProductInterface|MockObject
     {
         $product = $this->createMock(ProductInterface::class);
         $this->productRepository->method('get')->willReturn($product);

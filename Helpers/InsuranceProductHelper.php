@@ -89,8 +89,6 @@ class InsuranceProductHelper extends AbstractHelper
      */
     public function getInsuranceProduct(): ProductInterface
     {
-        $this->logger->info('getCurrentStoreId', [$this->getCurrentStoreId()]);
-
         return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU, true, Store::DEFAULT_STORE_ID);
     }
 
@@ -118,6 +116,27 @@ class InsuranceProductHelper extends AbstractHelper
         } catch (AlmaProductException $e) {
             $this->logger->error('Disable insurance product failed with message : ', [$e->getMessage()]);
             throw new AlmaInsuranceProductException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    public function enableInsuranceProductIfExist(): void
+    {
+        try {
+            $insuranceProduct = $this->getInsuranceProduct();
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error('Insurance product not exist', [$e->getMessage()]);
+            throw new AlmaInsuranceProductException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ((int)$insuranceProduct->getStatus() === Status::STATUS_ENABLED) {
+            return;
+        }
+
+        try {
+            $this->productHelper->enableProduct($insuranceProduct);
+
+        } catch (AlmaProductException $e) {
+            $this->logger->error('Enable insurance product failed with message : ', [$e->getMessage()]);
         }
     }
 
@@ -183,9 +202,9 @@ class InsuranceProductHelper extends AbstractHelper
     /**
      * Get current store ID
      *
-     * @return int
+     * @return int|null
      */
-    private function getCurrentStoreId(): int
+    private function getCurrentStoreId(): ?int
     {
         return $this->scopeConfig->getValue('store_id', ScopeInterface::SCOPE_STORE);
     }
