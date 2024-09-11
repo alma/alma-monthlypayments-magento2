@@ -119,4 +119,26 @@ class ProductHelper
             throw new AlmaProductException($e->getMessage(), $e->getCode(), $e);
         }
     }
+
+    /**
+     * Enable a product
+     *
+     * @param Product $product
+     * @return void
+     * @throws AlmaProductException
+     */
+    public function enableProduct(ProductInterface $product): void
+    {
+        $product->setStatus(Status::STATUS_ENABLED);
+        try {
+            $this->productRepository->save($product);
+
+        } catch (CouldNotSaveException|InputException|StateException $e) {
+            $this->logger->warning(
+                "Impossible to enable Product",
+                ['productId' => $product->getId(), 'message' => $e->getMessage()]
+            );
+            throw new AlmaProductException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
 }

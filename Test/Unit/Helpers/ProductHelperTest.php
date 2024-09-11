@@ -97,6 +97,28 @@ class ProductHelperTest extends TestCase
         $this->createProductHelper()->disableProduct($product);
     }
 
+    public function testEnableProductCallSetStatusAndNotThrowExceptionForSave(): void
+    {
+        $product = $this->createMock(Product::class);
+        $product->expects($this->once())->method('setStatus')->with(Status::STATUS_ENABLED);
+        $this->productRepository->expects($this->once())->method('save');
+        $this->createProductHelper()->enableProduct($product);
+    }
+    /**
+     * @dataProvider errorDataProvider
+     */
+    public function testEnableProductCallSetStatusAndThrowExceptionForSave($exceptionClass): void
+    {
+        $product = $this->createMock(Product::class);
+        $product->expects($this->once())->method('setStatus')->with(Status::STATUS_ENABLED);
+        $this->productRepository
+            ->expects($this->once())
+            ->method('save')
+            ->willThrowException($exceptionClass);
+        $this->expectException(AlmaProductException::class);
+        $this->createProductHelper()->enableProduct($product);
+    }
+
     private function errorDataProvider(): array
     {
         return [
