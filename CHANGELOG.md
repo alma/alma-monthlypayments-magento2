@@ -4,21 +4,16 @@
 
 ### Changes
 
-- Backport main to develop (#185)
-
-### 🚀 New Features
-
 - Remove insurance products from active carts when insurance is disabled (#197)
 - Add signature verification on ipn (#191)
 - Insurance reset widget on qty change (#195)
-- Change return if insurance product not exist (#188)
 - Warn user that module is in test mode (#187)
 
 ### 🐛 Bug Fixes
 
 - Fix getNameUnsanitizedHtml name override (#193)
-- Fix issue The order confirmation email was sent, but the field email_sent remains NULL  (#194)
-- Change return if insurance product not exist (#188)
+- Fix Order confirmation email was sent, but the field email_sent remains NULL  (#194)
+- Fix stack product in quote if insurance product not exist (#188)
 
 #### Contributors
 
