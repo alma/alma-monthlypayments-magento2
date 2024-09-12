@@ -1,5 +1,24 @@
 # Changelog
 
+## v5.2.0 - 2024-09-12
+
+### Changes
+
+- Remove insurance products from active carts when insurance is disabled (#197)
+- Add signature verification on ipn (#191)
+- Insurance reset widget on qty change (#195)
+- Warn user that module is in test mode (#187)
+
+### 🐛 Bug Fixes
+
+- Fix getNameUnsanitizedHtml name override (#193)
+- Fix Order confirmation email was sent, but the field email_sent remains NULL  (#194)
+- Fix stack product in quote if insurance product not exist (#188)
+
+#### Contributors
+
+@FranceBe, @Francois-Gomis, @defenseoftheancients, @github-actions and hng.atuan@gmail.com
+
 ## v5.1.0 - 2024-08-08
 
 ### Changes
