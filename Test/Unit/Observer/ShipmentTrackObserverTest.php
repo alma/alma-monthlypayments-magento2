@@ -64,6 +64,10 @@ class ShipmentTrackObserverTest extends TestCase
      * @var OrderInterface
      */
     private $trackOrder;
+    /**
+     * @var ShipmentTrackObserver
+     */
+    private $shipmentTrackObserver;
 
 
     protected function setUp(): void
@@ -374,7 +378,7 @@ class ShipmentTrackObserverTest extends TestCase
             $this->almaClient,
             $this->logger
         );
-        $this->assertNull($this->shipmentTrackObserver->execute($this->observer));
+        $this->shipmentTrackObserver->execute($this->observer);
     }
 
     /**
