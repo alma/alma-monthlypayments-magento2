@@ -166,7 +166,7 @@ class InsuranceProductHelper extends AbstractHelper
         $insuranceProduct->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE);
         // Tax class ID 0 for not applicable
         $insuranceProduct->setTaxClassId(0);
-        $insuranceProduct->setDescription('Alma Insura      nce product');
+        $insuranceProduct->setDescription('Alma Insurance product');
         $insuranceProduct->setUrlKey('alma-insurance');
 
         $fileName = 'alma_insurance_logo.jpg';
@@ -197,15 +197,5 @@ class InsuranceProductHelper extends AbstractHelper
                 [InsuranceHelper::ALMA_INSURANCE_SKU]
             );
         }
-    }
-
-    /**
-     * Get current store ID
-     *
-     * @return int|null
-     */
-    private function getCurrentStoreId(): ?int
-    {
-        return $this->scopeConfig->getValue('store_id', ScopeInterface::SCOPE_STORE);
     }
 }
