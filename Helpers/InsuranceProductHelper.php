@@ -3,7 +3,8 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceProductException;
-use Magento\Catalog\Model\Product;
+use Alma\MonthlyPayments\Model\Exceptions\AlmaProductException;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ProductFactory;
@@ -12,18 +13,43 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Module\Dir;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\Store;
 
 class InsuranceProductHelper extends AbstractHelper
 {
+    /**
+     * @var ProductFactory
+     */
     private $productFactory;
+    /**
+     * @var File
+     */
     private $fileProcessor;
+    /**
+     * @var Filesystem
+     */
     private $filesystem;
+    /**
+     * @var Logger
+     */
     private $logger;
+    /**
+     * @var Dir
+     */
     private $directory;
+    /**
+     * @var ProductRepository
+     */
     private $productRepository;
+    /**
+     * @var ProductHelper
+     */
+    private $productHelper;
 
     /**
      * @param Context $context
@@ -33,6 +59,7 @@ class InsuranceProductHelper extends AbstractHelper
      * @param File $fileProcessor
      * @param Filesystem $filesystem
      * @param ProductRepository $productRepository
+     * @param ProductHelper $productHelper
      */
     public function __construct(
         Context           $context,
@@ -41,10 +68,9 @@ class InsuranceProductHelper extends AbstractHelper
         Dir               $directory,
         File              $fileProcessor,
         Filesystem        $filesystem,
-        ProductRepository $productRepository
-
+        ProductRepository $productRepository,
+        ProductHelper     $productHelper
     ) {
-
         parent::__construct($context);
         $this->productFactory = $productFactory;
         $this->fileProcessor = $fileProcessor;
@@ -52,15 +78,76 @@ class InsuranceProductHelper extends AbstractHelper
         $this->logger = $logger;
         $this->directory = $directory;
         $this->productRepository = $productRepository;
+        $this->productHelper = $productHelper;
     }
 
     /**
+     * Get insurance product
+     *
+     * @return ProductInterface
+     * @throws NoSuchEntityException
+     */
+    public function getInsuranceProduct(): ProductInterface
+    {
+        return $this->productRepository->get(InsuranceHelper::ALMA_INSURANCE_SKU, true, Store::DEFAULT_STORE_ID);
+    }
+
+    /**
+     * Disable insurance product if exist
+     *
+     * @return void
+     * @throws AlmaInsuranceProductException
+     */
+    public function disableInsuranceProductIfExist(): void
+    {
+        try {
+            $insuranceProduct = $this->getInsuranceProduct();
+        } catch (NoSuchEntityException $e) {
+            $this->logger->info('Alma insurance product not found no disable needed', [$e->getMessage()]);
+            return;
+        }
+
+        if ((int)$insuranceProduct->getStatus() === Status::STATUS_DISABLED) {
+            return;
+        }
+
+        try {
+            $this->productHelper->disableProduct($insuranceProduct);
+        } catch (AlmaProductException $e) {
+            $this->logger->error('Disable insurance product failed with message : ', [$e->getMessage()]);
+            throw new AlmaInsuranceProductException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    public function enableInsuranceProductIfExist(): void
+    {
+        try {
+            $insuranceProduct = $this->getInsuranceProduct();
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error('Insurance product not exist', [$e->getMessage()]);
+            throw new AlmaInsuranceProductException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ((int)$insuranceProduct->getStatus() === Status::STATUS_ENABLED) {
+            return;
+        }
+
+        try {
+            $this->productHelper->enableProduct($insuranceProduct);
+
+        } catch (AlmaProductException $e) {
+            $this->logger->error('Enable insurance product failed with message : ', [$e->getMessage()]);
+        }
+    }
+
+    /**
+     * Create Insurance product in merchant catalogue
+     *
      * @return void
      */
     public function createInsuranceProduct(): void
     {
         // Create a new product with the insurance SKU
-        /** @var Product $insuranceProduct */
         $insuranceProduct = $this->productFactory->create();
         $insuranceProduct->setSku(InsuranceHelper::ALMA_INSURANCE_SKU);
         $insuranceProduct->setName('Alma Insurance');
@@ -75,9 +162,9 @@ class InsuranceProductHelper extends AbstractHelper
             "manage_stock" => 0,
             "use_config_notify_stock_qty" => 0
         ]);
-        // Not visible individualy ID 1
+        // Not visible individually ID 1
         $insuranceProduct->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE);
-        // ID de la classe de taxe (0 pour non applicable)
+        // Tax class ID 0 for not applicable
         $insuranceProduct->setTaxClassId(0);
         $insuranceProduct->setDescription('Alma Insurance product');
         $insuranceProduct->setUrlKey('alma-insurance');

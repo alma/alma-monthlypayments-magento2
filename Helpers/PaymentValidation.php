@@ -265,7 +265,6 @@ class PaymentValidation
         $payment = $order->getPayment();
         $this->addTransactionToPayment($payment, $order, $almaPayment);
         $this->paymentProcessor->registerCaptureNotification($payment, $payment->getBaseAmountAuthorized());
-        $this->orderHelper->notify($order->getId());
 
         // TODO : Paylater / PnX
         $order = $this->addCommentToOrder($order, __('First instalment captured successfully'), $newStatus);
@@ -275,6 +274,8 @@ class PaymentValidation
         }
         $this->orderHelper->save($order);
         $this->inactiveQuoteById($order->getQuoteId());
+
+        $this->orderHelper->notify($order->getId());
     }
 
     /**

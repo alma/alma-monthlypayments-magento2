@@ -25,11 +25,51 @@
 
 namespace Alma\MonthlyPayments\Block\Adminhtml\System\Config\Fieldset;
 
+use Alma\MonthlyPayments\Gateway\Config\Config;
+use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
+use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Backend\Block\Context;
+use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Fieldset;
+use Magento\Framework\App\Area;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\View\Helper\Js;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Payment extends Fieldset
 {
+
+    private $logger;
+    private $apiConfigHelper;
+    private $config
+    ;
+
+    /**
+     * @param Context $context
+     * @param Session $authSession
+     * @param Js $jsHelper
+     * @param Logger $logger
+     * @param ApiConfigHelper $apiConfigHelper
+     * @param Config $config
+     * @param array $data
+     * @param SecureHtmlRenderer|null $secureRenderer
+     */
+    public function __construct(
+        Context             $context,
+        Session             $authSession,
+        Js                  $jsHelper,
+        Logger              $logger,
+        ApiConfigHelper     $apiConfigHelper,
+        Config              $config,
+        array               $data = [],
+        ?SecureHtmlRenderer $secureRenderer = null
+    ) {
+        parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
+        $this->logger = $logger;
+        $this->apiConfigHelper = $apiConfigHelper;
+        $this->config = $config;
+    }
+
     /**
      * Add custom css class
      *
@@ -53,19 +93,19 @@ class Payment extends Fieldset
         $html = '<div class="config-heading" >';
         $htmlId = $element->getHtmlId();
         $html .= '<div class="button-container"><button type="button"' .
-                 ' class="button action-configure' .
-                 '" id="' .
-                 $htmlId .
-                 '-head" onclick="almaToggleSolution.call(this, \'' .
-                 $htmlId .
-                 "', '" .
-                 $this->getUrl(
-                     'adminhtml/*/state'
-                 ) . '\'); return false;"><span class="state-closed">' . __(
-                     'Configure'
-                 ) . '</span><span class="state-opened">' . __(
-                     'Close'
-                 ) . '</span></button>';
+            ' class="button action-configure' .
+            '" id="' .
+            $htmlId .
+            '-head" onclick="almaToggleSolution.call(this, \'' .
+            $htmlId .
+            "', '" .
+            $this->getUrl(
+                'adminhtml/*/state'
+            ) . '\'); return false;"><span class="state-closed">' . __(
+                'Configure'
+            ) . '</span><span class="state-opened">' . __(
+                'Close'
+            ) . '</span></button>';
 
         $html .= '</div>';
         $html .= '<div class="heading"><strong>' . $element->getLegend() . '</strong>';
@@ -88,7 +128,23 @@ class Payment extends Fieldset
      */
     protected function _getHeaderCommentHtml($element)
     {
-        return '';
+        if (!$this->config->getIsActive() || $this->apiConfigHelper->getActiveMode() !== ApiConfigHelper::TEST_MODE_KEY) {
+            return '';
+        }
+        $html = '<div class="alma-test-mode" >';
+        $html .= '<div class="alma-test-mode-warning">';
+        $html .= '<img src="' . $this->getViewFileUrl('Alma_MonthlyPayments::images/warning.svg', ['area' => Area::AREA_FRONTEND]) . '" alt="Warning test mode" />';
+        $html .= '</div>';
+        $html .= '<div class="alma-test-mode-text">';
+        $html .= '<b>';
+        $html .= __('The module is currently set for test mode (sandbox)');
+        $html .= '</b>';
+        $html .= '<br>';
+        $html .= __("Don't forget to switch the live mode to allow your customer to use it.");
+        $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
     }
 
     /**

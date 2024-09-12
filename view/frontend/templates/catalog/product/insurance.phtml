@@ -79,6 +79,7 @@
             qtyNode.addEventListener('input',function (e) {
                 var qty = e.target.value;
                 if(qty > 0){
+                    resetInsurance();
                     utils.refreshWidget(
                         '<?= $block->getProductPriceInCent() ?>',
                         '<?= $block->getBaseProductId() ?>',

@@ -25,6 +25,9 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Magento\Framework\DataObject;
+use Magento\Quote\Model\ResourceModel\Quote\Item\Collection;
+use Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -61,6 +64,11 @@ class QuoteHelper
     private $quoteId;
 
     /**
+     * @var QuoteItemCollectionFactory
+     */
+    private $quoteItemCollectionFactory;
+
+    /**
      * @param Logger $logger
      * @param UserContextInterface $userContext
      * @param QuoteRepository $quoteRepository
@@ -70,13 +78,15 @@ class QuoteHelper
         Logger $logger,
         UserContextInterface $userContext,
         QuoteRepository $quoteRepository,
-        Session $checkoutSession
+        Session $checkoutSession,
+        QuoteItemCollectionFactory $quoteItemCollectionFactory
     ) {
         $this->logger = $logger;
         $this->userContext = $userContext;
         $this->quoteRepository = $quoteRepository;
         $this->checkoutSession = $checkoutSession;
         $this->quoteId=null;
+        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
     }
 
     /**
@@ -191,4 +201,40 @@ class QuoteHelper
     {
         return $this->checkoutSession->getQuoteId();
     }
+
+
+    /**
+     * Get quote items with insurance data for quote without reserved order id and delete insurance data
+     *
+     * @return void
+     */
+    public function deleteInsuranceDataFromQuoteItemForNotConvertedQuote(): void
+    {
+        $quoteCollection = $this->getQuoteItemsWithInsuranceData();
+        $quoteItems = $quoteCollection->getItems();
+        foreach ($quoteItems as $quoteItem) {
+            $quoteItem->setData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
+        }
+        $quoteCollection->save();
+    }
+
+
+    /**
+     * Get All quote items with insurance data for quote without reserved order id
+     *
+     * @return Collection
+     */
+    private function getQuoteItemsWithInsuranceData(): Collection
+    {
+        $quoteItemCollection = $this->quoteItemCollectionFactory->create();
+        $quoteItemCollection->getSelect()->joinLeft(
+            ['quote' => $quoteItemCollection->getTable('quote')],
+            'main_table.quote_id = quote.entity_id',
+            []
+        );
+        $quoteItemCollection->addFieldToFilter('quote.reserved_order_id', ['null' => true]);
+        $quoteItemCollection->addFieldToFilter('main_table.alma_insurance', ['notnull' => true]);
+        return $quoteItemCollection;
+    }
+
 }

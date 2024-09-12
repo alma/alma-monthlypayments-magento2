@@ -6,27 +6,34 @@ use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Magento\Catalog\Model\Product\Attribute\Source\Status as ProductStatus;
 use Magento\Framework\App\ObjectManager;
 use Magento\Quote\Model\Quote as BaseQuote;
+use Magento\Quote\Model\Quote\Item;
 
 class Quote extends BaseQuote
 {
+
+    /**
+     * selects item in quote on which the add item is to be stacked, False no stack
+     *
+     * @param $product
+     * @return false|Item
+     */
     public function getItemByProduct($product)
     {
         $objectManager = ObjectManager::getInstance();
 
         $insuranceHelper= $objectManager->get(InsuranceHelper::class);
-
-        try {
-            $almaInsuranceProduct = $insuranceHelper->getAlmaInsuranceProduct();
-        } catch (Exceptions\AlmaInsuranceProductException $e) {
-            return false;
-        }
-
+        // If insurance is in the request, do not stack
         if ($insuranceHelper->hasInsuranceInRequest()) {
             return false;
         }
-
-        if ($product->getId() === $almaInsuranceProduct->getId()) {
-            return false;
+        // Never stack insurance product
+        try {
+            $almaInsuranceProduct = $insuranceHelper->getAlmaInsuranceProduct();
+            if ($product->getId() === $almaInsuranceProduct->getId()) {
+                return false;
+            }
+        } catch (Exceptions\AlmaInsuranceProductException $e) {
+            // No insurance product found, continue
         }
 
         /** @var \Magento\Quote\Model\Quote\Item[] $items */
@@ -37,6 +44,7 @@ class Quote extends BaseQuote
                 && $item->getProduct()->getStatus() !== ProductStatus::STATUS_DISABLED
                 && $item->representProduct($product)
             ) {
+                // Do not stack with a product with an insurance
                 if ($insuranceHelper->getQuoteItemAlmaInsurance($item)) {
                     continue;
                 }

@@ -197,7 +197,9 @@ define(
             totalPaid: function (cost) {
                 return priceUtils.formatPrice(parseFloat(this.totals().base_grand_total) + (cost/100), window.checkoutConfig.priceFormat);
             },
-
+            getCurrentMode: function () {
+                return this.config.activeMode;
+            },
             getFeesMention: function (customerFee) {
                 return $t('Including fees: %1').replace('%1', this.formattedPrice(customerFee));
             },

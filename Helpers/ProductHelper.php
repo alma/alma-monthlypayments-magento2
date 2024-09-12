@@ -2,11 +2,19 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
+use Alma\MonthlyPayments\Model\Exceptions\AlmaProductException;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\StateException;
 
 class ProductHelper
 {
@@ -22,20 +30,27 @@ class ProductHelper
      * @var CategoryCollection
      */
     private $categoryCollectionFactory;
+    /**
+     * @var ProductRepository
+     */
+    private $productRepository;
 
     /**
      * @param Logger $logger
      * @param CollectionFactory $productCollectionFactory
      * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param ProductRepository $productRepository
      */
     public function __construct(
-        Logger             $logger,
-        CollectionFactory  $productCollectionFactory,
-        CategoryCollectionFactory $categoryCollectionFactory
+        Logger                    $logger,
+        CollectionFactory         $productCollectionFactory,
+        CategoryCollectionFactory $categoryCollectionFactory,
+        ProductRepository         $productRepository
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->logger = $logger;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -49,7 +64,7 @@ class ProductHelper
         /** @var Collection $collection */
         $collection = $this->productCollectionFactory->create();
         $collection->addAttributeToSelect('*');
-        return $collection->addAttributeToFilter('entity_id', ['in'=>$productIds]);
+        return $collection->addAttributeToFilter('entity_id', ['in' => $productIds]);
     }
 
     /**
@@ -68,16 +83,62 @@ class ProductHelper
 
         return array_values($categoriesId);
     }
+
     /**
      * Generate categories collection with product a collection
      *
      * @param Collection $products
      * @return CategoryCollection
+     * @throws LocalizedException
      */
     public function getProductsCategories(Collection $products): CategoryCollection
     {
         $categoriesId = $this->getProductsCategoriesIds($products);
 
-        return $this->categoryCollectionFactory->create()->addAttributeToSelect('*')->addFieldToFilter('entity_id', ['in'=>$categoriesId]);
+        return $this->categoryCollectionFactory->create()->addAttributeToSelect('*')->addFieldToFilter('entity_id', ['in' => $categoriesId]);
+    }
+
+    /**
+     * Disable a product
+     *
+     * @param Product $product
+     * @return void
+     * @throws AlmaProductException
+     */
+    public function disableProduct(ProductInterface $product): void
+    {
+        $product->setStatus(Status::STATUS_DISABLED);
+        try {
+            $this->productRepository->save($product);
+
+        } catch (CouldNotSaveException|InputException|StateException $e) {
+            $this->logger->warning(
+                "Impossible to disable Product",
+                ['productId' => $product->getId(), 'message' => $e->getMessage()]
+            );
+            throw new AlmaProductException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * Enable a product
+     *
+     * @param Product $product
+     * @return void
+     * @throws AlmaProductException
+     */
+    public function enableProduct(ProductInterface $product): void
+    {
+        $product->setStatus(Status::STATUS_ENABLED);
+        try {
+            $this->productRepository->save($product);
+
+        } catch (CouldNotSaveException|InputException|StateException $e) {
+            $this->logger->warning(
+                "Impossible to enable Product",
+                ['productId' => $product->getId(), 'message' => $e->getMessage()]
+            );
+            throw new AlmaProductException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }
