@@ -3,7 +3,7 @@
 repos:
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.27.0
+    rev: v3.29.0
     hooks:
       - id: commitizen
         name: Check commit message format
@@ -35,7 +35,7 @@ repos:
       #   stages: [commit]
 
   - repo: https://github.com/returntocorp/semgrep
-    rev: v1.73.0
+    rev: v1.87.0
     hooks:
       - id: semgrep
         args:
