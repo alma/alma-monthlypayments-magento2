@@ -8,6 +8,13 @@ use Magento\Framework\Url\Helper\Data;
 
 class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
 {
+    /**
+     * Notice Class Constructor
+     *
+     * @param Context $context
+     * @param Data  $urlHelper
+     * @param array   $data
+     */
     public function __construct(
         Context $context,
         Data    $urlHelper,
@@ -16,6 +23,12 @@ class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
         parent::__construct($context, $urlHelper, $data);
     }
 
+    /**
+     * Render the row
+     *
+     * @param \Magento\Framework\DataObject $row
+     * @return string
+     */
     public function render(\Magento\Framework\DataObject $row): string
     {
         if (preg_match('/^Alma/', $row->getTitle())) {
@@ -33,6 +46,7 @@ class Actions extends \Magento\AdminNotification\Block\Grid\Renderer\Actions
 
             $encodedUrl = $this->_urlHelper->getEncodedUrl();
             return sprintf(
+                // phpcs:ignore
                 '%s%s<a class="action-delete" href="%s" onClick="deleteConfirm(\'%s\', this.href); return false;">%s</a>',
                 $readDetailsHtml,
                 $markAsReadHtml,

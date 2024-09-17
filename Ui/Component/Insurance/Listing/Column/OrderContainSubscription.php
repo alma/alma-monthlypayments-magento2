@@ -9,9 +9,18 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class OrderContainSubscription extends Column
 {
+    /**
+     * Collection Factory instance
+     *
+     * @var \Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription\CollectionFactory
+     */
     private $collection;
 
     /**
+     * OrderContainSubscription constructor.
+     *
+     * This method initializes the class properties.
+     *
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param CollectionFactory $collection
@@ -30,6 +39,10 @@ class OrderContainSubscription extends Column
     }
 
     /**
+     * Prepare data source.
+     *
+     * This method prepares the data source for the UI component.
+     *
      * @param array $dataSource
      * @return array
      */
