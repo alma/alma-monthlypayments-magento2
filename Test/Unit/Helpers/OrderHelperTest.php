@@ -20,9 +20,7 @@ use Magento\Sales\Model\Order\Item;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Model\Store;
-use Magento\Store\Model\StoreManager;
 use Magento\Store\Model\StoreManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class OrderHelperTest extends TestCase
@@ -49,10 +47,7 @@ class OrderHelperTest extends TestCase
      * @var OrderManagementInterface
      */
     private $orderManagement;
-    /**
-     * @var StoreManager
-     */
-    private $storeManager;
+
     private $productHelper;
     /**
      * @var StoreManagerInterface
@@ -68,7 +63,6 @@ class OrderHelperTest extends TestCase
         $this->orderRepository = $this->createMock(OrderRepositoryInterface::class);
         $this->orderManagement = $this->createMock(OrderManagementInterface::class);
         $this->productHelper = $this->createMock(ProductHelper::class);
-        $this->storeManager = $this->createMock(StoreManager::class);
         $this->logger = $this->createMock(Logger::class);
 
         $storeInterface = $this->createMock(Store::class);
@@ -77,6 +71,7 @@ class OrderHelperTest extends TestCase
         $this->storeManagerInterface = $this->createMock(StoreManagerInterface::class);
         $this->storeManagerInterface->method('getStore')->willReturn($storeInterface);
     }
+
     private function getConstructorDependency(): array
     {
         return [
@@ -90,6 +85,7 @@ class OrderHelperTest extends TestCase
             $this->logger
         ];
     }
+
     private function createNewOrderHelper(): OrderHelper
     {
         return new OrderHelper(...$this->getConstructorDependency());
@@ -117,6 +113,7 @@ class OrderHelperTest extends TestCase
         $orderHelper = $this->createNewOrderHelper();
         $orderHelper->cancel($mockOrderId);
     }
+
     public function testNotifyOrderUseOrderId()
     {
         $mockOrderId = 10;
@@ -136,12 +133,13 @@ class OrderHelperTest extends TestCase
         $orderHelper = $this->createNewOrderHelper();
         $orderHelper->save($mockOrder);
     }
+
     /**
      * @dataProvider CartPayloadDataProvider
      *
      * @return void
      */
-    public function testBuild(array $dataProducts, array $dataItems, $expectedPayload):void
+    public function testBuild(array $dataProducts, array $dataItems, $expectedPayload): void
     {
         $products = [];
         $items = [];
@@ -163,7 +161,7 @@ class OrderHelperTest extends TestCase
         $catBag->method('getEntityId')->willReturn('4');
         $catBag->method('getName')->willReturn('Bags');
         $categoriesCollectionMock = $this->createMock(Collection::class);
-        $categoryIterator = new \ArrayIterator([$catGear,$catBag]);
+        $categoryIterator = new \ArrayIterator([$catGear, $catBag]);
         $categoriesCollectionMock->method('getIterator')->willReturn($categoryIterator);
 
         $this->productHelper = $this->createMock(ProductHelper::class);
@@ -179,7 +177,7 @@ class OrderHelperTest extends TestCase
         );
     }
 
-    public function cartPayloadDataProvider():array
+    public function cartPayloadDataProvider(): array
     {
         $simple1 = [
             '1',
@@ -220,6 +218,18 @@ class OrderHelperTest extends TestCase
             2430,
             false,
             true
+        );
+        $formattedSimple2WithoutImage = $this->formattedItemFactory(
+            'base-02',
+            'Simple product 2',
+            '',
+            1,
+            2430,
+            2430,
+            false,
+            true,
+            ['Gear', 'Bags'],
+            ''
         );
         $simpleWithoutCategory = [
             '3',
@@ -318,50 +328,50 @@ class OrderHelperTest extends TestCase
         );
         return [
             '1 simple product' => [
-                'products' =>  [['1','Simple product 1', ['3','4']]],
-                'items' =>  [$simple1],
+                'products' => [['1', 'Simple product 1', ['3', '4']]],
+                'items' => [$simple1],
                 'expected_payload' => [
                     $formattedSimple1
                 ]
             ],
-            '2 simple products' => [
-                'products' =>  [['1','Simple product 1', ['3','4']],['2','Simple product 2', ['3','4']]],
-                'items' =>  [$simple1, $simple2],
+            '2 simple products with 1 without image' => [
+                'products' => [['1', 'Simple product 1', ['3', '4']], ['2', 'Simple product 2', ['3', '4'], null]],
+                'items' => [$simple1, $simple2],
                 'expected_payload' => [
-                    $formattedSimple1 ,$formattedSimple2
+                    $formattedSimple1, $formattedSimple2WithoutImage
                 ]
             ],
             '1 simple product without category' => [
-                'products' =>  [['3','Simple product 3', []]],
-                'items' =>  [$simpleWithoutCategory],
+                'products' => [['3', 'Simple product 3', []]],
+                'items' => [$simpleWithoutCategory],
                 'expected_payload' => [
                     $formattedSimpleWithoutCategory
                 ]
             ],
             '1 virtual product' => [
-                'products' =>  [['4','virtual product 4', ['3','4']]],
-                'items' =>  [$virtualProduct1],
+                'products' => [['4', 'virtual product 4', ['3', '4']]],
+                'items' => [$virtualProduct1],
                 'expected_payload' => [
                     $formattedVirtualProduct1
                 ]
             ],
             '1 simple without tax' => [
-                'products' =>  [['5','Simple product 5', ['3','4']]],
-                'items' =>  [$simpleWithoutTax],
+                'products' => [['5', 'Simple product 5', ['3', '4']]],
+                'items' => [$simpleWithoutTax],
                 'expected_payload' => [
                     $formattedSimpleWithoutTax
                 ]
             ],
             '1 configurable product with dummy item' => [
-                'products' =>  [['7','Configurable product 1', ['3','4']],['6','Configurable dummy product 1', ['3','4']]],
-                'items' =>  [$configurableProduct, $dummyConfigurableProduct],
+                'products' => [['7', 'Configurable product 1', ['3', '4']], ['6', 'Configurable dummy product 1', ['3', '4']]],
+                'items' => [$configurableProduct, $dummyConfigurableProduct],
                 'expected_payload' => [
                     $formattedConfigurableProduct
                 ]
             ],
             '1 configurable product with dummy item and 1 simple' => [
-                'products' =>  [['7','Configurable product 1', ['3','4']],['6','Configurable dummy product 1', ['3','4']],['1','Simple product 1', ['3','4']]],
-                'items' =>  [
+                'products' => [['7', 'Configurable product 1', ['3', '4']], ['6', 'Configurable dummy product 1', ['3', '4']], ['1', 'Simple product 1', ['3', '4']]],
+                'items' => [
                     $configurableProduct,
                     $dummyConfigurableProduct,
                     $simple1
@@ -378,14 +388,15 @@ class OrderHelperTest extends TestCase
         string $pid,
         string $sku,
         string $name,
-        float $qty,
-        float $price,
-        float $rowPrice,
-        bool $isVirtual,
-        float $taxAmount,
-        bool $dummy = false,
-        array $productOptions= []
-    ):Item {
+        float  $qty,
+        float  $price,
+        float  $rowPrice,
+        bool   $isVirtual,
+        float  $taxAmount,
+        bool   $dummy = false,
+        array  $productOptions = []
+    ): Item
+    {
         $item = $this->createMock(Item::class);
         $item->method('getProductId')->willReturn($pid);
         $item->method('getSku')->willReturn($sku);
@@ -399,17 +410,20 @@ class OrderHelperTest extends TestCase
         $item->method('isDummy')->willReturn($dummy);
         return $item;
     }
+
     private function productFactory(
-        string $pid,
-        string $name,
-        array $categories = ['3','4'],
-    ):Product {
+        string  $pid,
+        string  $name,
+        array   $categories = ['3', '4'],
+        ?string $url = '/w/b/wb04-blue-0.jpg'
+    ): Product
+    {
         $product = $this->createMock(Product::class);
         $product->method('getEntityId')->willReturn($pid);
         $product->method('getName')->willReturn($name);
         $product->method('getCategoryIds')->willReturn($categories);
         $product->method('getProductUrl')->willReturn('https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html');
-        $product->method('getImage')->willReturn('/w/b/wb04-blue-0.jpg');
+        $product->method('getImage')->willReturn($url);
         return $product;
     }
 
@@ -417,13 +431,15 @@ class OrderHelperTest extends TestCase
         string $sku,
         string $name,
         string $variantName,
-        int $qty,
-        int $price,
-        int $rowPrice,
-        bool $isVirtual,
-        bool $taxAmount,
-        array $categories =  ['Gear','Bags']
-    ):array {
+        int    $qty,
+        int    $price,
+        int    $rowPrice,
+        bool   $isVirtual,
+        bool   $taxAmount,
+        array  $categories = ['Gear', 'Bags'],
+        string $pictureUrl = self::MEDIA_BASE_URL . 'catalog/product/w/b/wb04-blue-0.jpg'
+    ): array
+    {
         return [
             'sku' => $sku,
             'vendor' => '',
@@ -435,7 +451,7 @@ class OrderHelperTest extends TestCase
             'is_gift' => false,
             'categories' => $categories,
             'url' => 'https://adobe-commerce-a-2-4-5.local.test/fusion-backpack.html',
-            'picture_url' => self::MEDIA_BASE_URL . 'catalog/product/w/b/wb04-blue-0.jpg',
+            'picture_url' => $pictureUrl,
             'requires_shipping' => !$isVirtual,
             'taxes_included' => $taxAmount
         ];
