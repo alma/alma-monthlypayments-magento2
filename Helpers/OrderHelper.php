@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Magento\Catalog\Model\Category;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -60,15 +61,16 @@ class OrderHelper extends AbstractHelper
      * @param Logger $logger
      */
     public function __construct(
-        Context $context,
-        OrderFactory $orderFactory,
-        CollectionFactory $orderCollectionFactory,
+        Context                  $context,
+        OrderFactory             $orderFactory,
+        CollectionFactory        $orderCollectionFactory,
         OrderRepositoryInterface $orderRepository,
         OrderManagementInterface $orderManagement,
-        ProductHelper $productHelper,
-        StoreManagerInterface $storeManager,
-        Logger $logger
-    ) {
+        ProductHelper            $productHelper,
+        StoreManagerInterface    $storeManager,
+        Logger                   $logger
+    )
+    {
         parent::__construct($context);
         $this->orderFactory = $orderFactory;
         $this->orderManagement = $orderManagement;
@@ -131,17 +133,17 @@ class OrderHelper extends AbstractHelper
      * @param int $customerId
      * @return Collection
      */
-    public function getValidOrderCollectionByCustomerId(int  $customerId): Collection
+    public function getValidOrderCollectionByCustomerId(int $customerId): Collection
     {
         return $this->orderCollectionFactory->create($customerId)
-        ->addFieldToSelect('*')
-        ->addFieldToFilter('status', ['in' => [Order::STATE_COMPLETE, Order::STATE_PROCESSING]])
-        ->setOrder(
-            'created_at',
-            'desc'
-        )
-        ->setPageSize(10)
-        ->setCurPage(1);
+            ->addFieldToSelect('*')
+            ->addFieldToFilter('status', ['in' => [Order::STATE_COMPLETE, Order::STATE_PROCESSING]])
+            ->setOrder(
+                'created_at',
+                'desc'
+            )
+            ->setPageSize(10)
+            ->setCurPage(1);
     }
 
     /**
@@ -153,6 +155,7 @@ class OrderHelper extends AbstractHelper
     {
         return $order->getPayment()->getMethod();
     }
+
     /**
      * Get payment methode by order;
      *
@@ -163,6 +166,7 @@ class OrderHelper extends AbstractHelper
     {
         return $order->getShippingMethod();
     }
+
     /**
      * Parse order items for formatting
      *
@@ -201,6 +205,7 @@ class OrderHelper extends AbstractHelper
 
         return $this->formatDataForPayload($orderItems, $products, $categories);
     }
+
     /**
      * Get all non dummy productsIds for orderItems
      *
@@ -218,6 +223,7 @@ class OrderHelper extends AbstractHelper
 
         return $productsIds;
     }
+
     /**
      * Format categories collection in associative array ['entity_id' => Category]
      *
@@ -265,6 +271,7 @@ class OrderHelper extends AbstractHelper
 
         return $dataForCartItemPayload;
     }
+
     /**
      * Format array with order item, product, and categories for payment payload
      *
@@ -278,7 +285,7 @@ class OrderHelper extends AbstractHelper
             'vendor' => '',
             'title' => $data['item']->getName(),
             'variant_title' => $data['item']->getProductOptions()['simple_name'] ?? '',
-            'quantity' => (int) $data['item']->getQtyOrdered(),
+            'quantity' => (int)$data['item']->getQtyOrdered(),
             'unit_price' => Functions::priceToCents($data['item']->getPriceInclTax()),
             'line_price' => Functions::priceToCents($data['item']->getBaseRowTotalInclTax()),
             'is_gift' => false,
@@ -286,17 +293,22 @@ class OrderHelper extends AbstractHelper
             'url' => $data['product']->getProductUrl(),
             'picture_url' => $this->getMediaUrl($data['product']->getImage()),
             'requires_shipping' => !$data['item']->getIsVirtual(),
-            'taxes_included' => (bool) $data['item']->getTaxAmount()
+            'taxes_included' => (bool)$data['item']->getTaxAmount()
         ];
     }
+
     /**
      * Return media url for a product
      *
-     * @param string $path
+     * @param string | null $path
      * @return string
      */
-    private function getMediaUrl(string $path): string
+    private function getMediaUrl(?string $path): string
     {
+        if (!$path) {
+            return '';
+        }
+
         try {
             return $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $path;
         } catch (NoSuchEntityException $e) {
