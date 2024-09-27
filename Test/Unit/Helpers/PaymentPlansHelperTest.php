@@ -159,7 +159,7 @@ class PaymentPlansHelperTest extends TestCase
         $this->configHelper->expects($this->once())
             ->method('isInPageEnabled')
             ->willReturn(true);
-        $this->assertEquals($result, $this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
+        $this->assertEquals($result, $this->createPaymentPlansHelper()->isInPageAllowed());
     }
 
     /**
@@ -172,7 +172,7 @@ class PaymentPlansHelperTest extends TestCase
         $this->configHelper->expects($this->once())
             ->method('isInPageEnabled')
             ->willReturn(false);
-        $this->assertFalse($this->createPaymentPlansHelper()->isInPageAllowed($keyPlan));
+        $this->assertFalse($this->createPaymentPlansHelper()->isInPageAllowed());
     }
 
     /**
@@ -199,11 +199,11 @@ class PaymentPlansHelperTest extends TestCase
             ],
             'test p6x' => [
                 'keyPlan' => 'general:6:0:0',
-                'result' => false,
+                'result' => true,
             ],
             'test p12x' => [
-                'keyPlan' => 'general:6:0:0',
-                'result' => false,
+                'keyPlan' => 'general:12:0:0',
+                'result' => true,
             ],
             'test deferred 15d' => [
                 'keyPlan' => 'general:1:15:0',
