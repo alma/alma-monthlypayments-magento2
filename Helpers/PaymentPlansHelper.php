@@ -96,14 +96,11 @@ class PaymentPlansHelper
     /**
      * Check if in page is allowed for a fee plan
      *
-     * @param string $planKey
      * @return bool
      */
-    public function isInPageAllowed(string $planKey): bool
+    public function isInPageAllowed(): bool
     {
-        $planIsAllowed = preg_match('!general:[1-4]:([\d]+):([\d]+)!', $planKey);
-
-        return $this->configHelper->isInPageEnabled() && $planIsAllowed;
+        return $this->configHelper->isInPageEnabled();
     }
 
     /**
