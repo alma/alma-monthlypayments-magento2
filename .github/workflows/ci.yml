@@ -11,9 +11,10 @@ on:
       - main
 
 jobs:
-  ci:
-    name: Lint and tests
-    runs-on: ubuntu-22.04
+
+  lint:
+    name: Lint code
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -37,6 +38,22 @@ jobs:
 
       - name: Lint
         run: task lint
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install taskfile.dev
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ github.token }}
 
       - name: Run PHPUnit tests with coverage
         run: task test
