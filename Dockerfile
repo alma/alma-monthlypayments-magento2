@@ -37,6 +37,7 @@ WORKDIR /home/phpuser
 ARG MAGENTO_VERSION=2.4.6-p6
 RUN git clone --depth 1 --branch $MAGENTO_VERSION https://github.com/magento/magento2.git magento2
 
+RUN chown -R phpuser /home/phpuser/magento2
 WORKDIR /home/phpuser/magento2
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
