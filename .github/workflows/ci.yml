@@ -33,6 +33,9 @@ jobs:
 
       - name: Run PHPUnit tests with coverage
         run: |
+          echo $UID
+          whoami
+          id -u
           docker compose run -T --rm magento echo $UID
           docker compose run -T --rm magento whoami
           docker compose run -T --rm magento id -u
