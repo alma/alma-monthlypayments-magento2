@@ -44,13 +44,13 @@ tasks:
     deps:
       - docker:build
     cmds:
-      - #docker compose run --rm magento ./vendor/phpunit/phpunit/phpunit -c app/code/Alma/MonthlyPayments/Test/Unit/phpunit.ci.xml --coverage-text
       - echo $UID
       - whoami
       - id -u
       - docker compose run -T --rm magento echo $UID
       - docker compose run -T --rm magento id -u
       - docker compose run -T --rm magento cat /etc/passwd
+      - docker compose run --rm magento ./vendor/phpunit/phpunit/phpunit -c app/code/Alma/MonthlyPayments/Test/Unit/phpunit.ci.xml --coverage-text
       - docker compose run -T --rm magento whoami
 
   dist:
