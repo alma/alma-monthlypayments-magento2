@@ -2,6 +2,10 @@ version: 3
 
 env:
   REPOSITORY: alma-monthlypayments-magento2
+  UID:
+    sh: id -u
+  GID:
+    sh: id -g
 
 tasks:
 
@@ -40,7 +44,13 @@ tasks:
     deps:
       - docker:build
     cmds:
-      - docker compose run --rm magento ./vendor/phpunit/phpunit/phpunit -c app/code/Alma/MonthlyPayments/Test/Unit/phpunit.ci.xml --coverage-text
+      - #docker compose run --rm magento ./vendor/phpunit/phpunit/phpunit -c app/code/Alma/MonthlyPayments/Test/Unit/phpunit.ci.xml --coverage-text
+      - echo $UID
+      - whoami
+      - id -u
+      - docker compose run -T --rm magento echo $UID
+      - docker compose run -T --rm magento whoami
+      - docker compose run -T --rm magento id -u
 
   dist:
     desc: Build the zip file of the module
