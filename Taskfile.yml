@@ -49,8 +49,9 @@ tasks:
       - whoami
       - id -u
       - docker compose run -T --rm magento echo $UID
-      - docker compose run -T --rm magento whoami
       - docker compose run -T --rm magento id -u
+      - docker compose run -T --rm magento cat /etc/passwd
+      - docker compose run -T --rm magento whoami
 
   dist:
     desc: Build the zip file of the module
