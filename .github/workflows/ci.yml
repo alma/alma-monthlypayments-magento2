@@ -36,6 +36,6 @@ jobs:
           echo $UID
           whoami
           id -u
-          UID=$(id -u) GID=$(id -g) docker compose run -T --rm magento echo $UID
+          # UID=$(id -u) GID=$(id -g) docker compose run -T --rm magento echo $UID
           UID=$(id -u) GID=$(id -g) docker compose run -T --rm magento whoami
           UID=$(id -u) GID=$(id -g) docker compose run -T --rm magento id -u
