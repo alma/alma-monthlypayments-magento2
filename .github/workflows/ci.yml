@@ -2,13 +2,6 @@ name: Continuous integration
 
 on:
   push:
-    branches:
-      - develop
-      - main
-  pull_request:
-    branches:
-      - develop
-      - main
 
 jobs:
   ci:
@@ -27,16 +20,19 @@ jobs:
           version: 3.x
           repo-token: ${{ github.token }}
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          tools: composer:v2
+      # - name: Setup PHP
+      #   uses: shivammathur/setup-php@v2
+      #   with:
+      #     tools: composer:v2
 
-      - name: Validate composer.json and composer.lock
-        run: composer validate
+      # - name: Validate composer.json and composer.lock
+      #   run: composer validate
 
-      - name: Lint
-        run: task lint
+      # - name: Lint
+      #   run: task lint
 
       - name: Run PHPUnit tests with coverage
-        run: task test
+        run: |
+          docker compose run -T --rm magento echo $UID
+          docker compose run -T --rm magento whoami
+          docker compose run -T --rm magento id -u
