@@ -21,6 +21,10 @@
         </include>
     </coverage>
 
+    <listeners>
+        <listener class="Magento\Framework\TestFramework\Unit\Listener\ReplaceObjectManager"/>
+    </listeners>
+
     <testsuites>
         <testsuite name="Alma Monthly Payment for Magento 2 Unit Test Suite">
             <directory>.</directory>

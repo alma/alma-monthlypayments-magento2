@@ -3,6 +3,9 @@ ARG PHP_VERSION=8.1
 FROM composer:2 as composer
 FROM php:${PHP_VERSION}-fpm
 
+ARG UID
+ARG GID
+
 # Install dependencies
 RUN apt update && \
     apt install -y --no-install-recommends \
@@ -30,7 +33,8 @@ RUN apt update && \
 RUN pecl install xdebug-3.3.2 \
     && docker-php-ext-enable xdebug
 
-RUN useradd -ms /bin/bash phpuser
+RUN addgroup --gid "$GID" phpuser
+RUN adduser --uid "$UID" --gid "$GID" --disabled-password phpuser
 USER phpuser
 WORKDIR /home/phpuser
 
