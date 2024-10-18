@@ -34,15 +34,13 @@ use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Framework\App\Area;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\Js;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Payment extends Fieldset
 {
 
     private $logger;
     private $apiConfigHelper;
-    private $config
-    ;
+    private $config;
 
     /**
      * @param Context $context
@@ -52,19 +50,18 @@ class Payment extends Fieldset
      * @param ApiConfigHelper $apiConfigHelper
      * @param Config $config
      * @param array $data
-     * @param SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
-        Context             $context,
-        Session             $authSession,
-        Js                  $jsHelper,
-        Logger              $logger,
-        ApiConfigHelper     $apiConfigHelper,
-        Config              $config,
-        array               $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null
-    ) {
-        parent::__construct($context, $authSession, $jsHelper, $data, $secureRenderer);
+        Context         $context,
+        Session         $authSession,
+        Js              $jsHelper,
+        Logger          $logger,
+        ApiConfigHelper $apiConfigHelper,
+        Config          $config,
+        array           $data = []
+    )
+    {
+        parent::__construct($context, $authSession, $jsHelper, $data);
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
         $this->config = $config;
