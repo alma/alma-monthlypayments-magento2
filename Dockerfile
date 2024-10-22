@@ -33,7 +33,7 @@ RUN apt update && \
 RUN pecl install xdebug-3.3.2 \
     && docker-php-ext-enable xdebug
 
-RUN addgroup --gid "$GID" phpuser
+RUN getent group "$GID" || addgroup --gid "$GID" phpuser
 RUN adduser --uid "$UID" --gid "$GID" --disabled-password phpuser
 USER phpuser
 WORKDIR /home/phpuser
