@@ -2,6 +2,10 @@ version: 3
 
 env:
   REPOSITORY: alma-monthlypayments-magento2
+  HOST_UID:
+    sh: id -u
+  HOST_GID:
+    sh: id -g
 
 tasks:
 
