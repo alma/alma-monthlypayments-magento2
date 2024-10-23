@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Block\Cart\Item;
 
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
-use Magento\Framework\App\ObjectManager;
 
 class Renderer extends \Magento\Checkout\Block\Cart\Item\Renderer
 {
