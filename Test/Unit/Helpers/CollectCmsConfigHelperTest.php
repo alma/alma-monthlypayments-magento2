@@ -80,27 +80,10 @@ class CollectCmsConfigHelperTest extends TestCase
         $this->merchantEndpoint->expects($this->once())
             ->method('sendIntegrationsConfigurationsUrl')
             ->with('/V1/alma/config/collect')
-        ->willThrowException(new RequestException('Error in send'));
+            ->willThrowException(new RequestException('Error in send'));
         $this->logger->expects($this->once())->method('warning');
         $this->assertNull($this->collectCmlsConfigHelper->sendIntegrationsConfigurationsUrl());
     }
 
-    public function testNewSendIsNotNecessary()
-    {
-        $this->scopeConfig->method('getValue')->willReturn(time() - 100);
-        $this->assertFalse($this->collectCmlsConfigHelper->isUrlRefreshRequired());
-    }
-    public function testNewSendIsNecessary()
-    {
-        $oneMonthInSecondsMoreTen = 30 * 24 * 60 * 60 + 10; // 30 jours en secondes +10 sec
-        $this->scopeConfig->method('getValue')->willReturn(time() - $oneMonthInSecondsMoreTen);
-        $this->assertTrue($this->collectCmlsConfigHelper->isUrlRefreshRequired());
-    }
-
-    public function testNewSendIsNecessaryWithValueNull()
-    {
-        $this->scopeConfig->method('getValue')->willReturn(null);
-        $this->assertTrue($this->collectCmlsConfigHelper->isUrlRefreshRequired());
-    }
 
 }

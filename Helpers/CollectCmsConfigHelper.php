@@ -17,8 +17,17 @@ class CollectCmsConfigHelper extends ConfigHelper
     const COLLECT_URL = '/V1/alma/config/collect';
 
     private $almaClient;
-    private Logger $logger;
+    private $logger;
 
+    /**
+     * @param Context $context
+     * @param StoreHelper $storeHelper
+     * @param WriterInterface $writerInterface
+     * @param SerializerInterface $serializer
+     * @param TypeListInterface $typeList
+     * @param AlmaClient $almaClient
+     * @param Logger $logger
+     */
     public function __construct(
         Context             $context,
         StoreHelper         $storeHelper,
@@ -34,17 +43,22 @@ class CollectCmsConfigHelper extends ConfigHelper
         $this->logger = $logger;
     }
 
-    private function getSendCollectUrlStatus(): ?string
+    /**
+     * Send_collect_url_status getter
+     *
+     * @return string|null
+     */
+    public function getSendCollectUrlStatus(): ?string
     {
         return $this->getConfigByCode(self::SEND_COLLECT_URL_STATUS_PATH);
     }
 
-    private function setSendCollectUrlStatus():void
-    {
-        $this->saveConfig(self::SEND_COLLECT_URL_STATUS_PATH, time());
-    }
-
-    public function sendIntegrationsConfigurationsUrl():void
+    /**
+     * Send url to Alma
+     *
+     * @return void
+     */
+    public function sendIntegrationsConfigurationsUrl(): void
     {
         try {
             $this->almaClient->getDefaultClient()->merchants->sendIntegrationsConfigurationsUrl(self::COLLECT_URL);
@@ -56,9 +70,13 @@ class CollectCmsConfigHelper extends ConfigHelper
         }
     }
 
-    public function isUrlRefreshRequired(): bool
+    /**
+     * Send_collect_url_status setter
+     *
+     * @return void
+     */
+    private function setSendCollectUrlStatus(): void
     {
-        $oneMonthInSeconds = 30 * 24 * 60 * 60; // 30 jours en sec
-        return (time() - $this->getSendCollectUrlStatus()) > $oneMonthInSeconds;
+        $this->saveConfig(self::SEND_COLLECT_URL_STATUS_PATH, time());
     }
 }
