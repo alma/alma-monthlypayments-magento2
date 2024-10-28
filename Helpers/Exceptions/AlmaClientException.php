@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Helpers\Exceptions;
 
 use Alma\API\Exceptions\AlmaException;
-use Exception;
 
 class AlmaClientException extends AlmaException
 {
