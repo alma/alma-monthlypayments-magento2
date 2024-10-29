@@ -77,6 +77,6 @@ class CollectCmsConfigHelper extends ConfigHelper
      */
     private function setSendCollectUrlStatus(): void
     {
-        $this->saveConfig(self::SEND_COLLECT_URL_STATUS_PATH, time());
+        $this->saveConfig(self::SEND_COLLECT_URL_STATUS_PATH, time(), "default", 0);
     }
 }
