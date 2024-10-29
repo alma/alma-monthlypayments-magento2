@@ -45,36 +45,44 @@ class CheckoutSubmitAllAfter implements ObserverInterface
      */
     public function execute(Observer $observer): void
     {
-        /** @var Order $order */
-        $order = $observer->getEvent()->getData('order');
-
         /** @var Quote $quote */
         $quote = $observer->getEvent()->getData('quote');
 
-        $orderItems = $order->getAllVisibleItems();
+        $orders = $observer->getEvent()->getData('order') ?
+            [$observer->getEvent()->getData('order')] :
+            $observer->getEvent()->getData('orders');
 
-        $saveInsuranceData = false;
-
-        /** @var Order\Item $orderItem */
-        foreach ($orderItems as $orderItem) {
-            $productType = $orderItem->getProductType();
-            switch ($productType) {
-                case 'simple_product_with_alma_insurance':
-                case 'configurable_product_with_alma_insurance':
-                case 'alma_insurance':
-                    $saveInsuranceData = true;
-                    $this->setInsuranceData($orderItem, $quote);
-                    break;
-                default:
-                    break;
-            }
+        if (empty($orders)) {
+            return;
         }
 
-        if ($saveInsuranceData) {
-            try {
-                $this->orderModel->save($order);
-            } catch (\Exception $e) {
-                $this->logger->error('Impossible to save order', [$e->getMessage()]);
+        foreach ($orders as $order) {
+
+            $orderItems = $order->getAllVisibleItems();
+
+            $saveInsuranceData = false;
+
+            /** @var Order\Item $orderItem */
+            foreach ($orderItems as $orderItem) {
+                $productType = $orderItem->getProductType();
+                switch ($productType) {
+                    case 'simple_product_with_alma_insurance':
+                    case 'configurable_product_with_alma_insurance':
+                    case 'alma_insurance':
+                        $saveInsuranceData = true;
+                        $this->setInsuranceData($orderItem, $quote);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if ($saveInsuranceData) {
+                try {
+                    $this->orderModel->save($order);
+                } catch (\Exception $e) {
+                    $this->logger->error('Impossible to save order', [$e->getMessage()]);
+                }
             }
         }
     }
