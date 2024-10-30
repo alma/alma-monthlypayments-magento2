@@ -63,7 +63,7 @@ class CollectCmsConfigHelper extends ConfigHelper
         try {
             $this->almaClient->getDefaultClient()->merchants->sendIntegrationsConfigurationsUrl(self::COLLECT_URL);
             $this->setSendCollectUrlStatus();
-        } catch (AlmaClientException) {
+        } catch (AlmaClientException $e) {
             // No need to log this, it's already logged in AlmaClient
         } catch (AlmaException $e) {
             $this->logger->warning('Error while sending integrations configurations URL to Alma', ['exception' => $e]);
