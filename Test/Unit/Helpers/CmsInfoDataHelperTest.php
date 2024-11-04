@@ -66,7 +66,7 @@ class CmsInfoDataHelperTest extends TestCase
             'cms_name' => 'Adobe Commerce',
             'cms_version' => '2.4.0',
             'third_parties_plugins' => [],
-            'theme_name' => 'Parent Themee / Child Theme',
+            'theme_name' => 'Parent Theme / Child Theme',
             'theme_version' => '1.0.0 / 2.0.0',
             'language_name' => 'PHP',
             'language_version' => phpversion(),

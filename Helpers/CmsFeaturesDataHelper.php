@@ -37,7 +37,7 @@ class CmsFeaturesDataHelper
             'alma_enabled' => $this->config->getIsActive(),
             'widget_cart_activated' => $this->config->showEligibilityMessage(),
             'widget_product_activated' => $this->config->showProductWidget(),
-            'custom_widget_css' => $this->convertStringToBool($this->config->isCustomWidgetPosition()),
+            'custom_widget_css' => $this->config->isCustomWidgetPosition() === 'true',
             'used_fee_plans' => $this->getFeePlans(),
             'in_page_activated' => $this->configHelper->isInPageEnabled(),
             'log_activated' => (bool)(int)$this->configHelper->getConfigByCode(Logger::CONFIG_DEBUG),
@@ -59,11 +59,4 @@ class CmsFeaturesDataHelper
         return json_decode($this->config->getPaymentPlansConfig()->toJson(), true);
     }
 
-    private function convertStringToBool($stringValue): bool
-    {
-        if ($stringValue === 'true' || $stringValue === 'false') {
-            return $stringValue === 'true';
-        }
-        return false;
-    }
 }

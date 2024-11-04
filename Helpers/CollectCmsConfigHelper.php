@@ -68,8 +68,6 @@ class CollectCmsConfigHelper extends ConfigHelper
      */
     public function sendIntegrationsConfigurationsUrl(): void
     {
-        $this->logger->info('Sending integrations configurations URL to Alma', []);
-
         try {
             $this->almaClient->getDefaultClient()->merchants->sendIntegrationsConfigurationsUrl($this->urlBuilder->getBaseUrl() . self::COLLECT_URL);
             $this->setSendCollectUrlStatus();
