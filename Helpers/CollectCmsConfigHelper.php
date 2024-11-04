@@ -8,16 +8,21 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\UrlInterface;
 
 class CollectCmsConfigHelper extends ConfigHelper
 {
     // Path to the configuration that stores the last time we sent the collect URL to Alma in system.xml
     const SEND_COLLECT_URL_STATUS_PATH = 'send_collect_url_status';
 
-    const COLLECT_URL = '/V1/alma/config/collect';
+    const COLLECT_URL = 'V1/alma/config/collect';
 
     private $almaClient;
     private $logger;
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
 
     /**
      * @param Context $context
@@ -26,6 +31,7 @@ class CollectCmsConfigHelper extends ConfigHelper
      * @param SerializerInterface $serializer
      * @param TypeListInterface $typeList
      * @param AlmaClient $almaClient
+     * @param UrlInterface $urlBuilder
      * @param Logger $logger
      */
     public function __construct(
@@ -35,11 +41,13 @@ class CollectCmsConfigHelper extends ConfigHelper
         SerializerInterface $serializer,
         TypeListInterface   $typeList,
         AlmaClient          $almaClient,
+        UrlInterface        $urlBuilder,
         Logger              $logger
     )
     {
         parent::__construct($context, $storeHelper, $writerInterface, $serializer, $typeList);
         $this->almaClient = $almaClient;
+        $this->urlBuilder = $urlBuilder;
         $this->logger = $logger;
     }
 
@@ -60,8 +68,10 @@ class CollectCmsConfigHelper extends ConfigHelper
      */
     public function sendIntegrationsConfigurationsUrl(): void
     {
+        $this->logger->info('Sending integrations configurations URL to Alma', []);
+
         try {
-            $this->almaClient->getDefaultClient()->merchants->sendIntegrationsConfigurationsUrl(self::COLLECT_URL);
+            $this->almaClient->getDefaultClient()->merchants->sendIntegrationsConfigurationsUrl($this->urlBuilder->getBaseUrl() . self::COLLECT_URL);
             $this->setSendCollectUrlStatus();
         } catch (AlmaClientException $e) {
             // No need to log this, it's already logged in AlmaClient

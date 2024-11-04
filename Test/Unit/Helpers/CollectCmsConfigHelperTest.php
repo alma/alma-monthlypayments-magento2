@@ -15,6 +15,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\UrlInterface;
 use PHPUnit\Framework\TestCase;
 
 class CollectCmsConfigHelperTest extends TestCase
@@ -30,6 +31,8 @@ class CollectCmsConfigHelperTest extends TestCase
     private $merchantEndpoint;
     private $logger;
 
+    private $urlBuilder;
+
     public function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
@@ -41,6 +44,7 @@ class CollectCmsConfigHelperTest extends TestCase
         $this->writerInterface = $this->createMock(WriterInterface::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
         $this->typeList = $this->createMock(TypeListInterface::class);
+        $this->urlBuilder = $this->createMock(UrlInterface::class);
 
         $this->merchantEndpoint = $this->createMock(Merchants::class);
         $client = $this->createMock(Client::class);
@@ -55,14 +59,16 @@ class CollectCmsConfigHelperTest extends TestCase
             $this->serializer,
             $this->typeList,
             $this->almaClient,
+            $this->urlBuilder,
             $this->logger
         );
     }
 
     public function testSendIntegrationsConfigurationsUrlWithGoodParamsWriteConfig()
     {
+        $this->urlBuilder->method('getBaseUrl')->willReturn('https://baseurl.com/');
         $this->writerInterface->expects($this->once())->method('save')->with('payment/alma_monthly_payments/send_collect_url_status', time());
-        $this->merchantEndpoint->expects($this->once())->method('sendIntegrationsConfigurationsUrl')->with('/V1/alma/config/collect');
+        $this->merchantEndpoint->expects($this->once())->method('sendIntegrationsConfigurationsUrl')->with('https://baseurl.com/V1/alma/config/collect');
         $this->assertNull($this->collectCmlsConfigHelper->sendIntegrationsConfigurationsUrl());
     }
 
@@ -79,7 +85,6 @@ class CollectCmsConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->never())->method('save');
         $this->merchantEndpoint->expects($this->once())
             ->method('sendIntegrationsConfigurationsUrl')
-            ->with('/V1/alma/config/collect')
             ->willThrowException(new RequestException('Error in send'));
         $this->logger->expects($this->once())->method('warning');
         $this->assertNull($this->collectCmlsConfigHelper->sendIntegrationsConfigurationsUrl());
