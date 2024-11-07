@@ -41,6 +41,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data;
 use Magento\Quote\Api\Data\CartInterface;
 use \InvalidArgumentException;
+use Magento\Quote\Model\QuoteRepository;
 
 class Eligibility extends AbstractHelper
 {
@@ -87,6 +88,10 @@ class Eligibility extends AbstractHelper
      * @var QuoteHelper
      */
     private $quoteHelper;
+    /**
+     * @var QuoteRepository
+     */
+    private $quoteRepository;
 
     /**
      * Eligibility constructor.
@@ -100,14 +105,16 @@ class Eligibility extends AbstractHelper
      * @param QuoteHelper $quoteHelper
      */
     public function __construct(
-        Context $context,
-        Data $pricingHelper,
+        Context            $context,
+        Data               $pricingHelper,
         Helpers\AlmaClient $almaClient,
-        Helpers\Logger $logger,
-        Config $config,
-        AlmaQuote $quoteData,
-        QuoteHelper $quoteHelper
-    ) {
+        Helpers\Logger     $logger,
+        Config             $config,
+        AlmaQuote          $quoteData,
+        QuoteHelper        $quoteHelper,
+        QuoteRepository   $quoteRepository
+    )
+    {
         parent::__construct($context);
         $this->pricingHelper = $pricingHelper;
         $this->alma = $almaClient;
@@ -119,6 +126,7 @@ class Eligibility extends AbstractHelper
         $this->eligible = false;
         $this->currentFeePlans = [];
         $this->message = '';
+        $this->quoteRepository = $quoteRepository;
     }
 
     /**
@@ -151,9 +159,9 @@ class Eligibility extends AbstractHelper
 
         $cartTotal = Functions::priceToCents((float)$quote->getGrandTotal());
         // Get enabled plans in BO and build a list of installments counts that should be tested for eligibility
-        $enabledPlansInConfig      = $this->getEnabledConfigPaymentPlans();
-        $installmentsQuery         = [];
-        $availablePlansKeyInBo     = [];
+        $enabledPlansInConfig = $this->getEnabledConfigPaymentPlans();
+        $installmentsQuery = [];
+        $availablePlansKeyInBo = [];
 
         foreach ($enabledPlansInConfig as $planKey => $planConfig) {
             if (
@@ -174,6 +182,8 @@ class Eligibility extends AbstractHelper
 
         if (empty($installmentsQuery)) {
             $this->logger->info('No eligible installment in config for this amount', [$cartTotal]);
+            $quote->setData('alma_bnpl_eligibility', false);
+            $this->quoteRepository->save($quote);
             return [];
         }
 
@@ -182,8 +192,10 @@ class Eligibility extends AbstractHelper
                 $this->quoteData->eligibilityDataFromQuote($quote, $installmentsQuery),
                 true
             );
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Get plan eligibility exception', [$e->getMessage()]);
+            $quote->setData('alma_bnpl_eligibility', false);
+            $this->quoteRepository->save($quote);
             return [];
         }
 
@@ -191,7 +203,7 @@ class Eligibility extends AbstractHelper
 
         $plansEligibility = [];
         foreach ($availablePlansKeyInBo as $planKey) {
-            $planConfig  = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
+            $planConfig = $this->getPlanConfigFromKey($enabledPlansInConfig, $planKey);
 
             if (!$planConfig) {
                 $this->logger->info('No Plan Config', ['planKey' => $planKey]);
@@ -207,6 +219,15 @@ class Eligibility extends AbstractHelper
         }
         $feePlans = array_values($plansEligibility);
         $this->setCurrentsFeePlans($feePlans);
+        $quote->setData('alma_bnpl_eligibility', false);
+        foreach ($feePlans as $feePlan) {
+            if ($feePlan->getPlanConfig()->planKey() !== PaymentPlansHelper::PAY_NOW_KEY) {
+                $quote->setData('alma_bnpl_eligibility', true);
+                break;
+            }
+        }
+        $this->quoteRepository->save($quote);
+
         return $feePlans;
     }
 
@@ -314,7 +335,7 @@ class Eligibility extends AbstractHelper
 
     /**
      * @param PaymentPlanConfigInterface[] $plansConfig
-     * @param string                       $planKey
+     * @param string $planKey
      *
      * @return null|PaymentPlanConfigInterface
      */
@@ -380,7 +401,7 @@ class Eligibility extends AbstractHelper
         $hasFeePlans = false;
         if (count($feePlans) > 0) {
             $this->currentFeePlans = $feePlans;
-            $hasFeePlans  = true;
+            $hasFeePlans = true;
         }
         $this->setIsAlreadyLoaded($hasFeePlans);
     }
@@ -433,7 +454,7 @@ class Eligibility extends AbstractHelper
             }
         }
         if ($minPurchaseAmount === null) {
-            $minPurchaseAmount =  0;
+            $minPurchaseAmount = 0;
         }
         return $minPurchaseAmount;
     }
@@ -456,7 +477,7 @@ class Eligibility extends AbstractHelper
             }
         }
         if ($maxPurchaseAmount === null) {
-            $maxPurchaseAmount =  0;
+            $maxPurchaseAmount = 0;
         }
         return $maxPurchaseAmount;
     }
