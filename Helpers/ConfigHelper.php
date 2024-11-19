@@ -146,8 +146,14 @@ class ConfigHelper extends AbstractHelper
      *
      * @return void
      */
-    public function saveConfig($path, $value, $scope, $storeId): void
+    public function saveConfig($path, $value, $scope = null, $storeId = null): void
     {
+        if (!isset($storeId)) {
+            $storeId = $this->storeHelper->getStoreId();
+        }
+        if (!isset($scope)) {
+            $scope = $this->storeHelper->getScope();
+        }
         $this->writerInterface->save($this->getConfigPath($path), $value, $scope, $storeId);
     }
 

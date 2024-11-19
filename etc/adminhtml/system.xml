@@ -344,6 +344,10 @@
                         <comment><![CDATA[<b>Advanced.</b> Overrides the <code>failure_return_url</code> value of created payments]]></comment>
                         <config_path>payment/alma_monthly_payments/failure_return_url</config_path>
                     </field>
+                    <field id="send_collect_url_status" type="hidden" sortOrder="18" showInDefault="1"    >
+                        <backend_model>Alma\MonthlyPayments\Model\Adminhtml\Config\SendCollectUrlBackendModel</backend_model>
+                        <config_path>payment/alma_monthly_payments/send_collect_url_status</config_path>
+                    </field>
                     <field id="insurance_allowed" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="0"
                            showInStore="0">
                         <label>Beta features</label>

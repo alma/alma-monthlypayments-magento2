@@ -56,10 +56,10 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             1,
-            0,
+            '',
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, '', 1);
     }
 
     public function testCmsAllowInsuranceIsTrueSave1(): void
@@ -69,10 +69,10 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             1,
-            0,
+            '',
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, '', 1);
     }
 
     public function testCmsAllowInsuranceIsFalseSave0(): void
@@ -82,10 +82,10 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             0,
-            0,
+            '',
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, '', 1);
     }
 
     public function testIfNoMerchantSave0(): void
@@ -93,10 +93,10 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             0,
-            0,
+            '',
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsurance(null, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsurance(null, '', 1);
     }
 
     public function testSaveIsAllowedInsuranceValue0()
@@ -104,10 +104,10 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             0,
-            0,
+            '',
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsuranceValue(0, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsuranceValue(0, '', 1);
     }
 
     public function testSaveIsAllowedInsuranceValue1()
@@ -115,10 +115,10 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface->expects($this->once())->method('save')->with(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
             1,
-            0,
+            '',
             1
         );
-        $this->createConfigHelper()->saveIsAllowedInsuranceValue(1, 0, 1);
+        $this->createConfigHelper()->saveIsAllowedInsuranceValue(1, '', 1);
     }
 
     public function testClearInsuranceConfig(): void
@@ -128,10 +128,10 @@ class ConfigHelperTest extends TestCase
             ->with(
                 ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE,
                 null,
-                0,
+                '',
                 1
             );
-        $this->createConfigHelper()->clearInsuranceConfig(0, 1);
+        $this->createConfigHelper()->clearInsuranceConfig('', 1);
     }
 
 
