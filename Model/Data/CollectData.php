@@ -15,6 +15,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Exceptions\CollectDataException;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Webapi\Exception;
+use Magento\Framework\Webapi\Rest\Response;
 
 class CollectData implements CollectDataInterface
 {
@@ -43,6 +44,11 @@ class CollectData implements CollectDataInterface
      */
     private $config;
 
+    /**
+     * @var Response
+     */
+    private $response;
+
 
     /**
      * @param Logger $logger
@@ -52,6 +58,7 @@ class CollectData implements CollectDataInterface
      * @param Request $request
      * @param ApiConfigHelper $apiConfigHelper
      * @param Config $config
+     * @param Response $response
      */
     public function __construct(
         Logger                $logger,
@@ -60,7 +67,8 @@ class CollectData implements CollectDataInterface
         CmsFeaturesDataHelper $cmsFeaturesDataHelper,
         Request               $request,
         ApiConfigHelper       $apiConfigHelper,
-        Config                $config
+        Config                $config,
+        Response              $response
     )
     {
         $this->payloadFormatter = $payloadFormatter;
@@ -70,6 +78,7 @@ class CollectData implements CollectDataInterface
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
         $this->config = $config;
+        $this->response = $response;
     }
 
     /**
@@ -84,8 +93,10 @@ class CollectData implements CollectDataInterface
         }
         $cmsInfo = new CmsInfo($this->cmsInfoDataHelper->getCmsInfoData());
         $cmsFeatures = new CmsFeatures($this->cmsFeaturesDataHelper->getCmsFeaturesData());
-
-        return $this->payloadFormatter->formatConfigurationPayload($cmsInfo, $cmsFeatures);
+        $this->response
+            ->setHeader('Content-Type', 'application/json', true)
+            ->setBody(json_encode($this->payloadFormatter->formatConfigurationPayload($cmsInfo, $cmsFeatures)))
+            ->sendResponse();
     }
 
     /**
