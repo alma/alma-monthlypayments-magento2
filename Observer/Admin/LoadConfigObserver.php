@@ -70,10 +70,7 @@ class LoadConfigObserver implements ObserverInterface
 
                 $this->paymentPlansHelper->saveBaseApiPlansConfig();
                 # Send the data collect URL to Alma if necessary
-                $this->logger->info('Before Sending collect URL to Alma');
-
                 if (IntegrationsConfigurationsUtils::isUrlRefreshRequired((int)$this->collectCmsConfigHelper->getSendCollectUrlStatus())) {
-                    $this->logger->info('Sending collect URL to Alma');
                     $this->collectCmsConfigHelper->sendIntegrationsConfigurationsUrl();
                 }
             }
