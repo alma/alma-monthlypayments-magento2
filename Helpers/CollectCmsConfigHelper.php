@@ -15,7 +15,7 @@ class CollectCmsConfigHelper extends ConfigHelper
     // Path to the configuration that stores the last time we sent the collect URL to Alma in system.xml
     const SEND_COLLECT_URL_STATUS_PATH = 'send_collect_url_status';
 
-    const COLLECT_URL = 'V1/alma/config/collect';
+    const COLLECT_URL = 'rest/V1/alma/config/collect';
 
     private $almaClient;
     private $logger;
