@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Test\Unit\Observer\Admin;
 
 use Alma\MonthlyPayments\Helpers\Availability;
+use Alma\MonthlyPayments\Helpers\CollectCmsConfigHelper;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
@@ -34,6 +35,10 @@ class LoadConfigObserverTest extends TestCase
     private $storeHelper;
     private $httpInterface;
     private $cacheManager;
+    /**
+     * @var CollectCmsConfigHelper
+     */
+    private $collectCmsConfigHelper;
 
     public function setUp(): void
     {
@@ -59,6 +64,8 @@ class LoadConfigObserverTest extends TestCase
         $this->cacheManager = $this->createMock(Manager::class);
         $this->storeHelper->method('getScope')->willReturn('default');
         $this->storeHelper->method('getStoreId')->willReturn('1');
+        $this->collectCmsConfigHelper = $this->createMock(CollectCmsConfigHelper::class);
+
     }
 
     public function tearDown(): void
@@ -70,6 +77,7 @@ class LoadConfigObserverTest extends TestCase
         $this->configHelper = null;
         $this->storeHelper = null;
         $this->cacheManager = null;
+        $this->collectCmsConfigHelper = null;
     }
 
     private function createLoadConfigObserver(): LoadConfigObserver
@@ -81,7 +89,8 @@ class LoadConfigObserverTest extends TestCase
             $this->availability,
             $this->configHelper,
             $this->storeHelper,
-            $this->cacheManager
+            $this->cacheManager,
+            $this->collectCmsConfigHelper
         );
     }
 
@@ -234,4 +243,34 @@ class LoadConfigObserverTest extends TestCase
             ->method('saveBaseApiPlansConfig');
         $this->createLoadConfigObserver()->execute($this->observer);
     }
+
+    public function testObserverNotSendForInsurancePanel()
+    {
+        $this->urlInterface->expects($this->once())
+            ->method('getCurrentUrl')
+            ->willReturn(self::INSURANCE_URL);
+        $this->collectCmsConfigHelper->expects($this->never())->method('getSendCollectUrlStatus')->willReturn((string)time());
+        $this->createLoadConfigObserver()->execute($this->observer);
+    }
+
+    public function testObserverNotSendIfNotNecessary()
+    {
+        $this->urlInterface->expects($this->once())
+            ->method('getCurrentUrl')
+            ->willReturn(self::PAYMENT_URL);
+        $this->collectCmsConfigHelper->expects($this->once())->method('getSendCollectUrlStatus')->willReturn((string)time());
+        $this->collectCmsConfigHelper->expects($this->never())->method('sendIntegrationsConfigurationsUrl');
+        $this->createLoadConfigObserver()->execute($this->observer);
+    }
+
+    public function testObserverSendIfNecessary()
+    {
+        $this->urlInterface->expects($this->once())
+            ->method('getCurrentUrl')
+            ->willReturn(self::PAYMENT_URL);
+        $this->collectCmsConfigHelper->expects($this->once())->method('getSendCollectUrlStatus')->willReturn(null);
+        $this->collectCmsConfigHelper->expects($this->once())->method('sendIntegrationsConfigurationsUrl');
+        $this->createLoadConfigObserver()->execute($this->observer);
+    }
+
 }

@@ -68,7 +68,7 @@ class CollectCmsConfigHelperTest extends TestCase
     {
         $this->urlBuilder->method('getBaseUrl')->willReturn('https://baseurl.com/');
         $this->writerInterface->expects($this->once())->method('save')->with('payment/alma_monthly_payments/send_collect_url_status', time());
-        $this->configurationEndpoint->expects($this->once())->method('sendIntegrationsConfigurationsUrl')->with('https://baseurl.com/V1/alma/config/collect');
+        $this->configurationEndpoint->expects($this->once())->method('sendIntegrationsConfigurationsUrl')->with('https://baseurl.com/rest/V1/alma/config/collect');
         $this->assertNull($this->collectCmlsConfigHelper->sendIntegrationsConfigurationsUrl());
     }
 
