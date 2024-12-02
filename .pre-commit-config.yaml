@@ -4,13 +4,14 @@ repos:
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.0.0
+
     hooks:
       - id: commitizen
         name: Check commit message format
         stages: [commit-msg]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=1024"]
@@ -35,7 +36,7 @@ repos:
       #   stages: [commit]
 
   - repo: https://github.com/returntocorp/semgrep
-    rev: v1.92.0
+    rev: v1.97.0
     hooks:
       - id: semgrep
         args:
