@@ -55,12 +55,7 @@ class CheckoutSubmitAllAfterTest extends TestCase
         $this->quote = $this->createMock(Quote::class);
 
         $this->event = $this->createMock(Event::class);
-        $this->event->method('getData')->willReturnMap(
-            [
-                ['order', null, $this->order],
-                ['quote', null, $this->quote]
-            ]
-        );
+
 
         $this->observer = $this->createMock(Observer::class);
         $this->observer->method('getEvent')->willReturn($this->event);
@@ -79,9 +74,43 @@ class CheckoutSubmitAllAfterTest extends TestCase
             $this->orderModel
         ];
     }
+    public function testNoOrdersAndOrderInObserver(): void
+    {
+        $this->event->method('getData')->willReturnMap(
+            [
+                ['order', null, null],
+                ['quote', null, $this->quote],
+                ['orders', null, null],
+            ]
+        );
+        $this->orderModel->expects($this->never())->method('save');
+        $checkoutSubmitAllAfter = $this->createCheckoutSubmitAllAfter();
+        $checkoutSubmitAllAfter->execute($this->observer);
+    }
 
     public function testNoInsuranceProductInOrderNotCallSave(): void
     {
+        $this->event->method('getData')->willReturnMap(
+            [
+                ['order', null, $this->order],
+                ['quote', null, $this->quote],
+                ['orders', null, []],
+            ]
+        );
+        $this->orderModel->expects($this->never())->method('save');
+        $this->order->method('getAllVisibleItems')->willReturn($this->getAllVisibleItemsWithoutInsurance());
+        $checkoutSubmitAllAfter = $this->createCheckoutSubmitAllAfter();
+        $checkoutSubmitAllAfter->execute($this->observer);
+    }
+    public function testNoInsuranceProductInOrdersNotCallSave(): void
+    {
+        $this->event->method('getData')->willReturnMap(
+            [
+                ['order', null, null],
+                ['quote', null, $this->quote],
+                ['orders', null, [$this->order]],
+            ]
+        );
         $this->orderModel->expects($this->never())->method('save');
         $this->order->method('getAllVisibleItems')->willReturn($this->getAllVisibleItemsWithoutInsurance());
         $checkoutSubmitAllAfter = $this->createCheckoutSubmitAllAfter();
@@ -90,6 +119,13 @@ class CheckoutSubmitAllAfterTest extends TestCase
 
     public function testInsuranceProductInOrderCallSaveAndCopyData(): void
     {
+        $this->event->method('getData')->willReturnMap(
+            [
+                ['order', null, $this->order],
+                ['quote', null, $this->quote],
+                ['orders', null, null],
+            ]
+        );
         $this->quote->method('getItemById')->willReturnMap([
             [2, $this->quoteItemFactory(2, 'simple_product_with_alma_insurance')],
             [3, $this->quoteItemFactory(3, 'alma_insurance')],
@@ -97,6 +133,26 @@ class CheckoutSubmitAllAfterTest extends TestCase
             [6, $this->quoteItemFactory(6, 'alma_insurance')]
         ]);
         $this->orderModel->expects($this->once())->method('save');
+        $this->order->method('getAllVisibleItems')->willReturn($this->getAllVisibleItemsWithInsurance());
+        $checkoutSubmitAllAfter = $this->createCheckoutSubmitAllAfter();
+        $checkoutSubmitAllAfter->execute($this->observer);
+    }
+    public function testInsuranceProductInOrdersCallSaveAndCopyData(): void
+    {
+        $this->event->method('getData')->willReturnMap(
+            [
+                ['order', null, null],
+                ['quote', null, $this->quote],
+                ['orders', null, [$this->order,$this->order]],
+            ]
+        );
+        $this->quote->method('getItemById')->willReturnMap([
+            [2, $this->quoteItemFactory(2, 'simple_product_with_alma_insurance')],
+            [3, $this->quoteItemFactory(3, 'alma_insurance')],
+            [5, $this->quoteItemFactory(5, 'configurable_product_with_alma_insurance')],
+            [6, $this->quoteItemFactory(6, 'alma_insurance')]
+        ]);
+        $this->orderModel->expects($this->exactly(2))->method('save');
         $this->order->method('getAllVisibleItems')->willReturn($this->getAllVisibleItemsWithInsurance());
         $checkoutSubmitAllAfter = $this->createCheckoutSubmitAllAfter();
         $checkoutSubmitAllAfter->execute($this->observer);
@@ -114,7 +170,7 @@ class CheckoutSubmitAllAfterTest extends TestCase
     private function quoteItemFactory(int $quoteItemId, string $type): Order\Item
     {
         $item = $this->createMock(Order\Item::class);
-        $item->expects($this->once())->method('getData')->willReturn(
+        $item->expects($this->atLeastOnce())->method('getData')->willReturn(
             '{"id":' . $quoteItemId . ',"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":,"parent_name":"Fusion Backpack","type":"' . $type . '"}'
         );
         return $item;
@@ -131,23 +187,23 @@ class CheckoutSubmitAllAfterTest extends TestCase
     private function getAllVisibleItemsWithInsurance(): array
     {
         $simpleWithInsurance = $this->orderItemFactory('24-MBO2', 'simple_product_with_alma_insurance', 2);
-        $simpleWithInsurance->expects($this->once())->method('setData')->with(
+        $simpleWithInsurance->expects($this->atLeastOnce())->method('setData')->with(
             InsuranceHelper::ALMA_INSURANCE_DB_KEY,
             '{"id":2,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":,"parent_name":"Fusion Backpack","type":"simple_product_with_alma_insurance"}'
         );
         $insuranceForSimple = $this->orderItemFactory('alma_insurance', 'alma_insurance', 3);
-        $insuranceForSimple->expects($this->once())->method('setData')->with(
+        $insuranceForSimple->expects($this->atLeastOnce())->method('setData')->with(
             InsuranceHelper::ALMA_INSURANCE_DB_KEY,
             '{"id":3,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":,"parent_name":"Fusion Backpack","type":"alma_insurance"}'
         );
 
         $configurableWithInsurance = $this->orderItemFactory('WSM12', 'configurable_product_with_alma_insurance', 5);
-        $configurableWithInsurance->expects($this->once())->method('setData')->with(
+        $configurableWithInsurance->expects($this->atLeastOnce())->method('setData')->with(
             InsuranceHelper::ALMA_INSURANCE_DB_KEY,
             '{"id":5,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":,"parent_name":"Fusion Backpack","type":"configurable_product_with_alma_insurance"}'
         );
         $insuranceForConfigurable = $this->orderItemFactory('alma_insurance', 'alma_insurance', 6);
-        $insuranceForConfigurable->expects($this->once())->method('setData')->with(
+        $insuranceForConfigurable->expects($this->atLeastOnce())->method('setData')->with(
             InsuranceHelper::ALMA_INSURANCE_DB_KEY,
             '{"id":6,"name":"Alma outillage thermique 3 ans (Vol + casse)","price":11,"link":,"parent_name":"Fusion Backpack","type":"alma_insurance"}'
         );

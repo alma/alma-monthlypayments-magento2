@@ -38,7 +38,7 @@
          data-bind="attr: { src: require.toUrl('Alma_MonthlyPayments/images/alma_logo.svg'), alt: 'alma'}">
     <div class="payment-method-content">
         <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-description" data-bind="text: spreadPaymentMethod().description"></div>
         <p class="alma-plan-choices">
@@ -56,11 +56,12 @@
         </p>
         <!-- ko template: 'Alma_MonthlyPayments/payment/mode-warning' --><!-- /ko -->
         <ul class="alma-installments">
-            <!-- ko if: spreadSelectedPlan().eligibility -->
-                <!-- ko foreach: spreadSelectedPlan().eligibility.paymentPlan -->
-                <li>
-                    <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
-                    <span class="alma-installment--amount-column">
+            <!-- ko if: spreadPaymentPlans().eligibility -->
+                <!-- ko foreach: spreadPaymentPlans().eligibility.paymentPlan -->
+                    <!-- ko ifnot: $parent.spreadSelectedPlan().inPageAllowed -->
+            <li>
+                <span class="alma-installment--due-date" data-bind="text: $parent.formattedDate(due_date)"></span>
+                <span class="alma-installment--amount-column">
                             <span class="alma-installment--amount"
                                   data-bind="text: $parent.formattedPrice(total_amount)"></span>
                         <!-- ko if: customer_fee > 0 -->
@@ -69,21 +70,28 @@
                                 </span>
                         <!-- /ko -->
                         </span>
-                </li>
-                <!-- /ko -->
-              <li>
+            </li>
+            <!-- /ko -->
+            <li>
                     <span>
                         <span data-bind="i18n: 'Your cart total :'"></span>
                         <span class="alma-installment--cartTotal"
-                              data-bind="text: cartTotal()"></span><br />
-                        <span data-bind="i18n: 'Credit cost :'"></span><span data-bind="text: customerTotalCostAmount(spreadSelectedPlan().eligibility.customerTotalCostAmount)"></span><br />
+                              data-bind="text: cartTotal()"></span><br/>
+                        <span data-bind="i18n: 'Credit cost :'"></span><span
+                            data-bind="text: customerTotalCostAmount(spreadSelectedPlan().eligibility.customerTotalCostAmount)"></span><br/>
                         <!-- ko if: hasAnnualInterestRate(spreadSelectedPlan().eligibility.annualInterestRate) -->
-                        <span data-bind="i18n: 'Annual interest rate :'"></span><span data-bind="text: spreadSelectedPlan().eligibility.annualInterestRate/100+'%'"></span><br />
+                        <span data-bind="i18n: 'Annual interest rate :'"></span><span
+                            data-bind="text: spreadSelectedPlan().eligibility.annualInterestRate/100+'%'"></span><br/>
                         <!-- /ko -->
-                        <strong><span data-bind="i18n: 'Total :'"></span><span data-bind="text: totalPaid(spreadSelectedPlan().eligibility.customerTotalCostAmount)"></span></strong><br />
+                        <strong><span data-bind="i18n: 'Total :'"></span><span
+                                data-bind="text: totalPaid(spreadSelectedPlan().eligibility.customerTotalCostAmount)"></span></strong><br/>
                     </span>
             </li>
-        <!--/ko-->
+
+            <!-- /ko -->
+            <!-- /ko -->
+            <div id="alma-in-page-alma_monthly_payments_spread"></div>
+
         </ul>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->

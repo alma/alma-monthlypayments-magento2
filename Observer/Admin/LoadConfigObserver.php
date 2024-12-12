@@ -2,7 +2,9 @@
 
 namespace Alma\MonthlyPayments\Observer\Admin;
 
+use Alma\API\Lib\IntegrationsConfigurationsUtils;
 use Alma\MonthlyPayments\Helpers\Availability;
+use Alma\MonthlyPayments\Helpers\CollectCmsConfigHelper;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
@@ -29,16 +31,22 @@ class LoadConfigObserver implements ObserverInterface
     private $configHelper;
     private $storeHelper;
     private $cacheManager;
+    /**
+     * @var CollectCmsConfigHelper
+     */
+    private $collectCmsConfigHelper;
 
     public function __construct(
-        Logger             $logger,
-        UrlInterface       $url,
-        PaymentPlansHelper $paymentPlansHelper,
-        Availability       $availability,
-        ConfigHelper       $configHelper,
-        StoreHelper        $storeHelper,
-        Manager            $cacheManager
-    ) {
+        Logger                 $logger,
+        UrlInterface           $url,
+        PaymentPlansHelper     $paymentPlansHelper,
+        Availability           $availability,
+        ConfigHelper           $configHelper,
+        StoreHelper            $storeHelper,
+        Manager                $cacheManager,
+        CollectCmsConfigHelper $collectCmsConfigHelper
+    )
+    {
         $this->url = $url;
         $this->paymentPlansHelper = $paymentPlansHelper;
         $this->logger = $logger;
@@ -46,13 +54,14 @@ class LoadConfigObserver implements ObserverInterface
         $this->configHelper = $configHelper;
         $this->storeHelper = $storeHelper;
         $this->cacheManager = $cacheManager;
+        $this->collectCmsConfigHelper = $collectCmsConfigHelper;
     }
 
     /**
      * @param Observer $observer
      * @return $this
      */
-    public function execute(Observer $observer) : self
+    public function execute(Observer $observer): self
     {
         $controller = $observer->getEvent()->getControllerAction();
         $currentUrl = $this->url->getCurrentUrl();
@@ -60,6 +69,10 @@ class LoadConfigObserver implements ObserverInterface
             if ($matches[1] === 'payment') {
 
                 $this->paymentPlansHelper->saveBaseApiPlansConfig();
+                # Send the data collect URL to Alma if necessary
+                if (IntegrationsConfigurationsUtils::isUrlRefreshRequired((int)$this->collectCmsConfigHelper->getSendCollectUrlStatus())) {
+                    $this->collectCmsConfigHelper->sendIntegrationsConfigurationsUrl();
+                }
             }
             try {
                 $cmsInsuranceFlagValue = $this->availability->isMerchantInsuranceAvailable();
@@ -67,7 +80,7 @@ class LoadConfigObserver implements ObserverInterface
                 $this->logger->error('Alma Insurance Flag Exception', ['exception' => $e->getMessage()]);
                 return $this;
             }
-            $cacheTypeList = ["config","layout","block_html","compiled_config","config_integration","config_integration_api","full_page"];
+            $cacheTypeList = ["config", "layout", "block_html", "compiled_config", "config_integration", "config_integration_api", "full_page"];
             if (!$cmsInsuranceFlagValue && $this->configHelper->getConfigByCode(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH) === '1') {
 
                 $this->saveIsAllowedInsurance(0);
@@ -89,7 +102,7 @@ class LoadConfigObserver implements ObserverInterface
      * @param $value
      * @return void
      */
-    private function saveIsAllowedInsurance($value):void
+    private function saveIsAllowedInsurance($value): void
     {
         $this->configHelper->saveIsAllowedInsuranceValue(
             $value,

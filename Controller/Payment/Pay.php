@@ -162,7 +162,7 @@ class Pay extends Action
             }
         }
 
-        if ($this->paymentPlansHelper->isInPageAllowed($paymentPlanKey)) {
+        if ($this->paymentPlansHelper->isInPageAllowed()) {
             $response = $this->jsonFactory->create();
             $response->setData(['error' => false, 'paymentId' => $paymentID]);
 

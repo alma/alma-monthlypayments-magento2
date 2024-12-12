@@ -113,7 +113,7 @@ class PaymentDataBuilder implements BuilderInterface
 
         $configArray = [
             'return_url' => $this->config->getReturnUrl(),
-            'origin' => $this->paymentPlansHelper->isInPageAllowed($planKey) ? 'online_in_page' : 'online',
+            'origin' => $this->paymentPlansHelper->isInPageAllowed() ? 'online_in_page' : 'online',
             'ipn_callback_url' => $this->config->getIpnCallbackUrl(),
             'customer_cancel_url' => $this->config->getCustomerCancelUrl(),
             'failure_return_url' => $this->config->getFailureReturnUrl(),
