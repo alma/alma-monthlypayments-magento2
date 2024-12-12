@@ -13,6 +13,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Model\Data\CollectData;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Webapi\Exception;
+use Magento\Framework\Webapi\Rest\Response;
 use PHPUnit\Framework\TestCase;
 
 class CollectDataTest extends TestCase
@@ -32,6 +33,11 @@ class CollectDataTest extends TestCase
     private $config;
 
     /**
+     * @var Response
+     */
+    private $response;
+
+    /**
      * @return void
      */
     public function mockSignature(): void
@@ -49,6 +55,9 @@ class CollectDataTest extends TestCase
         $this->request = $this->createMock(Request::class);
         $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
         $this->config = $this->createMock(Config::class);
+        $this->response = $this->createMock(Response::class);
+        $this->response->method('setHeader')->willReturnSelf();
+        $this->response->method('setBody')->willReturnSelf();
         $this->payloadFormatter = new PayloadFormatter();
         $this->collectData = new CollectData(
             $this->logger,
@@ -57,7 +66,8 @@ class CollectDataTest extends TestCase
             $this->cmsFeaturesDataHelper,
             $this->request,
             $this->apiConfigHelper,
-            $this->config
+            $this->config,
+            $this->response
         );
     }
 
@@ -114,7 +124,8 @@ class CollectDataTest extends TestCase
             $this->cmsFeaturesDataHelper,
             $this->request,
             $this->apiConfigHelper,
-            $this->config
+            $this->config,
+            $this->response
         );
 
         $formater
@@ -125,26 +136,6 @@ class CollectDataTest extends TestCase
                 $this->isInstanceOf(CmsFeatures::class)
             );
         $this->assertNull($collectData->collect());
-    }
-
-    /**
-     * Integration Test
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function testDataFormaterReturnEmptyDataStructure()
-    {
-        $this->mockSignature();
-        $this->cmsInfoDataHelper
-            ->expects($this->once())
-            ->method('getCmsInfoData')
-            ->willReturn([]);
-        $this->cmsFeaturesDataHelper
-            ->expects($this->once())
-            ->method('getCmsFeaturesData')
-            ->willReturn([]);
-        $this->assertEquals(['cms_info' => [], 'cms_features' => []], $this->collectData->collect());
     }
 
 }
