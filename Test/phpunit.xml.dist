@@ -9,8 +9,22 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          colors="true"
          columns="max"
+         testdox = "true"
+         convertErrorsToExceptions   = "true"
+         convertNoticesToExceptions  = "true"
+         convertWarningsToExceptions = "true"
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="./framework/bootstrap.php">
+
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true">
+        <include>
+            <directory suffix=".php">.</directory>
+        </include>
+    </coverage>
+
     <testsuites>
         <testsuite name="Alma_Unit_Tests">
             <directory>./Unit</directory>
