@@ -2,18 +2,12 @@
 
 ## v5.3.0 - 2024-12-12
 
-### Changes
-
-- Add rest in send collect and change trigger (#213)
-- Backport main to develop (#199)
-
 ### 🚀 New Features
 
-- Feature/ecom 2245 ac normalize gather data return format (#212)
+- Fix gather cms data (#212)
 - Implement Send Url and Gather Data collection (#211)
 - Change wording for in page configuration (#209)
 - Multi shipping insurance compatibility (#208)
-- Fix compatibility with parent::__construct form Fieldset 2.3.7 (#207)
 - Integrate credit for in page (#202)
 - Fix bug cart payment payload creation (#200)
 
