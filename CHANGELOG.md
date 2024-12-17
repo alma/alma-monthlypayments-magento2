@@ -1,5 +1,24 @@
 # Changelog
 
+## v5.3.0 - 2024-12-12
+
+### 🚀 New Features
+
+- Fix gather cms data (#212)
+- Implement Send Url and Gather Data collection (#211)
+- Change wording for in page configuration (#209)
+- Multi shipping insurance compatibility (#208)
+- Integrate credit for in page (#202)
+- Fix bug cart payment payload creation (#200)
+
+### 🐛 Bug Fixes
+
+- Fix compatibility with parent::__construct form Fieldset 2.3.7 (#207)
+
+#### Contributors
+
+@Francois-Gomis, @alma-renovate-bot, @alma-renovate-bot[bot], @gdraynz, @github-actions, @joyet-simon and @remi-zuffinetti
+
 ## v5.2.0 - 2024-09-12
 
 ### Changes

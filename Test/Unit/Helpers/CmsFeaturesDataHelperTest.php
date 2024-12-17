@@ -42,7 +42,7 @@ class CmsFeaturesDataHelperTest extends TestCase
                 'widget_cart_activated' => false,
                 'widget_product_activated' => false,
                 'custom_widget_css' => false,
-                'used_fee_plans' => [],
+                'used_fee_plans' => null,
                 'in_page_activated' => false,
                 'log_activated' => false,
                 'excluded_categories' => null,

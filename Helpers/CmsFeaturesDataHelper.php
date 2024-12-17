@@ -52,11 +52,12 @@ class CmsFeaturesDataHelper
     /**
      * Get fee plans from config or empty array
      *
-     * @return array
+     * @return array | null
      */
-    private function getFeePlans(): array
+    private function getFeePlans(): ?array
     {
-        return json_decode($this->config->getPaymentPlansConfig()->toJson(), true);
+        $feePlans = json_decode($this->config->getPaymentPlansConfig()->toJson(), true);
+        return empty($feePlans) ? null : $feePlans ;
     }
 
 }
