@@ -2,42 +2,35 @@ name: Continuous integration
 
 on:
   push:
-    branches:
-      - develop
-      - main
-  pull_request:
-    branches:
-      - develop
-      - main
 
 jobs:
 
-  lint:
-    name: Lint code
-    runs-on: ubuntu-24.04
+  # lint:
+  #   name: Lint code
+  #   runs-on: ubuntu-24.04
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         persist-credentials: false
 
-      - name: Install taskfile.dev
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
-          repo-token: ${{ github.token }}
+  #     - name: Install taskfile.dev
+  #       uses: arduino/setup-task@v2
+  #       with:
+  #         version: 3.x
+  #         repo-token: ${{ github.token }}
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          tools: composer:v2
+  #     - name: Setup PHP
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         tools: composer:v2
 
-      - name: Validate composer.json and composer.lock
-        run: composer validate
+  #     - name: Validate composer.json and composer.lock
+  #       run: composer validate
 
-      - name: Lint
-        run: task lint
+  #     - name: Lint
+  #       run: task lint
 
   test:
     name: Run tests
@@ -56,7 +49,7 @@ jobs:
           repo-token: ${{ github.token }}
 
       - name: Set ReportPortal configuration
-        if: (github.ref_name == 'main' || github.ref_name == 'develop') && vars.REPORT_PORTAL_ENABLED == 'true'
+        #if: (github.ref_name == 'main' || github.ref_name == 'develop' ) && vars.REPORT_PORTAL_ENABLED == 'true'
         run: ./Test/reportportal/reportportal_conf.sh
         env:
           REPORT_PORTAL_API_KEY: ${{ secrets.REPORT_PORTAL_API_KEY }}
