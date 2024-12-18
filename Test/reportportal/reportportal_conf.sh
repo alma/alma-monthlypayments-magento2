@@ -22,6 +22,7 @@ sed -i $'/<\/phpunit>/{e cat Test/reportportal/reportportal_phpunit_conf.xml\n}'
 
 # Add ReportPortal extension to composer.json
 # reportportal/phpunit has no stable version, so we set minimum stability to dev only when running tests
+pwd
 composer config minimum-stability dev
 # This is not supported by all versions of PHP, so we need to install it separately
 composer require --dev reportportal/phpunit
