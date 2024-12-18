@@ -55,5 +55,12 @@ jobs:
           version: 3.x
           repo-token: ${{ github.token }}
 
+      - name: Set ReportPortal configuration
+        if: (github.ref_name == 'main' || github.ref_name == 'develop') && vars.REPORT_PORTAL_ENABLED == 'true'
+        run: ./Test/reportportal/reportportal_conf.sh
+        env:
+          REPORT_PORTAL_API_KEY: ${{ secrets.REPORT_PORTAL_API_KEY }}
+          REPORT_PORTAL_ENDPOINT: ${{ vars.REPORT_PORTAL_ENDPOINT }}
+
       - name: Run PHPUnit tests with coverage
         run: task test
