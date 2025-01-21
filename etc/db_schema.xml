@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-
+    <table name="quote" resource="checkout" comment="Alma eligibility for quote">
+        <column xsi:type="boolean" name="alma_bnpl_eligibility" nullable="true" comment="Quote is eligible to alma BNPL"/>
+    </table>
     <table name="quote_item" resource="checkout" comment="Alma insurance Data in Quote Item">
         <column xsi:type="text" name="alma_insurance" nullable="true" comment="Alma insurance"/>
     </table>
