@@ -11,6 +11,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Model\Exceptions\MerchantBusinessServiceException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteRepository;
 use Magento\Sales\Model\Order;
@@ -52,10 +53,10 @@ class MerchantBusinessService
     /**
      * Set alma_bnpl_eligibility to true in quote DB
      *
-     * @param Quote $quote
+     * @param CartInterface $quote
      * @return void
      */
-    public function quoteIsEligibleForBNPL(Quote $quote): void
+    public function quoteIsEligibleForBNPL(CartInterface $quote): void
     {
         $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, true);
         $this->quoteRepository->save($quote);
@@ -64,10 +65,10 @@ class MerchantBusinessService
     /**
      * Set alma_bnpl_eligibility to false in quote DB
      *
-     * @param Quote $quote
+     * @param CartInterface $quote
      * @return void
      */
-    public function quoteNotEligibleForBNPL(Quote $quote): void
+    public function quoteNotEligibleForBNPL(CartInterface $quote): void
     {
         $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, false);
         $this->quoteRepository->save($quote);
