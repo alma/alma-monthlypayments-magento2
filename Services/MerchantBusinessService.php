@@ -58,7 +58,7 @@ class MerchantBusinessService
      */
     public function quoteIsEligibleForBNPL(CartInterface $quote): void
     {
-        $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, true);
+        $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, '1');
         $this->quoteRepository->save($quote);
     }
 
@@ -70,7 +70,7 @@ class MerchantBusinessService
      */
     public function quoteNotEligibleForBNPL(CartInterface $quote): void
     {
-        $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, false);
+        $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, '0');
         $this->quoteRepository->save($quote);
     }
 
@@ -95,12 +95,13 @@ class MerchantBusinessService
             throw new MerchantBusinessServiceException('Create Order confirmed business event : quote not found');
         }
         try {
+            $quoteIsEligible = $quote->getData(self::QUOTE_BNPL_ELIGIBILITY_KEY);
             return new OrderConfirmedBusinessEvent(
                 $isPayNow,
                 $isBNPL,
-                (bool)$quote->getData(self::QUOTE_BNPL_ELIGIBILITY_KEY),
-                $order->getId(),
-                $order->getQuoteId(),
+                $quoteIsEligible !== null ? (bool)$quoteIsEligible : null,
+                !empty($order->getIncrementId()) ? (string)$order->getIncrementId() : null,
+                !empty($order->getQuoteId()) ? (string)$order->getQuoteId() : null,
                 $order->getPayment()->getAdditionalInformation()['PAYMENT_ID'] ?? null
             );
         } catch (ParametersException $e) {
@@ -120,7 +121,7 @@ class MerchantBusinessService
         try {
             $this->almaClient->getDefaultClient()->merchants->sendOrderConfirmedBusinessEvent($orderConfirmedMock);
         } catch (AlmaException $e) {
-            $this->logger->error('sendOrderConfirmedBusinessEvent : ', [$e->getMessage()]);
+            $this->logger->error('Send OrderConfirmedBusinessEvent error : ', [$e->getMessage()]);
         }
     }
 }

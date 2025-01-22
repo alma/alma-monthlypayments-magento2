@@ -42,13 +42,13 @@ class MerchantBusinessServiceTest extends TestCase
         );
     }
 
-    public function testSeQuoteIsEligibleForBNPLCallQuoteRepository()
+    public function testSetQuoteIsEligibleForBNPLCallQuoteRepository()
     {
         $quote = $this->createMock(Quote::class);
         $quote
             ->expects($this->once())
             ->method('setData')
-            ->with('alma_bnpl_eligibility', true);
+            ->with('alma_bnpl_eligibility', '1');
         $this->quoteRepository
             ->expects($this->once())
             ->method('save')
@@ -56,13 +56,13 @@ class MerchantBusinessServiceTest extends TestCase
         $this->merchantBusinessService->quoteIsEligibleForBNPL($quote);
     }
 
-    public function testSeQuoteNotEligibleForBNPLCallQuoteRepository()
+    public function testSetQuoteNotEligibleForBNPLCallQuoteRepository()
     {
         $quote = $this->createMock(Quote::class);
         $quote
             ->expects($this->once())
             ->method('setData')
-            ->with('alma_bnpl_eligibility', false);
+            ->with('alma_bnpl_eligibility', '0');
         $this->quoteRepository
             ->expects($this->once())
             ->method('save')
@@ -105,7 +105,7 @@ class MerchantBusinessServiceTest extends TestCase
             ->method('getPayment')
             ->willReturn($paymentMock);
         $orderMock
-            ->method('getId')
+            ->method('getIncrementId')
             ->willReturn('42');
         $orderMock
             ->method('getQuoteId')
@@ -113,7 +113,7 @@ class MerchantBusinessServiceTest extends TestCase
         $quote
             ->method('getData')
             ->with('alma_bnpl_eligibility')
-            ->willReturn(false);
+            ->willReturn('0');
         $this->quoteRepository
             ->method('get')
             ->willReturn($quote);
@@ -140,7 +140,7 @@ class MerchantBusinessServiceTest extends TestCase
             ->method('getPayment')
             ->willReturn($paymentMock);
         $orderMock
-            ->method('getId')
+            ->method('getIncrementId')
             ->willReturn('42');
         $orderMock
             ->method('getQuoteId')
@@ -148,7 +148,7 @@ class MerchantBusinessServiceTest extends TestCase
         $quote
             ->method('getData')
             ->with('alma_bnpl_eligibility')
-            ->willReturn(true);
+            ->willReturn('1');
         $this->quoteRepository
             ->method('get')
             ->willReturn($quote);
@@ -175,7 +175,7 @@ class MerchantBusinessServiceTest extends TestCase
             ->method('getPayment')
             ->willReturn($paymentMock);
         $orderMock
-            ->method('getId')
+            ->method('getIncrementId')
             ->willReturn('42');
         $orderMock
             ->method('getQuoteId')
@@ -183,7 +183,7 @@ class MerchantBusinessServiceTest extends TestCase
         $quote
             ->method('getData')
             ->with('alma_bnpl_eligibility')
-            ->willReturn(true);
+            ->willReturn('1');
         $this->quoteRepository
             ->method('get')
             ->willReturn($quote);
@@ -230,14 +230,14 @@ class MerchantBusinessServiceTest extends TestCase
             ->willReturn($paymentMock);
         $orderMock
             ->method('getId')
-            ->willReturn(42);
+            ->willReturn(null);
         $orderMock
             ->method('getQuoteId')
-            ->willReturn(12);
+            ->willReturn('12');
         $quote
             ->method('getData')
             ->with('alma_bnpl_eligibility')
-            ->willReturn(true);
+            ->willReturn('1');
         $this->quoteRepository
             ->method('get')
             ->willReturn($quote);

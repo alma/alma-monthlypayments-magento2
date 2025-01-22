@@ -4,14 +4,17 @@ namespace Alma\MonthlyPayments\Test\Unit\Observer;
 
 use Alma\API\Client;
 use Alma\API\Endpoints\Insurance;
+use Alma\API\Entities\DTO\MerchantBusinessEvent\OrderConfirmedBusinessEvent;
 use Alma\API\Entities\Insurance\Subscriber;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceSendCustomerCartHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\MerchantBusinessServiceException;
 use Alma\MonthlyPayments\Model\Insurance\Subscription;
 use Alma\MonthlyPayments\Observer\SalesOrderInvoicePayObserver;
+use Alma\MonthlyPayments\Services\MerchantBusinessService;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Model\Order;
@@ -48,6 +51,11 @@ class SalesOrderInvoicePayObserverTest extends TestCase
      */
     private $insuranceSendCustomerCartHelper;
 
+    /**
+     * @var MerchantBusinessService
+     */
+    private $merchantBusinessService;
+
 
     protected function setUp(): void
     {
@@ -57,7 +65,7 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->subscriptionResourceModel = $this->createMock(\Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription::class);
         $this->apiConfigHelper = $this->createMock(ApiConfigHelper::class);
         $this->insuranceSendCustomerCartHelper = $this->createMock(InsuranceSendCustomerCartHelper::class);
-
+        $this->merchantBusinessService = $this->createMock(MerchantBusinessService::class);
     }
 
     public function testObserverMustCallGetSubscriberAndSubscriptionDataAndNullSubscriptionNotCallAlmaClient(): void
@@ -128,6 +136,76 @@ class SalesOrderInvoicePayObserverTest extends TestCase
         $this->createSalesOrderInvoicePayObserver()->execute($observer);
     }
 
+    public function testObserverMustCallOrderConfirmedMerchantBusinessService(): void
+    {
+        $billingAddress = $this->createMock(Address::class);
+        $itemsInvoiceCollection = $this->createMock(Collection::class);
+        $invoice = $this->createMock(Invoice::class);
+        $invoice->method('getBillingAddress')->willReturn($billingAddress);
+        $invoice->method('getItems')->willReturn($itemsInvoiceCollection);
+
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getQuoteId')->willReturn(42);
+        $invoice->method('getOrder')->willReturn($orderMock);
+
+        $event = $this->createMock(Event::class);
+        $event->method('getData')->willReturn($invoice);
+        $observer = $this->createMock(Observer::class);
+        $observer->method('getEvent')->willReturn($event);
+        $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress');
+        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection, 42);
+        $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([]);
+        $this->almaClient->expects($this->never())->method('getDefaultClient');
+
+
+        $dtoMock = $this->createMock(OrderConfirmedBusinessEvent::class);
+        $this->merchantBusinessService
+            ->expects($this->once())
+            ->method('createOrderConfirmedBusinessEventByOrder')
+            ->with($orderMock)
+            ->willReturn($dtoMock);
+        $this->merchantBusinessService
+            ->expects($this->once())
+            ->method('sendOrderConfirmedBusinessEvent')
+            ->with($dtoMock);
+        $this->createSalesOrderInvoicePayObserver()->execute($observer);
+    }
+
+    public function testObserverNotThrowInCasOfCreateOrderConfirmedObjectError(): void
+    {
+        $billingAddress = $this->createMock(Address::class);
+        $itemsInvoiceCollection = $this->createMock(Collection::class);
+        $invoice = $this->createMock(Invoice::class);
+        $invoice->method('getBillingAddress')->willReturn($billingAddress);
+        $invoice->method('getItems')->willReturn($itemsInvoiceCollection);
+
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getQuoteId')->willReturn(42);
+        $invoice->method('getOrder')->willReturn($orderMock);
+
+        $event = $this->createMock(Event::class);
+        $event->method('getData')->willReturn($invoice);
+        $observer = $this->createMock(Observer::class);
+        $observer->method('getEvent')->willReturn($event);
+        $this->insuranceHelper->expects($this->once())->method('getSubscriberByAddress');
+        $this->insuranceSendCustomerCartHelper->expects($this->once())->method('sendCustomerCart')->with($itemsInvoiceCollection, 42);
+        $this->insuranceHelper->expects($this->once())->method('getSubscriptionData')->willReturn([]);
+        $this->almaClient->expects($this->never())->method('getDefaultClient');
+
+
+        $dtoMock = $this->createMock(OrderConfirmedBusinessEvent::class);
+        $this->merchantBusinessService
+            ->expects($this->once())
+            ->method('createOrderConfirmedBusinessEventByOrder')
+            ->with($orderMock)
+            ->willThrowException(new MerchantBusinessServiceException('Error in DTO creation'));
+        $this->merchantBusinessService
+            ->expects($this->never())
+            ->method('sendOrderConfirmedBusinessEvent')
+            ->with($dtoMock);
+        $this->createSalesOrderInvoicePayObserver()->execute($observer);
+    }
+
     private function createSalesOrderInvoicePayObserver(): SalesOrderInvoicePayObserver
     {
         return new SalesOrderInvoicePayObserver(...$this->getDependency());
@@ -141,7 +219,8 @@ class SalesOrderInvoicePayObserverTest extends TestCase
             $this->almaClient,
             $this->subscriptionResourceModel,
             $this->apiConfigHelper,
-            $this->insuranceSendCustomerCartHelper
+            $this->insuranceSendCustomerCartHelper,
+            $this->merchantBusinessService
         ];
     }
 
