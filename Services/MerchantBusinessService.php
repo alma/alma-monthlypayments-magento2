@@ -48,6 +48,31 @@ class MerchantBusinessService
         $this->quoteRepository = $quoteRepository;
     }
 
+
+    /**
+     * Set alma_bnpl_eligibility to true in quote DB
+     *
+     * @param Quote $quote
+     * @return void
+     */
+    public function quoteIsEligibleForBNPL(Quote $quote): void
+    {
+        $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, true);
+        $this->quoteRepository->save($quote);
+    }
+
+    /**
+     * Set alma_bnpl_eligibility to false in quote DB
+     *
+     * @param Quote $quote
+     * @return void
+     */
+    public function quoteNotEligibleForBNPL(Quote $quote): void
+    {
+        $quote->setData(self::QUOTE_BNPL_ELIGIBILITY_KEY, false);
+        $this->quoteRepository->save($quote);
+    }
+
     /**
      * Generate OrderConfirmed DTO
      *

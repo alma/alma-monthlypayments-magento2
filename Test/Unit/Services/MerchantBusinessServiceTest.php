@@ -42,6 +42,33 @@ class MerchantBusinessServiceTest extends TestCase
         );
     }
 
+    public function testSeQuoteIsEligibleForBNPLCallQuoteRepository()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->expects($this->once())
+            ->method('setData')
+            ->with('alma_bnpl_eligibility', true);
+        $this->quoteRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($quote);
+        $this->merchantBusinessService->quoteIsEligibleForBNPL($quote);
+    }
+
+    public function testSeQuoteNotEligibleForBNPLCallQuoteRepository()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->expects($this->once())
+            ->method('setData')
+            ->with('alma_bnpl_eligibility', false);
+        $this->quoteRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($quote);
+        $this->merchantBusinessService->quoteNotEligibleForBNPL($quote);
+    }
 
     public function testSendOrderConfirmedCallPhpClient()
     {
