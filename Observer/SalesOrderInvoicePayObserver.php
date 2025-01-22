@@ -56,7 +56,6 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         ApiConfigHelper                 $apiConfigHelper,
         InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper,
         MerchantBusinessService         $merchantBusinessService
-
     )
     {
         $this->logger = $logger;

@@ -120,9 +120,9 @@ class MerchantBusinessServiceTest extends TestCase
 
         $dto = $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($orderMock);
         $this->assertInstanceOf(OrderConfirmedBusinessEvent::class, $dto);
-        $this->assertEquals(false, $dto->isAlmaP1X());
-        $this->assertEquals(false, $dto->isAlmaBNPL());
-        $this->assertEquals(false, $dto->wasBNPLEligible());
+        $this->assertFalse($dto->isAlmaP1X());
+        $this->assertFalse($dto->isAlmaBNPL());
+        $this->assertFalse($dto->wasBNPLEligible());
         $this->assertEquals('42', $dto->getOrderId());
         $this->assertEquals('12', $dto->getCartId());
         $this->assertNull($dto->getAlmaPaymentId());
@@ -155,9 +155,9 @@ class MerchantBusinessServiceTest extends TestCase
 
         $dto = $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($orderMock);
         $this->assertInstanceOf(OrderConfirmedBusinessEvent::class, $dto);
-        $this->assertEquals(false, $dto->isAlmaP1X());
-        $this->assertEquals(true, $dto->isAlmaBNPL());
-        $this->assertEquals(true, $dto->wasBNPLEligible());
+        $this->assertFalse($dto->isAlmaP1X());
+        $this->assertTrue($dto->isAlmaBNPL());
+        $this->assertTrue($dto->wasBNPLEligible());
         $this->assertEquals('42', $dto->getOrderId());
         $this->assertEquals('12', $dto->getCartId());
         $this->assertEquals('alma_payment_external_id', $dto->getAlmaPaymentId());
@@ -190,9 +190,9 @@ class MerchantBusinessServiceTest extends TestCase
 
         $dto = $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($orderMock);
         $this->assertInstanceOf(OrderConfirmedBusinessEvent::class, $dto);
-        $this->assertEquals(true, $dto->isAlmaP1X());
-        $this->assertEquals(false, $dto->isAlmaBNPL());
-        $this->assertEquals(true, $dto->wasBNPLEligible());
+        $this->assertTrue($dto->isAlmaP1X());
+        $this->assertFalse($dto->isAlmaBNPL());
+        $this->assertTrue($dto->wasBNPLEligible());
         $this->assertEquals('42', $dto->getOrderId());
         $this->assertEquals('12', $dto->getCartId());
         $this->assertEquals('alma_payment_external_id', $dto->getAlmaPaymentId());
