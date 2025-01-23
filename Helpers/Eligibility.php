@@ -218,12 +218,13 @@ class Eligibility extends AbstractHelper
         }
         $feePlans = array_values($plansEligibility);
         $this->setCurrentsFeePlans($feePlans);
-        $this->merchantBusinessService->quoteNotEligibleForBNPL($quote);
+        $isEligible = false;
         if (array_filter($feePlans, function ($feePlan) {
             return $feePlan->getPlanConfig()->planKey() !== PaymentPlansHelper::PAY_NOW_KEY;
         })) {
-            $this->merchantBusinessService->quoteIsEligibleForBNPL($quote);
+            $isEligible = true;
         }
+        $isEligible ? $this->merchantBusinessService->quoteIsEligibleForBNPL($quote) : $this->merchantBusinessService->quoteNotEligibleForBNPL($quote);
         return $feePlans;
     }
 
