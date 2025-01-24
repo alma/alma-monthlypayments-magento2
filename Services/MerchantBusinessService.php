@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Services;
 
 
+use Alma\API\Entities\DTO\MerchantBusinessEvent\CartInitiatedBusinessEvent;
 use Alma\API\Entities\DTO\MerchantBusinessEvent\OrderConfirmedBusinessEvent;
 use Alma\API\Exceptions\AlmaException;
 use Alma\API\Exceptions\ParametersException;
@@ -19,6 +20,7 @@ use Magento\Sales\Model\Order;
 class MerchantBusinessService
 {
     const QUOTE_BNPL_ELIGIBILITY_KEY = 'alma_bnpl_eligibility';
+    const CART_INITIATED_STATUS_KEY = 'alma_cart_initiated_status';
     /**
      * @var AlmaClient
      */
@@ -47,6 +49,62 @@ class MerchantBusinessService
         $this->almaClient = $almaClient;
         $this->logger = $logger;
         $this->quoteRepository = $quoteRepository;
+    }
+
+    /**
+     * Get cart initiated notification status in quote DB
+     *
+     * @param CartInterface $quote
+     * @return bool
+     */
+    public function isSendCartInitiatedNotification(CartInterface $quote)
+    {
+        return (bool)$quote->getData(self::CART_INITIATED_STATUS_KEY);
+    }
+
+    /**
+     * Create and send cart initiated business event
+     * Update db Status
+     * Never throw Exception
+     *
+     * @param CartInterface $quote
+     * @return void
+     */
+    public function createAndSendCartInitiatedBusinessEvent(CartInterface $quote)
+    {
+        try {
+            $businessEvent = $this->createCartInitiatedBusinessEventByQuote($quote);
+            $this->almaClient->getDefaultClient()->merchants->sendCartInitiatedBusinessEvent($businessEvent);
+            $this->saveCartInitiatedIsSendStatus($quote);
+        } catch (AlmaException $e) {
+            $this->logger->error('Send CartInitiatedBusinessEvent error : ', [$e->getMessage()]);
+        }
+    }
+
+    /**
+     * Create a CartInitiatedBusinessEventDTO
+     *
+     * @param CartInterface $quote //ID can be null, it's not in return type
+     * @return CartInitiatedBusinessEvent
+     * @throws ParametersException
+     */
+    private function createCartInitiatedBusinessEventByQuote(CartInterface $quote): CartInitiatedBusinessEvent
+    {
+        $quoteIdBoolOrNull = $quote->getId() ? (string)($quote->getId()) : null;
+        return new CartInitiatedBusinessEvent($quoteIdBoolOrNull);
+
+    }
+
+    /**
+     * Set alma_cart_initiated to true in quote DB
+     *
+     * @param CartInterface $quote
+     * @return void
+     */
+    private function saveCartInitiatedIsSendStatus(CartInterface $quote): void
+    {
+        $quote->setData(self::CART_INITIATED_STATUS_KEY, '1');
+        $this->quoteRepository->save($quote);
     }
 
 

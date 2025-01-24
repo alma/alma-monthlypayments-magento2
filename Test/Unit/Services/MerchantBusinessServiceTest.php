@@ -4,6 +4,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Services;
 
 use Alma\API\Client;
 use Alma\API\Endpoints\Merchants;
+use Alma\API\Entities\DTO\MerchantBusinessEvent\CartInitiatedBusinessEvent;
 use Alma\API\Entities\DTO\MerchantBusinessEvent\OrderConfirmedBusinessEvent;
 use Alma\API\Exceptions\RequestException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
@@ -244,5 +245,85 @@ class MerchantBusinessServiceTest extends TestCase
         $this->expectException(MerchantBusinessServiceException::class);
         $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($orderMock);
     }
+
+    public function testisSendCartInitiatedNotificationReturnTrueFor1()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->method('getData')
+            ->with('alma_cart_initiated_status')
+            ->willReturn('1');
+        $this->assertTrue($this->merchantBusinessService->isSendCartInitiatedNotification($quote));
+    }
+
+    public function testisSendCartInitiatedNotificationReturnFalseFor0()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->method('getData')
+            ->with('alma_cart_initiated_status')
+            ->willReturn('0');
+        $this->assertFalse($this->merchantBusinessService->isSendCartInitiatedNotification($quote));
+    }
+
+    public function testSendCartInitiatedNotThrowErrorForBadDTO()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->method('getId')
+            ->willReturn(null);
+        $this->merchantEndpoint
+            ->expects($this->never())
+            ->method('sendCartInitiatedBusinessEvent');
+        $this->quoteRepository
+            ->expects($this->never())
+            ->method('save')
+            ->with($quote);
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
+        $this->assertNull($this->merchantBusinessService->createAndSendCartInitiatedBusinessEvent($quote));
+    }
+
+    public function testSendCartInitiatedNotThrowErrorRequestException()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->method('getId')
+            ->willReturn(42);
+        $this->merchantEndpoint
+            ->expects($this->once())
+            ->method('sendCartInitiatedBusinessEvent')
+            ->willThrowException(new RequestException('Error in send'));
+        $this->quoteRepository
+            ->expects($this->never())
+            ->method('save')
+            ->with($quote);
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
+        $this->assertNull($this->merchantBusinessService->createAndSendCartInitiatedBusinessEvent($quote));
+    }
+
+    public function testSendCartInitiatedCallPhpClientAndSaveDBData()
+    {
+        $quote = $this->createMock(Quote::class);
+        $quote
+            ->expects($this->once())
+            ->method('setData')
+            ->with('alma_cart_initiated_status', '1');
+        $quote
+            ->method('getId')
+            ->willReturn(42);
+        $this->merchantEndpoint
+            ->expects($this->once())
+            ->method('sendCartInitiatedBusinessEvent');
+        $this->quoteRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($quote);
+        $this->assertNull($this->merchantBusinessService->createAndSendCartInitiatedBusinessEvent($quote));
+    }
+
 
 }
