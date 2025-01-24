@@ -8,7 +8,9 @@ use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\InsuranceSendCustomerCartHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Alma\MonthlyPayments\Model\Exceptions\MerchantBusinessServiceException;
 use Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription;
+use Alma\MonthlyPayments\Services\MerchantBusinessService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
@@ -37,7 +39,14 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
      * @var ApiConfigHelper
      */
     private $apiConfigHelper;
+    /**
+     * @var InsuranceSendCustomerCartHelper
+     */
     private $insuranceSendCustomerCartHelper;
+    /**
+     * @var MerchantBusinessService
+     */
+    private $merchantBusinessService;
 
     public function __construct(
         Logger                          $logger,
@@ -45,14 +54,17 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
         AlmaClient                      $almaClient,
         Subscription                    $subscriptionResourceModel,
         ApiConfigHelper                 $apiConfigHelper,
-        InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper
-    ) {
+        InsuranceSendCustomerCartHelper $insuranceSendCustomerCartHelper,
+        MerchantBusinessService         $merchantBusinessService
+    )
+    {
         $this->logger = $logger;
         $this->insuranceHelper = $insuranceHelper;
         $this->almaClient = $almaClient;
         $this->subscriptionResourceModel = $subscriptionResourceModel;
         $this->apiConfigHelper = $apiConfigHelper;
         $this->insuranceSendCustomerCartHelper = $insuranceSendCustomerCartHelper;
+        $this->merchantBusinessService = $merchantBusinessService;
     }
 
     /**
@@ -62,6 +74,14 @@ class SalesOrderInvoicePayObserver implements ObserverInterface
     {
         /** @var Invoice $invoice */
         $invoice = $observer->getEvent()->getData('invoice');
+
+        try {
+            $orderConfirmedBusinessEventDTO = $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($invoice->getOrder());
+            $this->merchantBusinessService->sendOrderConfirmedBusinessEvent($orderConfirmedBusinessEventDTO);
+        } catch (MerchantBusinessServiceException $e) {
+            $this->logger->error('Error sending Order Confirmed Business Event observer', ['exception' => $e]);
+        }
+
         $billingAddress = $invoice->getBillingAddress();
         $subscriber = $this->insuranceHelper->getSubscriberByAddress($billingAddress);
 
