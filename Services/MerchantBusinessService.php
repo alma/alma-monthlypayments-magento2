@@ -158,8 +158,8 @@ class MerchantBusinessService
                 $isPayNow,
                 $isBNPL,
                 $quoteIsEligible !== null ? (bool)$quoteIsEligible : null,
-                !empty($order->getIncrementId()) ? (string)$order->getIncrementId() : null,
-                !empty($order->getQuoteId()) ? (string)$order->getQuoteId() : null,
+                (string)$order->getIncrementId(),
+                (string)$order->getQuoteId(),
                 $order->getPayment()->getAdditionalInformation()['PAYMENT_ID'] ?? null
             );
         } catch (ParametersException $e) {
