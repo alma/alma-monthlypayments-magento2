@@ -246,6 +246,34 @@ class MerchantBusinessServiceTest extends TestCase
         $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($orderMock);
     }
 
+    public function testCreateOrderConfirmedThrowExceptionForEmptyStringInPaymentID()
+    {
+        $paymentMock = $this->createMock(OrderPaymentInterface::class);
+        $paymentMock->method('getAdditionalInformation')
+            ->willReturn(['PAYMENT_ID' => '', 'selectedPlan' => 'general:1:0:0']);
+        $quote = $this->createMock(Quote::class);
+
+        $orderMock = $this->createMock(Order::class);
+        $orderMock
+            ->method('getPayment')
+            ->willReturn($paymentMock);
+        $orderMock
+            ->method('getId')
+            ->willReturn(null);
+        $orderMock
+            ->method('getQuoteId')
+            ->willReturn('12');
+        $quote
+            ->method('getData')
+            ->with('alma_bnpl_eligibility')
+            ->willReturn('1');
+        $this->quoteRepository
+            ->method('get')
+            ->willReturn($quote);
+        $this->expectException(MerchantBusinessServiceException::class);
+        $this->merchantBusinessService->createOrderConfirmedBusinessEventByOrder($orderMock);
+    }
+
     public function testisSendCartInitiatedNotificationReturnTrueFor1()
     {
         $quote = $this->createMock(Quote::class);
