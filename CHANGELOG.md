@@ -2,19 +2,15 @@
 
 ## v5.4.0 - 2025-01-30
 
-### Changes
-
-- infra: add new task cmd for local unit test (#217)
-- Backport main to develop (#218)
-
 ### 🚀 New Features
 
 - Implement merchant business event (#223)
-- feat: add CartInitiated notification (#224)
 
 #### Contributors
 
-@Francois-Gomis, @alma-renovate-bot[bot], @carine-bonnafous, @joyet-simon, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+@Francois-Gomis, @alma-renovate-bot[bot], @carine-bonnafous,
+@joyet-simon, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot)
+and [github-actions[bot]](https://github.com/apps/github-actions)
 
 ## v5.3.0 - 2024-12-12
 
@@ -33,7 +29,8 @@
 
 #### Contributors
 
-@Francois-Gomis, @alma-renovate-bot, @alma-renovate-bot[bot], @gdraynz, @github-actions, @joyet-simon and @remi-zuffinetti
+@Francois-Gomis, @alma-renovate-bot, @alma-renovate-bot[bot], @gdraynz, @github-actions, @joyet-simon and
+@remi-zuffinetti
 
 ## v5.2.0 - 2024-09-12
 
@@ -151,7 +148,7 @@
 ## v3.0.0
 
 * feature: change vendor name to almapay
-* fix: get product error on product page  when cache is enabled
+* fix: get product error on product page when cache is enabled
 * feature: update alma widget to 2.12.3
 
 ## v2.9.0
@@ -311,10 +308,9 @@
 * Adds Web API endpoints to get an Alma URL for an order paid with Alma, and to validate such a payment
   upon customer return. See `etc/webapi.xml` for endpoints URLs and `Model/Api/Payment.php` for
   implementation.
-  
+
 * Adds 3 API Configuration fields to override `return_url`, `ipn_callback_url` and `customer_cancel_url`
   in created payments.
-  
 
 ## v1.0.7
 
@@ -346,7 +342,8 @@
 Let's start following semver.
 
 * Switches logo image to SVG
-* Adds User-Agent string containing the module's version, Magento version, PHP client and PHP versions, to all requests going to Alma's API.
+* Adds User-Agent string containing the module's version, Magento version, PHP client and PHP versions, to all requests
+  going to Alma's API.
 
 ## v1.0.0
 
@@ -354,6 +351,8 @@ This version evolved for a while without any version bump 🤷‍♂️
 Features in the latest push to this release:
 
 * Module can be configured in Test and Live mode
-* A message displays below the cart and in the minicart to indicate whether the purchase is eligible to monthly installments
+* A message displays below the cart and in the minicart to indicate whether the purchase is eligible to monthly
+  installments
 * The module adds a payment method to the checkout, which redirects the user to Alma's payment page.
-  If everything goes right (i.e. Customer doesn't cancel, pays the right amount, ... ), the order is validated upon customer return.
+  If everything goes right (i.e. Customer doesn't cancel, pays the right amount, ... ), the order is validated upon
+  customer return.
