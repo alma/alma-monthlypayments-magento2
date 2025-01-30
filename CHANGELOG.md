@@ -1,5 +1,21 @@
 # Changelog
 
+## v5.4.0 - 2025-01-30
+
+### Changes
+
+- infra: add new task cmd for local unit test (#217)
+- Backport main to develop (#218)
+
+### 🚀 New Features
+
+- Implement merchant business event (#223)
+- feat: add CartInitiated notification (#224)
+
+#### Contributors
+
+@Francois-Gomis, @alma-renovate-bot[bot], @carine-bonnafous, @joyet-simon, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.3.0 - 2024-12-12
 
 ### 🚀 New Features
