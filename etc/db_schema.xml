@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
-<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="quote" resource="checkout" comment="Alma eligibility for quote">
+        <column xsi:type="boolean" name="alma_bnpl_eligibility" nullable="true"
+                comment="Quote is eligible to alma BNPL"/>
+        <column xsi:type="boolean" name="alma_cart_initiated_status" nullable="false" default="false"
+                comment="Cart initiated notification status"/>
+    </table>
     <table name="quote_item" resource="checkout" comment="Alma insurance Data in Quote Item">
         <column xsi:type="text" name="alma_insurance" nullable="true" comment="Alma insurance"/>
     </table>
@@ -10,31 +16,42 @@
 
     <table name="alma_insurance_subscription" resource="checkout" comment="Alma insurance subscriptions">
         <column xsi:type="int" name="entity_id" identity="true" comment="Auto increment ID"/>
-        <column xsi:type="int" name="order_id" padding="10" nullable="false" unsigned="true" comment="Subscription Order id"/>
-        <column xsi:type="int" name="order_item_id" padding="10" nullable="false" unsigned="true" comment="Order item id"/>
+        <column xsi:type="int" name="order_id" padding="10" nullable="false" unsigned="true"
+                comment="Subscription Order id"/>
+        <column xsi:type="int" name="order_item_id" padding="10" nullable="false" unsigned="true"
+                comment="Order item id"/>
         <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Insurance Name"/>
         <column xsi:type="varchar" name="subscription_id" nullable="false" length="255" comment="Alma subscription ID"/>
         <column xsi:type="varchar" name="subscription_broker_id" length="255" comment="Subscription broker ID"/>
-        <column xsi:type="varchar" name="subscription_broker_reference" length="255" comment="Subscription broker reference"/>
-        <column xsi:type="int" name="subscription_amount" nullable="false" unsigned="true" comment="Alma subscription Price"/>
-        <column xsi:type="varchar" name="contract_id" nullable="false" length="255"  comment="Alma contract ID"/>
+        <column xsi:type="varchar" name="subscription_broker_reference" length="255"
+                comment="Subscription broker reference"/>
+        <column xsi:type="int" name="subscription_amount" nullable="false" unsigned="true"
+                comment="Alma subscription Price"/>
+        <column xsi:type="varchar" name="contract_id" nullable="false" length="255" comment="Alma contract ID"/>
         <column xsi:type="varchar" name="cms_reference" nullable="false" length="255" comment="cms reference - SKU"/>
-        <column xsi:type="varchar" name="linked_product_name" nullable="false" length="255" comment="Name of insured product"/>
+        <column xsi:type="varchar" name="linked_product_name" nullable="false" length="255"
+                comment="Name of insured product"/>
         <column xsi:type="int" name="linked_product_price" nullable="false" comment="Price of insured product"/>
-        <column xsi:type="varchar" name="subscription_state" nullable="false" length="255" comment="Subscription state"/>
+        <column xsi:type="varchar" name="subscription_state" nullable="false" length="255"
+                comment="Subscription state"/>
         <column xsi:type="varchar" name="mode" nullable="false" length="10" comment="Subscription mode live/test"/>
         <column xsi:type="datetime" name="date_of_cancelation" nullable="true" comment="Cancellation date"/>
         <column xsi:type="datetime" name="date_of_cancelation_request" nullable="true" comment="Cancellation date"/>
-        <column xsi:type="varchar" name="reason_of_cancelation" nullable="true" length="255" comment="Cancellation reason"/>
+        <column xsi:type="varchar" name="reason_of_cancelation" nullable="true" length="255"
+                comment="Cancellation reason"/>
         <column xsi:type="boolean" name="is_refunded" default="false" comment="Confirm subscription refund"/>
         <column xsi:type="varchar" name="callback_url" nullable="false" length="255" comment="Callback url for update"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="foreign" referenceId="ALMA_SUBSCRIPTION_ORDER_ID_SALES_ORDER_ENTITY_ID" table="alma_insurance_subscription" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
-        <constraint xsi:type="foreign" referenceId="ALMA_SUBSCRIPTION_ORDER_ITEM_ID_SALES_ORDER_ITEM_ID" table="alma_insurance_subscription" column="order_item_id" referenceTable="sales_order_item" referenceColumn="item_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="ALMA_SUBSCRIPTION_ORDER_ID_SALES_ORDER_ENTITY_ID"
+                    table="alma_insurance_subscription" column="order_id" referenceTable="sales_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="ALMA_SUBSCRIPTION_ORDER_ITEM_ID_SALES_ORDER_ITEM_ID"
+                    table="alma_insurance_subscription" column="order_item_id" referenceTable="sales_order_item"
+                    referenceColumn="item_id" onDelete="CASCADE"/>
         <index referenceId="SUBSCRIPTION_EXTERNAL_ID" indexType="btree">
-            <column name="subscription_id" />
+            <column name="subscription_id"/>
         </index>
 
     </table>

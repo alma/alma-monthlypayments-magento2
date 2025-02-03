@@ -112,7 +112,8 @@ class InsuranceHelper extends AbstractHelper
         SubscriptionFactory     $subscriptionFactory,
         Session                 $session,
         StoreManagerInterface   $storeManager
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -212,7 +213,6 @@ class InsuranceHelper extends AbstractHelper
             return $this->productRepository->get(self::ALMA_INSURANCE_SKU);
         } catch (NoSuchEntityException $e) {
             $message = 'No alma Insurance product in Catalog - Use a product with sku : ' . self::ALMA_INSURANCE_SKU;
-            $this->logger->error($message, [$e->getMessage()]);
             throw new AlmaInsuranceProductException($message, 0, $e);
         }
     }
