@@ -53,7 +53,12 @@ class OrderStatusObserver implements ObserverInterface
         $almaPaymentId = $payment->getAdditionalInformation()[Config::ORDER_PAYMENT_ID];
         try {
             $almaClient = $this->getAlmaClient();
-            $almaClient->payments->addOrderStatusByMerchantOrderReference($almaPaymentId, $order->getIncrementId(), $order->getStatus(), $order->hasShipments());
+            $almaClient->payments->addOrderStatusByMerchantOrderReference(
+                $almaPaymentId,
+                $order->getIncrementId(),
+                $order->getStatus(),
+                $order->hasShipments()
+            );
         } catch (AlmaException|OrderStatusException $e) {
             $this->logger->error('Impossible to send order Status', [$e->getMessage()]);
         }
