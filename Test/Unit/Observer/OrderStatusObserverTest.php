@@ -3,10 +3,7 @@
 namespace Alma\MonthlyPayments\Test\Unit\Observer;
 
 use Alma\API\Client;
-use Alma\API\Endpoints\Orders;
 use Alma\API\Endpoints\Payments;
-use Alma\API\Entities\Order;
-use Alma\API\Entities\Payment;
 use Alma\API\Exceptions\RequestException;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
@@ -15,6 +12,8 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Observer\OrderStatusObserver;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
 use PHPUnit\Framework\TestCase;
 
 class OrderStatusObserverTest extends TestCase
@@ -52,7 +51,7 @@ class OrderStatusObserverTest extends TestCase
 
     public function testGivenOrderStateIsNewShouldReturnVoid(): void
     {
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('new');
         $orderStatusObserver = $this->createOrderStatusObserverObject();
         $this->event->method('getData')->willReturn($order);
@@ -62,10 +61,10 @@ class OrderStatusObserverTest extends TestCase
 
     public function testGivenProcessingOrderWithNonAlmaPaymentMethodShouldNotCallAlmaAndReturnVoid(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn('not_alma');
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getPayment')->willReturn($payment);
 
@@ -77,11 +76,11 @@ class OrderStatusObserverTest extends TestCase
 
     public function testGivenNoAlmaPaymentIdInAdditionalInformationMustReturnWithoutCallAddOrderStatusByMerchantOrderReference(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([]);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getStatus')->willReturn('processing_status');
         $order->method('getPayment')->willReturn($payment);
@@ -95,11 +94,11 @@ class OrderStatusObserverTest extends TestCase
 
     public function testGivenAlmaPaymentClientThrowExceptionReturnVoidAndLog(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([Config::ORDER_PAYMENT_ID => 'alma_payment_external_id']);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getStatus')->willReturn('processing_status');
         $order->method('getPayment')->willReturn($payment);
@@ -116,11 +115,11 @@ class OrderStatusObserverTest extends TestCase
 
     public function testGivenAlmaPaymentAddOrderStatusThrowExceptionReturnVoidAndLog(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([Config::ORDER_PAYMENT_ID => 'alma_payment_external_id']);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getStatus')->willReturn('processing_status');
         $order->method('getPayment')->willReturn($payment);
@@ -142,11 +141,11 @@ class OrderStatusObserverTest extends TestCase
      */
     public function testGivenProcessingOrderWithAlmaPaymentMethodShouldCallAlmaSendStatusAndReturnVoid($dataProvider): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([Config::ORDER_PAYMENT_ID => 'alma_payment_external_id']);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getStatus')->willReturn($dataProvider['status']);
         $order->method('getPayment')->willReturn($payment);
