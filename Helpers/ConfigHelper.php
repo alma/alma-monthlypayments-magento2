@@ -257,11 +257,11 @@ class ConfigHelper extends AbstractHelper
      */
     public function getBaseApiPlansConfig(): array
     {
-        $basPlanConfig = $this->getConfigByCode(self::BASE_PLANS_CONFIG);
-        if (!$basPlanConfig) {
+        $basePlanConfig = $this->getConfigByCode(self::BASE_PLANS_CONFIG);
+        if (!$basePlanConfig) {
             return [];
         }
-        $baseApiFeePlansInArray = $this->serializer->unserialize($basPlanConfig);
+        $baseApiFeePlansInArray = $this->serializer->unserialize($basePlanConfig);
         $feePlans = [];
         foreach ($baseApiFeePlansInArray as $key => $feePlanInArray) {
             $feePlans[$key] = new FeePlan($feePlanInArray);
