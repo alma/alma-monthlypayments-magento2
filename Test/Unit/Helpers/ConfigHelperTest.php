@@ -41,9 +41,7 @@ class ConfigHelperTest extends TestCase
         $this->scopeConfig->method('getValue')->willReturn(null);
 
         $feePlans = $this->createConfigHelper()->getBaseApiPlansConfig();
-        foreach ($feePlans as $feePlan) {
-            $this->assertInstanceOf(FeePlan::class, $feePlan);
-        }
+        $this->assertEquals([], $feePlans);
     }
 
     public function testBaseApiPlansConfigIsFeePlan(): void
