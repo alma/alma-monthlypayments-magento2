@@ -168,6 +168,10 @@ class OrderStatusObserverTest extends TestCase
         $this->createOrderStatusObserverObject()->execute($this->observer);
     }
 
+    /**
+     * Data provider for testGivenProcessingOrderWithAlmaPaymentMethodShouldCallAlmaSendStatusAndReturnVoid
+     * @return array[]
+     */
     private function orderStatusDataProvider(): array
     {
         return [
