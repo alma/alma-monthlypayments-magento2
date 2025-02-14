@@ -48,12 +48,13 @@ class ConfigHelper extends AbstractHelper
      * @param TypeListInterface $typeList
      */
     public function __construct(
-        Context $context,
-        StoreHelper $storeHelper,
-        WriterInterface $writerInterface,
+        Context             $context,
+        StoreHelper         $storeHelper,
+        WriterInterface     $writerInterface,
         SerializerInterface $serializer,
-        TypeListInterface $typeList
-    ) {
+        TypeListInterface   $typeList
+    )
+    {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeHelper = $storeHelper;
@@ -178,7 +179,7 @@ class ConfigHelper extends AbstractHelper
      *
      * @return void
      */
-    public function disableInPage():void
+    public function disableInPage(): void
     {
         $this->saveConfig(self::IN_PAGE_ENABLED, 0, $this->storeHelper->getScope(), $this->storeHelper->getStoreId());
     }
@@ -228,7 +229,7 @@ class ConfigHelper extends AbstractHelper
         $this->cleanCache(CacheConfig::TYPE_IDENTIFIER);
     }
 
-    public function saveIsAllowedInsurance($merchant, $scope, $storeId):void
+    public function saveIsAllowedInsurance($merchant, $scope, $storeId): void
     {
         $isAllowedInsurance = 0;
         if ($merchant) {
@@ -240,11 +241,12 @@ class ConfigHelper extends AbstractHelper
         $this->saveIsAllowedInsuranceValue($isAllowedInsurance, $scope, $storeId);
     }
 
-    public function saveIsAllowedInsuranceValue($value, $scope, $storeId):void
+    public function saveIsAllowedInsuranceValue($value, $scope, $storeId): void
     {
         $this->saveConfig(InsuranceHelper::IS_ALLOWED_INSURANCE_PATH, $value, $scope, $storeId);
     }
-    public function clearInsuranceConfig($scope, $storeId):void
+
+    public function clearInsuranceConfig($scope, $storeId): void
     {
         $this->saveConfig(InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE, null, $scope, $storeId);
     }
@@ -255,7 +257,11 @@ class ConfigHelper extends AbstractHelper
      */
     public function getBaseApiPlansConfig(): array
     {
-        $baseApiFeePlansInArray = $this->serializer->unserialize($this->getConfigByCode(self::BASE_PLANS_CONFIG));
+        $basePlanConfig = $this->getConfigByCode(self::BASE_PLANS_CONFIG);
+        if (!$basePlanConfig) {
+            return [];
+        }
+        $baseApiFeePlansInArray = $this->serializer->unserialize($basePlanConfig);
         $feePlans = [];
         foreach ($baseApiFeePlansInArray as $key => $feePlanInArray) {
             $feePlans[$key] = new FeePlan($feePlanInArray);

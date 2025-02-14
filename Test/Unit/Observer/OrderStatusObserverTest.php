@@ -3,16 +3,17 @@
 namespace Alma\MonthlyPayments\Test\Unit\Observer;
 
 use Alma\API\Client;
-use Alma\API\Endpoints\Orders;
 use Alma\API\Endpoints\Payments;
-use Alma\API\Entities\Order;
-use Alma\API\Entities\Payment;
+use Alma\API\Exceptions\RequestException;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
+use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Observer\OrderStatusObserver;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
 use PHPUnit\Framework\TestCase;
 
 class OrderStatusObserverTest extends TestCase
@@ -21,17 +22,14 @@ class OrderStatusObserverTest extends TestCase
     private $observer;
 
     private $event;
-    private $ordersEndpoint;
     private $paymentsEndpoint;
     private $almaClient;
 
     protected function setUp(): void
     {
-        $this->ordersEndpoint = $this->createMock(Orders::class);
         $this->paymentsEndpoint = $this->createMock(Payments::class);
 
         $client = $this->createMock(Client::class);
-        $client->orders = $this->ordersEndpoint;
         $client->payments = $this->paymentsEndpoint;
 
         $this->logger = $this->createMock(Logger::class);
@@ -53,91 +51,89 @@ class OrderStatusObserverTest extends TestCase
 
     public function testGivenOrderStateIsNewShouldReturnVoid(): void
     {
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('new');
         $orderStatusObserver = $this->createOrderStatusObserverObject();
         $this->event->method('getData')->willReturn($order);
-        $this->ordersEndpoint->expects($this->never())->method('sendStatus');
+        $this->paymentsEndpoint->expects($this->never())->method('addOrderStatusByMerchantOrderReference');
         $orderStatusObserver->execute($this->observer);
     }
 
     public function testGivenProcessingOrderWithNonAlmaPaymentMethodShouldNotCallAlmaAndReturnVoid(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn('not_alma');
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getPayment')->willReturn($payment);
 
         $orderStatusObserver = $this->createOrderStatusObserverObject();
         $this->event->method('getData')->willReturn($order);
-        $this->ordersEndpoint->expects($this->never())->method('sendStatus');
+        $this->paymentsEndpoint->expects($this->never())->method('addOrderStatusByMerchantOrderReference');
         $orderStatusObserver->execute($this->observer);
     }
 
-    public function testGivenNoAlmaPaymentIdInAdditionalInformationMustReturnWithoutCallAlmaPayment(): void
+    public function testGivenNoAlmaPaymentIdInAdditionalInformationMustReturnWithoutCallAddOrderStatusByMerchantOrderReference(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([]);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getStatus')->willReturn('processing_status');
         $order->method('getPayment')->willReturn($payment);
 
         $this->event->method('getData')->willReturn($order);
 
-
-        $this->paymentsEndpoint->expects($this->never())->method('fetch');
+        $this->paymentsEndpoint->expects($this->never())->method('addOrderStatusByMerchantOrderReference');
         $this->createOrderStatusObserverObject()->execute($this->observer);
 
     }
 
-    public function testGivenAnAlmaPaymentWithoutOrdersShouldNotCallSendStatus(): void
+    public function testGivenAlmaPaymentClientThrowExceptionReturnVoidAndLog(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([Config::ORDER_PAYMENT_ID => 'alma_payment_external_id']);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
+        $order->method('getStatus')->willReturn('processing_status');
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getIncrementId')->willReturn('100000013');
 
         $this->event->method('getData')->willReturn($order);
-        $almaPayment = $this->createMock(Payment::class);
-        $almaPayment->orders = [];
-
-        $this->paymentsEndpoint->expects($this->once())->method('fetch')->with('alma_payment_external_id')->willReturn($almaPayment);
-        $this->ordersEndpoint->expects($this->never())->method('sendStatus');
+        $this->almaClient->method('getDefaultClient')->willThrowException(new AlmaClientException('error'));
+        $this->paymentsEndpoint->expects($this->never())->method('addOrderStatusByMerchantOrderReference');
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
         $this->createOrderStatusObserverObject()->execute($this->observer);
+
     }
 
-    public function testGivenAnAlmaPaymentWithOrdersWithBadMerchantReferenceShouldNotCallSendStatus(): void
+    public function testGivenAlmaPaymentAddOrderStatusThrowExceptionReturnVoidAndLog(): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([Config::ORDER_PAYMENT_ID => 'alma_payment_external_id']);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
+        $order->method('getStatus')->willReturn('processing_status');
         $order->method('getPayment')->willReturn($payment);
-        $order->method('getIncrementId')->willReturn('100000013');
 
         $this->event->method('getData')->willReturn($order);
-        $almaPayment = $this->createMock(Payment::class);
-
-        $almaOrder = $this->createMock(Order::class);
-        $almaOrder->merchant_reference = '100000012';
-        $almaOrder2 = $this->createMock(Order::class);
-        $almaOrder2->merchant_reference = '100000014';
-        $almaPayment->orders = [$almaOrder, $almaOrder2];
-
-        $this->paymentsEndpoint->expects($this->once())->method('fetch')->with('alma_payment_external_id')->willReturn($almaPayment);
-        $this->ordersEndpoint->expects($this->never())->method('sendStatus');
+        $this->paymentsEndpoint
+            ->expects($this->once())
+            ->method('addOrderStatusByMerchantOrderReference')
+            ->willThrowException(new RequestException('error'));
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
         $this->createOrderStatusObserverObject()->execute($this->observer);
+
     }
 
     /**
@@ -145,11 +141,11 @@ class OrderStatusObserverTest extends TestCase
      */
     public function testGivenProcessingOrderWithAlmaPaymentMethodShouldCallAlmaSendStatusAndReturnVoid($dataProvider): void
     {
-        $payment = $this->createMock(\Magento\Sales\Model\Order\Payment::class);
+        $payment = $this->createMock(Payment::class);
         $payment->method('getMethod')->willReturn(Config::CODE);
         $payment->method('getAdditionalInformation')->willReturn([Config::ORDER_PAYMENT_ID => 'alma_payment_external_id']);
 
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createMock(Order::class);
         $order->method('getState')->willReturn('processing');
         $order->method('getStatus')->willReturn($dataProvider['status']);
         $order->method('getPayment')->willReturn($payment);
@@ -158,17 +154,24 @@ class OrderStatusObserverTest extends TestCase
 
         $this->event->method('getData')->willReturn($order);
 
-        $almaOrder = $this->createMock(Order::class);
-        $almaOrder->id = 'alma_order_external_id';
-        $almaOrder->merchant_reference = '100000013';
-        $almaPayment = $this->createMock(Payment::class);
-        $almaPayment->orders = [$almaOrder];
+        $this->paymentsEndpoint->expects($this->never())->method('fetch');
+        $this->paymentsEndpoint
+            ->expects($this->once())
+            ->method('addOrderStatusByMerchantOrderReference')
+            ->with(
+                'alma_payment_external_id',
+                '100000013',
+                $dataProvider['status'],
+                $dataProvider['is_shipped']
 
-        $this->paymentsEndpoint->expects($this->once())->method('fetch')->with('alma_payment_external_id')->willReturn($almaPayment);
-        $this->ordersEndpoint->expects($this->once())->method('sendStatus')->with('alma_order_external_id', ['status' => $dataProvider['status'], 'is_shipped' => $dataProvider['is_shipped']]);
+            );
         $this->createOrderStatusObserverObject()->execute($this->observer);
     }
 
+    /**
+     * Data provider for testGivenProcessingOrderWithAlmaPaymentMethodShouldCallAlmaSendStatusAndReturnVoid
+     * @return array[]
+     */
     private function orderStatusDataProvider(): array
     {
         return [

@@ -12,6 +12,7 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Serialize\Serializer\Serialize;
 use Magento\Framework\Serialize\SerializerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -27,23 +28,32 @@ class ConfigHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
-        $this->scopeConfig->method('getValue')->willReturn('');
         $this->context = $this->createMock(Context::class);
         $this->context->method('getScopeConfig')->willReturn($this->scopeConfig);
         $this->storeHelper = $this->createMock(StoreHelper::class);
         $this->writerInterface = $this->createMock(WriterInterface::class);
-        $this->serializer = $this->createMock(SerializerInterface::class);
+        $this->serializer = new Serialize();
         $this->typeList = $this->createMock(TypeListInterface::class);
+    }
+
+    public function testBaseApiPlansConfigForNullReturnValue()
+    {
+        $this->scopeConfig->method('getValue')->willReturn(null);
+
+        $feePlans = $this->createConfigHelper()->getBaseApiPlansConfig();
+        $this->assertEquals([], $feePlans);
     }
 
     public function testBaseApiPlansConfigIsFeePlan(): void
     {
-        $this->serializer->method('unserialize')->willReturn(
+        $serializedPlans = $this->serializer->serialize(
             [
                 FeePlanFactoryMock::dataFeePlanFactory(FeePlanFactoryMock::KEY_2),
-                FeePlanFactoryMock::dataFeePlanFactory(FeePlanFactoryMock::KEY_3),
+                FeePlanFactoryMock::dataFeePlanFactory(FeePlanFactoryMock::KEY_3)
             ]
         );
+        $this->scopeConfig->method('getValue')->willReturn($serializedPlans);
+
         $feePlans = $this->createConfigHelper()->getBaseApiPlansConfig();
         foreach ($feePlans as $feePlan) {
             $this->assertInstanceOf(FeePlan::class, $feePlan);
