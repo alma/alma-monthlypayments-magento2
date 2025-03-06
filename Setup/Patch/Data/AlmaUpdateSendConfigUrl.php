@@ -50,5 +50,4 @@ class AlmaUpdateSendConfigUrl implements DataPatchInterface
     {
         return [];
     }
-
 }

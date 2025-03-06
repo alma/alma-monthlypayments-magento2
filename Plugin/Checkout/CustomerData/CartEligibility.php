@@ -59,8 +59,7 @@ class CartEligibility
         Config $config,
         Helpers\Logger $logger,
         Helpers\Availability $availabilityHelper
-    )
-    {
+    ) {
         $this->eligibilityHelper = $eligibilityHelper;
         $this->config = $config;
         $this->logger = $logger;

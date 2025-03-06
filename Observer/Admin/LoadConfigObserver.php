@@ -45,8 +45,7 @@ class LoadConfigObserver implements ObserverInterface
         StoreHelper            $storeHelper,
         Manager                $cacheManager,
         CollectCmsConfigHelper $collectCmsConfigHelper
-    )
-    {
+    ) {
         $this->url = $url;
         $this->paymentPlansHelper = $paymentPlansHelper;
         $this->logger = $logger;
@@ -121,5 +120,4 @@ class LoadConfigObserver implements ObserverInterface
             $this->storeHelper->getStoreId()
         );
     }
-
 }

@@ -46,15 +46,15 @@ class ProductWidgetPositions implements \Magento\Framework\Option\ArrayInterface
     public function toOptionArray()
     {
         return [
-            ['value' => SELF::POS_AFTER_TITLE, 'label' => __('After Product Title')],
-            ['value' => SELF::POS_BEFORE_PRICE, 'label' => __('Before Product Price')],
-            ['value' => SELF::POS_BEFORE_STOCK, 'label' => __('Before Product Stock')],
-            ['value' => SELF::POS_AFTER_STOCK, 'label' => __('After Product Stock')],
-            ['value' => SELF::POS_AFTER_INFO, 'label' => __('After Product Information')],
-            ['value' => SELF::POS_BEFORE_ADDTOCART, 'label' => __('Before Product AddToCart Button')],
-            ['value' => SELF::POS_AFTER_ADDTOCART, 'label' => __('After Product AddToCart Button')],
-            ['value' => SELF::POS_AFTER_ADDLINKS, 'label' => __('After AddTo links')],
-            ['value' => SELF::POS_CUSTOM, 'label' => __('Inside a custom HTML container')]
+            ['value' => self::POS_AFTER_TITLE, 'label' => __('After Product Title')],
+            ['value' => self::POS_BEFORE_PRICE, 'label' => __('Before Product Price')],
+            ['value' => self::POS_BEFORE_STOCK, 'label' => __('Before Product Stock')],
+            ['value' => self::POS_AFTER_STOCK, 'label' => __('After Product Stock')],
+            ['value' => self::POS_AFTER_INFO, 'label' => __('After Product Information')],
+            ['value' => self::POS_BEFORE_ADDTOCART, 'label' => __('Before Product AddToCart Button')],
+            ['value' => self::POS_AFTER_ADDTOCART, 'label' => __('After Product AddToCart Button')],
+            ['value' => self::POS_AFTER_ADDLINKS, 'label' => __('After AddTo links')],
+            ['value' => self::POS_CUSTOM, 'label' => __('Inside a custom HTML container')]
         ];
     }
 }

@@ -28,8 +28,7 @@ class InsuranceWidget extends Field
         InsuranceHelper $insuranceHelper,
         ApiConfigHelper $apiConfigHelper,
         array           $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->insuranceHelper = $insuranceHelper;
         $this->apiConfigHelper = $apiConfigHelper;

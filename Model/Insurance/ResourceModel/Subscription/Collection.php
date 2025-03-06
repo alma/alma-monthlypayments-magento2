@@ -24,5 +24,4 @@ class Collection extends AbstractCollection
             ResourceModelSubscriptionAlias::class
         );
     }
-
 }

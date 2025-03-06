@@ -134,8 +134,7 @@ class APIKeyValue extends Encrypted
     {
         $value = $this->getValue();
         $valueIsStars = preg_match('/^\*+$/', $value);
-        if (
-            !$this->hasDataChanges()
+        if (!$this->hasDataChanges()
             || $valueIsStars
         ) {
             $this->disallowDataSave();

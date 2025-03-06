@@ -22,9 +22,8 @@ class Collect extends Action
     public function __construct(
         FileFactory $fileFactory,
         Context $context
-    )
-    {
-    parent::__construct($context);
+    ) {
+        parent::__construct($context);
         $this->fileFactory = $fileFactory;
     }
 
@@ -36,5 +35,4 @@ class Collect extends Action
         $content['value'] = $filepath;
         return $this->fileFactory->create($downloadedFileName, $content, DirectoryList::LOG);
     }
-
 }

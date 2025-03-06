@@ -23,6 +23,7 @@
  */
 
 namespace Alma\MonthlyPayments\Api;
+
 interface PaymentInterface
 {
 

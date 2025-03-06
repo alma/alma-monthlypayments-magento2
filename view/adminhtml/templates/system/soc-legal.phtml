@@ -9,7 +9,7 @@ $position = $block->getPosition()
         <div id="alma_soc_detail_title_<?=$position?>" class="alma_collapse"><u><?= $block->getDetailTitle() ?></u></div>
         <div id="alma_soc_detail_content_<?=$position?>">
             <ul>
-                <?php foreach ($block->getDetailsArgs() as $arg) :?>
+                <?php foreach ($block->getDetailsArgs() as $arg):?>
                     <li>
                         <?= $arg ?>
                     </li>

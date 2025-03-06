@@ -2,13 +2,11 @@
 
 namespace Alma\MonthlyPayments\Observer;
 
-
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Services\MerchantBusinessService;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Quote\Model\Quote;
-
 
 class SalesQuoteSaveAfterObserver implements ObserverInterface
 {
@@ -28,8 +26,7 @@ class SalesQuoteSaveAfterObserver implements ObserverInterface
     public function __construct(
         Logger                  $logger,
         MerchantBusinessService $merchantBusinessService
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->merchantBusinessService = $merchantBusinessService;
     }
@@ -46,6 +43,4 @@ class SalesQuoteSaveAfterObserver implements ObserverInterface
             $this->merchantBusinessService->createAndSendCartInitiatedBusinessEvent($quote);
         }
     }
-
-
 }

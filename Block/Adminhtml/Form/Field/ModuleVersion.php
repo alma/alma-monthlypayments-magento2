@@ -7,7 +7,6 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ResourceInterface;
 
-
 class ModuleVersion extends Field
 {
     /**
@@ -37,7 +36,7 @@ class ModuleVersion extends Field
     protected function _getElementHtml(AbstractElement $element):string
     {
         $moduleVersion= $this->resource->getDataVersion('Alma_MonthlyPayments');
-        $element->setComment(sprintf(__("v%s"),$moduleVersion));
+        $element->setComment(sprintf(__("v%s"), $moduleVersion));
         return $element->getElementHtml();
     }
 }

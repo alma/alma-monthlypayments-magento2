@@ -60,8 +60,7 @@ class ConfigurationSave extends Value
         if (!$this->isValueChanged()) {
             return $this;
         }
-        if (
-            !isset($arrayValue['isInsuranceActivated']) ||
+        if (!isset($arrayValue['isInsuranceActivated']) ||
             $arrayValue['isInsuranceActivated'] === false
         ) {
             $this->insuranceProductHelper->disableInsuranceProductIfExist();

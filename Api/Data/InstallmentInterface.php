@@ -3,7 +3,6 @@
 
 namespace Alma\MonthlyPayments\Api\Data;
 
-
 interface InstallmentInterface
 {
     /**

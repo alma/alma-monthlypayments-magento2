@@ -66,8 +66,7 @@ class Eligibility extends Template
         Helpers\Availability $availabilityHelper,
         Logger $logger,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->logger = $logger;
         $this->config = $config;
@@ -84,7 +83,7 @@ class Eligibility extends Template
         try {
             $this->eligibilityHelper->checkEligibility();
         } catch (\Exception $e) {
-            $this->logger->error('Check Eligibility Exception : ',[$e->getMessage()]);
+            $this->logger->error('Check Eligibility Exception : ', [$e->getMessage()]);
         }
     }
 

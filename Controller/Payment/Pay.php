@@ -99,7 +99,6 @@ class Pay extends Action
         OrderHelper $orderHelper,
         JsonFactory $jsonFactory,
         AlmaClient $almaClient
-
     ) {
         parent::__construct($context);
         $this->checkoutSession = $checkoutSession;
@@ -173,7 +172,6 @@ class Pay extends Action
         $redirect->setUrl($url);
 
         return $redirect;
-
     }
 
     /**
@@ -186,8 +184,7 @@ class Pay extends Action
     {
         $requestContent = json_decode($this->request->getContent(), true);
 
-        if (
-            !isset($requestContent)
+        if (!isset($requestContent)
             || !isset($requestContent['planKey'])
             || !preg_match('!general:([\d]+):([\d]+):([\d]+)!', $requestContent['planKey'])
         ) {

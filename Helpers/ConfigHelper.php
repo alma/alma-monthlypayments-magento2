@@ -53,8 +53,7 @@ class ConfigHelper extends AbstractHelper
         WriterInterface     $writerInterface,
         SerializerInterface $serializer,
         TypeListInterface   $typeList
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeHelper = $storeHelper;

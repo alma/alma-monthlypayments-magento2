@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Services;
 
-
 use Alma\API\Entities\DTO\MerchantBusinessEvent\CartInitiatedBusinessEvent;
 use Alma\API\Entities\DTO\MerchantBusinessEvent\OrderConfirmedBusinessEvent;
 use Alma\API\Exceptions\AlmaException;
@@ -44,8 +43,7 @@ class MerchantBusinessService
         AlmaClient      $almaClient,
         Logger          $logger,
         QuoteRepository $quoteRepository
-    )
-    {
+    ) {
         $this->almaClient = $almaClient;
         $this->logger = $logger;
         $this->quoteRepository = $quoteRepository;
@@ -92,7 +90,6 @@ class MerchantBusinessService
     {
         $quoteIdBoolOrNull = $quote->getId() ? (string)($quote->getId()) : null;
         return new CartInitiatedBusinessEvent($quoteIdBoolOrNull);
-
     }
 
     /**
@@ -183,4 +180,3 @@ class MerchantBusinessService
         }
     }
 }
-

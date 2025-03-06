@@ -7,7 +7,6 @@ use Magento\Framework\App\ProductMetadata;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Theme\Model\ResourceModel\Theme\CollectionFactory;
 
-
 class CmsInfoDataHelper
 {
 
@@ -24,8 +23,7 @@ class CmsInfoDataHelper
         ProductMetadata     $productMetadata,
         ModuleListInterface $moduleList,
         CollectionFactory   $themeCollectionFactory
-    )
-    {
+    ) {
         $this->productMetadata = $productMetadata;
         $this->moduleList = $moduleList;
         $this->themeCollectionFactory = $themeCollectionFactory;
@@ -110,5 +108,4 @@ class CmsInfoDataHelper
         $themeDataArray['version'] = $themeVersion;
         return $themeDataArray;
     }
-
 }

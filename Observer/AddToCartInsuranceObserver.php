@@ -83,10 +83,10 @@ class AddToCartInsuranceObserver implements ObserverInterface
         $this->checkoutSession = $checkoutSession;
     }
 
-	/**
-	 * @param Observer $observer
-	 * @return void
-	 */
+    /**
+     * @param Observer $observer
+     * @return void
+     */
     public function execute(Observer $observer): void
     {
         try {

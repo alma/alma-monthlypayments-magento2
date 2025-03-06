@@ -112,8 +112,7 @@ class InsuranceHelper extends AbstractHelper
         SubscriptionFactory     $subscriptionFactory,
         Session                 $session,
         StoreManagerInterface   $storeManager
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->json = $json;
         $this->request = $request;
@@ -473,5 +472,4 @@ class InsuranceHelper extends AbstractHelper
     {
         return $this->storeManager->getStore()->getBaseUrl() . self::CALLBACK_URI;
     }
-
 }
