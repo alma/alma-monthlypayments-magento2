@@ -74,7 +74,7 @@ tasks:
         else
           echo "Image already exists"
         fi
-        
+
   lint:
     desc: Run lint container
     deps:
