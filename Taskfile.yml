@@ -91,7 +91,12 @@ tasks:
   php-compatibility:build:
     desc: Build php-compatibility container (phpcs)
     cmds:
-      - docker build -t php-compatibility:ac -f lint.Dockerfile .
+      - |
+        if ! docker image inspect php-compatibility:ac > /dev/null 2>&1; then
+          docker build -t php-compatibility:ac -f lint.Dockerfile .
+        else
+          echo "Image already exists"
+        fi
 
   php-compatibility:
     desc: Check compatibility code in PHP-CS container
