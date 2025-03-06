@@ -74,6 +74,7 @@ tasks:
         else
           echo "Image already exists"
         fi
+        
   lint:
     desc: Run lint container
     deps:
@@ -104,7 +105,7 @@ tasks:
       - php-compatibility:build
     cmds:
       - ./scripts/php-compatibility.sh
-      -
+
   crowdin:
     internal: true
     preconditions:
