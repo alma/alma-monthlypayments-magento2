@@ -37,6 +37,7 @@
             <values>
                 <value id="getalma.eu" type="host">*.getalma.eu</value>
                 <value id="almapay.com" type="host">*.almapay.com/</value>
+                <value id="stripe.com" type="host">*.stripe.com/</value>
             </values>
         </policy>
     </policies>
