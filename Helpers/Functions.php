@@ -46,10 +46,10 @@ class Functions
     }
 
     /**
-    * Get payment type with plankey
-    *
-    * @param string $planKey
-    * @return string
+     * Get payment type with plankey
+     *
+     * @param string $planKey
+     * @return string
      */
     public static function getPaymentType(string $planKey): string
     {

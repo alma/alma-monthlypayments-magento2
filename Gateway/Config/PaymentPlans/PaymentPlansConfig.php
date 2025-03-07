@@ -50,7 +50,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     /**
      * @var Logger
      */
-    private  $logger;
+    private $logger;
 
     /**
      * PaymentPlansConfig constructor.

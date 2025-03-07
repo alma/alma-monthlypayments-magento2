@@ -69,8 +69,7 @@ class OrderHelper extends AbstractHelper
         ProductHelper            $productHelper,
         StoreManagerInterface    $storeManager,
         Logger                   $logger
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->orderFactory = $orderFactory;
         $this->orderManagement = $orderManagement;
@@ -179,8 +178,7 @@ class OrderHelper extends AbstractHelper
         $formattedItems = [];
 
         foreach ($dataProducts as $data) {
-            if (
-                isset($data['item'])
+            if (isset($data['item'])
                 && isset($data['product'])
                 && isset($data['categories'])
             ) {

@@ -41,8 +41,7 @@ class ShipmentTrackObserver implements ObserverInterface
         OrderRepository $orderRepository,
         AlmaClient      $almaClient,
         Logger          $logger
-    )
-    {
+    ) {
         $this->orderRepository = $orderRepository;
         $this->logger = $logger;
         $this->almaClient = $almaClient;
@@ -79,8 +78,7 @@ class ShipmentTrackObserver implements ObserverInterface
             if (!isset($orderExternalId)) {
                 $almaOrder = $almaClient->payments->addOrder($almaPaymentId, [
                         'merchant_reference' => $order->getIncrementId()
-                    ]
-                );
+                    ]);
                 $orderExternalId = $almaOrder->getExternalId();
             }
             $almaClient->orders->addTracking($orderExternalId, $track->getCarrierCode(), $track->getTrackNumber());
@@ -99,8 +97,7 @@ class ShipmentTrackObserver implements ObserverInterface
      */
     private function getAlmaPaymentId(?OrderPaymentInterface $payment): string
     {
-        if (
-            $payment === null ||
+        if ($payment === null ||
             $payment->getMethod() !== Config::CODE
         ) {
             throw new OrderShipmentException('Shipment Track observer no Alma payment');

@@ -236,5 +236,4 @@ class QuoteHelper
         $quoteItemCollection->addFieldToFilter('main_table.alma_insurance', ['notnull' => true]);
         return $quoteItemCollection;
     }
-
 }

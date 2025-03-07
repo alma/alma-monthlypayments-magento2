@@ -3,7 +3,6 @@
 
 namespace Alma\MonthlyPayments\Model\Api\Data;
 
-
 use Alma\API\Endpoints\Results\Eligibility;
 use Alma\MonthlyPayments\Api\Data\EligiblePlansResultInterface;
 use Alma\MonthlyPayments\Api\Data\InstallmentInterfaceFactory;

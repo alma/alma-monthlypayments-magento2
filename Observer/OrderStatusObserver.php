@@ -23,8 +23,7 @@ class OrderStatusObserver implements ObserverInterface
     public function __construct(
         Logger     $logger,
         AlmaClient $almaClient
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->almaClient = $almaClient;
     }
@@ -41,8 +40,7 @@ class OrderStatusObserver implements ObserverInterface
         $order = $observer->getEvent()->getData('order');
         $payment = $order->getPayment();
 
-        if (
-            $order->getState() === Order::STATE_NEW
+        if ($order->getState() === Order::STATE_NEW
             || !$payment
             || $payment->getMethod() !== Config::CODE
             || !array_key_exists(Config::ORDER_PAYMENT_ID, $payment->getAdditionalInformation())
@@ -78,6 +76,4 @@ class OrderStatusObserver implements ObserverInterface
             throw new OrderStatusException('Impossible to initialize Alma', $this->logger, 0, $e);
         }
     }
-
-
 }

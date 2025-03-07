@@ -73,6 +73,4 @@ class AlmaInsuranceRenderer extends DefaultRenderer
         }
         return parent::getItem();
     }
-
-
 }

@@ -43,8 +43,7 @@ class CollectCmsConfigHelper extends ConfigHelper
         AlmaClient          $almaClient,
         UrlInterface        $urlBuilder,
         Logger              $logger
-    )
-    {
+    ) {
         parent::__construct($context, $storeHelper, $writerInterface, $serializer, $typeList);
         $this->almaClient = $almaClient;
         $this->urlBuilder = $urlBuilder;

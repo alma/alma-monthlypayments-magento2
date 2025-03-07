@@ -64,5 +64,4 @@ class Address
 
         return $data;
     }
-
 }

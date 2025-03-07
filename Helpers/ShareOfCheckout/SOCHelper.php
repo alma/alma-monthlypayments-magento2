@@ -134,6 +134,7 @@ class SOCHelper extends AbstractHelper
     }
 
     /**
+     * @throws InvalidArgumentException
      * @return string
      */
     public function getEnabledDate(): string
