@@ -10,22 +10,41 @@ Let your customers pay for their purchases at their own pace! You'll receive the
 
 This plugin integrates Alma into Magento 2 by adding a new payment method that you can activate to offer monthly payments to your customers.
 
+## Requirements
+
+### Compatibility
+- **Adobe Commerce (Magento) versions 2.3.5 to 2.4.7**: Fully compatible with the latest version of our module.
+- **Adobe Commerce (Magento) versions 2.2.8 to 2.3.5**: Compatible with module version **2.8.2**.
+- **Adobe Commerce (Magento) versions lower than 2.2.8**: **Partially compatible** with module version **2.8.2**.
+- **PHP**: Compatible with versions `7.1` to `8.1`
+
 ## Installation
 
-### Prerequisites
+### Account Setup (Required)
 
-You first need to create your merchant account on [dashboard.getalma.eu](https://dashboard.getalma.eu) and activate your account.
+Before configuring the module, you need to create your merchant account on [dashboard.getalma.eu](https://dashboard.getalma.eu).
 
-### Installing
+1. Go to [registration page](https://dashboard.getalma.eu/new-register) and create an account.
+2. Retrieve your API key from the dashboard.
+3. Use these credentials in the module configuration.
 
-#### Using Composer
-The easiest way to install the extension is to use Composer:
+### Method: Composer Installation (Recommended)
+1. Run the following command in your Magento root directory:
+   ```bash
+   $ composer require almapay/alma-monthlypayments-magento2
+    ```
+2. Enable the module:
+   ```bash
+   $ bin/magento module:enable Alma_MonthlyPayments
+    ```
 
-```bash
-$ composer require almapay/alma-monthlypayments-magento2
-$ bin/magento module:enable Alma_MonthlyPayments
-$ bin/magento setup:upgrade && bin/magento setup:static-content:deploy
-```
+3. Run setup upgrade and compile:
+   ```bash
+   $ bin/magento setup:upgrade
+   $ bin/magento setup:di:compile
+   $ bin/magento setup:static-content:deploy
+   $ bin/magento cache:flush
+    ```
 
 ### Configuring the plugin
 
@@ -38,3 +57,6 @@ You also have access to different settings to control what the plugin should dis
 We advise you to stay in \"Test\" mode until you\'re happy with your configuration and are ready to accept payments from your customers.
 
 Once everything is properly set up, go ahead and switch to \"Live\" mode!
+
+## Support
+If you encounter any issues or have questions, feel free to contact us at [support@getalma.eu](mailto:support@getalma.eu.).
