@@ -84,18 +84,18 @@ class APIKeyValue extends Encrypted
      * @param array $data
      */
     public function __construct(
-        Context $context,
-        Registry $registry,
+        Context              $context,
+        Registry             $registry,
         ScopeConfigInterface $config,
-        TypeListInterface $cacheTypeList,
-        EncryptorInterface $encryptor,
-        Availability $availabilityHelper,
-        MessageManager $messageManager,
-        ConfigHelper $configHelper,
-        ApiConfigHelper $apiConfigHelper,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        TypeListInterface    $cacheTypeList,
+        EncryptorInterface   $encryptor,
+        Availability         $availabilityHelper,
+        MessageManager       $messageManager,
+        ConfigHelper         $configHelper,
+        ApiConfigHelper      $apiConfigHelper,
+        AbstractResource     $resource = null,
+        AbstractDb           $resourceCollection = null,
+        array                $data = []
     ) {
         parent::__construct(
             $context,
@@ -176,15 +176,10 @@ class APIKeyValue extends Encrypted
      * @param $merchant
      * @return void
      */
-    private function saveMerchantData($merchant):void
+    private function saveMerchantData($merchant): void
     {
         $this->configHelper->saveMerchantId(
             $this->getMerchantIdPath(),
-            $merchant,
-            $this->getScope(),
-            $this->getScopeId()
-        );
-        $this->configHelper->saveIsAllowedInsurance(
             $merchant,
             $this->getScope(),
             $this->getScopeId()
@@ -227,7 +222,7 @@ class APIKeyValue extends Encrypted
      *
      * @return string
      */
-    protected function getApiKeyType():string
+    protected function getApiKeyType(): string
     {
         return $this->apiKeyType;
     }
