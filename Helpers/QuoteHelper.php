@@ -25,8 +25,6 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Framework\DataObject;
-use Magento\Quote\Model\ResourceModel\Quote\Item\Collection;
 use Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Checkout\Model\Session;
@@ -38,7 +36,6 @@ use Magento\Sales\Api\Data\OrderInterface;
 class QuoteHelper
 {
     /**
-     * /**
      * @var Logger
      */
     private $logger;

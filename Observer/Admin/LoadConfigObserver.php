@@ -3,14 +3,9 @@
 namespace Alma\MonthlyPayments\Observer\Admin;
 
 use Alma\API\Lib\IntegrationsConfigurationsUtils;
-use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\CollectCmsConfigHelper;
-use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
-use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Magento\Backend\Model\UrlInterface;
-use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 

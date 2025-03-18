@@ -3,10 +3,6 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Client;
-use Magento\Framework\App\Cache\TypeListInterface;
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Serialize\SerializerInterface;
 
 class ApiConfigHelper extends ConfigHelper
 {
@@ -27,7 +23,7 @@ class ApiConfigHelper extends ConfigHelper
         $mode = $this->getActiveMode($scope, $storeId);
         $apiKeyType = ($mode == Client::LIVE_MODE) ?
             self::CONFIG_LIVE_API_KEY :
-            self::CONFIG_TEST_API_KEY ;
+            self::CONFIG_TEST_API_KEY;
         return $this->getConfigByCode($apiKeyType, $scope, $storeId);
     }
 
@@ -68,6 +64,8 @@ class ApiConfigHelper extends ConfigHelper
     }
 
     /**
+     * @param string|null $scope
+     * @param string|null $storeId
      * @return string
      */
     public function getActiveMode(?string $scope = null, ?string $storeId = null): string

@@ -5,7 +5,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 use Alma\API\Entities\Payment as AlmaPayment;
 use Alma\API\Entities\Refund;
 use Alma\MonthlyPayments\Gateway\Response\RefundHandler;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
@@ -33,7 +32,7 @@ class RefundHandlerTest extends TestCase
      */
     public function testTransactionIsSetWithLastRefundParams($provider): void
     {
-        $paymentMock =  $this->createMock(Payment::class);
+        $paymentMock = $this->createMock(Payment::class);
         $paymentMock->expects($this->any())
             ->method('formatPrice')
             ->willReturnOnConsecutiveCalls(...$provider['formatPriceReturn']);
@@ -46,7 +45,7 @@ class RefundHandlerTest extends TestCase
         $paymentMock->expects($this->once())
             ->method('addTransaction')
             ->with(TransactionInterface::TYPE_REFUND);
-        $paymentDataMock =  $this->createMock(PaymentDataObject::class);
+        $paymentDataMock = $this->createMock(PaymentDataObject::class);
         $paymentDataMock->expects($this->once())
             ->method('getPayment')
             ->willReturn($paymentMock);
@@ -54,7 +53,7 @@ class RefundHandlerTest extends TestCase
         $handlingSubjectMock['payment'] = $paymentDataMock;
         $handlingSubjectMock['amount'] = '48';
 
-        $almaPaymentMock =  $this->createMock(AlmaPayment::class);
+        $almaPaymentMock = $this->createMock(AlmaPayment::class);
         $almaPaymentMock->refunds = $provider['refunds'];
         $responseMock['almaRefund'] = $almaPaymentMock;
         $responseMock['isFullRefund'] = $provider['isFullRefund'];
@@ -67,42 +66,42 @@ class RefundHandlerTest extends TestCase
     {
         return [
             'Test not full refund' => [
-                    [
-                        'isFullRefund' => false,
-                        'customerFee' => 0,
-                        'refunds' => $this->getAlmaRefunds(),
-                        'formatPriceReturn' => ['€22', '€48', '€48'],
-                        'lastRefundId' => 'refund_3333333333',
-                        'lastRefundData' => [
-                            'created' => self::FIXED_TIMESTAMP,
-                            'amount' => '€48'
-                        ]
-                    ]
-                ],
-            'Test with full refund' => [
-                    [
-                        'isFullRefund' => true,
-                        'customerFee' => 1600,
-                        'refunds' => $this->getAlmaRefunds(),
-                        'formatPriceReturn' => ['€22', '€48', '€48', '€16', '€48'],
-                        'lastRefundId' => 'refund_3333333333',
-                        'lastRefundData' => [
-                            'created' => self::FIXED_TIMESTAMP,
-                            'amount' => '€48',
-                            'customer_fee' => '€16',
-                            'magento_refund' => '€48'
-                        ]
+                [
+                    'isFullRefund' => false,
+                    'customerFee' => 0,
+                    'refunds' => $this->getAlmaRefunds(),
+                    'formatPriceReturn' => ['€22', '€48', '€48'],
+                    'lastRefundId' => 'refund_3333333333',
+                    'lastRefundData' => [
+                        'created' => self::FIXED_TIMESTAMP,
+                        'amount' => '€48'
                     ]
                 ]
-            ];
+            ],
+            'Test with full refund' => [
+                [
+                    'isFullRefund' => true,
+                    'customerFee' => 1600,
+                    'refunds' => $this->getAlmaRefunds(),
+                    'formatPriceReturn' => ['€22', '€48', '€48', '€16', '€48'],
+                    'lastRefundId' => 'refund_3333333333',
+                    'lastRefundData' => [
+                        'created' => self::FIXED_TIMESTAMP,
+                        'amount' => '€48',
+                        'customer_fee' => '€16',
+                        'magento_refund' => '€48'
+                    ]
+                ]
+            ]
+        ];
     }
 
     private function getAlmaRefunds(): array
     {
         return [
-            new Refund(['id' => 'refund_1111111111','created' => self::FIXED_TIMESTAMP,'amount' => '2200']),
-            new Refund(['id' => 'refund_2222222222','created' => self::FIXED_TIMESTAMP,'amount' => '4800']),
-            new Refund(['id' => 'refund_3333333333','created' => self::FIXED_TIMESTAMP,'amount' => '4800']),
+            new Refund(['id' => 'refund_1111111111', 'created' => self::FIXED_TIMESTAMP, 'amount' => '2200']),
+            new Refund(['id' => 'refund_2222222222', 'created' => self::FIXED_TIMESTAMP, 'amount' => '4800']),
+            new Refund(['id' => 'refund_3333333333', 'created' => self::FIXED_TIMESTAMP, 'amount' => '4800']),
         ];
     }
 }

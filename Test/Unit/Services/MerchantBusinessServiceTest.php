@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Services;
 
 use Alma\API\Client;
 use Alma\API\Endpoints\Merchants;
-use Alma\API\Entities\DTO\MerchantBusinessEvent\CartInitiatedBusinessEvent;
 use Alma\API\Entities\DTO\MerchantBusinessEvent\OrderConfirmedBusinessEvent;
 use Alma\API\Exceptions\RequestException;
 use Alma\MonthlyPayments\Helpers\AlmaClient;
