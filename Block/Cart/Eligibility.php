@@ -25,13 +25,12 @@
 
 namespace Alma\MonthlyPayments\Block\Cart;
 
-use Magento\Framework\Exception\InputException;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Alma\MonthlyPayments\Helpers\Availability;
 use Magento\Framework\View\Element\Template;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
 use Alma\MonthlyPayments\Helpers\Logger;
+use Magento\Framework\View\Element\Template\Context;
 
 class Eligibility extends Template
 {
@@ -53,19 +52,20 @@ class Eligibility extends Template
 
     /**
      * Eligibility constructor.
-     * @param Template\Context $context
+     * @param Context $context
      * @param Config $config
      * @param Helpers\Eligibility $eligibilityHelper
-     * @param Helpers\Availability $availabilityHelper
+     * @param Availability $availabilityHelper
+     * @param Logger $logger
      * @param array $data
      */
     public function __construct(
-        Template\Context $context,
-        Config $config,
-        Helpers\Eligibility $eligibilityHelper,
+        Template\Context     $context,
+        Config               $config,
+        Helpers\Eligibility  $eligibilityHelper,
         Helpers\Availability $availabilityHelper,
-        Logger $logger,
-        array $data = []
+        Logger               $logger,
+        array                $data = []
     ) {
         parent::__construct($context, $data);
         $this->logger = $logger;
@@ -78,7 +78,7 @@ class Eligibility extends Template
     /**
      * @return void
      */
-    public function checkEligibility():void
+    public function checkEligibility(): void
     {
         try {
             $this->eligibilityHelper->checkEligibility();

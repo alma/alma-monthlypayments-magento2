@@ -1,0 +1,49 @@
+{
+    "quote": {
+        "column": {
+            "alma_bnpl_eligibility": true,
+            "alma_cart_initiated_status": true
+        }
+    },
+    "quote_item": {
+        "column": {
+            "alma_insurance": true
+        }
+    },
+    "sales_order_item": {
+        "column": {
+            "alma_insurance": true
+        }
+    },
+    "alma_insurance_subscription": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "order_item_id": true,
+            "name": true,
+            "subscription_id": true,
+            "subscription_broker_id": true,
+            "subscription_broker_reference": true,
+            "subscription_amount": true,
+            "contract_id": true,
+            "cms_reference": true,
+            "linked_product_name": true,
+            "linked_product_price": true,
+            "subscription_state": true,
+            "mode": true,
+            "date_of_cancelation": true,
+            "date_of_cancelation_request": true,
+            "reason_of_cancelation": true,
+            "is_refunded": true,
+            "callback_url": true
+        },
+        "index": {
+            "ALMA_INSURANCE_SUBSCRIPTION_SUBSCRIPTION_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ALMA_INSURANCE_SUBSCRIPTION_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "FK_7A1AC7F826B9D129FEE697BB02B14E72": true
+        }
+    }
+}

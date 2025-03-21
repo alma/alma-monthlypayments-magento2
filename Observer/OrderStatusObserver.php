@@ -3,8 +3,6 @@
 namespace Alma\MonthlyPayments\Observer;
 
 use Alma\API\Client;
-use Alma\API\Entities\Order as AlmaOrder;
-use Alma\API\Entities\Payment;
 use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\AlmaClient;

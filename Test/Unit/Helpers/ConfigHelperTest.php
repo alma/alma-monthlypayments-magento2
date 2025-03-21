@@ -3,9 +3,7 @@
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
 use Alma\API\Entities\FeePlan;
-use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
-use Alma\MonthlyPayments\Helpers\InsuranceHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -13,7 +11,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Serialize\Serializer\Serialize;
-use Magento\Framework\Serialize\SerializerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ConfigHelperTest extends TestCase
@@ -58,90 +55,6 @@ class ConfigHelperTest extends TestCase
         foreach ($feePlans as $feePlan) {
             $this->assertInstanceOf(FeePlan::class, $feePlan);
         }
-    }
-
-    public function testCmsInsuranceNotExistSaveTrue(): void
-    {
-        $merchant = $this->createMock(Merchant::class);
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
-            1,
-            '',
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, '', 1);
-    }
-
-    public function testCmsAllowInsuranceIsTrueSave1(): void
-    {
-        $merchant = $this->createMock(Merchant::class);
-        $merchant->cms_insurance = true;
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
-            1,
-            '',
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, '', 1);
-    }
-
-    public function testCmsAllowInsuranceIsFalseSave0(): void
-    {
-        $merchant = $this->createMock(Merchant::class);
-        $merchant->cms_insurance = false;
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
-            0,
-            '',
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInsurance($merchant, '', 1);
-    }
-
-    public function testIfNoMerchantSave0(): void
-    {
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
-            0,
-            '',
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInsurance(null, '', 1);
-    }
-
-    public function testSaveIsAllowedInsuranceValue0()
-    {
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
-            0,
-            '',
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInsuranceValue(0, '', 1);
-    }
-
-    public function testSaveIsAllowedInsuranceValue1()
-    {
-        $this->writerInterface->expects($this->once())->method('save')->with(
-            ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::IS_ALLOWED_INSURANCE_PATH,
-            1,
-            '',
-            1
-        );
-        $this->createConfigHelper()->saveIsAllowedInsuranceValue(1, '', 1);
-    }
-
-    public function testClearInsuranceConfig(): void
-    {
-        $this->writerInterface->expects($this->once())
-            ->method('save')
-            ->with(
-                ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . InsuranceHelper::ALMA_INSURANCE_CONFIG_CODE,
-                null,
-                '',
-                1
-            );
-        $this->createConfigHelper()->clearInsuranceConfig('', 1);
     }
 
 

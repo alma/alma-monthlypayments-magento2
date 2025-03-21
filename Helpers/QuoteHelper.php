@@ -25,8 +25,6 @@
 
 namespace Alma\MonthlyPayments\Helpers;
 
-use Magento\Framework\DataObject;
-use Magento\Quote\Model\ResourceModel\Quote\Item\Collection;
 use Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Checkout\Model\Session;
@@ -37,7 +35,6 @@ use Magento\Sales\Api\Data\OrderInterface;
 
 class QuoteHelper
 {
-    /**
     /**
      * @var Logger
      */
@@ -75,17 +72,17 @@ class QuoteHelper
      * @param Session $checkoutSession
      */
     public function __construct(
-        Logger $logger,
-        UserContextInterface $userContext,
-        QuoteRepository $quoteRepository,
-        Session $checkoutSession,
+        Logger                     $logger,
+        UserContextInterface       $userContext,
+        QuoteRepository            $quoteRepository,
+        Session                    $checkoutSession,
         QuoteItemCollectionFactory $quoteItemCollectionFactory
     ) {
         $this->logger = $logger;
         $this->userContext = $userContext;
         $this->quoteRepository = $quoteRepository;
         $this->checkoutSession = $checkoutSession;
-        $this->quoteId=null;
+        $this->quoteId = null;
         $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
     }
 
@@ -94,7 +91,7 @@ class QuoteHelper
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getQuote():?CartInterface
+    public function getQuote(): ?CartInterface
     {
         if (isset($this->quoteId)) {
             $quoteById = $this->getQuoteById();
@@ -118,7 +115,7 @@ class QuoteHelper
      * @param $quoteId int
      * @return void
      */
-    public function setEligibilityQuoteId($quoteId):void
+    public function setEligibilityQuoteId($quoteId): void
     {
         $this->quoteId = $quoteId;
     }
@@ -146,7 +143,7 @@ class QuoteHelper
      * @return CartInterface|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function getQuoteFromSession():?CartInterface
+    private function getQuoteFromSession(): ?CartInterface
     {
         $quote = null;
         $sessionQuoteId = $this->getQuoteIdFromSession();
@@ -160,7 +157,7 @@ class QuoteHelper
      * @return CartInterface|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    private function getQuoteByContextUserId():?CartInterface
+    private function getQuoteByContextUserId(): ?CartInterface
     {
         $quote = null;
         $customerUserId = $this->getContextUserId();
@@ -174,7 +171,7 @@ class QuoteHelper
      * Load quote with cartID
      * @return CartInterface|null
      */
-    private function getQuoteById():?CartInterface
+    private function getQuoteById(): ?CartInterface
     {
         $quote = null;
         try {
@@ -189,7 +186,7 @@ class QuoteHelper
      * @return int|null
      * default value 0
      */
-    private function getContextUserId():?int
+    private function getContextUserId(): ?int
     {
         return $this->userContext->getUserId();
     }
@@ -197,43 +194,8 @@ class QuoteHelper
     /**
      * @return int|null
      */
-    private function getQuoteIdFromSession():?int
+    private function getQuoteIdFromSession(): ?int
     {
         return $this->checkoutSession->getQuoteId();
-    }
-
-
-    /**
-     * Get quote items with insurance data for quote without reserved order id and delete insurance data
-     *
-     * @return void
-     */
-    public function deleteInsuranceDataFromQuoteItemForNotConvertedQuote(): void
-    {
-        $quoteCollection = $this->getQuoteItemsWithInsuranceData();
-        $quoteItems = $quoteCollection->getItems();
-        foreach ($quoteItems as $quoteItem) {
-            $quoteItem->setData(InsuranceHelper::ALMA_INSURANCE_DB_KEY);
-        }
-        $quoteCollection->save();
-    }
-
-
-    /**
-     * Get All quote items with insurance data for quote without reserved order id
-     *
-     * @return Collection
-     */
-    private function getQuoteItemsWithInsuranceData(): Collection
-    {
-        $quoteItemCollection = $this->quoteItemCollectionFactory->create();
-        $quoteItemCollection->getSelect()->joinLeft(
-            ['quote' => $quoteItemCollection->getTable('quote')],
-            'main_table.quote_id = quote.entity_id',
-            []
-        );
-        $quoteItemCollection->addFieldToFilter('quote.reserved_order_id', ['null' => true]);
-        $quoteItemCollection->addFieldToFilter('main_table.alma_insurance', ['notnull' => true]);
-        return $quoteItemCollection;
     }
 }

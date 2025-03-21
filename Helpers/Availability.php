@@ -28,7 +28,6 @@ namespace Alma\MonthlyPayments\Helpers;
 use Alma\API\Entities\Merchant;
 use Alma\API\RequestError;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
-use Alma\MonthlyPayments\Model\Exceptions\AlmaInsuranceFlagException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Availability
@@ -45,28 +44,21 @@ class Availability
      * @var Logger
      */
     private $logger;
-    /**
-     * @var ApiConfigHelper
-     */
-    private $apiConfigHelper;
 
     /**
      * Availability constructor.
      * @param StoreManagerInterface $storeManager
      * @param AlmaClient $almaClient
-     * @param ApiConfigHelper $apiConfigHelper
      * @param Logger $logger
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         AlmaClient            $almaClient,
-        ApiConfigHelper       $apiConfigHelper,
         Logger                $logger
     ) {
         $this->storeManager = $storeManager;
         $this->almaClient = $almaClient;
         $this->logger = $logger;
-        $this->apiConfigHelper = $apiConfigHelper;
     }
 
     /**
@@ -104,21 +96,6 @@ class Availability
             $this->logger->error("Could not create API client to check API key", [$mode]);
             $this->logger->error("Exception message", [$e->getMessage()]);
             return false;
-        }
-    }
-
-    /**
-     * @return bool
-     * @throws AlmaInsuranceFlagException
-     */
-    public function isMerchantInsuranceAvailable(): bool
-    {
-        try {
-            $merchant = $this->almaClient->getDefaultClient()->merchants->me();
-            return $merchant->cms_insurance ?? true;
-        } catch (AlmaClientException|RequestError $e) {
-            $this->logger->error("Exception message", [$e->getMessage()]);
-            throw new AlmaInsuranceFlagException($e->getMessage(), $this->logger, 0, $e);
         }
     }
 }

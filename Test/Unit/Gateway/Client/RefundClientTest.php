@@ -17,9 +17,9 @@ use PHPUnit\Framework\TestCase;
 
 class RefundClientTest extends TestCase
 {
-    private string $mockPaymentId;
-    private string $mockMerchantId;
-    private string $mockAmount;
+    private $mockPaymentId;
+    private $mockMerchantId;
+    private $mockAmount;
     /**
      * @var AlmaClient
      */
@@ -33,7 +33,7 @@ class RefundClientTest extends TestCase
     {
         $this->mockPaymentId = 'payment_11uNKOn3uuKhgUdY2eU6AZF1oKifmetCKZ';
         $this->mockMerchantId = 'merchant_11uNKOn3uuKhgUdY2eU6AZF1oKiametCKZ';
-        $this->mockAmount =  '1021.2';
+        $this->mockAmount = '1021.2';
         $this->logger = $this->createMock(Logger::class);
         $this->almaClient = $this->createMock(AlmaClient::class);
     }
@@ -62,7 +62,7 @@ class RefundClientTest extends TestCase
             ->method('partialRefund')
             ->with($this->mockPaymentId, $sendAmount, $this->mockMerchantId)
             ->willReturn($payment);
-        $refundClient  = $this->createNewRefundClient();
+        $refundClient = $this->createNewRefundClient();
         $this->assertEquals(
             [
                 'resultCode' => 1,
@@ -86,7 +86,7 @@ class RefundClientTest extends TestCase
             ->method('fullRefund')
             ->with($this->mockPaymentId, $this->mockMerchantId)
             ->willReturn($payment);
-        $refundClient  = $this->createNewRefundClient();
+        $refundClient = $this->createNewRefundClient();
         $this->assertEquals(
             [
                 'resultCode' => 1,
@@ -112,7 +112,7 @@ class RefundClientTest extends TestCase
             ->method('partialRefund')
             ->with($this->mockPaymentId, $sendAmount, $this->mockMerchantId)
             ->willThrowException($exception);
-        $refundClient  = $this->createNewRefundClient();
+        $refundClient = $this->createNewRefundClient();
         $this->assertEquals(
             [
                 'resultCode' => 0,
@@ -123,10 +123,9 @@ class RefundClientTest extends TestCase
     }
 
 
-
     private function getMockTransferObject($amount, $orderTotal, $totalRefund): Transfer
     {
-        $transferObject =  $this->createMock(Transfer::class);
+        $transferObject = $this->createMock(Transfer::class);
         $transferObject->expects($this->once())
             ->method('getBody')
             ->willReturn(

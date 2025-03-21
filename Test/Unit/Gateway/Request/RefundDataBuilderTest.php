@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Test\Unit\Gateway\Request;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Gateway\Request\RefundDataBuilder;
-use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -39,7 +38,7 @@ class RefundDataBuilderTest extends TestCase
     {
         $mockPaymentId = 'payment_11uNKOn3uuKhgUdY2eU6AZF1oKifmetCKZ';
         $mockMerchantId = 'merchant_11uNKOn3uuKhgUdY2eU6AZF1oKiametCKZ';
-        $mockAmount =  '75.20';
+        $mockAmount = '75.20';
         $mockTotalRefunded = '100.0000';
         $mockGrandTotal = '1000.0000';
         $mockOrderId = 21;

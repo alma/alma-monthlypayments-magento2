@@ -29,15 +29,16 @@
     font-weight: normal;
     font-style: normal;
 }
+
 .admin__menu .level-0.item-alma > a:before {
     font-family: 'alma';
     content: '\e800';
-    font-size : 3.2rem;
+    font-size: 3.2rem;
     padding: 0 0 25px 0;
 }
 
 li#menu-vendor_extension-menu_id > a > span {
-display: none;
+    display: none;
 }
 
 .alma_collapse:after {
@@ -53,19 +54,23 @@ display: none;
     margin-left: 5px;
     transition: all .2s linear;
 }
+
 .alma_collapse.open:after {
-     border-color: transparent;
-     border-bottom-color: #000;
-     border-width: 0 0.5rem 0.8rem 0.5rem;
+    border-color: transparent;
+    border-bottom-color: #000;
+    border-width: 0 0.5rem 0.8rem 0.5rem;
 }
+
 #alma_soc_detail_title_message, #alma_soc_detail_title_comment {
     padding: 10px 0;
     cursor: pointer;
 }
+
 #alma_soc_detail_content_message, #alma_soc_detail_content_comment {
     display: none;
     padding: 0 0 0 15px;
 }
+
 .message-alma {
     background: #fffbbb;
     border: none;
@@ -77,19 +82,7 @@ display: none;
     position: relative;
     text-shadow: none;
 }
-.message-alma::before {
-    border: 0;
-    content: ' ';
-    height: 80px;
-    left: 0.3em;
-    line-height: inherit;
-    position: absolute;
-    speak: none;
-    text-shadow: none;
-    width: 80px;
-    background:url('../images/alma-insurance-small.png') no-repeat;
-    background-size: 60%;
-}
+
 .alma-test-mode {
     display: flex;
     flex-flow: row;
@@ -98,7 +91,8 @@ display: none;
     margin: 20px 0;
     border-radius: 20px;
 }
-.alma-test-mode-warning{
+
+.alma-test-mode-warning {
     padding: 5px;
 }
 

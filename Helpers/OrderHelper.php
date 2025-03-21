@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Magento\Catalog\Model\Category;
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
