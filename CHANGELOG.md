@@ -4,12 +4,15 @@
 
 ### 🚀 New Features
 
-- Remove insurance codebase (#236)
 - Use the new endpoint for order status (#231)
 
 ### 🐛 Bug Fixes
 
 - Fix CSP whitelist for Stripe, Adyen and checkout.com (#233)
+
+### Changes
+
+- Remove insurance codebase (#236)
 
 #### Contributors
 
