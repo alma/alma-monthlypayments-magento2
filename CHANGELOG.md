@@ -1,5 +1,23 @@
 # Changelog
 
+## v5.5.0 - 2025-03-24
+
+### Changes
+
+- Add stripe to CSP whitelist (#233)
+- Backport main to develop (#228)
+
+### 🚀 New Features
+
+- Fix csp policy for Adyen and checkout.com (#237)
+- Remove insurance codebase (#236)
+- Feature/ecom 2538 fix linter on adobe commerce (#232)
+- Use the new endpoint for order status (#231)
+
+#### Contributors
+
+@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot], @webaaz, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.4.0 - 2025-01-30
 
 ### 🚀 New Features
@@ -308,9 +326,10 @@ and [github-actions[bot]](https://github.com/apps/github-actions)
 * Adds Web API endpoints to get an Alma URL for an order paid with Alma, and to validate such a payment
   upon customer return. See `etc/webapi.xml` for endpoints URLs and `Model/Api/Payment.php` for
   implementation.
-
+  
 * Adds 3 API Configuration fields to override `return_url`, `ipn_callback_url` and `customer_cancel_url`
   in created payments.
+  
 
 ## v1.0.7
 
