@@ -19,8 +19,7 @@ class CmsFeaturesDataHelper
         ConfigHelper          $configHelper,
         WidgetConfigHelper    $config,
         StoreManagerInterface $storeManager
-    )
-    {
+    ) {
         $this->configHelper = $configHelper;
         $this->config = $config;
         $this->storeManager = $storeManager;
@@ -59,5 +58,4 @@ class CmsFeaturesDataHelper
         $feePlans = json_decode($this->config->getPaymentPlansConfig()->toJson(), true);
         return empty($feePlans) ? null : $feePlans ;
     }
-
 }

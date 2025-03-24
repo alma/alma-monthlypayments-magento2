@@ -27,7 +27,6 @@ namespace Alma\MonthlyPayments\Plugin\Checkout\CustomerData;
 
 use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers;
-use Magento\Store\Model\StoreManagerInterface;
 
 class CartEligibility
 {
@@ -55,12 +54,11 @@ class CartEligibility
      * @param Helpers\Availability $availabilityHelper
      */
     public function __construct(
-        Helpers\Eligibility $eligibilityHelper,
-        Config $config,
-        Helpers\Logger $logger,
+        Helpers\Eligibility  $eligibilityHelper,
+        Config               $config,
+        Helpers\Logger       $logger,
         Helpers\Availability $availabilityHelper
-    )
-    {
+    ) {
         $this->eligibilityHelper = $eligibilityHelper;
         $this->config = $config;
         $this->logger = $logger;

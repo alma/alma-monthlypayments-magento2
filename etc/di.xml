@@ -28,9 +28,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- Web API -->
-    <preference for="Alma\MonthlyPayments\Api\Insurance\InsuranceUpdateInterface"
-                type="Alma\MonthlyPayments\Model\Api\Insurance\InsuranceUpdate"/>
-
     <preference for="Alma\MonthlyPayments\Api\PaymentInterface"
                 type="Alma\MonthlyPayments\Model\Api\Payment"/>
     <preference for="Alma\MonthlyPayments\Api\Data\PaymentValidationResultInterface"
@@ -41,18 +38,6 @@
                 type="Alma\MonthlyPayments\Model\Api\Data\EligiblePlansResult"/>
     <preference for="Alma\MonthlyPayments\Api\Data\InstallmentInterface"
                 type="Alma\MonthlyPayments\Model\Api\Data\Installment"/>
-    <preference for="Magento\Quote\Model\Quote"
-                type="Alma\MonthlyPayments\Model\Quote"/>
-    <preference for="Magento\Quote\Model\Quote\Item"
-                type="Alma\MonthlyPayments\Model\Quote\Item"/>
-    <preference for="Magento\Checkout\CustomerData\DefaultItem"
-                type="Alma\MonthlyPayments\CustomerData\DefaultItem"/>
-    <preference for="Magento\Checkout\CustomerData\Cart"
-                type="Alma\MonthlyPayments\CustomerData\Cart"/>
-    <preference for="Magento\AdminNotification\Block\Grid\Renderer\Notice"
-                type="Alma\MonthlyPayments\Block\Grid\Renderer\Notice"/>
-    <preference for="Magento\AdminNotification\Block\Grid\Renderer\Actions"
-                type="Alma\MonthlyPayments\Block\Grid\Renderer\Actions"/>
     <preference for="Alma\MonthlyPayments\Api\Data\CollectDataInterface"
                 type="Alma\MonthlyPayments\Model\Data\CollectData"/>
     <!-- Eligibility injection in cart customer data -->
@@ -227,19 +212,4 @@
             <argument name="config" xsi:type="object">Alma\MonthlyPayments\Gateway\Config\Config</argument>
         </arguments>
     </type>
-    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
-        <arguments>
-            <argument name="collections" xsi:type="array">
-                <item name="subscription_grid_listing_data_source" xsi:type="string">SubscriptionGridCollection</item>
-            </argument>
-        </arguments>
-    </type>
-
-    <virtualType name="SubscriptionGridCollection" type="Alma\MonthlyPayments\Ui\DataProvider\Insurance\Subscription\Collection">
-        <arguments>
-            <argument name="mainTable" xsi:type="string">alma_insurance_subscription</argument>
-            <argument name="resourceModel" xsi:type="string">Alma\MonthlyPayments\Model\Insurance\ResourceModel\Subscription</argument>
-        </arguments>
-    </virtualType>
-
 </config>

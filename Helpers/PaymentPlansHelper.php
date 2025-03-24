@@ -133,8 +133,7 @@ class PaymentPlansHelper
     private function forceAmountThresholds(array $plan): array
     {
         $key = $plan['kind'] . ':' . $plan['installmentsCount'] . ':' . $plan['deferredDays'] . ':' . $plan['deferredMonths'];
-        if (
-            $plan[self::KEY_MIN_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
+        if ($plan[self::KEY_MIN_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MIN_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MIN_AMOUNT] > $plan[self::KEY_MAX_AMOUNT]
         ) {
@@ -143,8 +142,7 @@ class PaymentPlansHelper
                 sprintf(__("Minimum amount is %s€ for plan %s"), ($plan[PaymentPlanConfig::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] / 100), $this->planLabelByKey($key))
             );
         }
-        if (
-            $plan[self::KEY_MAX_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
+        if ($plan[self::KEY_MAX_AMOUNT] > $plan[self::TRANSIENT_KEY_MAX_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MAX_AMOUNT] < $plan[self::TRANSIENT_KEY_MIN_ALLOWED_AMOUNT] ||
             $plan[self::KEY_MAX_AMOUNT] < $plan[self::KEY_MIN_AMOUNT]
         ) {
@@ -170,8 +168,7 @@ class PaymentPlansHelper
             $label =  __('Pay in %1 installments', $matches[1]);
         }
 
-        if (
-            isset($matches[1])
+        if (isset($matches[1])
             && $matches[1] === '1'
             && $matches[2] === '0'
             && $matches[3] === '0'
@@ -179,15 +176,13 @@ class PaymentPlansHelper
             $label =  __('Pay now');
         }
 
-        if (
-            isset($matches[2])
+        if (isset($matches[2])
             && $matches[2] !== '0'
         ) {
             $label =  __('Pay later - D+%1', $matches[2]);
         }
 
-        if (
-            isset($matches[3])
+        if (isset($matches[3])
             && $matches[3] !== '0'
         ) {
             $label =  __('Pay later - %1 month', $matches[3]);

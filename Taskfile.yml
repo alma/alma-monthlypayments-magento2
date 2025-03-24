@@ -65,15 +65,46 @@ tasks:
     cmds:
       - rm -rf ./dist
 
-  lint:
-    desc: Run linter
+  lint:build:
+    desc: Build lint container (phpcs)
     cmds:
-      - docker compose run -T --rm magento composer exec phpcs -- --standard=Magento2 ./app/code/Alma/MonthlyPayments/
+      - |
+        if ! docker image inspect lint:ac > /dev/null 2>&1; then
+          docker build -t lint:ac -f lint.Dockerfile .
+        else
+          echo "Image already exists"
+        fi
+
+  lint:
+    desc: Run lint container
+    deps:
+      - lint:build
+    cmds:
+      - ./scripts/lint.sh
 
   lint:fix:
-    desc: Run linter and apply fixes
+    desc: Run lint container
+    deps:
+      - lint:build
     cmds:
-      - docker compose run -T --rm magento composer exec php-cs-fixer -- fix ./app/code/Alma/MonthlyPayments/
+      - ./scripts/lint-fix.sh
+
+  php-compatibility:build:
+    desc: Build php-compatibility container (phpcs)
+    cmds:
+      - |
+        if ! docker image inspect php-compatibility:ac > /dev/null 2>&1; then
+          docker build -t php-compatibility:ac -f lint.Dockerfile .
+        else
+          echo "Image already exists"
+        fi
+
+  php-compatibility:
+    desc: Check compatibility code in PHP-CS container
+    deps:
+      - php-compatibility:build
+    cmds:
+      - ./scripts/php-compatibility.sh
 
   crowdin:
     internal: true

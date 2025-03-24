@@ -48,5 +48,4 @@ class RefundHelper extends AbstractHelper
         }
         return $payment;
     }
-
 }

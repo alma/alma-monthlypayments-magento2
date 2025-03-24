@@ -3,7 +3,6 @@
 
 namespace Alma\MonthlyPayments\Gateway\Config\PaymentPlans;
 
-
 use Alma\API\Entities\FeePlan;
 
 interface PaymentPlanConfigInterface

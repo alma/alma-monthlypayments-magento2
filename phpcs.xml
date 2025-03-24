@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Alma Woocommerce Gateway"
+         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
+    <description>A custom set of rules to check for Alma Woocommerce Gateway</description>
+
+    <!-- Exclude tests. -->
+    <exclude-pattern>*/Test/*</exclude-pattern>
+
+    <!-- Exclude the Composer Vendor directory. -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- Exclude minified Javascript files. -->
+    <exclude-pattern>*.min.js</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
+
+    <!-- Include the Magento2 standard. -->
+    <rule ref="Magento2">
+
+    </rule>
+
+    <!-- Add in some extra rules from other standards. -->
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+    <rule ref="Generic.Commenting.Todo"/>
+
+    <rule ref="Squiz.Commenting.FunctionCommentThrowTag">
+        <exclude name="Squiz.Commenting.FunctionCommentThrowTag.WrongNumber"/>
+    </rule>
+
+    <config name="ignore_warnings_on_exit" value="1"/>
+</ruleset>

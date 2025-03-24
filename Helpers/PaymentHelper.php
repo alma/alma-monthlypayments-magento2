@@ -13,7 +13,7 @@ class PaymentHelper extends AbstractHelper
 
     /**
      * @param Payment $almaPayment
-     *
+     * @throws InvalidArgumentException
      * @return string
      */
     public function getOrderIdFromAlmaPayment(Payment $almaPayment): string
@@ -39,5 +39,4 @@ class PaymentHelper extends AbstractHelper
     {
         return sprintf('general:%s:%s:%s', $almaPayment->installments_count, $almaPayment->deferred_days, $almaPayment->deferred_months);
     }
-
 }

@@ -38,25 +38,5 @@
     vertical-align: middle;
     width: 50%
 }
-#alma_insurance_section_alma_insurance colgroup.label {
-    width: 10%;
-}
-#alma_insurance_section_alma_insurance colgroup.scope-label {
-    width: 10%;
-}
-#alma_insurance_section_alma_insurance colgroup.value {
-    width: 80%;
-}
 
-#alma_insurance_section_alma_insurance td {
-    width: 0;
-}
-#alma_insurance_section_alma_insurance td.value {
-    height: 40em;
-}
-.subscription-alma-iframe{
-    width: 100%;
-    height: 666px;
-    border: none;
-}
 

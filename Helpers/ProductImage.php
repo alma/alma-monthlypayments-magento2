@@ -55,8 +55,7 @@ class ProductImage
         StoreManagerInterface $storeManager,
         Emulation $appEmulation,
         ImageFactory $imageFactory
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->appEmulation = $appEmulation;
         $this->imageFactory = $imageFactory;
@@ -80,5 +79,4 @@ class ProductImage
         $this->appEmulation->stopEnvironmentEmulation();
         return $imageUrl;
     }
-
 }

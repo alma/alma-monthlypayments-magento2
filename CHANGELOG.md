@@ -1,5 +1,25 @@
 # Changelog
 
+## v5.5.0 - 2025-03-24
+
+### 🚀 New Features
+
+- Use the new endpoint for order status (#231)
+
+### 🐛 Bug Fixes
+
+- Fix CSP whitelist for Stripe, Adyen and checkout.com (#233)
+
+### Changes
+
+- Remove insurance codebase (#236)
+
+#### Contributors
+
+@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot],
+@webaaz, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot)
+and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.4.0 - 2025-01-30
 
 ### 🚀 New Features

@@ -114,8 +114,7 @@ class Eligibility extends AbstractHelper
         AlmaQuote               $quoteData,
         QuoteHelper             $quoteHelper,
         MerchantBusinessService $merchantBusinessService
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->pricingHelper = $pricingHelper;
         $this->alma = $almaClient;
@@ -165,8 +164,7 @@ class Eligibility extends AbstractHelper
         $availablePlansKeyInBo = [];
 
         foreach ($enabledPlansInConfig as $planKey => $planConfig) {
-            if (
-                $cartTotal >= $planConfig->minimumAmount() &&
+            if ($cartTotal >= $planConfig->minimumAmount() &&
                 $cartTotal <= $planConfig->maximumAmount()
             ) {
                 // Query eligibility for the plan's installments count & keep track of which plans are queried
@@ -443,8 +441,7 @@ class Eligibility extends AbstractHelper
         $minPurchaseAmount = null;
         $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
         foreach ($inConfigPaymentPlans as $paymentPlan) {
-            if (
-                $paymentPlan->isEnabled() &&
+            if ($paymentPlan->isEnabled() &&
                 ($minPurchaseAmount === null || $paymentPlan->minimumAmount() < $minPurchaseAmount)
             ) {
                 $minPurchaseAmount = $paymentPlan->minimumAmount();
@@ -466,8 +463,7 @@ class Eligibility extends AbstractHelper
         $maxPurchaseAmount = null;
         $inConfigPaymentPlans = $this->getEnabledConfigPaymentPlans();
         foreach ($inConfigPaymentPlans as $paymentPlan) {
-            if (
-                $paymentPlan->isEnabled() &&
+            if ($paymentPlan->isEnabled() &&
                 ($maxPurchaseAmount === null || $paymentPlan->maximumAmount() > $maxPurchaseAmount)
             ) {
                 $maxPurchaseAmount = $paymentPlan->maximumAmount();

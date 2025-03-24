@@ -93,6 +93,4 @@ class SOCMessage implements MessageInterface
     {
         return self::SEVERITY_CRITICAL;
     }
-
 }
-

@@ -7,10 +7,11 @@
     width: 28%;
     display: inline-block;
 }
+
 .alma.payment-method .alma-plan-choices label span {
     position: relative;
     padding-left: 0.2rem;
-    bottom: 0.2rem  ;
+    bottom: 0.2rem;
 }
 
 .alma.payment-method .alma-plan-logo {
@@ -18,9 +19,9 @@
     vertical-align: bottom;
 }
 
-.alma.payment-method .alma-method-logo{
+.alma.payment-method .alma-method-logo {
     position: relative;
-    padding : 0 10px;
+    padding: 0 10px;
     float: right;
     bottom: 3.8rem;
     width: 50px;
@@ -58,30 +59,18 @@
     font-weight: lighter;
     font-size: smaller;
 }
+
 .alma.payment-method .payment-method-description {
     font-size: smaller;
-    color:grey;
-    position:relative;
+    color: grey;
+    position: relative;
     bottom: 20px;
 }
-.alma-insurance-iframe {
-    height: 100%;
-    width: 100%;
-    border: none;
-}
-.cart.table-wrapper .cart > .alma-cart-with-insurance {
-    border-bottom: none;
-}
-.table > tbody + tbody.alma-cart-insurance {
-    border-top: none;
-}
 
-.insuranceqty {
-    padding-right: 1.8em;
-}
 .checkout-agreements .alma-validation-input {
     align-items: start;
 }
+
 .alma-test-mode {
     display: flex;
     flex-flow: row;
@@ -90,9 +79,11 @@
     margin: 20px 0;
     border-radius: 20px;
 }
-.alma-test-mode-warning{
+
+.alma-test-mode-warning {
     padding: 5px;
 }
+
 .alma-test-mode-text {
     padding: 5px;
 }

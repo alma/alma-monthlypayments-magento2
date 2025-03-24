@@ -40,24 +40,6 @@
                                             <item name="children" xsi:type="array">
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
-                                                        <item name="payments-list" xsi:type="array">
-                                                            <item name="children" xsi:type="array">
-                                                                <item name="before-place-order" xsi:type="array">
-                                                                    <item name="children" xsi:type="array">
-                                                                        <item name="insurance-checkbox" xsi:type="array">
-                                                                            <item name="component" xsi:type="string">Alma_MonthlyPayments/js/view/checkout/checkout-agreements</item>
-                                                                        </item>
-                                                                    </item>
-                                                                </item>
-                                                            </item>
-                                                        </item>
-                                                        <item name="alma-additional-payment-validators" xsi:type="array">
-                                                            <item name="children" xsi:type="array">
-                                                                <item name="agreements-validator" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Alma_MonthlyPayments/js/view/checkout/agreement-validation</item>
-                                                                </item>
-                                                            </item>
-                                                        </item>
                                                         <item name="renders" xsi:type="array">
                                                             <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">

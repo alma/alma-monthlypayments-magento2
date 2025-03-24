@@ -69,8 +69,7 @@ class CollectData implements CollectDataInterface
         ApiConfigHelper       $apiConfigHelper,
         Config                $config,
         Response              $response
-    )
-    {
+    ) {
         $this->payloadFormatter = $payloadFormatter;
         $this->cmsInfoDataHelper = $cmsInfoDataHelper;
         $this->cmsFeaturesDataHelper = $cmsFeaturesDataHelper;
@@ -83,6 +82,7 @@ class CollectData implements CollectDataInterface
 
     /**
      * {@inheritdoc}
+     * @throws Exception
      */
     public function collect()
     {

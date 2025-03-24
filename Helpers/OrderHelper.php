@@ -3,7 +3,6 @@
 namespace Alma\MonthlyPayments\Helpers;
 
 use Magento\Catalog\Model\Category;
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -69,8 +68,7 @@ class OrderHelper extends AbstractHelper
         ProductHelper            $productHelper,
         StoreManagerInterface    $storeManager,
         Logger                   $logger
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->orderFactory = $orderFactory;
         $this->orderManagement = $orderManagement;
@@ -179,8 +177,7 @@ class OrderHelper extends AbstractHelper
         $formattedItems = [];
 
         foreach ($dataProducts as $data) {
-            if (
-                isset($data['item'])
+            if (isset($data['item'])
                 && isset($data['product'])
                 && isset($data['categories'])
             ) {

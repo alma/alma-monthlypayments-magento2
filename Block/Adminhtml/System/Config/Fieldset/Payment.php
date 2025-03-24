@@ -59,8 +59,7 @@ class Payment extends Fieldset
         ApiConfigHelper $apiConfigHelper,
         Config          $config,
         array           $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $authSession, $jsHelper, $data);
         $this->logger = $logger;
         $this->apiConfigHelper = $apiConfigHelper;
