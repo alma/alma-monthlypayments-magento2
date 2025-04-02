@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Helpers;
 use Alma\API\Entities\FeePlan;
 use Alma\API\Entities\Merchant;
 use Alma\MonthlyPayments\Gateway\Config\Config;
+use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Cache\Type\Config as CacheConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -39,6 +40,10 @@ class ConfigHelper extends AbstractHelper
      * @var TypeListInterface
      */
     private $typeList;
+    /**
+     * @var Manager
+     */
+    private $cacheManager;
 
     /**
      * @param Context $context
@@ -46,19 +51,22 @@ class ConfigHelper extends AbstractHelper
      * @param WriterInterface $writerInterface
      * @param SerializerInterface $serializer
      * @param TypeListInterface $typeList
+     * @param Manager $cacheManager
      */
     public function __construct(
         Context             $context,
         StoreHelper         $storeHelper,
         WriterInterface     $writerInterface,
         SerializerInterface $serializer,
-        TypeListInterface   $typeList
+        TypeListInterface   $typeList,
+        Manager             $cacheManager
     ) {
         parent::__construct($context);
         $this->writerInterface = $writerInterface;
         $this->storeHelper = $storeHelper;
         $this->serializer = $serializer;
         $this->typeList = $typeList;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -155,6 +163,7 @@ class ConfigHelper extends AbstractHelper
             $scope = $this->storeHelper->getScope();
         }
         $this->writerInterface->save($this->getConfigPath($path), $value, $scope, $storeId);
+        $this->cleanAllCaches();
     }
 
     /**
@@ -253,5 +262,13 @@ class ConfigHelper extends AbstractHelper
     private function cleanCache(string $type): void
     {
         $this->typeList->cleanType($type);
+    }
+
+    /**
+     * @return void
+     */
+    private function cleanAllCaches()
+    {
+        $this->cacheManager->clean($this->cacheManager->getAvailableTypes());
     }
 }
