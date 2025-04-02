@@ -48,7 +48,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     private const CONFIG_IPN_CALLBACK_URL = 'ipn_callback_url';
     public const CONFIG_CUSTOMER_CANCEL_URL = 'customer_cancel_url';
     private const FAILURE_RETURN_URL = 'failure_return_url';
-    private const CONFIG_PAYMENT_PLANS = 'payment_plans';
+    public const CONFIG_PAYMENT_PLANS = 'payment_plans';
     private const ALMA_IS_ACTIVE = 'active';
 
     /**
@@ -83,12 +83,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @param string $pathPattern
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
+        ScopeConfigInterface               $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
-        ApiConfigHelper $apiConfigHelper,
-        StoreHelper $storeHelper,
-        string $methodCode = null,
-        string $pathPattern = self::DEFAULT_PATH_PATTERN
+        ApiConfigHelper                    $apiConfigHelper,
+        StoreHelper                        $storeHelper,
+        string                             $methodCode = null,
+        string                             $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->methodCode = $methodCode;

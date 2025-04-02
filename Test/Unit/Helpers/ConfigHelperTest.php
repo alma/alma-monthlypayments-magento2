@@ -6,6 +6,7 @@ use Alma\API\Entities\FeePlan;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Alma\MonthlyPayments\Test\Unit\Mocks\FeePlanFactoryMock;
+use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
@@ -21,6 +22,7 @@ class ConfigHelperTest extends TestCase
     protected $writerInterface;
     protected $serializer;
     protected $typeList;
+    protected $cacheManager;
 
     protected function setUp(): void
     {
@@ -31,6 +33,8 @@ class ConfigHelperTest extends TestCase
         $this->writerInterface = $this->createMock(WriterInterface::class);
         $this->serializer = new Serialize();
         $this->typeList = $this->createMock(TypeListInterface::class);
+        $this->cacheManager = $this->createMock(Manager::class);
+
     }
 
     public function testBaseApiPlansConfigForNullReturnValue()
@@ -70,7 +74,8 @@ class ConfigHelperTest extends TestCase
             $this->storeHelper,
             $this->writerInterface,
             $this->serializer,
-            $this->typeList
+            $this->typeList,
+            $this->cacheManager
         ];
     }
 }
