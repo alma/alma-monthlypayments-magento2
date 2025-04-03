@@ -139,7 +139,7 @@
                            showInStore="1">
                         <label>Activate in-page checkout</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>Enable this setting if you want in-page payments (no redirection) for all Alma payment methods.</comment>
+                        <frontend_model>Alma\MonthlyPayments\Block\Adminhtml\System\Config\EnableInPageFrontModel</frontend_model>
                         <config_path>payment/alma_monthly_payments/in_page_enabled</config_path>
                     </field>
                     <field id="payment_expiration" translate="label comment" sortOrder="20" showInDefault="1">
