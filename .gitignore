@@ -4,3 +4,6 @@ auth.json
 .idea
 /Test/.phpunit.result.cache
 .phpunit.result.cache
+
+# Taskfile
+.task

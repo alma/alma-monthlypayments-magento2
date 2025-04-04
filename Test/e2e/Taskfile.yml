@@ -1,0 +1,56 @@
+version: 3
+
+tasks:
+
+  npm:
+    preconditions:
+      - sh: which npm
+        msg: 'This task requires `npm`. Please install Node.js and npm: https://nodejs.org/en/download'
+
+  install:
+    desc: Install dependencies for E2E tests
+    deps:
+      - npm
+    sources:
+      - package-lock.json
+    cmds:
+      - npm clean-install
+      - node_modules/.bin/playwright install --with-deps chromium
+
+  test:
+    desc: Run E2E tests
+    deps:
+      - install
+    cmds:
+      - node_modules/.bin/bddgen && node_modules/.bin/playwright test
+
+  test:ui:
+    desc: Run E2E tests with Playwright UI
+    deps:
+      - install
+    cmds:
+      # Run Playwright UI with BDDGen automatically after each test file change
+      - node_modules/.bin/playwright test --ui & node_modules/.bin/nodemon -w "./features/" -w "./steps/" -e feature,ts
+        --exec "node_modules/.bin/bddgen"
+
+  test:bdd:watch:
+    desc: Generate Playwright tests automatically after each BDD test files change
+    deps:
+      - install
+    cmds:
+      - node_modules/.bin/nodemon -w "./features/" -w "./steps/" -e feature,ts --exec "node_modules/.bin/bddgen"
+
+  list:steps:
+    desc: List all available test steps
+    deps:
+      - install
+    cmds:
+      - node_modules/.bin/bddgen export
+
+  lint:
+    desc: Lint E2E tests
+    deps:
+      - install
+    cmds:
+      - node_modules/.bin/eslint
+      - node_modules/.bin/tsc -p tsconfig.json --noEmit
