@@ -1,0 +1,17 @@
+{
+  "name": "@alma/alma-monthlypayments-magento2-e2e",
+  "version": "1.0.0",
+  "description": "alma-monthlypayments-magento2 E2E tests with Playwright and BDD",
+  "author": "Alma SAS",
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.14.00",
+    "playwright-bdd": "^8.2.1",
+    "eslint": "^9.23.0",
+    "typescript-eslint": "^8.29.0",
+    "envalid": "^8.0.0",
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9"
+  }
+}

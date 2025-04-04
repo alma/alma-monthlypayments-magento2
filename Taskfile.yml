@@ -1,5 +1,10 @@
 version: 3
 
+includes:
+  e2e:
+    taskfile: Test/e2e/Taskfile.yml
+    dir: Test/e2e/
+
 env:
   REPOSITORY: alma-monthlypayments-magento2
   HOST_UID:
