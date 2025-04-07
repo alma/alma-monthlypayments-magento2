@@ -19,7 +19,7 @@ jobs:
 
     - name: Generate Github token for PR checks
       id: github-token-checks
-      uses: actions/create-github-app-token@v1
+      uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
       continue-on-error: true
       with:
         app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -28,7 +28,7 @@ jobs:
 
     - name: Create a Github check for E2E tests run in the Pull Request
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
       id: create-github-check
       with:
           github-token: ${{ steps.github-token-checks.outputs.token }}
@@ -44,14 +44,14 @@ jobs:
 
     - name: Generate Github token for integration-infrastructure repo
       id: github-token-infrastructure
-      uses: actions/create-github-app-token@v1
+      uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
         repositories: integration-infrastructure
 
     - name: Trigger E2E tests in the integration-infrastructure repository
-      uses: codex-/return-dispatch@v1
+      uses: codex-/return-dispatch@8e5959a15e0ef0a34b9569395f994e61fed5dd26 # v1.16.0
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-infrastructure.outputs.token }}
@@ -74,7 +74,7 @@ jobs:
           workflow_timeout_seconds: 120 # Default: 300
 
     - name: Hide deprecated E2E test run info message
-      uses: int128/hide-comment-action@v1
+      uses: int128/hide-comment-action@dba8ef7116a5609731b75a2ceb566d561c0e57f5 # v1.40.0
       with:
         # This string should be kept in sync with the last words of the comment in :
         # `Send a comment to the PR informing that the E2E tests are running` step (in this workflow).
@@ -83,7 +83,7 @@ jobs:
 
     - name: Send a comment to the PR informing that the E2E tests are running
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
       with:
           script: |
               github.rest.issues.createComment({
@@ -97,7 +97,7 @@ jobs:
 
     - name: Update Github check with the E2E tests run URL
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
       with:
           github-token: ${{ steps.github-token-checks.outputs.token }}
           script: |
