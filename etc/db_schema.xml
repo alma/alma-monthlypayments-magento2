@@ -7,14 +7,4 @@
         <column xsi:type="boolean" name="alma_cart_initiated_status" nullable="false" default="false"
                 comment="Cart initiated notification status"/>
     </table>
-    <table name="quote_item" resource="checkout" comment="Alma insurance Data in Quote Item">
-        <column xsi:type="text" name="alma_insurance" nullable="true" comment="Alma insurance" disabled="true"/>
-    </table>
-    <table name="sales_order_item" resource="sales" comment="Alma insurance Data in Order Item">
-        <column xsi:type="text" name="alma_insurance" nullable="true" comment="Alma insurance" disabled="true"/>
-    </table>
-
-    <table name="alma_insurance_subscription" resource="checkout" comment="Alma insurance subscriptions"
-           disabled="true">
-    </table>
 </schema>
