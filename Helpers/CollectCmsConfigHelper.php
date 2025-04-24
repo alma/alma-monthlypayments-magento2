@@ -4,7 +4,6 @@ namespace Alma\MonthlyPayments\Helpers;
 
 use Alma\API\Exceptions\AlmaException;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
-use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
@@ -34,7 +33,6 @@ class CollectCmsConfigHelper extends ConfigHelper
      * @param AlmaClient $almaClient
      * @param UrlInterface $urlBuilder
      * @param Logger $logger
-     * @param Manager $cacheManager
      */
     public function __construct(
         Context             $context,
@@ -44,10 +42,9 @@ class CollectCmsConfigHelper extends ConfigHelper
         TypeListInterface   $typeList,
         AlmaClient          $almaClient,
         UrlInterface        $urlBuilder,
-        Logger              $logger,
-        Manager             $cacheManager
+        Logger              $logger
     ) {
-        parent::__construct($context, $storeHelper, $writerInterface, $serializer, $typeList, $cacheManager);
+        parent::__construct($context, $storeHelper, $writerInterface, $serializer, $typeList);
         $this->almaClient = $almaClient;
         $this->urlBuilder = $urlBuilder;
         $this->logger = $logger;

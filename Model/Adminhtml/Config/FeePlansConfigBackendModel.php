@@ -2,7 +2,6 @@
 
 namespace Alma\MonthlyPayments\Model\Adminhtml\Config;
 
-use Alma\MonthlyPayments\Gateway\Config\Config;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -31,16 +30,16 @@ class FeePlansConfigBackendModel extends Value
 
 
     public function __construct(
-        Context              $context,
-        Registry             $registry,
+        Context $context,
+        Registry $registry,
         ScopeConfigInterface $config,
-        TypeListInterface    $cacheTypeList,
-        SerializerInterface  $serialize,
-        PaymentPlansHelper   $paymentPlansHelper,
-        ConfigHelper         $configHelper,
-        AbstractResource     $resource = null,
-        AbstractDb           $resourceCollection = null,
-        array                $data = []
+        TypeListInterface $cacheTypeList,
+        SerializerInterface $serialize,
+        PaymentPlansHelper $paymentPlansHelper,
+        ConfigHelper $configHelper,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
     ) {
         parent::__construct(
             $context,
@@ -86,13 +85,8 @@ class FeePlansConfigBackendModel extends Value
     {
         $value = $this->getValue();
         $almaPlans = $this->configHelper->getBaseApiPlansConfig();
-        if (!empty($value)) {
+        if ($value) {
             $value = $this->serialize->unserialize($value);
-        }
-        // When API keys are saved the first time, fee plans are not saved in DB
-        // Default value is display but not usable
-        if (empty($value)) {
-            $this->saveDefaultPlanConfig($almaPlans);
         }
         $feePlans = [];
         foreach ($almaPlans as $key => $feePlan) {
@@ -103,30 +97,5 @@ class FeePlansConfigBackendModel extends Value
         }
 
         $this->setValue($feePlans);
-    }
-
-    /**
-     * @param array $almaPlans
-     * @return void
-     */
-    public function saveDefaultPlanConfig(array $almaPlans): void
-    {
-        $planToSave = [];
-        foreach ($almaPlans as $key => $feePlan) {
-            if (!$feePlan->allowed) {
-                continue;
-            }
-            // Default enabled plans custom min/max purchase amount are set with good values in formatFeePlanConfigForSave
-            $initDefaultEnabledPlans = [
-                "general:3:0:0" => [
-                    "enabled" => "1",
-                    "custom_min_purchase_amount" => "0",
-                    "custom_max_purchase_amount" => "4000",
-                ]
-            ];
-            $planToSave[$key] = $this->paymentPlansHelper->formatFeePlanConfigForSave($feePlan, $initDefaultEnabledPlans[$key] ?? []);
-        }
-        $encodedValue = $this->serialize->serialize($planToSave);
-        $this->configHelper->saveConfig(Config::CONFIG_PAYMENT_PLANS, $encodedValue);
     }
 }

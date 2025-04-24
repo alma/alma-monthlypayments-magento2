@@ -10,7 +10,6 @@ use Alma\MonthlyPayments\Helpers\CollectCmsConfigHelper;
 use Alma\MonthlyPayments\Helpers\Exceptions\AlmaClientException;
 use Alma\MonthlyPayments\Helpers\Logger;
 use Alma\MonthlyPayments\Helpers\StoreHelper;
-use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
@@ -52,8 +51,6 @@ class CollectCmsConfigHelperTest extends TestCase
         $client->configuration = $this->configurationEndpoint;
         $this->almaClient = $this->createMock(AlmaClient::class);
         $this->almaClient->method('getDefaultClient')->willReturn($client);
-        $manager = $this->createMock(Manager::class);
-        $manager->method('getAvailableTypes')->willReturn([]);
 
         $this->collectCmlsConfigHelper = new CollectCmsConfigHelper(
             $this->context,
@@ -63,8 +60,7 @@ class CollectCmsConfigHelperTest extends TestCase
             $this->typeList,
             $this->almaClient,
             $this->urlBuilder,
-            $this->logger,
-            $manager
+            $this->logger
         );
     }
 
