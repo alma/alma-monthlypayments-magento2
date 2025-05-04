@@ -19,7 +19,7 @@ jobs:
 
     - name: Generate Github token for PR checks
       id: github-token-checks
-      uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
+      uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
       continue-on-error: true
       with:
         app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -44,7 +44,7 @@ jobs:
 
     - name: Generate Github token for integration-infrastructure repo
       id: github-token-infrastructure
-      uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
+      uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
