@@ -13,9 +13,7 @@ jobs:
         version:
         - 2.4.6
     runs-on: ubuntu-24.04
-    # TODO: Uncomment this when the workflow is ready to be used
-    #if: vars.RUN_PLAYWRIGHT_E2E_TESTS == 'true' && github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'hotfix')
-    if: vars.RUN_PLAYWRIGHT_E2E_TESTS == 'true'
+    if: vars.RUN_PLAYWRIGHT_E2E_TESTS == 'true' && github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'hotfix')
 
     steps:
 
@@ -57,7 +55,7 @@ jobs:
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-magento2-private.outputs.token }}
-          ref: devx/dex-1304-make-e2e-workflow-callable-from-public-repo # TODO: Update this to the main branch
+          ref: main
           repo: alma-monthlypayments-magento2-private 
           owner: alma
           workflow: e2e.yml
