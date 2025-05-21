@@ -42,21 +42,21 @@ jobs:
               })
               core.setOutput('id', check.data.id)
 
-    - name: Generate a Github token for alma-monthlypayments-magento2-private repo
-      id: github-token-magento2-private
+    - name: Generate a Github token for adobe-commerce-priv repo
+      id: github-token-adobe-commerce-priv
       uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
-        repositories: alma-monthlypayments-magento2-private
+        repositories: adobe-commerce-priv
 
-    - name: Trigger E2E tests in the alma-monthlypayments-magento2-private repository
+    - name: Trigger E2E tests in the adobe-commerce-priv repository
       uses: codex-/return-dispatch@df6e17379382ea99310623bc5ed1a7dddd6c878f # v2.0.4
       id: e2e-tests-workflow-dispatch
       with:
-          token: ${{ steps.github-token-magento2-private.outputs.token }}
+          token: ${{ steps.github-token-adobe-commerce-priv.outputs.token }}
           ref: main
-          repo: alma-monthlypayments-magento2-private 
+          repo: adobe-commerce-priv
           owner: alma
           workflow: e2e.yml
           workflow_inputs: '{
