@@ -1,5 +1,5 @@
 ---
-name: CodeceptJS E2E Tests
+name: Playwright E2E Tests
 on:
   pull_request:
     branches: ["main", "develop"]
@@ -13,11 +13,11 @@ jobs:
         version:
         - 2.4.6
     runs-on: ubuntu-24.04
-    if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'hotfix')
+    if: vars.RUN_PLAYWRIGHT_E2E_TESTS == 'true' && github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'hotfix')
 
     steps:
 
-    - name: Generate Github token for PR checks
+    - name: Generate Github token with permissions to create Github checks
       id: github-token-checks
       uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
       continue-on-error: true
@@ -26,7 +26,7 @@ jobs:
         private-key: ${{ secrets.ALMA_UPDATE_CHECKS_APP_PEM }}
         repositories: alma-monthlypayments-magento2
 
-    - name: Create a Github check for E2E tests run in the Pull Request
+    - name: Create a Github check for the E2E tests run in the pull request
       if: github.event_name == 'pull_request'
       uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
       id: create-github-check
@@ -36,52 +36,47 @@ jobs:
               const check = await github.rest.checks.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  name: 'CodeceptJS E2E tests results',
+                  name: 'Playwright E2E tests results',
                   head_sha: '${{ github.event.pull_request.head.sha }}',
                   status: "in_progress",
               })
               core.setOutput('id', check.data.id)
 
-    - name: Generate Github token for integration-infrastructure repo
-      id: github-token-infrastructure
+    - name: Generate a Github token for adobe-commerce-priv repo
+      id: github-token-adobe-commerce-priv
       uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
-        repositories: integration-infrastructure
+        repositories: adobe-commerce-priv
 
-    - name: Trigger E2E tests in the integration-infrastructure repository
+    - name: Trigger E2E tests in the adobe-commerce-priv repository
       uses: codex-/return-dispatch@df6e17379382ea99310623bc5ed1a7dddd6c878f # v2.0.4
       id: e2e-tests-workflow-dispatch
       with:
-          token: ${{ steps.github-token-infrastructure.outputs.token }}
+          token: ${{ steps.github-token-adobe-commerce-priv.outputs.token }}
           ref: main
-          repo: integration-infrastructure
+          repo: adobe-commerce-priv
           owner: alma
-          workflow: deploy-cms.yaml
+          workflow: e2e.yml
           workflow_inputs: '{
-              "name": "e2e-${{ github.run_id }}",
-              "alma_plugin_branch": "${{ github.head_ref || github.ref_name }}",
-              "alma_plugin_test_branch" : "main",
-              "cms":"adobe-commerce-${{ matrix.version }}",
-              "e2e": "true",
-              "e2e_check_info" : "{
-                  \"repository\": \"${{ github.event.repository.name }}\",
+              "adobe_commerce_version":"${{ matrix.version }}",
+              "triggering_github_check_info" : "{
                   \"pr_number\": \"${{ github.event.number }}\",
                   \"check_id\": \"${{ steps.create-github-check.outputs.id  }}\"
                   }"
               }'
-          workflow_timeout_seconds: 120 # Default: 300
+          workflow_timeout_seconds: 300
 
-    - name: Hide deprecated E2E test run info message
-      uses: int128/hide-comment-action@0a9e7919192e41201af6ebd979df163956982d07 # v1.41.0
+    - name: Hide deprecated comment about last E2E tests run
+      uses: int128/hide-comment-action@185e98e4e71b2ee7a4ce37e40c084db335833770 # v1.42.0
       with:
         # This string should be kept in sync with the last words of the comment in :
-        # `Send a comment to the PR informing that the E2E tests are running` step (in this workflow).
-        # `Add a comment with E2E tests results in the Pull Request` step (in e2e-test-post-results workflow)
-        contains: <!-- id:e2e-test-run-info -->
+        # `Add a comment to the PR informing that the E2E tests are running` step (in this workflow).
+        # `Add a comment with E2E tests results in the Pull Request` step (in e2e-tests-playwright-post-results workflow)
+        contains: <!-- id:pw-e2e-test-run-info -->
 
-    - name: Send a comment to the PR informing that the E2E tests are running
+    - name: Add a comment to the PR informing that the E2E tests are running
       if: github.event_name == 'pull_request'
       uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
       with:
@@ -90,9 +85,9 @@ jobs:
                   issue_number: context.issue.number,
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  body: '⏳CodeceptJS E2E tests are currently running. \n' +
+                  body: '⏳Playwright E2E tests are currently running. \n' +
                       '➡️ You can follow their progression [here](${{steps.e2e-tests-workflow-dispatch.outputs.run_url}}).' +
-                      '\n\n<!-- id:e2e-test-run-info -->'
+                      '\n\n<!-- id:pw-e2e-test-run-info -->'
               })
 
     - name: Update Github check with the E2E tests run URL
@@ -102,8 +97,8 @@ jobs:
           github-token: ${{ steps.github-token-checks.outputs.token }}
           script: |
               const checkOutput = {
-                  title: 'CodeceptJS E2E tests results',
-                  summary: '⏳CodeceptJS E2E tests are currently running.',
+                  title: 'Playwright E2E tests results',
+                  summary: '⏳Playwright E2E tests are currently running.',
                   text: '➡️ You can follow their progression [here](${{steps.e2e-tests-workflow-dispatch.outputs.run_url}}).'
               };
               github.rest.checks.update({
