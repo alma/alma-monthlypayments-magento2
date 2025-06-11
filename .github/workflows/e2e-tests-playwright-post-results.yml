@@ -1,4 +1,4 @@
-name: Post E2E results in pull request
+name: Post Playwright E2E results in pull request
 
 on:
   workflow_dispatch:
@@ -31,12 +31,12 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
             script: |
-              let commentBody = '❌ CodeceptJS E2E tests have failed. \n';
+              let commentBody = '❌ Playwright E2E tests have failed. \n';
               if ('${{ github.event.inputs.e2e-status }}' === 'success') {
-                  commentBody = '✅ CodeceptJS E2E tests have been successfully completed. \n';
+                  commentBody = '✅ Playwright E2E tests have been successfully completed. \n';
               }
               commentBody += '➡️ You can find the results [here](${{ github.event.inputs.e2e-run-url }}).';
-              commentBody += '\n\n<!-- id:e2e-test-run-info -->';
+              commentBody += '\n\n<!-- id:pw-e2e-test-run-info -->';
               github.rest.issues.createComment({
                   issue_number: ${{ github.event.inputs.pr-number }},
                   owner: context.repo.owner,
@@ -47,7 +47,7 @@ jobs:
 
       - name: Generate Github token for PR checks
         id: github-token-checks
-        uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
         continue-on-error: true
         with:
           app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -62,13 +62,13 @@ jobs:
             let checkStatus = 'completed';
             let checkConclusion = 'success';
             let checkOutput = {
-              title: 'CodeceptJS E2E tests',
-              summary: '✅ CodeceptJS E2E tests have been successfully completed',
+              title: 'Playwright E2E tests',
+              summary: '✅ Playwright E2E tests have been successfully completed',
               text: `➡️ You can find the results [here](${{ github.event.inputs.e2e-run-url }}).`
             };
             if ('${{ github.event.inputs.e2e-status }}' === 'failure') {
               checkConclusion = 'failure';
-              checkOutput.summary = '❌ CodeceptJS E2E tests have failed.';
+              checkOutput.summary = '❌ Playwright E2E tests have failed.';
             }
             github.rest.checks.update({
               owner: context.repo.owner,
