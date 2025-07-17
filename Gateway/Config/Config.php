@@ -28,8 +28,9 @@ namespace Alma\MonthlyPayments\Gateway\Config;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterface;
 use Alma\MonthlyPayments\Gateway\Config\PaymentPlans\PaymentPlansConfigInterfaceFactory;
 use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
-use Alma\MonthlyPayments\Helpers\StoreHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
@@ -68,9 +69,13 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     private $apiConfigHelper;
     /**
-     * @var StoreHelper
+     * @var ScopeConfigInterface
      */
-    private $storeHelper;
+    private $scopeConfig;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
 
     /**
      * Config constructor
@@ -78,24 +83,25 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentPlansConfigInterfaceFactory $plansConfigFactory
      * @param ApiConfigHelper $apiConfigHelper
-     * @param StoreHelper $storeHelper
+     * @param RequestInterface $request
      * @param string|null $methodCode
      * @param string $pathPattern
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
+        ScopeConfigInterface               $scopeConfig,
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
-        ApiConfigHelper $apiConfigHelper,
-        StoreHelper $storeHelper,
-        string $methodCode = null,
-        string $pathPattern = self::DEFAULT_PATH_PATTERN
+        ApiConfigHelper                    $apiConfigHelper,
+        RequestInterface                   $request,
+        string                             $methodCode = null,
+        string                             $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
+        $this->scopeConfig = $scopeConfig;
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
         $this->plansConfigFactory = $plansConfigFactory;
         $this->apiConfigHelper = $apiConfigHelper;
-        $this->storeHelper = $storeHelper;
+        $this->request = $request;
     }
 
     /**
@@ -121,14 +127,40 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function get(string $field, $default = null, $storeId = null)
     {
-        if (!$storeId) {
-            $storeId = $this->storeHelper->getStoreId();
+        $websiteId = $this->request->getParam('website');
+        $currentStoreId = $this->request->getParam('store');
+
+        if ($websiteId && !$currentStoreId) {
+            $value = $this->getWebsiteValue($field, $websiteId);
+        } else {
+            $value = parent::getValue($field, $storeId);
         }
-        $value = parent::getValue($field, $storeId);
+
         if ($value === null) {
             $value = $default;
         }
         return $value;
+    }
+
+    /**
+     * Get config website value based on method code and path pattern
+     * Parent method is not used because it does not support website scope
+     *
+     * @param $field
+     * @param $websiteId
+     * @return mixed|null
+     */
+    private function getWebsiteValue($field, $websiteId = null)
+    {
+        if ($this->methodCode === null || $this->pathPattern === null) {
+            return null;
+        }
+
+        return $this->scopeConfig->getValue(
+            sprintf($this->pathPattern, $this->methodCode, $field),
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
+        );
     }
 
     /**
