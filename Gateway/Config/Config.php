@@ -133,7 +133,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         if ($websiteId && !$currentStoreId) {
             $value = $this->getWebsiteValue($field, $websiteId);
         } else {
-            $value = parent::getValue($field, $storeId);
+            $effectiveStoreId = $currentStoreId ?? $storeId;
+            $value = parent::getValue($field, $effectiveStoreId);
         }
 
         if ($value === null) {
