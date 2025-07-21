@@ -162,7 +162,7 @@ class OrderHelper extends AbstractHelper
      */
     public function getOrderShippingMethodName(Order $order): string
     {
-        return $order->getShippingMethod();
+        return $order->getShippingMethod() ?? '';
     }
 
     /**
