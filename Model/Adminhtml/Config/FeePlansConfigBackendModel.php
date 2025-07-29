@@ -37,8 +37,8 @@ class FeePlansConfigBackendModel extends Value
         SerializerInterface $serialize,
         PaymentPlansHelper $paymentPlansHelper,
         ConfigHelper $configHelper,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(

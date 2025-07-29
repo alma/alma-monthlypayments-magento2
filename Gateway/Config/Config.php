@@ -92,7 +92,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         PaymentPlansConfigInterfaceFactory $plansConfigFactory,
         ApiConfigHelper                    $apiConfigHelper,
         RequestInterface                   $request,
-        string                             $methodCode = null,
+        ?string                            $methodCode = null,
         string                             $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
