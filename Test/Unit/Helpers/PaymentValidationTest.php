@@ -290,22 +290,22 @@ class PaymentValidationTest extends TestCase
     {
         return [
             'Check with deferred Trigger True' => [
-                    [
-                        'created' => self::FIXED_TIMESTAMP,
-                        'deferred_days' => self::DEFFERED_DAYS_30,
-                        'deferred_trigger' => true,
-                        'deferred_trigger_description' => 'At shipping'
-                    ],
-                    [
-                        'total' => self::TXT_PRICE,
-                        'created' => self::FIXED_TIMESTAMP,
-                        'deferred_days' => self::DEFFERED_DAYS_30,
-                        'installments_count' => '0',
-                        'deferred_months' => '0',
-                        'deferred_trigger' => 'yes',
-                        'deferred_trigger_description' => 'At shipping'
-                    ]
+                [
+                    'created' => self::FIXED_TIMESTAMP,
+                    'deferred_days' => self::DEFFERED_DAYS_30,
+                    'deferred_trigger' => true,
+                    'deferred_trigger_description' => 'At shipping'
                 ],
+                [
+                    'total' => self::TXT_PRICE,
+                    'created' => self::FIXED_TIMESTAMP,
+                    'deferred_days' => self::DEFFERED_DAYS_30,
+                    'installments_count' => '0',
+                    'deferred_months' => '0',
+                    'deferred_trigger' => 'yes',
+                    'deferred_trigger_description' => 'At shipping'
+                ]
+            ],
             'Check with deferred Trigger False' => [
                 [
                     'created' => self::FIXED_TIMESTAMP,

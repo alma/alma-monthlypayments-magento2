@@ -93,8 +93,8 @@ class APIKeyValue extends Encrypted
         MessageManager       $messageManager,
         ConfigHelper         $configHelper,
         ApiConfigHelper      $apiConfigHelper,
-        AbstractResource     $resource = null,
-        AbstractDb           $resourceCollection = null,
+        ?AbstractResource    $resource = null,
+        ?AbstractDb          $resourceCollection = null,
         array                $data = []
     ) {
         parent::__construct(

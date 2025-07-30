@@ -63,10 +63,10 @@ class PaymentPlansHelper
      * @param ConfigHelper $configHelper
      */
     public function __construct(
-        Logger $logger,
+        Logger                      $logger,
         PaymentPlansConfigInterface $paymentPlansConfig,
-        MessageManager $messageManager,
-        ConfigHelper $configHelper
+        MessageManager              $messageManager,
+        ConfigHelper                $configHelper
     ) {
         $this->logger = $logger;
         $this->configHelper = $configHelper;
@@ -84,7 +84,7 @@ class PaymentPlansHelper
         $feePlans = $this->configHelper->getBaseApiPlansConfig();
 
         foreach ($feePlans as $plan) {
-            $deferredLimitDays  = $plan->getDeferredTriggerLimitDays();
+            $deferredLimitDays = $plan->getDeferredTriggerLimitDays();
             if (isset($deferredLimitDays)) {
                 $triggerIsAllowed = true;
                 break;
@@ -165,7 +165,7 @@ class PaymentPlansHelper
         $label = $key;
 
         if (isset($matches[1])) {
-            $label =  __('Pay in %1 installments', $matches[1]);
+            $label = __('Pay in %1 installments', $matches[1]);
         }
 
         if (isset($matches[1])
@@ -173,19 +173,19 @@ class PaymentPlansHelper
             && $matches[2] === '0'
             && $matches[3] === '0'
         ) {
-            $label =  __('Pay now');
+            $label = __('Pay now');
         }
 
         if (isset($matches[2])
             && $matches[2] !== '0'
         ) {
-            $label =  __('Pay later - D+%1', $matches[2]);
+            $label = __('Pay later - D+%1', $matches[2]);
         }
 
         if (isset($matches[3])
             && $matches[3] !== '0'
         ) {
-            $label =  __('Pay later - %1 month', $matches[3]);
+            $label = __('Pay later - %1 month', $matches[3]);
         }
 
         return $label;
@@ -218,7 +218,7 @@ class PaymentPlansHelper
      *
      * @return int
      */
-    private function getEnabledDefaultValue(FeePlan $feePlan, array $feePlanConfig = null) : int
+    private function getEnabledDefaultValue(FeePlan $feePlan, ?array $feePlanConfig = null): int
     {
         $key = PaymentPlanConfig::keyForFeePlan($feePlan);
         $defaultEnabled = 0;
@@ -236,8 +236,8 @@ class PaymentPlansHelper
     private function getFee(FeePlan $feePlan): array
     {
         $fee = [];
-        $fee['merchant'] = ['merchant_fee_fixed' => $feePlan->merchant_fee_fixed, 'merchant_fee_variable' => $feePlan->merchant_fee_variable ];
-        $fee['customer'] = ['customer_fee_fixed' => $feePlan->customer_fee_fixed, 'customer_fee_variable' => $feePlan->customer_fee_variable ];
+        $fee['merchant'] = ['merchant_fee_fixed' => $feePlan->merchant_fee_fixed, 'merchant_fee_variable' => $feePlan->merchant_fee_variable];
+        $fee['customer'] = ['customer_fee_fixed' => $feePlan->customer_fee_fixed, 'customer_fee_variable' => $feePlan->customer_fee_variable];
         return $fee;
     }
 

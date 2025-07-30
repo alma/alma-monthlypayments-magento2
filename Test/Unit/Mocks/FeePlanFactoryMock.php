@@ -14,7 +14,7 @@ class FeePlanFactoryMock
     public static function feePlanFactory(
         string $key,
         bool $allowed = true,
-        string $triggerDays = null,
+        ?string $triggerDays = null,
         int $minAmount = 5000,
         int $maxAmount = 200000
     ): FeePlan {
@@ -32,7 +32,7 @@ class FeePlanFactoryMock
     public static function dataFeePlanFactory(
         string $key,
         bool $allowed = true,
-        string $triggerDays = null,
+        ?string $triggerDays = null,
         int $minAmount = 5000,
         int $maxAmount = 200000
     ): array {
