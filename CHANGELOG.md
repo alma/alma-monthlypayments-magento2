@@ -1,5 +1,22 @@
 # Changelog
 
+## v5.7.0 - 2025-07-30
+
+### Changes
+
+### 🚀 New Features
+
+- fix  PHP 8.4 Implicitly marking parameter as nullable is deprecated (#267)
+
+### 🐛 Bug Fixes
+
+- fix: Error previous order without shipping method (#264)
+- fix: add website scope in gateway config (#266)
+
+#### Contributors
+
+@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot], @gdraynz, @joyet-simon, @remi-zuffinetti, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.6.0 - 2025-04-24
 
 ### Changes

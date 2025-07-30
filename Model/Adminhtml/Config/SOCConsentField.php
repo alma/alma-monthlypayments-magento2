@@ -62,8 +62,8 @@ class SOCConsentField extends Value
         AlmaClient           $almaClient,
         Logger               $logger,
         ManagerInterface     $messageManager,
-        AbstractResource     $resource = null,
-        AbstractDb           $resourceCollection = null
+        ?AbstractResource     $resource = null,
+        ?AbstractDb           $resourceCollection = null
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, []);
         $this->socHelper = $socHelper;
