@@ -557,7 +557,6 @@ class Eligibility extends AbstractHelper
         return $type;
     }
 
-
     /**
      * @return CartInterface|null
      * @throws LocalizedException

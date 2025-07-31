@@ -30,10 +30,11 @@ define([
     'widgets/Alma',
     'jquery',
     'Magento_Catalog/js/price-utils'
-], function (Alma, $){
+], function (Alma, $) {
     'use strict';
 
-    return function (config){
+    return function (config) {
+        console.log(config)
         var priceContainer = getHtmlPriceContainer(config.productId, false);
 
         priceContainer.on('DOMSubtreeModified', function () {
@@ -46,13 +47,15 @@ define([
         if (config.useQuantityForWidgetPrice) {
             var qtyNode = document.getElementById('qty');
 
-            qtyNode.addEventListener('input',function () {updateWidget();});
+            qtyNode.addEventListener('input', function () {
+                updateWidget();
+            });
         }
 
         moveToCustomPosition(config.customDisplay, config.containerId);
         updateWidget();
 
-        function updateWidget(){
+        function updateWidget() {
             widgets.add(
                 Alma.Widgets.PaymentPlans, {
                     container: '#' + config.containerId,
@@ -69,13 +72,13 @@ define([
      * @param customDisplay Widget config define in view/frontend/templates/catalog/product/view.phtml
      * @param baseContainerId Base container who contain the widget
      */
-    function moveToCustomPosition(customDisplay, baseContainerId){
-        if(customDisplay.hasCustomPosition && $(customDisplay.customContainerSelector) != undefined ){
+    function moveToCustomPosition(customDisplay, baseContainerId) {
+        if (customDisplay.hasCustomPosition && $(customDisplay.customContainerSelector) != undefined) {
             var position = 'append';
-            if(customDisplay.isPrepend) {
+            if (customDisplay.isPrepend) {
                 position = 'prepend'
             }
-            $(customDisplay.customContainerSelector)[position]($('#'+baseContainerId));
+            $(customDisplay.customContainerSelector)[position]($('#' + baseContainerId));
         }
     }
 
@@ -86,17 +89,17 @@ define([
      * @param productId product Id
      * @returns {number} price in cent
      */
-    function getPrice(productPrice, useQuantityForWidgetPrice, productId){
+    function getPrice(productPrice, useQuantityForWidgetPrice, productId) {
         var price = productPrice;
-        if(useQuantityForWidgetPrice){
-            var priceContainer = getHtmlPriceContainer(productId,'price');
+        if (useQuantityForWidgetPrice) {
+            var priceContainer = getHtmlPriceContainer(productId, 'price');
             var frontPrice = getPriceFromContainer(priceContainer);
 
-            if( frontPrice > 0){
+            if (frontPrice > 0) {
                 price = frontPrice;
             }
         }
-        return price ;
+        return price;
     }
 
     /**
@@ -105,13 +108,13 @@ define([
      * @param subClass Sub class to select
      * @returns {*}
      */
-    function getHtmlPriceContainer(productId, subClass = false){
+    function getHtmlPriceContainer(productId, subClass = false) {
         var classToSelect = '';
-        if (subClass){
-            classToSelect = '.'+subClass;
+        if (subClass) {
+            classToSelect = '.' + subClass;
         }
         var priceContainer = $(`#product-price-${productId} ${classToSelect}`);
-        if (!priceContainer.length){
+        if (!priceContainer.length) {
             // Only if tax config is diplay with and without tax
             priceContainer = $(`#price-including-tax-product-price-${productId} ${classToSelect}`);
         }
@@ -123,10 +126,9 @@ define([
      * @param priceContainer Container with the price to extract
      * @returns {number} price in cent
      */
-    function getPriceFromContainer(priceContainer){
+    function getPriceFromContainer(priceContainer) {
         var price = 0;
-        if(priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null)
-        {
+        if (priceContainer !== undefined && priceContainer !== null && priceContainer.html() !== undefined && priceContainer.html() !== null) {
             price = getPricePerQty(convertHtmlPriceToCent(priceContainer.html()));
         }
         return price;
@@ -137,9 +139,9 @@ define([
      * @param priceHtml The price extracted from HTML
      * @returns {number} price in cent
      */
-    function convertHtmlPriceToCent(priceHtml){
+    function convertHtmlPriceToCent(priceHtml) {
         var centMultiplier = getCentMultiplier(priceHtml);
-        var price = priceHtml.replace(/[^\d]/g,"");
+        var price = priceHtml.replace(/[^\d]/g, "");
         return price * centMultiplier;
     }
 
@@ -148,10 +150,9 @@ define([
      * @param {number} priceInCent Html price in cent
      * @returns {number} final price for qty
      */
-    function getPricePerQty(priceInCent){
+    function getPricePerQty(priceInCent) {
         var qty = $('#qty').val();
-        if(!qty.match(/^\d+$/) || (qty <= 0))
-        {
+        if (!qty.match(/^\d+$/) || (qty <= 0)) {
             qty = 1;
         }
         return priceInCent * qty;
@@ -162,10 +163,10 @@ define([
      * @param   {string} priceHtml The price extracted from HTML
      * @returns {number} 1 for flaot or 100 for integer
      */
-    function getCentMultiplier(priceHtml){
+    function getCentMultiplier(priceHtml) {
         var multiplier = 1;
         var countSeparator = priceHtml.match(/[.,]/g) || [];
-        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][\d]{3}/g).test(priceHtml))){
+        if (countSeparator.length == 0 || (countSeparator.length == 1 && (/[.,][\d]{3}/g).test(priceHtml))) {
             multiplier = 100;
         }
         return multiplier;

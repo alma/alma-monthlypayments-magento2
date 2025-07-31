@@ -18,9 +18,9 @@ class SOCHelper extends AbstractHelper
     const SHARED_ORDER_STATES = ['processing', 'complete'];
     const ENABLE_KEY = 'soc_enabled';
     const DATE_KEY = 'soc_date';
-    const SELECTOR_NO =  0;
-    const SELECTOR_YES =  1;
-    const SELECTOR_NOT_SET =  2;
+    const SELECTOR_NO = 0;
+    const SELECTOR_YES = 1;
+    const SELECTOR_NOT_SET = 2;
 
     /**
      * @var Logger
@@ -57,13 +57,13 @@ class SOCHelper extends AbstractHelper
      * @param DateHelper $dateHelper
      */
     public function __construct(
-        Context $context,
-        Logger $logger,
-        AlmaClient $almaClient,
+        Context         $context,
+        Logger          $logger,
+        AlmaClient      $almaClient,
         WriterInterface $configWriter,
-        PayloadBuilder $payloadBuilder,
-        OrderHelper $orderHelper,
-        DateHelper $dateHelper
+        PayloadBuilder  $payloadBuilder,
+        OrderHelper     $orderHelper,
+        DateHelper      $dateHelper
     ) {
         parent::__construct($context);
         $this->logger = $logger;
@@ -80,10 +80,10 @@ class SOCHelper extends AbstractHelper
      */
     public function getSelectorValue(): int
     {
-        return intval($this->scopeConfig->getValue(
+        return (int)$this->scopeConfig->getValue(
             ConfigHelper::XML_PATH_PAYMENT . '/' . ConfigHelper::XML_PATH_METHODE . '/' . self::ENABLE_KEY,
             ScopeInterface::SCOPE_STORE
-        ));
+        );
     }
 
     /**
@@ -107,7 +107,7 @@ class SOCHelper extends AbstractHelper
             $this->dateHelper->setShareDates($date);
             $payload = $this->payloadBuilder->getPayload();
             $this->almaClient->getDefaultClient()->shareOfCheckout->share($payload);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Share Day request error message', [$e->getMessage()]);
             throw new RequestError($e->getMessage(), null, $res);
         } finally {
@@ -125,7 +125,7 @@ class SOCHelper extends AbstractHelper
         try {
             $lastUpdateByApi = $this->almaClient->getDefaultClient()->shareOfCheckout->getLastUpdateDates();
             return date('Y-m-d', $lastUpdateByApi['end_time']);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             if ($e->response->responseCode == '404') {
                 return date('Y-m-d', strtotime('-1 day'));
             }
@@ -134,8 +134,8 @@ class SOCHelper extends AbstractHelper
     }
 
     /**
-     * @throws InvalidArgumentException
      * @return string
+     * @throws InvalidArgumentException
      */
     public function getEnabledDate(): string
     {

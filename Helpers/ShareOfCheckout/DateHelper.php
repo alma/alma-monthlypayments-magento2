@@ -32,7 +32,7 @@ class DateHelper extends AbstractHelper
         if ($to === '') {
             $to = date('Y-m-d');
         }
-        $startTimestamp =  $from;
+        $startTimestamp = $from;
 
         while ($startTimestamp < $to) {
             if ($startTimestamp > $enabledDate) {
@@ -53,7 +53,6 @@ class DateHelper extends AbstractHelper
         return date('Y-m-d', strtotime('+1 day', strtotime($date)));
     }
 
-
     /**
      * @param $date
      *
@@ -62,7 +61,7 @@ class DateHelper extends AbstractHelper
     public function setShareDates($date): void
     {
         $this->startTime = $date . ' 00:00:00';
-        $this->endTime   = $date . ' 23:59:59';
+        $this->endTime = $date . ' 23:59:59';
     }
 
     /**
@@ -72,6 +71,7 @@ class DateHelper extends AbstractHelper
     {
         return $this->startTime;
     }
+
     /**
      * @return string
      */

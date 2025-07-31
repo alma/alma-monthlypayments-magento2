@@ -28,18 +28,17 @@ class FeePlansConfigBackendModel extends Value
      */
     private $configHelper;
 
-
     public function __construct(
-        Context $context,
-        Registry $registry,
+        Context              $context,
+        Registry             $registry,
         ScopeConfigInterface $config,
-        TypeListInterface $cacheTypeList,
-        SerializerInterface $serialize,
-        PaymentPlansHelper $paymentPlansHelper,
-        ConfigHelper $configHelper,
-        ?AbstractResource $resource = null,
-        ?AbstractDb $resourceCollection = null,
-        array $data = []
+        TypeListInterface    $cacheTypeList,
+        SerializerInterface  $serialize,
+        PaymentPlansHelper   $paymentPlansHelper,
+        ConfigHelper         $configHelper,
+        ?AbstractResource    $resource = null,
+        ?AbstractDb          $resourceCollection = null,
+        array                $data = []
     ) {
         parent::__construct(
             $context,

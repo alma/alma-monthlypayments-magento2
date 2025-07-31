@@ -33,7 +33,6 @@ class MerchantBusinessService
      */
     private $quoteRepository;
 
-
     /**
      * @param AlmaClient $almaClient
      * @param Logger $logger
@@ -103,7 +102,6 @@ class MerchantBusinessService
         $quote->setData(self::CART_INITIATED_STATUS_KEY, '1');
         $this->quoteRepository->save($quote);
     }
-
 
     /**
      * Set alma_bnpl_eligibility to true in quote DB
