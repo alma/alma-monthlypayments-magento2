@@ -33,6 +33,11 @@
 $config = $block->getConfig();
 $widgetConfig = $block->getWidgetConfig();
 $containerId = 'alma-widget';
+// Escaper compatibility for Adobe Commerce 2.3
+if (!isset($escaper)) {
+    $escaper = $block;
+}
+
 if ($widgetConfig->showProductWidget() && $block->getJsonPlans() && $block->getPrice() > 0): ?>
     <div id="<?= $escaper->escapeHtmlAttr($containerId) ?>"></div>
     <script type="text/x-magento-init">

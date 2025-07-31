@@ -14,6 +14,12 @@ use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
  */
 /** @var $block \Alma\MonthlyPayments\Block\Adminhtml\System\Config\FeePlansConfigFrontModel */
 /** @var $escaper \Magento\Framework\Escaper */
+
+// Escaper compatibility for Adobe Commerce 2.3
+if (!isset($escaper)) {
+    $escaper = $block;
+}
+
 $_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
 $_colspan = $block->isAddAfter() ? 2 : 1;
 ?>

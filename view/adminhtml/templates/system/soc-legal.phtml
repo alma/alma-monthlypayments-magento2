@@ -1,6 +1,12 @@
 <?php
 /** @var Alma\MonthlyPayments\Block\Adminhtml\System\SOCBlockLegal $block */
 /** @var $escaper \Magento\Framework\Escaper */
+
+// Escaper compatibility for Adobe Commerce 2.3
+if (!isset($escaper)) {
+    $escaper = $block;
+}
+
 $position = $block->getPosition()
 ?>
 <div style="margin-left: 10px">

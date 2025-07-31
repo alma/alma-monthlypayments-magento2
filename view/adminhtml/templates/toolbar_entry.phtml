@@ -6,6 +6,12 @@
 // phpcs:disable Generic.Files.LineLength
 /** @var $block \Magento\AdminNotification\Block\ToolbarEntry */
 /** @var $escaper \Magento\Framework\Escaper */
+
+// Escaper compatibility for Adobe Commerce 2.3
+if (!isset($escaper)) {
+    $escaper = $block;
+}
+
 $notificationCount = $block->getUnreadNotificationCount();
 $notificationCounterMax = $block->getNotificationCounterMax();
 

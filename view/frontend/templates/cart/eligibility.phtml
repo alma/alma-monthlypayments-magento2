@@ -27,6 +27,12 @@
 <?php
 /** @var $block \Alma\MonthlyPayments\Block\Cart\Eligibility */
 /** @var $escaper \Magento\Framework\Escaper */
+
+// Escaper compatibility for Adobe Commerce 2.3
+if (!isset($escaper)) {
+    $escaper = $block;
+}
+
 ?>
 <?php if ($block->showEligibilityMessage() && $block->hasEnabledPaymentPlansInBo()): ?>
     <div class="alma-cart-eligibility">
