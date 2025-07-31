@@ -1,12 +1,22 @@
 # Changelog
 
+## v5.7.1 - 2025-07-31
+
+### 🐛 Bug Fixes
+
+- Coding standard lint and escape (#271)
+
+#### Contributors
+
+@Francois-Gomis and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.7.0 - 2025-07-30
 
 ### Changes
 
 ### 🚀 New Features
 
-- fix  PHP 8.4 Implicitly marking parameter as nullable is deprecated (#267)
+- fix PHP 8.4 Implicitly marking parameter as nullable is deprecated (#267)
 
 ### 🐛 Bug Fixes
 
@@ -15,7 +25,9 @@
 
 #### Contributors
 
-@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot], @gdraynz, @joyet-simon, @remi-zuffinetti, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot], @gdraynz, @joyet-simon,
+@remi-zuffinetti, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot)
+and [github-actions[bot]](https://github.com/apps/github-actions)
 
 ## v5.6.0 - 2025-04-24
 
@@ -33,7 +45,9 @@
 
 #### Contributors
 
-@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot], @joyet-simon, @remi-zuffinetti, @webaaz, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+@Benjamin-Freoua-Alma, @Francois-Gomis, @alma-renovate-bot[bot], @joyet-simon, @remi-zuffinetti,
+@webaaz, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot)
+and [github-actions[bot]](https://github.com/apps/github-actions)
 
 ## v5.5.0 - 2025-03-24
 
@@ -363,10 +377,9 @@ and [github-actions[bot]](https://github.com/apps/github-actions)
 * Adds Web API endpoints to get an Alma URL for an order paid with Alma, and to validate such a payment
   upon customer return. See `etc/webapi.xml` for endpoints URLs and `Model/Api/Payment.php` for
   implementation.
-  
+
 * Adds 3 API Configuration fields to override `return_url`, `ipn_callback_url` and `customer_cancel_url`
   in created payments.
-  
 
 ## v1.0.7
 
