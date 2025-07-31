@@ -61,9 +61,9 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
      * @param Logger $logger
      */
     public function __construct(
-        AlmaClient $almaClient,
+        AlmaClient                        $almaClient,
         PaymentPlanConfigInterfaceFactory $planConfigFactory,
-        Logger $logger,
+        Logger                            $logger,
         $data = []
     ) {
         $this->serializer = new Json();
@@ -85,7 +85,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
     {
         try {
             $feePlans = $this->almaClient->getDefaultClient()->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Update From Api', [$e->getMessage()]);
             return;
         }
@@ -97,7 +97,6 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
         }
     }
 
-
     /**
      * @return FeePlan[]
      */
@@ -106,7 +105,7 @@ class PaymentPlansConfig implements PaymentPlansConfigInterface
         $feePlans = [];
         try {
             $feePlans = $this->almaClient->getDefaultClient()->merchants->feePlans(FeePlan::KIND_GENERAL, "all", true);
-        } catch (RequestError | AlmaClientException $e) {
+        } catch (RequestError|AlmaClientException $e) {
             $this->logger->error('Error in Get fee plans from Api', [$e->getMessage()]);
         }
         return $feePlans;

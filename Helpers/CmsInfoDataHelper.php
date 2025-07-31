@@ -52,7 +52,6 @@ class CmsInfoDataHelper
         ];
     }
 
-
     /**
      * Get third party modules list without Magento modules
      *

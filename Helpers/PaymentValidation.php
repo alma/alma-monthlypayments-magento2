@@ -143,7 +143,6 @@ class PaymentValidation
         return $order;
     }
 
-
     /**
      * @param string $paymentId
      *

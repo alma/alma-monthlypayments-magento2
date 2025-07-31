@@ -31,7 +31,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      */
     private $paymentPlansHelper;
 
-
     /**
      * @param PaymentPlansHelper $paymentPlansHelper
      * @param Context $context
@@ -39,8 +38,8 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
      */
     public function __construct(
         PaymentPlansHelper $paymentPlansHelper,
-        Context $context,
-        array $data = []
+        Context            $context,
+        array              $data = []
     ) {
         $this->setTemplate('system/config/form/field/array.phtml');
         parent::__construct(
@@ -124,7 +123,6 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
         $row->setData('option_extra_attrs', $options);
     }
 
-
     /**
      * @return BlockInterface
      * @throws LocalizedException
@@ -156,6 +154,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
         }
         return $this->renderString;
     }
+
     /**
      * Get the grid and scripts contents
      *
@@ -188,20 +187,20 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
             $html .= '<p class="content">';
             $html .= '<b>' . $this->paymentPlansHelper->planLabelByKey($key) . '</b> : ';
             if ($merchantFees['merchant_fee_variable'] != 0) {
-                $html .= ' ' . __('Merchant fee variable:') . ' ' . intval($merchantFees['merchant_fee_variable']) / 100 . '%';
+                $html .= ' ' . __('Merchant fee variable:') . ' ' . (int)$merchantFees['merchant_fee_variable'] / 100 . '%';
             }
             if ($merchantFees['merchant_fee_fixed'] != 0) {
-                $html .= ' ' . __('Merchant fee fixed:') . ' ' . intval($merchantFees['merchant_fee_variable']) / 100 . '%';
+                $html .= ' ' . __('Merchant fee fixed:') . ' ' . (int)$merchantFees['merchant_fee_variable'] / 100 . '%';
             }
             $html .= ' <b>-</b> ';
             if ($customerFees['customer_fee_fixed'] == 0 && $customerFees['customer_fee_variable'] == 0) {
                 $html .= ' ' . __('Customer fee:') . ' ' . __('no fees');
             }
             if ($customerFees['customer_fee_fixed'] != 0) {
-                $html .= ' ' . __('Customer fixed fee:') . ' ' . intval($customerFees['customer_fee_fixed']) / 100 . '%';
+                $html .= ' ' . __('Customer fixed fee:') . ' ' . (int)$customerFees['customer_fee_fixed'] / 100 . '%';
             }
             if ($customerFees['customer_fee_variable'] != 0) {
-                $html .= ' ' . __('Customer variable fee:') . ' ' . intval($customerFees['customer_fee_variable']) / 100 . '%';
+                $html .= ' ' . __('Customer variable fee:') . ' ' . (int)$customerFees['customer_fee_variable'] / 100 . '%';
             }
             $html .= '</p>';
         }

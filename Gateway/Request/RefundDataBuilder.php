@@ -11,7 +11,6 @@ use Magento\Sales\Model\OrderRepository;
 class RefundDataBuilder implements BuilderInterface
 {
 
-
     /**
      * @var Config
      */
@@ -26,7 +25,7 @@ class RefundDataBuilder implements BuilderInterface
      * @param OrderRepository $orderRepository
      */
     public function __construct(
-        Config $config,
+        Config          $config,
         OrderRepository $orderRepository
     ) {
         $this->config = $config;
@@ -44,10 +43,10 @@ class RefundDataBuilder implements BuilderInterface
     {
         /** @var PaymentDataObject $paymentDO */
         $paymentDO = SubjectReader::readPayment($buildSubject);
-        $payment   = $paymentDO->getPayment();
-        $orderDO   = $paymentDO->getOrder();
+        $payment = $paymentDO->getPayment();
+        $orderDO = $paymentDO->getOrder();
         $order = $this->orderRepository->get($orderDO->getId());
-        $refundPayload['payment_id'] =  $payment->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
+        $refundPayload['payment_id'] = $payment->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
         $refundPayload['merchant_id'] = $this->config->getMerchantId($order->getStoreId());
         $refundPayload['amount'] = $buildSubject['amount'];
         $refundPayload['total_refund'] = $order->getTotalRefunded();

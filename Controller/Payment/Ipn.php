@@ -79,7 +79,6 @@ class Ipn extends Action
         $this->apiConfigHelper = $apiConfigHelper;
     }
 
-
     /**
      * @inerhitDoc
      */
