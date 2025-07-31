@@ -19,7 +19,6 @@ use Magento\Framework\Webapi\Rest\Response;
 
 class CollectData implements CollectDataInterface
 {
-
     private $payloadFormatter;
     private $cmsInfoDataHelper;
     private $cmsFeaturesDataHelper;
@@ -37,7 +36,9 @@ class CollectData implements CollectDataInterface
      */
     private $apiConfigHelper;
 
-
+    /**
+     * @var string
+     */
     const HEADER_SIGNATURE_KEY = 'X-Alma-Signature';
     /**
      * @var Config
@@ -48,7 +49,6 @@ class CollectData implements CollectDataInterface
      * @var Response
      */
     private $response;
-
 
     /**
      * @param Logger $logger

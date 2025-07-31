@@ -50,7 +50,6 @@ class PaymentDataAssignObserver extends AbstractDataAssignObserver
         $this->logger = $logger;
     }
 
-
     /**
      * @param Observer $observer
      * @return void

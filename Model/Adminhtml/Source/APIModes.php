@@ -30,6 +30,9 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
+ * This class provides the available API modes for the Alma payment method.
+ * It implements the ArrayInterface to provide options for the admin configuration.
+ *
  * Class APIModes
  */
 class APIModes implements ArrayInterface
@@ -49,7 +52,7 @@ class APIModes implements ArrayInterface
      * @param ApiConfigHelper $apiConfigHelper
      */
     public function __construct(
-        Logger $logger,
+        Logger          $logger,
         ApiConfigHelper $apiConfigHelper
     ) {
         $this->logger = $logger;

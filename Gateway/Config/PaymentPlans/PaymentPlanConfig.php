@@ -60,8 +60,8 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function __construct(
         PaymentPlansHelper $paymentPlansHelper,
-        Logger $logger,
-        array $data = []
+        Logger             $logger,
+        array              $data = []
     ) {
         $this->data = $data;
         $this->paymentPlansHelper = $paymentPlansHelper;
@@ -88,9 +88,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
     {
         return self::key(
             $plan->kind,
-            intval($plan->installments_count),
-            intval($plan->deferred_days),
-            intval($plan->deferred_months)
+            (int)$plan->installments_count,
+            (int)$plan->deferred_days,
+            (int)$plan->deferred_months
         );
     }
 
@@ -106,11 +106,11 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
 
             'installmentsCount' => $plan->installments_count,
 
-            'deferredDays' => intval($plan->deferred_days),
-            'deferredMonths' => intval($plan->deferred_months),
+            'deferredDays' => (int)$plan->deferred_days,
+            'deferredMonths' => (int)$plan->deferred_months,
 
             'deferredTriggerEnable' => !empty($deferred_trigger_limit_days),
-            'deferredTriggerDays' => intval($deferred_trigger_limit_days),
+            'deferredTriggerDays' => (int)$deferred_trigger_limit_days,
 
             'enabled' => 0,
 
@@ -142,9 +142,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     private static function key(
         string $planKind,
-        int $installmentsCount,
-        int $deferredDays,
-        int $deferredMonths
+        int    $installmentsCount,
+        int    $deferredDays,
+        int    $deferredMonths
     ): string {
         return implode(':', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
     }
@@ -158,9 +158,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     private static function almaKey(
         string $planKind,
-        int $installmentsCount,
-        int $deferredDays,
-        int $deferredMonths
+        int    $installmentsCount,
+        int    $deferredDays,
+        int    $deferredMonths
     ): string {
         return implode('_', [$planKind, $installmentsCount, $deferredDays, $deferredMonths]);
     }
@@ -170,9 +170,9 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function toArray(): array
     {
-        $this->data['key']= $this->planKey();
-        $this->data['logo']= $this->logoFileName();
-        $this->data['inPageAllowed']= $this->paymentPlansHelper->isInPageAllowed();
+        $this->data['key'] = $this->planKey();
+        $this->data['logo'] = $this->logoFileName();
+        $this->data['inPageAllowed'] = $this->paymentPlansHelper->isInPageAllowed();
         return $this->data;
     }
 
@@ -270,7 +270,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function deferredDays(): int
     {
-        return intval($this->data['deferredDays']);
+        return (int)$this->data['deferredDays'];
     }
 
     /**
@@ -278,7 +278,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function deferredMonths(): int
     {
-        return intval($this->data['deferredMonths']);
+        return (int)$this->data['deferredMonths'];
     }
 
     /**
@@ -294,7 +294,7 @@ class PaymentPlanConfig implements PaymentPlanConfigInterface
      */
     public function maxDeferredTriggerDays(): int
     {
-        return intval($this->data['deferredTriggerDays']);
+        return (int)$this->data['deferredTriggerDays'];
     }
 
     /**

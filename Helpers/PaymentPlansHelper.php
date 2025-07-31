@@ -205,8 +205,8 @@ class PaymentPlansHelper
             'pnx_label' => $this->planLabelByKey($key),
             'enabled' => $this->getEnabledDefaultValue($feePlan, $feePlanConfig),
             'min_purchase_amount' => Functions::priceFromCents($feePlan->min_purchase_amount),
-            self::CUSTOM_MIN_PURCHASE_KEY => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents(intval($feePlanConfig['minAmount'])) : Functions::priceFromCents($feePlan->min_purchase_amount),
-            'custom_max_purchase_amount' => isset($feePlanConfig['maxAmount']) ? Functions::priceFromCents(intval($feePlanConfig['maxAmount'])) : Functions::priceFromCents($feePlan->max_purchase_amount),
+            self::CUSTOM_MIN_PURCHASE_KEY => isset($feePlanConfig['minAmount']) ? Functions::priceFromCents((int)$feePlanConfig['minAmount']) : Functions::priceFromCents($feePlan->min_purchase_amount),
+            'custom_max_purchase_amount' => isset($feePlanConfig['maxAmount']) ? Functions::priceFromCents((int)$feePlanConfig['maxAmount']) : Functions::priceFromCents($feePlan->max_purchase_amount),
             'max_purchase_amount' => Functions::priceFromCents($feePlan->max_purchase_amount),
             'fee' => $this->getFee($feePlan)
         ];
@@ -225,7 +225,7 @@ class PaymentPlansHelper
         if ($key === 'general:3:0:0') {
             $defaultEnabled = 1;
         }
-        return isset($feePlanConfig['enabled']) ? intval($feePlanConfig['enabled']) : $defaultEnabled;
+        return isset($feePlanConfig['enabled']) ? (int)$feePlanConfig['enabled'] : $defaultEnabled;
     }
 
     /**

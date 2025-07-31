@@ -26,6 +26,8 @@
 namespace Alma\MonthlyPayments\Model\Adminhtml\Source;
 
 /**
+ * This class provides options for the position of the product widget in Magento.
+ *
  * Class ProductWidgetContainer
  */
 class ProductWidgetContainer implements \Magento\Framework\Option\ArrayInterface

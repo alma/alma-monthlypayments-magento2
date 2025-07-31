@@ -23,16 +23,22 @@
  *
  */
 
-// @codingStandardsIgnoreFile
-
 ?>
 <?php
 /** @var $block \Alma\MonthlyPayments\Block\Cart\Eligibility */
+/** @var $escaper \Magento\Framework\Escaper */
+
+// Escaper compatibility for Adobe Commerce 2.3
+if (!isset($escaper)) {
+    $escaper = $block;
+}
+
 ?>
 <?php if ($block->showEligibilityMessage() && $block->hasEnabledPaymentPlansInBo()): ?>
     <div class="alma-cart-eligibility">
-        <img src="<?php echo $block->getViewFileUrl('Alma_MonthlyPayments::images/alma_logo.svg') ?>" alt="Alma">
+        <img src="<?= $escaper->escapeUrl($block->getViewFileUrl('Alma_MonthlyPayments::images/alma_logo.svg')) ?>"
+             alt="Alma">
         <br>
-        <span class="alma-cart-eligibility--message"><?php echo $block->getEligibilityMessage() ?></span>
+        <span class="alma-cart-eligibility--message"><?= $escaper->escapeHtml($block->getEligibilityMessage()) ?></span>
     </div>
 <?php endif; ?>

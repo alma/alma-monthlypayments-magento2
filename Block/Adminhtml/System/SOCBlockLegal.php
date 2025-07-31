@@ -22,9 +22,9 @@ class SOCBlockLegal extends Template
      * @param array $data
      */
     public function __construct(
-        UrlInterface $url,
+        UrlInterface     $url,
         Template\Context $context,
-        array $data = []
+        array            $data = []
     ) {
         parent::__construct($context, $data);
         $this->urlBuilder = $url;
@@ -40,17 +40,43 @@ class SOCBlockLegal extends Template
     {
         return __('Increase your performance with Alma!');
     }
+
     /**
-     * Getter for SOC legal block description
-     *
+     * Getter for SOC legal block description first part
      * @return string
      */
-    public function getDescription(): string
+    public function getDescriptionFirstPart(): string
     {
-        $html = "By accepting this option, you enable Alma to analyze the usage of your payment methods and get information in order to improve your clients' experience.";
-        $html .= " You can <a href='mailto:support+soc@getalma.eu' target='_blank'>opt out and erase your data</a> at any moment.";
-        return __($html);
+        return __("By accepting this option, you enable Alma to analyze the usage of your payment methods and get information in order to improve your clients' experience. You can ");
     }
+
+    /**
+     * Getter for SOC legal block description last part
+     * @return string
+     */
+    public function getDescriptionLastPart(): string
+    {
+        return __(" at any moment.");
+    }
+
+    /**
+     * Getter for SOC opt-out link text
+     * @return string
+     */
+    public function getOptOutLinkText(): string
+    {
+        return __("opt out and erase your data");
+    }
+
+    /**
+     * Getter for SOC opt-out email address
+     * @return string
+     */
+    public function getOptOutEmail(): string
+    {
+        return "support+soc@getalma.eu";
+    }
+
     /**
      * Getter for SOC legal additional information title
      *
@@ -60,6 +86,7 @@ class SOCBlockLegal extends Template
     {
         return __('Know more about collected data');
     }
+
     /**
      * Getter for SOC legal additional information details <li>
      *
@@ -72,6 +99,7 @@ class SOCBlockLegal extends Template
             __('payment provider for each order')
         ];
     }
+
     /**
      * Getter for SOC legal link to config page title
      *
@@ -101,6 +129,7 @@ class SOCBlockLegal extends Template
     {
         return $this->data['position'];
     }
+
     /**
      * Getter for SOC legal link to config page url for href
      *
