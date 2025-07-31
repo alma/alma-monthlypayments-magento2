@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.7.1 - 2025-07-31
+
+### Changes
+
+- Backport main to develop (#270)
+
+### 🐛 Bug Fixes
+
+- Coding standard lint and escape (#271)
+
+#### Contributors
+
+@Francois-Gomis and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.7.0 - 2025-07-30
 
 ### Changes
