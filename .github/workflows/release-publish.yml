@@ -102,7 +102,7 @@ jobs:
             });
 
       - name: Format release notes for Slack
-        uses: LoveToKnow/slackify-markdown-action@v1.1.1
+        uses: LoveToKnow/slackify-markdown-action@698a1d4d0ff1794152a93c03ee8ca5e03a310d4e # v1.1.1
         id: slack-markdown-release-notes
         with:
           text: |
