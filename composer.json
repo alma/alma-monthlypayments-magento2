@@ -6,7 +6,7 @@
         "alma/alma-php-client": ">=2.6.0"
     },
     "type": "magento2-module",
-    "version": "5.7.1",
+    "version": "5.8.0",
     "license": [
         "MIT"
     ],
