@@ -28,7 +28,7 @@ jobs:
 
     - name: Create a Github check for the E2E tests run in the pull request
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
       id: create-github-check
       with:
           github-token: ${{ steps.github-token-checks.outputs.token }}
@@ -78,7 +78,7 @@ jobs:
 
     - name: Add a comment to the PR informing that the E2E tests are running
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
       with:
           script: |
               github.rest.issues.createComment({
@@ -92,7 +92,7 @@ jobs:
 
     - name: Update Github check with the E2E tests run URL
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
       with:
           github-token: ${{ steps.github-token-checks.outputs.token }}
           script: |
