@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.8.1 - 2025-10-01
+
+### Changes
+
+- Backport main to develop (#280)
+
+### 🐛 Bug Fixes
+
+- fix: install on version 2.4.8 (#283)
+
+#### Contributors
+
+@Benjamin-Freoua-Alma, @alma-renovate-bot[bot], @remi-zuffinetti, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+
 ## v5.8.0 - 2025-09-30
 
 ### Changes
