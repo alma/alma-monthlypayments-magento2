@@ -41,7 +41,7 @@ repos:
          stages: [ pre-commit ]
 
   - repo: https://github.com/returntocorp/semgrep
-    rev: v1.106.0
+    rev: v1.139.0
     hooks:
       - id: semgrep
         args:
