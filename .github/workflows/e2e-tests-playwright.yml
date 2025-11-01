@@ -69,7 +69,7 @@ jobs:
           workflow_timeout_seconds: 300
 
     - name: Hide deprecated comment about last E2E tests run
-      uses: int128/hide-comment-action@9803637eab610cca14ac6f64c42c0d7ffe9327e0 # v1.44.0
+      uses: int128/hide-comment-action@bddc4e774ea6f0b45b9621c3a689db72b9a3cec5 # v1.46.0
       with:
         # This string should be kept in sync with the last words of the comment in :
         # `Add a comment to the PR informing that the E2E tests are running` step (in this workflow).
