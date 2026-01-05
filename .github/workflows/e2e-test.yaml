@@ -51,7 +51,7 @@ jobs:
         repositories: integration-infrastructure
 
     - name: Trigger E2E tests in the integration-infrastructure repository
-      uses: codex-/return-dispatch@e23442963c2e1aa0a88234e3cba076f8bbef8975 # v2.2.0
+      uses: codex-/return-dispatch@2277c7e64ca38a7350b95cfec2d6715ccebb7108 # v3.0.1
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-infrastructure.outputs.token }}
