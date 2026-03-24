@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Install taskfile.dev
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611 #v2
         with:
           version: 3.x
           repo-token: ${{ github.token }}
@@ -50,7 +50,7 @@ jobs:
           persist-credentials: false
 
       - name: Install taskfile.dev
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611 #v2
         with:
           version: 3.x
           repo-token: ${{ github.token }}

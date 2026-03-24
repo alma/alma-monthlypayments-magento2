@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Install taskfile.dev
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611 # v2
         with:
           version: 3.x
           repo-token: ${{ github.token }}
@@ -102,7 +102,7 @@ jobs:
             });
 
       - name: Format release notes for Slack
-        uses: LoveToKnow/slackify-markdown-action@v1.1.1
+        uses: LoveToKnow/slackify-markdown-action@698a1d4d0ff1794152a93c03ee8ca5e03a310d4e # v1.1.1
         id: slack-markdown-release-notes
         with:
           text: |
