@@ -19,7 +19,7 @@ jobs:
 
     - name: Generate Github token with permissions to create Github checks
       id: github-token-checks
-      uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
       continue-on-error: true
       with:
         app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -44,14 +44,14 @@ jobs:
 
     - name: Generate a Github token for adobe-commerce-priv repo
       id: github-token-adobe-commerce-priv
-      uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
         repositories: adobe-commerce-priv
 
     - name: Trigger E2E tests in the adobe-commerce-priv repository
-      uses: codex-/return-dispatch@2277c7e64ca38a7350b95cfec2d6715ccebb7108 # v3.0.1
+      uses: codex-/return-dispatch@16fa9d14771c4d56ae0196bbda1d3c17f7f3650f # v3.0.2
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-adobe-commerce-priv.outputs.token }}
@@ -69,7 +69,7 @@ jobs:
           workflow_timeout_seconds: 300
 
     - name: Hide deprecated comment about last E2E tests run
-      uses: int128/hide-comment-action@3d2609ba272116ebbf0d268a8d406e8719967721 # v1.52.0
+      uses: int128/hide-comment-action@7e00bd46796b28fdf74b2f4b0e4f0568bd024b00 # v1.54.0
       with:
         # This string should be kept in sync with the last words of the comment in :
         # `Add a comment to the PR informing that the E2E tests are running` step (in this workflow).

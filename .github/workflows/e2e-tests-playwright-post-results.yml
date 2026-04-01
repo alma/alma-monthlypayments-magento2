@@ -47,7 +47,7 @@ jobs:
 
       - name: Generate Github token for PR checks
         id: github-token-checks
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         continue-on-error: true
         with:
           app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
