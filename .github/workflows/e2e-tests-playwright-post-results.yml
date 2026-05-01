@@ -28,7 +28,7 @@ jobs:
     steps:
 
       - name: Add a comment with E2E tests results in the Pull Request
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
             script: |
               let commentBody = '❌ Playwright E2E tests have failed. \n';
@@ -55,7 +55,7 @@ jobs:
           repositories: alma-monthlypayments-magento2
 
       - name: Update check in PR with E2E tests results
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ steps.github-token-checks.outputs.token }}
           script: |
