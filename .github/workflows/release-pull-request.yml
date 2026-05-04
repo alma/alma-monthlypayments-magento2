@@ -24,7 +24,7 @@ jobs:
           git reset --hard develop
 
       - name: Create release draft
-        uses: release-drafter/release-drafter@139054aeaa9adc52ab36ddf67437541f039b88e2 # v7.1.1
+        uses: release-drafter/release-drafter@563bf132657a13ded0b01fcb723c5a58cdd824e2 # v7.2.1
         id: release-drafter
         with:
           # release-drafter should be based on develop to get the correct content as pull requests are merged into develop
@@ -47,7 +47,7 @@ jobs:
       # If using default Github token, the created pull request won't trigger workflows with pull_request event
       # See https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
       - name: Generate Github token to create PR
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         id: github-token
         with:
           app-id: ${{ secrets.ALMA_CREATE_TEAM_PRS_APP_ID }}
@@ -55,7 +55,7 @@ jobs:
           repositories: alma-monthlypayments-magento2
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ steps.github-token.outputs.token }}
           commit-message: 'chore: update version'
