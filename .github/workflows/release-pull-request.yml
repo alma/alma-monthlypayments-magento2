@@ -24,7 +24,7 @@ jobs:
           git reset --hard develop
 
       - name: Create release draft
-        uses: release-drafter/release-drafter@563bf132657a13ded0b01fcb723c5a58cdd824e2 # v7.2.1
+        uses: release-drafter/release-drafter@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
         id: release-drafter
         with:
           # release-drafter should be based on develop to get the correct content as pull requests are merged into develop
@@ -47,7 +47,7 @@ jobs:
       # If using default Github token, the created pull request won't trigger workflows with pull_request event
       # See https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs
       - name: Generate Github token to create PR
-        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: github-token
         with:
           app-id: ${{ secrets.ALMA_CREATE_TEAM_PRS_APP_ID }}
