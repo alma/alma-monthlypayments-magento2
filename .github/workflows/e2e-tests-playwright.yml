@@ -19,7 +19,7 @@ jobs:
 
     - name: Generate Github token with permissions to create Github checks
       id: github-token-checks
-      uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
       continue-on-error: true
       with:
         app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -44,7 +44,7 @@ jobs:
 
     - name: Generate a Github token for adobe-commerce-priv repo
       id: github-token-adobe-commerce-priv
-      uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
@@ -69,7 +69,7 @@ jobs:
           workflow_timeout_seconds: 300
 
     - name: Hide deprecated comment about last E2E tests run
-      uses: int128/hide-comment-action@d38cf5901fbb26e4d5790890955713b0ec539087 # v1.57.0
+      uses: int128/hide-comment-action@4a4b259f4f47a711d8a58dfa1f5c644e16ab14ea # v1.60.0
       with:
         # This string should be kept in sync with the last words of the comment in :
         # `Add a comment to the PR informing that the E2E tests are running` step (in this workflow).
