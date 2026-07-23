@@ -34,14 +34,19 @@ define([
     'use strict';
 
     return function (config) {
-        console.log(config)
         var priceContainer = getHtmlPriceContainer(config.productId, false);
+        var $priceBox = $('[data-role="priceBox"]');
 
         priceContainer.on('DOMSubtreeModified', function () {
             if (config.useQuantityForWidgetPrice) {
                 updateWidget();
             }
         });
+
+        $priceBox.on('reloadPrice.alma', function () {
+            updateWidget();
+        });
+
         var widgets = Alma.Widgets.initialize(config.merchantId, Alma.ApiMode[config.activeMode]);
 
         if (config.useQuantityForWidgetPrice) {
