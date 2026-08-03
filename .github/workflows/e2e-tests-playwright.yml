@@ -51,7 +51,7 @@ jobs:
         repositories: adobe-commerce-priv
 
     - name: Trigger E2E tests in the adobe-commerce-priv repository
-      uses: codex-/return-dispatch@08365b69369e9eb639ce4c4cbbd29598bc52ca3a # v3.0.3
+      uses: codex-/return-dispatch@2e404d40b641ba1deb44be941660bb34828e4f6d # v4.0.0
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-adobe-commerce-priv.outputs.token }}
