@@ -63,7 +63,7 @@ class CmsInfoDataHelperTest extends TestCase
     {
         $this->moduleList->method('getAll')->willReturn([]);
         $this->assertEquals([
-            'cms_name' => 'Adobe Commerce',
+            'cms_name' => 'Magento 2',
             'cms_version' => '2.4.0',
             'third_parties_plugins' => [],
             'theme_name' => 'Parent Theme / Child Theme',
