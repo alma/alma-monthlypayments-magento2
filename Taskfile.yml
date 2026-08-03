@@ -94,7 +94,7 @@ tasks:
     cmds:
       - |
         if ! docker image inspect php-compatibility:ac > /dev/null 2>&1; then
-          docker build -t php-compatibility:ac -f lint.Dockerfile .
+          docker build -t php-compatibility:ac -f php-compatibility.Dockerfile .
         else
           echo "Image already exists"
         fi
