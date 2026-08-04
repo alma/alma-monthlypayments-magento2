@@ -54,11 +54,14 @@ function setCustomErrorHandler()
                     E_USER_ERROR => 'User Error',
                     E_USER_WARNING => 'User Warning',
                     E_USER_NOTICE => 'User Notice',
-                    E_STRICT => 'Strict',
                     E_RECOVERABLE_ERROR => 'Recoverable Error',
                     E_DEPRECATED => 'Deprecated',
                     E_USER_DEPRECATED => 'User Deprecated',
                 ];
+
+                if (PHP_VERSION_ID < 80400 && defined('E_STRICT')) {
+                    $errorNames[constant('E_STRICT')] = 'Strict';
+                }
 
                 $errName = isset($errorNames[$errNo]) ? $errorNames[$errNo] : "";
 

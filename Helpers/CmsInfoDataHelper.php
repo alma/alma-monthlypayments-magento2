@@ -62,7 +62,7 @@ class CmsInfoDataHelper
         $thirdPartyModules = [];
 
         foreach ($this->moduleList->getAll() as $moduleName => $moduleInfo) {
-            if (!str_starts_with($moduleName, 'Magento_')) {
+            if (!strncmp($moduleName, 'Magento_', strlen('Magento_'))) {
                 $thirdPartyModules[] = ['name' => $moduleName, 'version' => $moduleInfo['setup_version']];
             }
         }
