@@ -39,7 +39,7 @@ class CmsInfoDataHelper
         $themeDataArray = $this->getCurrentThemeNameAndVersion();
 
         return [
-            'cms_name' => 'Adobe Commerce',
+            'cms_name' => 'Magento 2',
             'cms_version' => $this->productMetadata->getVersion(),
             'third_parties_plugins' => $this->getThirdPartyModules(),
             'theme_name' => $themeDataArray['name'],
