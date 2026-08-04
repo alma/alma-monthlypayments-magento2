@@ -45,4 +45,4 @@ WORKDIR /home/phpuser/magento2
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer install --prefer-dist --no-progress && \
-    composer require alma/alma-php-client mockery/mockery
+    composer require alma/alma-php-client:^2.6 mockery/mockery

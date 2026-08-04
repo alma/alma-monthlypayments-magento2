@@ -39,7 +39,7 @@ class CmsInfoDataHelper
         $themeDataArray = $this->getCurrentThemeNameAndVersion();
 
         return [
-            'cms_name' => 'Adobe Commerce',
+            'cms_name' => 'Magento 2',
             'cms_version' => $this->productMetadata->getVersion(),
             'third_parties_plugins' => $this->getThirdPartyModules(),
             'theme_name' => $themeDataArray['name'],
@@ -62,7 +62,7 @@ class CmsInfoDataHelper
         $thirdPartyModules = [];
 
         foreach ($this->moduleList->getAll() as $moduleName => $moduleInfo) {
-            if (!str_starts_with($moduleName, 'Magento_')) {
+            if (!strncmp($moduleName, 'Magento_', strlen('Magento_'))) {
                 $thirdPartyModules[] = ['name' => $moduleName, 'version' => $moduleInfo['setup_version']];
             }
         }
