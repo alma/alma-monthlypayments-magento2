@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.8.4 - 2026-08-18
+
+### Changes
+
+### 🐛 Bug Fixes
+
+- fix: Fix getUrl() on Magento Fresh install (#315)
+
+#### Contributors
+
+@jimmycarricart-ext-collab
+
 ## v5.8.2 - 2026-07-23
 
 ### Changes
