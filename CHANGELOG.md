@@ -1,19 +1,16 @@
 # Changelog
 
-## v5.8.3 - 2026-08-04
+## v5.8.4 - 2026-08-18
 
 ### Changes
 
 ### 🐛 Bug Fixes
 
-- Feature/ecom 4523 magento2 x adobe commerce in looker (#311)
-- fix: Fix php compatibility (#310)
-- fix: Update badge when change product option (configurable, bundle, custom option) (#305)
-- fix(webapi): Swagger schema generation for collect endpoint (#301)
+- fix: Fix getUrl() on Magento Fresh install (#315)
 
 #### Contributors
 
-@Benjamin-Freoua-Alma, @alma-renovate-bot[bot], @gdraynz, @jimmycarricart-ext-collab, @remi-zuffinetti, [alma-renovate-bot[bot]](https://github.com/apps/alma-renovate-bot) and [github-actions[bot]](https://github.com/apps/github-actions)
+@jimmycarricart-ext-collab
 
 ## v5.8.2 - 2026-07-23
 

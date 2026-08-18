@@ -27,6 +27,7 @@ namespace Alma\MonthlyPayments\Model\Adminhtml\Config\ApiUrl;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\Data\ProcessorInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
@@ -46,14 +47,20 @@ class ApiUrlValue extends Value implements ProcessorInterface
     private $url;
 
     /**
+     * @var DeploymentConfig
+     */
+    private $deploymentConfig;
+
+    /**
      * ApiUrlValue constructor.
+     * @param Url $url
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
+     * @param DeploymentConfig $deploymentConfig
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
-     * @param Url $url
      * @param array $data
      */
     public function __construct(
@@ -62,12 +69,24 @@ class ApiUrlValue extends Value implements ProcessorInterface
         Registry             $registry,
         ScopeConfigInterface $config,
         TypeListInterface    $cacheTypeList,
+        DeploymentConfig     $deploymentConfig,
         ?AbstractResource    $resource = null,
         ?AbstractDb          $resourceCollection = null,
         array                $data = []
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
         $this->url = $url;
+        $this->deploymentConfig = $deploymentConfig;
+    }
+
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws \Magento\Framework\Exception\RuntimeException
+     */
+    private function isMagentoInstalled(): bool
+    {
+        return $this->deploymentConfig->isAvailable();
     }
 
     /**
@@ -75,6 +94,10 @@ class ApiUrlValue extends Value implements ProcessorInterface
      */
     public function processValue($value): string
     {
+        if (!$this->isMagentoInstalled()) {
+            return (string) $value;
+        }
+
         if (empty($value)) {
             $value = $this->url->getUrl(
                 $this->urlPath,
@@ -89,6 +112,10 @@ class ApiUrlValue extends Value implements ProcessorInterface
      */
     public function getOldDefaultUrl(): string
     {
+        if (!$this->isMagentoInstalled()) {
+            return '';
+        }
+
         return $this->url->getUrl(
             $this->oldUrlPath,
             ['_nosid' => true, '_type' => UrlInterface::URL_TYPE_WEB]
