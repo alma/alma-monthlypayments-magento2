@@ -50,9 +50,11 @@ jobs:
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: github-token
         with:
-          app-id: ${{ secrets.ALMA_CREATE_TEAM_PRS_APP_ID }}
-          private-key: ${{ secrets.ALMA_CREATE_TEAM_PRS_APP_PEM }}
+          client-id: ${{ vars.ALMA_AUTOMATIONS_CROSS_REPO_CLIENT_ID }}
+          private-key: ${{ secrets.ALMA_AUTOMATIONS_CROSS_REPO_PRIVATE_KEY }}
           repositories: alma-monthlypayments-magento2
+          permission-contents: write  # push branch
+          permission-pull-requests: write  # create pull-request
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
