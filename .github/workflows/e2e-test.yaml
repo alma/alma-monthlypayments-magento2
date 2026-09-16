@@ -22,9 +22,10 @@ jobs:
       uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
       continue-on-error: true
       with:
-        app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
-        private-key: ${{ secrets.ALMA_UPDATE_CHECKS_APP_PEM }}
+        client-id: ${{ vars.ALMA_AUTOMATIONS_CLIENT_ID }}
+        private-key: ${{ secrets.ALMA_AUTOMATIONS_PRIVATE_KEY }}
         repositories: alma-monthlypayments-magento2
+        permission-checks: write  # update checks
 
     - name: Create a Github check for E2E tests run in the Pull Request
       if: github.event_name == 'pull_request'
@@ -46,9 +47,10 @@ jobs:
       id: github-token-infrastructure
       uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
       with:
-        app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
-        private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
+        client-id: ${{ vars.ALMA_AUTOMATIONS_CROSS_REPO_CLIENT_ID }}
+        private-key: ${{ secrets.ALMA_AUTOMATIONS_CROSS_REPO_PRIVATE_KEY }}
         repositories: integration-infrastructure
+        permission-actions: write  # trigger workflow
 
     - name: Trigger E2E tests in the integration-infrastructure repository
       uses: codex-/return-dispatch@2e404d40b641ba1deb44be941660bb34828e4f6d # v4.0.0
