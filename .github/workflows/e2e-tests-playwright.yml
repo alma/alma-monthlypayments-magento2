@@ -12,7 +12,7 @@ jobs:
       matrix:
         version:
         - 2.4.6
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: vars.RUN_PLAYWRIGHT_E2E_TESTS == 'true' && github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'hotfix')
 
     steps:
