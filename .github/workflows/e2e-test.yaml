@@ -19,7 +19,7 @@ jobs:
 
     - name: Generate Github token for PR checks
       id: github-token-checks
-      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       continue-on-error: true
       with:
         app-id: ${{ secrets.ALMA_UPDATE_CHECKS_APP_ID }}
@@ -44,7 +44,7 @@ jobs:
 
     - name: Generate Github token for integration-infrastructure repo
       id: github-token-infrastructure
-      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       with:
         app-id: ${{ secrets.ALMA_WF_TRIGGER_APP_ID }}
         private-key: ${{ secrets.ALMA_WF_TRIGGER_APP_PEM }}
@@ -74,7 +74,7 @@ jobs:
           workflow_timeout_seconds: 120 # Default: 300
 
     - name: Hide deprecated E2E test run info message
-      uses: int128/hide-comment-action@d87d3445b5b7c0181476117977004197b1d19ddc # v1.75.0
+      uses: int128/hide-comment-action@06152282c98d81595109f39d4d1542d0c676ffba # v1.77.0
       with:
         # This string should be kept in sync with the last words of the comment in :
         # `Send a comment to the PR informing that the E2E tests are running` step (in this workflow).
