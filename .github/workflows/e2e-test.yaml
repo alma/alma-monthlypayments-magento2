@@ -12,14 +12,14 @@ jobs:
       matrix:
         version:
         - 2.4.6
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'hotfix')
 
     steps:
 
     - name: Generate Github token for PR checks
       id: github-token-checks
-      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       continue-on-error: true
       with:
         client-id: ${{ vars.ALMA_AUTOMATIONS_CLIENT_ID }}
@@ -45,7 +45,7 @@ jobs:
 
     - name: Generate Github token for integration-infrastructure repo
       id: github-token-infrastructure
-      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       with:
         client-id: ${{ vars.ALMA_AUTOMATIONS_CROSS_REPO_CLIENT_ID }}
         private-key: ${{ secrets.ALMA_AUTOMATIONS_CROSS_REPO_PRIVATE_KEY }}
@@ -53,7 +53,7 @@ jobs:
         permission-actions: write  # trigger workflow
 
     - name: Trigger E2E tests in the integration-infrastructure repository
-      uses: codex-/return-dispatch@2e404d40b641ba1deb44be941660bb34828e4f6d # v4.0.0
+      uses: codex-/return-dispatch@85e564d60eaec3cc4aca885373d510cfe4bd5b19 # v4.0.1
       id: e2e-tests-workflow-dispatch
       with:
           token: ${{ steps.github-token-infrastructure.outputs.token }}
@@ -76,7 +76,7 @@ jobs:
           workflow_timeout_seconds: 120 # Default: 300
 
     - name: Hide deprecated E2E test run info message
-      uses: int128/hide-comment-action@95dd081d51b1cae55a0d089db892cea5835e4e15 # v1.67.0
+      uses: int128/hide-comment-action@06152282c98d81595109f39d4d1542d0c676ffba # v1.77.0
       with:
         # This string should be kept in sync with the last words of the comment in :
         # `Send a comment to the PR informing that the E2E tests are running` step (in this workflow).

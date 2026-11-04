@@ -1,5 +1,21 @@
 # Changelog
 
+## v5.9.0 - 2026-11-04
+
+### Changes
+
+- Backport to develop (#331)
+- Backport main to develop (#313)
+
+### 🚀 New Features
+
+- docs(readme): warn about unsupported PHP versions [ECOM-4798] (#329)
+- feat: remove tag of khadija on release process (#324)
+
+#### Contributors
+
+@Benjamin-Freoua-Alma, @jimmycarricart-ext-collab, @webaaz, [@github-actions[bot]](https://github.com/apps/github-actions), @claude, @gdraynz, @juliandufoulon and @remic-alma
+
 ## v5.8.4 - 2026-08-18
 
 ### Changes
