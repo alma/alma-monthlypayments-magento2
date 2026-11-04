@@ -1,6 +1,8 @@
 Alma Monthly Payments for Magento 2
 ===================================
 
+> ⚠️ **PHP 8.1 and earlier versions are no longer supported by the PHP project and are not recommended by Alma. These versions may contain unpatched security vulnerabilities.**
+
 This plugin adds a new payment method to Magento 2, which allows you to offer monthly payments to your customer using Alma.
 
 ## Description
