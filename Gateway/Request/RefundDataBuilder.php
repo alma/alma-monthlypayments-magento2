@@ -49,7 +49,7 @@ class RefundDataBuilder implements BuilderInterface
         $refundPayload['payment_id'] = $payment->getAdditionalInformation(Config::ORDER_PAYMENT_ID);
         $refundPayload['merchant_id'] = $this->config->getMerchantId($order->getStoreId());
         $refundPayload['amount'] = $buildSubject['amount'];
-        $refundPayload['total_refund'] = $order->getTotalRefunded();
+        $refundPayload['total_refund'] = $payment->getAmountRefunded();
         $refundPayload['order_total'] = $order->getGrandTotal();
         $refundPayload['store_id'] = $order->getStoreId();
         return $refundPayload;
