@@ -7,8 +7,8 @@ use Alma\MonthlyPayments\Gateway\Request\RefundDataBuilder;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Payment\Model\Info;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\OrderRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -44,9 +44,6 @@ class RefundDataBuilderTest extends TestCase
         $mockOrderId = 21;
         $mockStoreId = '2';
         $orderInterfaceMock = $this->createMock(OrderInterface::class);
-        $orderInterfaceMock->expects($this->once())
-            ->method('getTotalRefunded')
-            ->willReturn($mockTotalRefunded);
         $orderInterfaceMock->method('getStoreId')
             ->willReturn($mockStoreId);
         $orderInterfaceMock->expects($this->once())
@@ -60,11 +57,14 @@ class RefundDataBuilderTest extends TestCase
             ->method('get')
             ->with($mockOrderId)
             ->willReturn($orderInterfaceMock);
-        $infoPaymentMock = $this->createMock(Info::class);
+        $infoPaymentMock = $this->createMock(Payment::class);
         $infoPaymentMock->expects($this->once())
             ->method('getAdditionalInformation')
             ->with(Config::ORDER_PAYMENT_ID)
             ->willReturn($mockPaymentId);
+        $infoPaymentMock->expects($this->once())
+            ->method('getAmountRefunded')
+            ->willReturn($mockTotalRefunded);
         $paymentDataObject = $this->createMock(PaymentDataObject::class);
         $paymentDataObject->expects($this->once())
             ->method('getPayment')
@@ -89,6 +89,49 @@ class RefundDataBuilderTest extends TestCase
             'store_id' => $mockStoreId
         ];
         $this->assertEquals($resultMock, $refundDataBuilder->build($buildSubjectMock));
+    }
+
+    public function testPartialRefundIsNotCountedTwiceWhenOrderAlreadyIncludesIt(): void
+    {
+        $payload = $this->buildRefundPayload('250.0000', '125.0000', null, '125.00');
+
+        $this->assertNull($payload['total_refund']);
+        $this->assertEquals(125, $payload['total_refund'] + $payload['amount']);
+        $this->assertNotEquals($payload['order_total'], $payload['total_refund'] + $payload['amount']);
+    }
+
+    public function testLastPartialRefundAddsUpToOrderTotal(): void
+    {
+        $payload = $this->buildRefundPayload('250.0000', '250.0000', '125.0000', '125.00');
+
+        $this->assertEquals(125, $payload['total_refund']);
+        $this->assertEquals($payload['order_total'], $payload['total_refund'] + $payload['amount']);
+    }
+
+    private function buildRefundPayload(
+        string $grandTotal,
+        string $orderTotalRefunded,
+        ?string $paymentAmountRefunded,
+        string $amount
+    ): array {
+        $orderMock = $this->createStub(OrderInterface::class);
+        $orderMock->method('getGrandTotal')->willReturn($grandTotal);
+        $orderMock->method('getTotalRefunded')->willReturn($orderTotalRefunded);
+        $orderMock->method('getStoreId')->willReturn('1');
+        $orderAdapter = $this->createStub(OrderAdapterInterface::class);
+        $orderAdapter->method('getId')->willReturn(42);
+        $this->orderRepository->method('get')->with(42)->willReturn($orderMock);
+        $paymentMock = $this->createStub(Payment::class);
+        $paymentMock->method('getAdditionalInformation')->willReturn('payment_id');
+        $paymentMock->method('getAmountRefunded')->willReturn($paymentAmountRefunded);
+        $paymentDataObject = $this->createStub(PaymentDataObject::class);
+        $paymentDataObject->method('getPayment')->willReturn($paymentMock);
+        $paymentDataObject->method('getOrder')->willReturn($orderAdapter);
+
+        return $this->createNewRefundDataBuilder()->build([
+            'payment' => $paymentDataObject,
+            'amount' => $amount
+        ]);
     }
 
     private function createNewRefundDataBuilder(): RefundDataBuilder
