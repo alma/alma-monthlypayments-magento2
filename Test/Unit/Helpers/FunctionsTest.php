@@ -3,6 +3,7 @@
 namespace Alma\MonthlyPayments\Test\Unit\Helpers;
 
 use Alma\MonthlyPayments\Helpers\Functions;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
@@ -11,12 +12,13 @@ class FunctionsTest extends TestCase
     /**
      * @dataProvider priceDataProvider
      */
+    #[DataProvider('priceDataProvider')]
     public function testConvertPriceToCent($price, $result): void
     {
         $this->assertEquals($result, Functions::priceToCents($price));
     }
 
-    public function priceDataProvider(): array
+    public static function priceDataProvider(): array
     {
         return [
             'Test with int Price' => [

@@ -10,6 +10,7 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RefundHandlerTest extends TestCase
@@ -30,11 +31,11 @@ class RefundHandlerTest extends TestCase
     /**
      * @dataProvider refundDataProvider
      */
+    #[DataProvider('refundDataProvider')]
     public function testTransactionIsSetWithLastRefundParams($provider): void
     {
         $paymentMock = $this->createMock(Payment::class);
-        $paymentMock->expects($this->any())
-            ->method('formatPrice')
+        $paymentMock->method('formatPrice')
             ->willReturnOnConsecutiveCalls(...$provider['formatPriceReturn']);
         $paymentMock->expects($this->once())
             ->method('setTransactionId')
@@ -62,14 +63,14 @@ class RefundHandlerTest extends TestCase
         $refundHandler->handle($handlingSubjectMock, $responseMock);
     }
 
-    public function refundDataProvider(): array
+    public static function refundDataProvider(): array
     {
         return [
             'Test not full refund' => [
                 [
                     'isFullRefund' => false,
                     'customerFee' => 0,
-                    'refunds' => $this->getAlmaRefunds(),
+                    'refunds' => self::getAlmaRefunds(),
                     'formatPriceReturn' => ['€22', '€48', '€48'],
                     'lastRefundId' => 'refund_3333333333',
                     'lastRefundData' => [
@@ -82,7 +83,7 @@ class RefundHandlerTest extends TestCase
                 [
                     'isFullRefund' => true,
                     'customerFee' => 1600,
-                    'refunds' => $this->getAlmaRefunds(),
+                    'refunds' => self::getAlmaRefunds(),
                     'formatPriceReturn' => ['€22', '€48', '€48', '€16', '€48'],
                     'lastRefundId' => 'refund_3333333333',
                     'lastRefundData' => [
@@ -96,7 +97,7 @@ class RefundHandlerTest extends TestCase
         ];
     }
 
-    private function getAlmaRefunds(): array
+    private static function getAlmaRefunds(): array
     {
         return [
             new Refund(['id' => 'refund_1111111111', 'created' => self::FIXED_TIMESTAMP, 'amount' => '2200']),

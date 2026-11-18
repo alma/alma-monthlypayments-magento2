@@ -19,6 +19,7 @@ use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class OrderHelperTest extends TestCase
@@ -137,6 +138,7 @@ class OrderHelperTest extends TestCase
      *
      * @return void
      */
+    #[DataProvider('cartPayloadDataProvider')]
     public function testBuild(array $dataProducts, array $dataItems, $expectedPayload): void
     {
         $products = [];
@@ -175,7 +177,7 @@ class OrderHelperTest extends TestCase
         );
     }
 
-    public function cartPayloadDataProvider(): array
+    public static function cartPayloadDataProvider(): array
     {
         $simple1 = [
             '1',
@@ -187,7 +189,7 @@ class OrderHelperTest extends TestCase
             0,
             2.10
         ];
-        $formattedSimple1 = $this->formattedItemFactory(
+        $formattedSimple1 = self::formattedItemFactory(
             'base-01',
             'Simple product 1',
             '',
@@ -207,7 +209,7 @@ class OrderHelperTest extends TestCase
             0,
             1.10
         ];
-        $formattedSimple2 = $this->formattedItemFactory(
+        $formattedSimple2 = self::formattedItemFactory(
             'base-02',
             'Simple product 2',
             '',
@@ -217,7 +219,7 @@ class OrderHelperTest extends TestCase
             false,
             true
         );
-        $formattedSimple2WithoutImage = $this->formattedItemFactory(
+        $formattedSimple2WithoutImage = self::formattedItemFactory(
             'base-02',
             'Simple product 2',
             '',
@@ -239,7 +241,7 @@ class OrderHelperTest extends TestCase
             0,
             1.10,
         ];
-        $formattedSimpleWithoutCategory = $this->formattedItemFactory(
+        $formattedSimpleWithoutCategory = self::formattedItemFactory(
             'base-02',
             'Simple product 2',
             '',
@@ -260,7 +262,7 @@ class OrderHelperTest extends TestCase
             1,
             1.10
         ];
-        $formattedVirtualProduct1 = $this->formattedItemFactory(
+        $formattedVirtualProduct1 = self::formattedItemFactory(
             'base-02',
             'virtual product 4',
             '',
@@ -280,7 +282,7 @@ class OrderHelperTest extends TestCase
             0,
             0
         ];
-        $formattedSimpleWithoutTax = $this->formattedItemFactory(
+        $formattedSimpleWithoutTax = self::formattedItemFactory(
             'base-01',
             'Simple product 5',
             '',
@@ -314,7 +316,7 @@ class OrderHelperTest extends TestCase
             false,
             ['simple_name' => 'Configurable product 1 - with variation']
         ];
-        $formattedConfigurableProduct = $this->formattedItemFactory(
+        $formattedConfigurableProduct = self::formattedItemFactory(
             'config-01',
             'Configurable product 1',
             'Configurable product 1 - with variation',
@@ -326,55 +328,55 @@ class OrderHelperTest extends TestCase
         );
         return [
             '1 simple product' => [
-                'products' => [['1', 'Simple product 1', ['3', '4']]],
-                'items' => [$simple1],
-                'expected_payload' => [
+                'dataProducts' => [['1', 'Simple product 1', ['3', '4']]],
+                'dataItems' => [$simple1],
+                'expectedPayload' => [
                     $formattedSimple1
                 ]
             ],
             '2 simple products with 1 without image' => [
-                'products' => [['1', 'Simple product 1', ['3', '4']], ['2', 'Simple product 2', ['3', '4'], null]],
-                'items' => [$simple1, $simple2],
-                'expected_payload' => [
+                'dataProducts' => [['1', 'Simple product 1', ['3', '4']], ['2', 'Simple product 2', ['3', '4'], null]],
+                'dataItems' => [$simple1, $simple2],
+                'expectedPayload' => [
                     $formattedSimple1, $formattedSimple2WithoutImage
                 ]
             ],
             '1 simple product without category' => [
-                'products' => [['3', 'Simple product 3', []]],
-                'items' => [$simpleWithoutCategory],
-                'expected_payload' => [
+                'dataProducts' => [['3', 'Simple product 3', []]],
+                'dataItems' => [$simpleWithoutCategory],
+                'expectedPayload' => [
                     $formattedSimpleWithoutCategory
                 ]
             ],
             '1 virtual product' => [
-                'products' => [['4', 'virtual product 4', ['3', '4']]],
-                'items' => [$virtualProduct1],
-                'expected_payload' => [
+                'dataProducts' => [['4', 'virtual product 4', ['3', '4']]],
+                'dataItems' => [$virtualProduct1],
+                'expectedPayload' => [
                     $formattedVirtualProduct1
                 ]
             ],
             '1 simple without tax' => [
-                'products' => [['5', 'Simple product 5', ['3', '4']]],
-                'items' => [$simpleWithoutTax],
-                'expected_payload' => [
+                'dataProducts' => [['5', 'Simple product 5', ['3', '4']]],
+                'dataItems' => [$simpleWithoutTax],
+                'expectedPayload' => [
                     $formattedSimpleWithoutTax
                 ]
             ],
             '1 configurable product with dummy item' => [
-                'products' => [['7', 'Configurable product 1', ['3', '4']], ['6', 'Configurable dummy product 1', ['3', '4']]],
-                'items' => [$configurableProduct, $dummyConfigurableProduct],
-                'expected_payload' => [
+                'dataProducts' => [['7', 'Configurable product 1', ['3', '4']], ['6', 'Configurable dummy product 1', ['3', '4']]],
+                'dataItems' => [$configurableProduct, $dummyConfigurableProduct],
+                'expectedPayload' => [
                     $formattedConfigurableProduct
                 ]
             ],
             '1 configurable product with dummy item and 1 simple' => [
-                'products' => [['7', 'Configurable product 1', ['3', '4']], ['6', 'Configurable dummy product 1', ['3', '4']], ['1', 'Simple product 1', ['3', '4']]],
-                'items' => [
+                'dataProducts' => [['7', 'Configurable product 1', ['3', '4']], ['6', 'Configurable dummy product 1', ['3', '4']], ['1', 'Simple product 1', ['3', '4']]],
+                'dataItems' => [
                     $configurableProduct,
                     $dummyConfigurableProduct,
                     $simple1
                 ],
-                'expected_payload' => [
+                'expectedPayload' => [
                     $formattedConfigurableProduct,
                     $formattedSimple1
                 ]
@@ -425,7 +427,7 @@ class OrderHelperTest extends TestCase
         return $product;
     }
 
-    private function formattedItemFactory(
+    private static function formattedItemFactory(
         string $sku,
         string $name,
         string $variantName,

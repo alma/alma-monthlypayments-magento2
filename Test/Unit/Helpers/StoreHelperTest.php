@@ -12,6 +12,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\StoreResolver;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class StoreHelperTest extends TestCase
@@ -53,6 +54,7 @@ class StoreHelperTest extends TestCase
      *
      * @return void
      */
+    #[DataProvider('dataProviderForTestStoreIdAndScope')]
     public function testStoreId($data): void
     {
         $this->state->method('getAreaCode')->willReturn($data['area']);
@@ -70,6 +72,7 @@ class StoreHelperTest extends TestCase
      *
      * @return void
      */
+    #[DataProvider('dataProviderForTestStoreIdAndScope')]
     public function testScope($data): void
     {
         $this->state->method('getAreaCode')->willReturn($data['area']);
@@ -77,7 +80,7 @@ class StoreHelperTest extends TestCase
         $this->assertEquals($data['expectedScope'], $this->createNewStoreHelper()->getScope());
     }
 
-    public function dataProviderForTestStoreIdAndScope(): array
+    public static function dataProviderForTestStoreIdAndScope(): array
     {
         return [
             'In Front in default view' => [

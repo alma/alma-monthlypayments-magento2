@@ -7,7 +7,6 @@ use Alma\MonthlyPayments\Helpers\ApiConfigHelper;
 use Alma\MonthlyPayments\Helpers\Availability;
 use Alma\MonthlyPayments\Helpers\ConfigHelper;
 use Alma\MonthlyPayments\Helpers\Logger;
-use Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\APIKeyValue;
 use Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\LiveAPIKeyValue;
 use Alma\MonthlyPayments\Model\Adminhtml\Config\ApiKey\TestAPIKeyValue;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -16,7 +15,6 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Message\Manager as MessageManager;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class ApiKeyValueTest extends TestCase
@@ -60,27 +58,27 @@ class ApiKeyValueTest extends TestCase
     {
         $this->mockGetMerchant();
         $apiKeyObject = $this->createPartialMockApiKeyObject();
-        $apiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $apiKeyObject->expects('getValue')->andReturn('test_key_1234567890');
+        $apiKeyObject->method('hasDataChanges')->willReturn(false);
+        $apiKeyObject->method('getValue')->willReturn('test_key_1234567890');
+        $apiKeyObject->expects($this->once())->method('disallowDataSave');
         $this->assertNull($apiKeyObject->beforeSave());
-        $apiKeyObject->shouldHaveReceived('disallowDataSave')->once();
     }
 
     public function testGetApiTestModeForStars(): void
     {
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
-        $ApiKeyObject->expects('getApiKeyType')->andReturn('test');
+        $ApiKeyObject->method('hasDataChanges')->willReturn(false);
+        $ApiKeyObject->method('getValue')->willReturn(self::SECRET_VALUE);
+        $ApiKeyObject->method('getApiKeyType')->willReturn('test');
         $this->apiConfigHelper->expects($this->once())->method('getTestKey');
         $this->assertNull($ApiKeyObject->beforeSave());
     }
     public function testGetApiLiveModeForStars(): void
     {
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
-        $ApiKeyObject->expects('getApiKeyType')->andReturn('live');
+        $ApiKeyObject->method('hasDataChanges')->willReturn(false);
+        $ApiKeyObject->method('getValue')->willReturn(self::SECRET_VALUE);
+        $ApiKeyObject->method('getApiKeyType')->willReturn('live');
         $this->apiConfigHelper->expects($this->once())->method('getLiveKey');
         $this->assertNull($ApiKeyObject->beforeSave());
     }
@@ -89,14 +87,14 @@ class ApiKeyValueTest extends TestCase
         $this->mockGetMerchant();
 
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(false);
-        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
+        $ApiKeyObject->method('hasDataChanges')->willReturn(false);
+        $ApiKeyObject->method('getValue')->willReturn(self::SECRET_VALUE);
 
         $this->configHelper->expects($this->once())
             ->method('saveMerchantId');
 
+        $ApiKeyObject->expects($this->once())->method('disallowDataSave');
         $this->assertNull($ApiKeyObject->beforeSave());
-        $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
 
     }
 
@@ -106,33 +104,27 @@ class ApiKeyValueTest extends TestCase
         $this->mockGetMerchant();
 
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(true);
-        $ApiKeyObject->expects('getValue')->andReturn(self::SECRET_VALUE);
+        $ApiKeyObject->method('hasDataChanges')->willReturn(true);
+        $ApiKeyObject->method('getValue')->willReturn(self::SECRET_VALUE);
+        $ApiKeyObject->expects($this->once())->method('disallowDataSave');
+        $ApiKeyObject->expects($this->never())->method('saveAndEncryptValue');
         $this->assertNull($ApiKeyObject->beforeSave());
-        $ApiKeyObject->shouldHaveReceived('disallowDataSave')->once();
-        $ApiKeyObject->shouldNotHaveReceived('saveAndEncryptValue');
 
     }
 
     public function testEmptyValueSave(): void
     {
         $this->mockGetMerchant();
-        $this->configHelper->expects($this->exactly(1))->method('deleteConfig')->withConsecutive(
-            [
-                'live_merchant_id',
-                0,
-                1
-            ]
-        );
+        $this->configHelper->expects($this->exactly(1))->method('deleteConfig')->with('live_merchant_id', 0, 1);
         $ApiKeyObject = $this->createPartialMockApiKeyObject();
-        $ApiKeyObject->expects('hasDataChanges')->andReturn(true);
-        $ApiKeyObject->expects('getValue')->andReturn('');
-        $ApiKeyObject->expects('getScope')->andReturn(0);
-        $ApiKeyObject->expects('getScopeId')->andReturn(1);
-        $ApiKeyObject->expects('getMerchantIdPath')->andReturn('live_merchant_id');
+        $ApiKeyObject->method('hasDataChanges')->willReturn(true);
+        $ApiKeyObject->method('getValue')->willReturn('');
+        $ApiKeyObject->method('getScope')->willReturn(0);
+        $ApiKeyObject->method('getScopeId')->willReturn(1);
+        $ApiKeyObject->method('getMerchantIdPath')->willReturn('live_merchant_id');
+        $ApiKeyObject->expects($this->never())->method('disallowDataSave');
+        $ApiKeyObject->expects($this->once())->method('saveAndEncryptValue');
         $this->assertNull($ApiKeyObject->beforeSave());
-        $ApiKeyObject->shouldNotHaveReceived('disallowDataSave');
-        $ApiKeyObject->shouldHaveReceived('saveAndEncryptValue')->once();
     }
 
 
@@ -148,7 +140,13 @@ class ApiKeyValueTest extends TestCase
 
     private function createPartialMockApiKeyObject()
     {
-        return Mockery::mock(APIKeyValue::class, $this->getConstructorDependency())->makePartial()->shouldAllowMockingProtectedMethods();
+        return $this->getMockBuilder(APIKeyValueData::class)
+            ->setConstructorArgs($this->getConstructorDependency())
+            ->onlyMethods([
+                'hasDataChanges', 'getValue', 'getApiKeyType', 'getScope', 'getScopeId',
+                'getMerchantIdPath', 'disallowDataSave', 'saveAndEncryptValue'
+            ])
+            ->getMock();
     }
 
     /**

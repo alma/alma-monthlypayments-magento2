@@ -14,6 +14,7 @@ use Magento\Payment\Api\PaymentMethodListInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CmsFeaturesDataHelperTest extends TestCase
@@ -108,6 +109,7 @@ class CmsFeaturesDataHelperTest extends TestCase
     /**
      * @dataProvider paymentMethodListDataProvider
      */
+    #[DataProvider('paymentMethodListDataProvider')]
     public function testPaymentMethodListWithDefinedPositions($result, $valueMap): void
     {
         $this->paymentPlansConfigInterface->method('toJson')->willReturn('[]');
@@ -170,12 +172,12 @@ class CmsFeaturesDataHelperTest extends TestCase
 
     }
 
-    private function paymentMethodListDataProvider()
+    public static function paymentMethodListDataProvider()
     {
         return [
             "With defined Positions" => [
                 'result' => [['name' => 'checkmo', 'position' => 1], ['name' => 'paypal', 'position' => 2], ['name' => 'alma', 'position' => 3], ['name' => 'free', 'position' => 4]],
-                'SortOrder' => [
+                'valueMap' => [
                     ['payment/free/sort_order', ScopeInterface::SCOPE_STORE, 1, 2],
                     ['payment/checkmo/sort_order', ScopeInterface::SCOPE_STORE, 1, 0],
                     ['payment/paypal/sort_order', ScopeInterface::SCOPE_STORE, 1, 0],
@@ -184,7 +186,7 @@ class CmsFeaturesDataHelperTest extends TestCase
             ],
             "Without defined Positions" => [
                 'result' => [['name' => 'alma', 'position' => 1], ['name' => 'checkmo', 'position' => 2], ['name' => 'free', 'position' => 3], ['name' => 'paypal', 'position' => 4]],
-                'SortOrder' => [
+                'valueMap' => [
                     ['payment/free/sort_order', ScopeInterface::SCOPE_STORE, 1, 0],
                     ['payment/checkmo/sort_order', ScopeInterface::SCOPE_STORE, 1, 0],
                     ['payment/paypal/sort_order', ScopeInterface::SCOPE_STORE, 1, 0],

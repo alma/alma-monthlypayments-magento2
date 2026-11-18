@@ -41,10 +41,9 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
         Context            $context,
         array              $data = []
     ) {
-        $this->setTemplate('system/config/form/field/array.phtml');
         parent::__construct(
             $context,
-            $data
+            array_replace(['template' => 'system/config/form/field/array.phtml'], $data)
         );
         $this->paymentPlansHelper = $paymentPlansHelper;
     }
@@ -165,11 +164,7 @@ class FeePlansConfigFrontModel extends AbstractFieldArray
     protected function _getElementHtml(AbstractElement $element)
     {
         $element->setComment($this->getHtmlComment($element->getValue()));
-        $this->setElement($element);
-        $html = $this->_toHtml();
-        $this->_arrayRowsCache = null;
-        // doh, the object is used as singleton!
-        return $html;
+        return parent::_getElementHtml($element);
     }
 
     /**

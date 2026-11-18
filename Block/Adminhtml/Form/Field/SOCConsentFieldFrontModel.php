@@ -75,9 +75,10 @@ class SOCConsentFieldFrontModel extends Field
             '',
             ['data'=>[
                 'link' => false,
-                'position' => self::POSITION
+                'position' => self::POSITION,
+                'template' => 'Alma_MonthlyPayments::system/soc-legal.phtml'
             ]]
-        )->setTemplate("Alma_MonthlyPayments::system/soc-legal.phtml");
+        );
         $element->setComment($blockOption->toHtml());
         return $element->getElementHtml();
     }

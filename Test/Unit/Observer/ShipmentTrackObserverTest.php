@@ -22,6 +22,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order\Shipment\Track;
 use Magento\Sales\Model\OrderRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentTrackObserverTest extends TestCase
@@ -103,9 +104,12 @@ class ShipmentTrackObserverTest extends TestCase
     /**
      * @dataProvider  getOrderExceptionDataManager
      */
+    #[DataProvider('getOrderExceptionDataManager')]
     public function testGetOrderThrowExceptionCallLogError($exception): void
     {
         $this->orderRepository->method('get')->willThrowException($exception);
+        $this->logger->expects($this->once())->method('info');
+        $this->almaClient->expects($this->never())->method('getDefaultClient');
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
 
     }
@@ -117,6 +121,8 @@ class ShipmentTrackObserverTest extends TestCase
 
         $this->givenOrderRepositoryReturnTheOrder();
 
+        $this->logger->expects($this->once())->method('info');
+        $this->almaClient->expects($this->never())->method('getDefaultClient');
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
 
     }
@@ -128,6 +134,8 @@ class ShipmentTrackObserverTest extends TestCase
         $this->givenAnOrderWithPayment();
         $this->givenOrderRepositoryReturnTheOrder();
 
+        $this->logger->expects($this->once())->method('info');
+        $this->almaClient->expects($this->never())->method('getDefaultClient');
         $this->whenTrackObserverIsExecutedThenReturnWithoutErrors();
 
     }
@@ -384,7 +392,7 @@ class ShipmentTrackObserverTest extends TestCase
     /**
      * @return array[]
      */
-    protected function getOrderExceptionDataManager(): array
+    public static function getOrderExceptionDataManager(): array
     {
         return [
             'NoSuchEntityException' => [

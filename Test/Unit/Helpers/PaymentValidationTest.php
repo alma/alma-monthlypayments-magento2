@@ -21,7 +21,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment as OrderPayment;
 use Magento\Sales\Model\Order\Payment\Processor;
 use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
-use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class PaymentValidationTest extends TestCase
@@ -72,7 +72,7 @@ class PaymentValidationTest extends TestCase
         $this->almaClient = $this->createMock(AlmaClient::class);
         $this->paymentProcessor = $this->createMock(Processor::class);
         $this->quoteRepository = $this->createMock(QuoteRepository::class);
-        $this->builderInterface = Mockery::mock(BuilderInterface::class);
+        $this->builderInterface = $this->createMock(BuilderInterface::class);
         $this->orderHelper = $this->createMock(OrderHelper::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
     }
@@ -80,6 +80,7 @@ class PaymentValidationTest extends TestCase
     /**
      * @dataProvider paymentDataProvider
      */
+    #[DataProvider('paymentDataProvider')]
     public function testCreateTransaction($data, $result): void
     {
         $paymentValidation = $this->createNewPaymentValidation();
@@ -117,31 +118,24 @@ class PaymentValidationTest extends TestCase
         $orderMock = $this->createMock(Order::class);
         $almaPaymentMock = $this->createMock(Payment::class);
 
-        $this->builderInterface->shouldReceive('setPayment')
-            ->once()
-            ->andReturnSelf();
-        $this->builderInterface->shouldReceive('setOrder')
-            ->once()
-            ->andReturnSelf();
-        $this->builderInterface->shouldReceive('setTransactionId')
-            ->once()
-            ->andReturnSelf();
-        $this->builderInterface->shouldReceive('setAdditionalInformation')
-            ->once()
-            ->andReturnSelf();
-        $this->builderInterface->shouldReceive('setFailSafe')
-            ->once()
+        $this->builderInterface->expects($this->once())->method('setPayment')
+            ->willReturnSelf();
+        $this->builderInterface->expects($this->once())->method('setOrder')
+            ->willReturnSelf();
+        $this->builderInterface->expects($this->once())->method('setTransactionId')
+            ->willReturnSelf();
+        $this->builderInterface->expects($this->once())->method('setAdditionalInformation')
+            ->willReturnSelf();
+        $this->builderInterface->expects($this->once())->method('setFailSafe')
             ->with(true)
-            ->andReturnSelf();
-        $this->builderInterface->shouldReceive('build')
-            ->once()
+            ->willReturnSelf();
+        $this->builderInterface->expects($this->once())->method('build')
             ->with(TransactionInterface::TYPE_PAYMENT)
-            ->andReturn($this->createMock(TransactionInterface::class));
+            ->willReturn($this->createMock(TransactionInterface::class));
         $paymentValidation = $this->getPaymentValidationMockPartial();
-        $paymentValidation->shouldReceive('createPaymentData')->once();
-        $paymentValidation->shouldReceive('addTransactionComment')
-            ->once()
-            ->andReturn($paymentMock);
+        $paymentValidation->expects($this->once())->method('createPaymentData')->willReturn([]);
+        $paymentValidation->expects($this->once())->method('addTransactionComment')
+            ->willReturn($paymentMock);
         $paymentValidation->addTransactionToPayment($paymentMock, $orderMock, $almaPaymentMock);
     }
 
@@ -182,10 +176,9 @@ class PaymentValidationTest extends TestCase
             ->with($orderId);
 
         $paymentValidation = $this->getPaymentValidationMockPartial();
-        $paymentValidation->shouldReceive('addCommentToOrder')
-            ->once()
+        $paymentValidation->expects($this->once())->method('addCommentToOrder')
             ->with($orderMock, 'internal error render', Order::STATUS_FRAUD)
-            ->andReturn($orderMock);
+            ->willReturn($orderMock);
 
         $phraseMock = $this->createMock(Phrase::class);
         $phraseMock->expects($this->exactly(2))
@@ -199,9 +192,9 @@ class PaymentValidationTest extends TestCase
      */
     public function testGetPaymentReturnPayment(): void
     {
-        $paymentMock = Mockery::mock(OrderPaymentInterface::class);
-        $orderMock = Mockery::mock(Order::class);
-        $orderMock->shouldReceive('getPayment')->andReturn($paymentMock);
+        $paymentMock = $this->createMock(OrderPaymentInterface::class);
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getPayment')->willReturn($paymentMock);
         $paymentValidationMock = $this->getPaymentValidationMockPartial();
         $this->assertEquals($paymentMock, $paymentValidationMock->getPayment($orderMock));
     }
@@ -211,11 +204,11 @@ class PaymentValidationTest extends TestCase
      */
     public function testGetPaymentThrowAlmaPaymentValidationException(): void
     {
-        $orderMock = Mockery::mock(Order::class);
-        $orderMock->shouldReceive('getPayment')->andReturn(null);
-        $orderMock->shouldReceive('getIncrementId')->andReturn('0000001');
+        $orderMock = $this->createMock(Order::class);
+        $orderMock->method('getPayment')->willReturn(null);
+        $orderMock->method('getIncrementId')->willReturn('0000001');
         $paymentValidationMock = $this->getPaymentValidationMockPartial();
-        $orderMock->shouldReceive('addCommentToStatusHistory');
+        $paymentValidationMock->method('addCommentToOrder')->willReturn($orderMock);
         $this->expectException(AlmaPaymentValidationException::class);
         $paymentValidationMock->getPayment($orderMock);
     }
@@ -281,12 +274,11 @@ class PaymentValidationTest extends TestCase
             $this->paymentProcessor,
             $this->quoteRepository,
             $this->builderInterface,
-            $this->orderHelper,
-            $this->configHelper
+            $this->orderHelper
         ];
     }
 
-    public function paymentDataProvider(): array
+    public static function paymentDataProvider(): array
     {
         return [
             'Check with deferred Trigger True' => [
@@ -327,10 +319,13 @@ class PaymentValidationTest extends TestCase
     }
 
     /**
-     * @return Mockery\Mock | PaymentValidation
+     * @return PaymentValidation|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getPaymentValidationMockPartial()
     {
-        return Mockery::mock(PaymentValidation::class, $this->getConstructorDependency())->makePartial()->shouldAllowMockingProtectedMethods();
+        return $this->getMockBuilder(PaymentValidation::class)
+            ->setConstructorArgs($this->getConstructorDependency())
+            ->onlyMethods(['createPaymentData', 'addTransactionComment', 'addCommentToOrder'])
+            ->getMock();
     }
 }

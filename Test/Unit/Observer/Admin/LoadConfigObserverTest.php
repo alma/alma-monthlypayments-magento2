@@ -6,8 +6,6 @@ use Alma\MonthlyPayments\Helpers\CollectCmsConfigHelper;
 use Alma\MonthlyPayments\Helpers\PaymentPlansHelper;
 use Alma\MonthlyPayments\Observer\Admin\LoadConfigObserver;
 use Magento\Backend\Model\UrlInterface;
-use Magento\Framework\App\ActionInterface;
-use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use PHPUnit\Framework\TestCase;
 
@@ -27,17 +25,7 @@ class LoadConfigObserverTest extends TestCase
     {
         $this->urlInterface = $this->createMock(UrlInterface::class);
         $this->paymentPlansHelper = $this->createMock(PaymentPlansHelper::class);
-        $eventMock = $this->getMockBuilder(Event::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getControllerAction'])
-            ->getMock();
-        $actionInterface = $this->getMockBuilder(ActionInterface::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['execute', 'getResponse'])
-            ->getMock();
-        $eventMock->method('getControllerAction')->willReturn($actionInterface);
         $this->observer = $this->createMock(Observer::class);
-        $this->observer->method('getEvent')->willReturn($eventMock);
         $this->collectCmsConfigHelper = $this->createMock(CollectCmsConfigHelper::class);
 
     }

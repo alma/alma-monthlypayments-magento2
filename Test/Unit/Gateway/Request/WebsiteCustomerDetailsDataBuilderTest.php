@@ -9,6 +9,7 @@ use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObject;
 use Magento\Reports\Model\ResourceModel\Customer\Orders\Collection;
 use Magento\Sales\Model\Order;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class WebsiteCustomerDetailsDataBuilderTest extends TestCase
@@ -55,14 +56,17 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
     /**
      * @dataProvider payloadDataProvider
      * @param array $customer
-     * @param Collection $orderCollection
+     * @param array $orderCollection
      * @param array $previousOrders
      * @param bool $isGuest
      * @return void
      */
-    public function testWebsiteCustomerDetailsPayload(array $customer, Collection $orderCollection, array $previousOrders, bool $isGuest):void
+    #[DataProvider('payloadDataProvider')]
+    public function testWebsiteCustomerDetailsPayload(array $customer, array $orderCollection, array $previousOrders, bool $isGuest):void
     {
-        //mock orders
+        $orderCollection = $this->mockOrderCollectionFactory(array_map(function ($amount) {
+            return $this->mockOrderFactory($amount);
+        }, $orderCollection));
         $this->orderHelper->method('getValidOrderCollectionByCustomerId')->willReturn($orderCollection);
         $paymentDataBuilder = $this->createWebsiteCustomerDetailsDataBuilderTest()
             ->build($this->mockBuildSubject($customer));
@@ -101,14 +105,14 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
         return ['payment' => $paymentDataObjectMock];
     }
 
-    public function payloadDataProvider():array
+    public static function payloadDataProvider():array
     {
         return [
             'Previous order must be an empty array for guest' => [
                 'customer' => [
                     'id' => null
                 ],
-                'orderCollection' => $this->mockOrderCollectionFactory(),
+                'orderCollection' => [],
                 'previousOrders' => [],
                 'isGuest' => true
             ],
@@ -116,7 +120,7 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
                 'customer' => [
                     'id' => 1
                 ],
-                'orderCollection' => $this->mockOrderCollectionFactory(),
+                'orderCollection' => [],
                 'previousOrders' => [],
                 'isGuest' => false
             ],
@@ -124,12 +128,7 @@ class WebsiteCustomerDetailsDataBuilderTest extends TestCase
                 'customer' => [
                     'id' => 1
                 ],
-                'orderCollection' => $this->mockOrderCollectionFactory(
-                    [
-                        $this->mockOrderFactory(123),
-                        $this->mockOrderFactory(223)
-                    ]
-                ),
+                'orderCollection' => [123, 223],
                 'previousOrders' => [
                     [
                         "purchase_amount"=> 12300,

@@ -5,6 +5,7 @@ namespace Alma\MonthlyPayments\Test\Unit\Helpers\ShareOfCheckout;
 use Alma\MonthlyPayments\Helpers\ShareOfCheckout\DateHelper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DateHelperTest extends TestCase
@@ -31,7 +32,7 @@ class DateHelperTest extends TestCase
     {
         $this->assertInstanceOf(AbstractHelper::class, $this->dateHelper);
     }
-    public function getDataIntervalProvider(): array
+    public static function getDataIntervalProvider(): array
     {
         $now = time();
         return [
@@ -62,7 +63,7 @@ class DateHelperTest extends TestCase
         ];
     }
 
-    public function getErrorsDataIntervalProvider(): array
+    public static function getErrorsDataIntervalProvider(): array
     {
         return [
             'No return with empty activation date' => [
@@ -81,6 +82,7 @@ class DateHelperTest extends TestCase
     /**
      * @dataProvider getDataIntervalProvider
      */
+    #[DataProvider('getDataIntervalProvider')]
     public function testGetDateInterval($activationDate, $from, $to, $expected): void
     {
         $this->assertEquals($expected, $this->dateHelper->getDatesInInterval($activationDate, $from, $to));
@@ -88,6 +90,7 @@ class DateHelperTest extends TestCase
     /**
      * @dataProvider getErrorsDataIntervalProvider
      */
+    #[DataProvider('getErrorsDataIntervalProvider')]
     public function testGetDateIntervalErrors($activationDate, $from, $to): void
     {
         $this->assertEquals([], $this->dateHelper->getDatesInInterval($activationDate, $from, $to));

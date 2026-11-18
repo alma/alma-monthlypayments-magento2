@@ -15,6 +15,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Phrase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ProductHelperTest extends TestCase
@@ -85,6 +86,7 @@ class ProductHelperTest extends TestCase
     /**
      * @dataProvider errorDataProvider
      */
+    #[DataProvider('errorDataProvider')]
     public function testDisableProductCallSetStatusAndThrowExceptionForSave($exceptionClass): void
     {
         $product = $this->createMock(Product::class);
@@ -107,6 +109,7 @@ class ProductHelperTest extends TestCase
     /**
      * @dataProvider errorDataProvider
      */
+    #[DataProvider('errorDataProvider')]
     public function testEnableProductCallSetStatusAndThrowExceptionForSave($exceptionClass): void
     {
         $product = $this->createMock(Product::class);
@@ -119,7 +122,7 @@ class ProductHelperTest extends TestCase
         $this->createProductHelper()->enableProduct($product);
     }
 
-    private function errorDataProvider(): array
+    public static function errorDataProvider(): array
     {
         return [
             'Could not save Exception' => [new CouldNotSaveException(new Phrase('Error could not save'))],

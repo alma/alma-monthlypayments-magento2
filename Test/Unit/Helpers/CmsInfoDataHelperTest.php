@@ -8,7 +8,6 @@ use Magento\Framework\App\ProductMetadata;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Theme\Model\ResourceModel\Theme\Collection;
 use Magento\Theme\Model\ResourceModel\Theme\CollectionFactory;
-use Magento\Theme\Model\Theme;
 use PHPUnit\Framework\TestCase;
 
 class CmsInfoDataHelperTest extends TestCase
@@ -24,28 +23,8 @@ class CmsInfoDataHelperTest extends TestCase
         $this->moduleList = $this->createMock(ModuleListInterface::class);
         $this->moduleList->method('getOne')->willReturn(['setup_version' => '1.0.0']);
         $this->themeCollectionFactory = $this->createMock(CollectionFactory::class);
-        $parentTheme = $this->getMockBuilder(Theme::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'getVersion',
-                'getThemeTitle',
-            ])
-            ->getMock();
-        $childTheme = $this->getMockBuilder(Theme::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'getParentId',
-                'getVersion',
-                'getThemeTitle',
-            ])
-            ->getMock();
-
-        $parentTheme->method('getThemeTitle')->willReturn('Parent Theme');
-        $parentTheme->method('getVersion')->willReturn('1.0.0');
-
-        $childTheme->method('getParentId')->willReturn(1);
-        $childTheme->method('getThemeTitle')->willReturn('Child Theme');
-        $childTheme->method('getVersion')->willReturn('2.0.0');
+        $parentTheme = new ThemeData(['theme_title' => 'Parent Theme', 'version' => '1.0.0']);
+        $childTheme = new ThemeData(['parent_id' => 1, 'theme_title' => 'Child Theme', 'version' => '2.0.0']);
 
         $iterator = new \ArrayIterator([$parentTheme, $childTheme]);
         $collection = $this->createMock(Collection::class);

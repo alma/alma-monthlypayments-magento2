@@ -12,6 +12,7 @@ use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class OrderHelperTest extends TestCase
@@ -89,15 +90,18 @@ class OrderHelperTest extends TestCase
             ->with('*')
             ->willReturnSelf()
         ;
+        $filters = [];
         $mockCollection->expects($this->exactly(2))
             ->method('addFieldToFilter')
-            ->withConsecutive(
-                ['created_at', ['from' => [''], 'to' => ['']]],
-                ['state', ['in' => ['processing', 'complete']]]
-            )
-            ->willReturnSelf()
-        ;
+            ->willReturnCallback(function ($field, $condition) use (&$filters, $mockCollection) {
+                $filters[] = [$field, $condition];
+                return $mockCollection;
+            });
         $this->createNewOrderHelper()->createOrderCollection();
+        $this->assertSame([
+            ['created_at', ['from' => [''], 'to' => ['']]],
+            ['state', ['in' => ['processing', 'complete']]]
+        ], $filters);
     }
 
     public function testCreatOrderCollectionNotCallIfOrderCollectionExist(): void
@@ -134,10 +138,11 @@ class OrderHelperTest extends TestCase
     /**
      * @dataProvider totalOrderDataProvider
      */
+    #[DataProvider('totalOrderDataProvider')]
     public function testGetTotalsOrdersResult($orders, $result): void
     {
         $orderHelper = $this->createNewOrderHelper();
-        $orderHelper->setOrderCollection($orders);
+        $orderHelper->setOrderCollection($this->getMockOrderCollection($orders));
         $this->assertEquals(
             $result,
             $orderHelper->getTotalsOrders()
@@ -147,10 +152,11 @@ class OrderHelperTest extends TestCase
     /**
      * @dataProvider paymentMethodOrderDataProvider
      */
+    #[DataProvider('paymentMethodOrderDataProvider')]
     public function testGetPaymentMethodOrdersResult($orders, $result): void
     {
         $orderHelper = $this->createNewOrderHelper();
-        $orderHelper->setOrderCollection($orders);
+        $orderHelper->setOrderCollection($this->getMockOrderCollection($orders));
         $this->assertEquals(
             $result,
             $orderHelper->getSOCByPaymentMethods()
@@ -170,11 +176,16 @@ class OrderHelperTest extends TestCase
             $this->dateHelper
         ];
     }
-    public function totalOrderDataProvider(): array
+    public static function totalOrderDataProvider(): array
     {
         return [
             'Multi devise orders ' => [
-                'orders' => $this->getMockOrderCollection(),
+                'orders' => [
+                    ['Alma', 'EUR', '100', '0'],
+                    ['Alma', 'EUR', '120', '0'],
+                    ['Paypal', 'EUR', '110', '0'],
+                    ['Paypal', 'USD', '100', '50'],
+                ],
                 'result' => [
                     [
                         'total_amount' => 33000,
@@ -190,11 +201,16 @@ class OrderHelperTest extends TestCase
             ]
         ];
     }
-    public function paymentMethodOrderDataProvider(): array
+    public static function paymentMethodOrderDataProvider(): array
     {
         return [
             'Multi devise orders ' => [
-                'orders' => $this->getMockOrderCollection(),
+                'orders' => [
+                    ['Alma', 'EUR', '100', '0'],
+                    ['Alma', 'EUR', '120', '0'],
+                    ['Paypal', 'EUR', '110', '0'],
+                    ['Paypal', 'USD', '100', '50'],
+                ],
                 'result' => [
                     [
                         'payment_method_name' => 'Alma',
@@ -227,25 +243,21 @@ class OrderHelperTest extends TestCase
     }
 
 
-    private function getMockOrderCollection()
+    private function getMockOrderCollection(array $orders)
     {
         $objectManagerHelper = new ObjectManagerHelper($this);
         return $objectManagerHelper->getCollectionMock(
             Collection::class,
-            [
-                $this->mockOrderFactory('Alma', 'EUR', '100', '0'),
-                $this->mockOrderFactory('Alma', 'EUR', '120', '0'),
-                $this->mockOrderFactory('Paypal', 'EUR', '110', '0'),
-                $this->mockOrderFactory('Paypal', 'USD', '100', '50'),
-            ]
+            array_map(function (array $order) {
+                return $this->mockOrderFactory(...$order);
+            }, $orders)
         );
     }
 
     private function mockOrderFactory($paymentMethodeCode, $currencyCode, $amountPaid, $amountRefund): Order
     {
         $payment = $this->createMock(OrderPaymentInterface::class);
-        $payment->expects($this->any())
-            ->method('getMethod')
+        $payment->method('getMethod')
             ->willReturn($paymentMethodeCode);
         $payment->expects($this->once())
             ->method('getAmountPaid')
@@ -254,8 +266,7 @@ class OrderHelperTest extends TestCase
             ->method('getAmountRefunded')
             ->willReturn($amountRefund);
         $order = $this->createMock(Order::class);
-        $order->expects($this->any())
-            ->method('getPayment')
+        $order->method('getPayment')
             ->willReturn($payment);
         $order->expects($this->once())
             ->method('getOrderCurrencyCode')

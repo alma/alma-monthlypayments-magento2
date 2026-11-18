@@ -14,6 +14,7 @@ use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class OrderStatusObserverTest extends TestCase
@@ -139,6 +140,7 @@ class OrderStatusObserverTest extends TestCase
     /**
      * @dataProvider orderStatusDataProvider
      */
+    #[DataProvider('orderStatusDataProvider')]
     public function testGivenProcessingOrderWithAlmaPaymentMethodShouldCallAlmaSendStatusAndReturnVoid($dataProvider): void
     {
         $payment = $this->createMock(Payment::class);
@@ -172,7 +174,7 @@ class OrderStatusObserverTest extends TestCase
      * Data provider for testGivenProcessingOrderWithAlmaPaymentMethodShouldCallAlmaSendStatusAndReturnVoid
      * @return array[]
      */
-    private function orderStatusDataProvider(): array
+    public static function orderStatusDataProvider(): array
     {
         return [
             'Test with an empty status' => [

@@ -9,7 +9,7 @@ use Alma\MonthlyPayments\Helpers\Logger;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
-use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RefundResponseValidatorTest extends TestCase
@@ -42,9 +42,10 @@ class RefundResponseValidatorTest extends TestCase
     /**
      * @dataProvider errorDataProvider
      */
+    #[DataProvider('errorDataProvider')]
     public function testCreateResultErrorParams($responseCode, $json, $failsDescription): void
     {
-        $almaApiResponseError = Mockery::mock(Response::class);
+        $almaApiResponseError = $this->createMock(Response::class);
         $almaApiResponseError->responseCode = $responseCode;
         $almaApiResponseError->json = $json;
         $validationSubjectMock = [
@@ -54,34 +55,40 @@ class RefundResponseValidatorTest extends TestCase
             ],
         ];
 
-        $resultInterface = Mockery::mock(ResultInterface::class);
+        $resultInterface = $this->createMock(ResultInterface::class);
 
-        $refundResponseValidatorMock = Mockery::mock(RefundResponseValidator::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $refundResponseValidatorMock->shouldReceive('createResult')
-            ->once()
+        $refundResponseValidatorMock = $this->getMockBuilder(RefundResponseValidator::class)
+            ->setConstructorArgs($this->getConstructorDependency())
+            ->onlyMethods(['createResult'])
+            ->getMock();
+        $refundResponseValidatorMock->expects($this->once())
+            ->method('createResult')
             ->with(0, [$failsDescription], [$almaApiResponseError->responseCode])
-            ->andReturn($resultInterface);
+            ->willReturn($resultInterface);
         $this->assertEquals($resultInterface, $refundResponseValidatorMock->validate($validationSubjectMock));
     }
 
     public function testCreateResultSuccess(): void
     {
-        $almaPaymentMock = Mockery::mock(Payment::class);
+        $almaPaymentMock = $this->createMock(Payment::class);
         $validationSubjectMock = [
             'response' => [
                 'resultCode' => 1,
                 'almaRefund' => $almaPaymentMock
             ],
         ];
-        $resultInterfaceMock = Mockery::mock(ResultInterface::class);
-        $refundResponseValidatorMock = Mockery::mock(RefundResponseValidator::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $refundResponseValidatorMock->shouldReceive('createResult')
+        $resultInterfaceMock = $this->createMock(ResultInterface::class);
+        $refundResponseValidatorMock = $this->getMockBuilder(RefundResponseValidator::class)
+            ->setConstructorArgs($this->getConstructorDependency())
+            ->onlyMethods(['createResult'])
+            ->getMock();
+        $refundResponseValidatorMock->expects($this->once())->method('createResult')
             ->with(1, [], [])
-            ->andReturn(Mockery::mock(ResultInterface::class));
+            ->willReturn($resultInterfaceMock);
         $this->assertEquals($resultInterfaceMock, $refundResponseValidatorMock->validate($validationSubjectMock));
     }
 
-    public function errorDataProvider(): array
+    public static function errorDataProvider(): array
     {
         return [
             'Test error 404' => [

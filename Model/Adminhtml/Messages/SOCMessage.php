@@ -78,9 +78,10 @@ class SOCMessage implements MessageInterface
             '',
             ['data'=>[
                 'link' => true,
-                'position' => self::POSITION
+                'position' => self::POSITION,
+                'template' => 'Alma_MonthlyPayments::system/soc-legal.phtml'
             ]]
-        )->setTemplate("Alma_MonthlyPayments::system/soc-legal.phtml");
+        );
         return $blockOption->toHtml();
     }
 
