@@ -1,0 +1,90 @@
+# When a release PR synced from the private repository is merged, publishes
+# the release with the module zip, then announces it on Slack.
+name: Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+
+  release:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write # Create the release and its tag
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          persist-credentials: false
+
+      - name: Extract the release notes from the CHANGELOG
+        id: notes
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          tag="${PR_HEAD_REF#release/}"
+          # "(#123)" points to private pull requests: here it would link to
+          # unrelated issues
+          awk -v heading="## $tag " '
+            index($0, heading) == 1 { found = 1; next }
+            found && /^## v/ { exit }
+            found { print }
+          ' CHANGELOG.md | sed -E 's/ \(#[0-9]+\)//g' > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "No \"## $tag\" section found in CHANGELOG.md" >&2
+            exit 1
+          fi
+          {
+            echo "tag=$tag"
+            echo "body<<EOF"
+            cat release-notes.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # The module is the whole repository but its GitHub files
+      - name: Build the module zip
+        run: git archive --format=zip -9 -o almapay-monthlypayments-magento2.zip HEAD -- . ':(exclude).github'
+
+      # The tag on the merge commit is what Packagist reads
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.notes.outputs.tag }}
+          TARGET: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          gh release create "$TAG" \
+            --target "$TARGET" \
+            --title "$TAG" \
+            --notes-file release-notes.md \
+            almapay-monthlypayments-magento2.zip
+
+      - name: Format release notes for Slack
+        uses: LoveToKnow/slackify-markdown-action@698a1d4d0ff1794152a93c03ee8ca5e03a310d4e # v1.1.1
+        id: slack-markdown-release-notes
+        with:
+          text: |
+            :tada: New publication of Adobe commerce (Magento 2) Alma module, **[${{ steps.notes.outputs.tag }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.notes.outputs.tag }})**:
+
+            ${{ steps.notes.outputs.body }}
+
+            :warning: This release will be available on Adobe marketplace in a few hours
+
+      - name: Send changelog to Slack
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_RELEASE_CHANGELOG_BOT_TOKEN }}
+          payload: |
+            channel: CR9C57YM6
+            username: "${{ github.event.sender.login }}"
+            icon_url: "${{ github.event.sender.avatar_url }}"
+            text: ${{ toJson(steps.slack-markdown-release-notes.outputs.text) }}
