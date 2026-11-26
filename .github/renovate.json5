@@ -1,0 +1,8 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [ "github>alma/renovate:defaults.json5" ],
+  "reviewers": [ "team:squad-e-commerce-integrations" ],
+  "baseBranches": [ "main" ],
+  // The module's dependencies are updated in the private repository, then synced here
+  "enabledManagers": [ "github-actions" ]
+}
