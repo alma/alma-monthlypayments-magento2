@@ -2,17 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [ "github>alma/renovate:defaults.json5" ],
   "reviewers": [ "team:squad-e-commerce-integrations" ],
-  "baseBranches": [ "develop" ],
-  "packageRules": [
-    {
-      // Group all composer updates
-      "matchManagers": [ "composer" ],
-      "groupName": "composer updates"
-    },
-    {
-      // Group all docker updates
-      "matchManagers": [ "dockerfile", "docker-compose" ],
-      "groupName": "docker updates"
-    }
-  ]
+  "baseBranches": [ "main" ],
+  // The module's dependencies are updated in the private repository, then synced here
+  "enabledManagers": [ "github-actions" ]
 }
