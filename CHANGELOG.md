@@ -1,5 +1,13 @@
 # Changelog
 
+## v5.10.0 - 2026-11-27
+
+### Changes
+
+### 🚀 New Features
+
+- feat(checkout): apply the new Alma brand to the checkout and BO logos
+
 ## v5.9.0 - 2026-11-04
 
 ### Changes
