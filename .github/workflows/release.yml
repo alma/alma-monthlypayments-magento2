@@ -1,5 +1,6 @@
-# When a release PR synced from the private repository is merged, publishes
+# When a release PR synced from the private repository is merged, drafts
 # the release with the module zip.
+# The draft is published by hand, once its zip is tested.
 name: Release
 
 on:
@@ -49,8 +50,9 @@ jobs:
       - name: Build the module zip
         run: git archive --format=zip -9 -o almapay-monthlypayments-magento2.zip HEAD -- . ':(exclude).github'
 
-      # The tag on the merge commit is what Packagist reads
-      - name: Publish the release
+      # The tag is only created at publish time: pin it to the commit the zip is
+      # built from. Packagist reads that tag.
+      - name: Draft the release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.notes.outputs.tag }}
@@ -60,5 +62,6 @@ jobs:
             --target "$TARGET" \
             --title "$TAG" \
             --notes-file release-notes.md \
+            --draft \
             almapay-monthlypayments-magento2.zip
 
